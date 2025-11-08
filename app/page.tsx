@@ -191,11 +191,11 @@ export default function HomePage() {
 
           {/* Search Bar */}
           <div className="pb-6 md:pb-8">
-            <div className="relative max-w-2xl">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Who are you trying to remember?"
-                className="pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-white dark:focus:bg-gray-700 transition-colors"
+                className="w-full pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-white dark:focus:bg-gray-700 transition-colors"
               />
             </div>
           </div>
@@ -332,39 +332,42 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Quick Capture FAB - Appears above Add Contact */}
-      <Link href="/quick-capture">
-        <div className="group relative">
-          <Button
-            size="icon"
-            className="fixed bottom-36 md:bottom-28 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] h-12 w-12 md:h-14 md:w-14 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 dark:from-cyan-500 dark:to-blue-500 hover:from-cyan-700 hover:to-blue-700 dark:hover:from-cyan-600 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] z-40 transition-all duration-200 hover:scale-105"
-          >
-            <Zap className="h-5 w-5 md:h-6 md:w-6 text-white" />
-          </Button>
-          {/* Tooltip */}
-          <span className="fixed bottom-48 md:bottom-40 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-            Quick Capture
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></span>
-          </span>
-        </div>
-      </Link>
+      {/* Floating Action Buttons - Stacked */}
+      <div className="fixed bottom-20 md:bottom-8 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] z-40 flex flex-col gap-3">
+        {/* Quick Capture FAB */}
+        <Link href="/quick-capture">
+          <div className="group relative">
+            <Button
+              size="icon"
+              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
+            >
+              <Zap className="h-6 w-6 md:h-7 md:w-7 text-white" />
+            </Button>
+            {/* Tooltip */}
+            <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+              Quick Capture
+              <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+            </span>
+          </div>
+        </Link>
 
-      {/* Floating Action Button */}
-      <Link href="/contacts/new">
-        <div className="group relative">
-          <Button
-            size="icon"
-            className="fixed bottom-20 md:bottom-8 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] h-14 w-14 md:h-16 md:w-16 rounded-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] z-40 transition-all duration-200 hover:scale-105"
-          >
-            <Plus className="h-6 w-6 md:h-7 md:w-7 text-white" />
-          </Button>
-          {/* Tooltip */}
-          <span className="fixed bottom-32 md:bottom-20 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-            Add Contact
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></span>
-          </span>
-        </div>
-      </Link>
+        {/* Add Contact FAB */}
+        <Link href="/contacts/new">
+          <div className="group relative">
+            <Button
+              size="icon"
+              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
+            >
+              <Plus className="h-6 w-6 md:h-7 md:w-7 text-white" />
+            </Button>
+            {/* Tooltip */}
+            <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+              Add Contact
+              <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+            </span>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
