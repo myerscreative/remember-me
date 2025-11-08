@@ -9,6 +9,8 @@ import type { LoopGroupWithCount } from "@/types/database.types";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoopGroupModal } from "@/components/loop-group-modal";
+import { CUSTOM_SVG_ICONS } from "@/components/custom-loop-icons";
+import { isStaticIcon, getStaticIconPath } from "@/components/static-loop-icons";
 import {
   DndContext,
   closestCenter,
@@ -31,7 +33,18 @@ import { CSS } from "@dnd-kit/utilities";
 type IconComponent = React.ComponentType<{ className?: string }>;
 
 // Helper function to get icon component by name
-const getIconComponent = (iconName: string): IconComponent => {
+const getIconComponent = (iconName: string): IconComponent | null => {
+  // First check if it's a custom SVG icon
+  if (iconName in CUSTOM_SVG_ICONS) {
+    return CUSTOM_SVG_ICONS[iconName];
+  }
+  
+  // Check if it's a static icon (return null to handle as image)
+  if (isStaticIcon(iconName)) {
+    return null;
+  }
+  
+  // Otherwise use Lucide icon
   const IconComp = (Icons as Record<string, IconComponent>)[iconName];
   return IconComp || Icons.Folder;
 };
@@ -55,6 +68,8 @@ function SortableLoopGroup({ group }: { group: LoopGroupWithCount }) {
 
   const IconComponent = getIconComponent(group.icon_name);
   const hasCustomIcon = !!group.custom_icon_url;
+  const staticIconPath = getStaticIconPath(group.icon_name);
+  const isStatic = staticIconPath !== undefined;
 
   return (
     <div
@@ -75,16 +90,28 @@ function SortableLoopGroup({ group }: { group: LoopGroupWithCount }) {
             backgroundColor: group.color,
           }}
         >
-          {/* Icon - Show custom icon if available, otherwise show Lucide icon */}
+          {/* Icon - Priority: custom uploaded > static preset > Lucide icon */}
           <div className="absolute inset-0 flex items-center justify-center p-2">
             {hasCustomIcon ? (
+              // Custom uploaded icon
               <img
                 src={group.custom_icon_url}
                 alt={group.name}
                 className="h-full w-full object-contain drop-shadow-sm"
               />
-            ) : (
+            ) : isStatic ? (
+              // Static preset icon (PNG/JPG)
+              <img
+                src={staticIconPath}
+                alt={group.name}
+                className="h-full w-full object-contain drop-shadow-sm"
+              />
+            ) : IconComponent ? (
+              // SVG component icon (custom or Lucide)
               <IconComponent className="h-8 w-8 md:h-12 md:w-12 text-white drop-shadow-sm" />
+            ) : (
+              // Fallback icon
+              <Icons.Folder className="h-8 w-8 md:h-12 md:w-12 text-white drop-shadow-sm" />
             )}
           </div>
 

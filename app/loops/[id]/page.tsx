@@ -12,6 +12,8 @@ import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoopGroupModal } from "@/components/loop-group-modal";
 import { ContactPickerModal } from "@/components/contact-picker-modal";
+import { CUSTOM_SVG_ICONS } from "@/components/custom-loop-icons";
+import { isStaticIcon, getStaticIconPath } from "@/components/static-loop-icons";
 import {
   DndContext,
   closestCenter,
@@ -33,7 +35,18 @@ import { CSS } from "@dnd-kit/utilities";
 type IconComponent = React.ComponentType<{ className?: string }>;
 
 // Helper function to get icon component by name
-const getIconComponent = (iconName: string): IconComponent => {
+const getIconComponent = (iconName: string): IconComponent | null => {
+  // First check if it's a custom SVG icon
+  if (iconName in CUSTOM_SVG_ICONS) {
+    return CUSTOM_SVG_ICONS[iconName];
+  }
+  
+  // Check if it's a static icon (return null to handle as image)
+  if (isStaticIcon(iconName)) {
+    return null;
+  }
+  
+  // Otherwise use Lucide icon
   const IconComp = (Icons as Record<string, IconComponent>)[iconName];
   return IconComp || Icons.Folder;
 };
@@ -279,6 +292,8 @@ export default function LoopGroupDetailPage() {
 
   const IconComponent = getIconComponent(loopGroup.icon_name);
   const hasCustomIcon = !!loopGroup.custom_icon_url;
+  const staticIconPath = getStaticIconPath(loopGroup.icon_name);
+  const isStatic = staticIconPath !== undefined;
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
@@ -302,13 +317,25 @@ export default function LoopGroupDetailPage() {
                 style={{ backgroundColor: loopGroup.color }}
               >
                 {hasCustomIcon ? (
+                  // Custom uploaded icon
                   <img
                     src={loopGroup.custom_icon_url}
                     alt={loopGroup.name}
                     className="h-full w-full object-contain"
                   />
-                ) : (
+                ) : isStatic ? (
+                  // Static preset icon (PNG/JPG)
+                  <img
+                    src={staticIconPath}
+                    alt={loopGroup.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : IconComponent ? (
+                  // SVG component icon (custom or Lucide)
                   <IconComponent className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                ) : (
+                  // Fallback icon
+                  <Icons.Folder className="h-6 w-6 md:h-7 md:w-7 text-white" />
                 )}
               </div>
               <div>

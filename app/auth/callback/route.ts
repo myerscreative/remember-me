@@ -5,6 +5,7 @@ import type { Database } from "@/types/database.types";
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const response = NextResponse.redirect(new URL("/", requestUrl.origin));
 
   if (code) {
     const supabase = createServerClient<Database>(
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              request.cookies.set(name, value, options)
+              response.cookies.set(name, value, options)
             );
           },
         },
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to home page
-  return NextResponse.redirect(new URL("/", requestUrl.origin));
+  return response;
 }
 
 

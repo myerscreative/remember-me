@@ -101,6 +101,7 @@ export default function NewContactPage() {
       // Insert person
       const { data: newPerson, error: personError } = await supabase
         .from("persons")
+        // @ts-expect-error - Supabase type issue with insert
         .insert(personData)
         .select()
         .single();

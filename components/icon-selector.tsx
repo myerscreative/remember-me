@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageCropModal } from "@/components/image-crop-modal";
+import { CUSTOM_SVG_ICONS, CUSTOM_SVG_ICON_NAMES } from "@/components/custom-loop-icons";
+import { STATIC_LOOP_ICONS, isStaticIcon, getStaticIconPath } from "@/components/static-loop-icons";
 
 // Type for icon component
 type IconComponent = React.ComponentType<{ className?: string }>;
 
-// Curated list of common icons for loop groups
-const COMMON_ICONS = [
+// Curated list of common Lucide icons for loop groups
+const LUCIDE_ICONS = [
   "Users", "Heart", "Briefcase", "GraduationCap", "Home", "Coffee",
   "Music", "GamepadIcon", "Book", "Dumbbell", "Plane", "Camera",
   "Palette", "Wrench", "ShoppingCart", "Gift", "Star", "Rocket",
@@ -24,6 +26,13 @@ const COMMON_ICONS = [
   "Database", "Server", "Settings", "Tool", "Package", "Archive",
   "Trash2", "Edit", "Save", "Plus", "Minus", "Check",
   "X", "AlertCircle", "Info", "HelpCircle", "AlertTriangle", "Bell",
+];
+
+// Combine all preset icon names
+const COMMON_ICONS = [
+  ...CUSTOM_SVG_ICON_NAMES,  // Custom SVG icons first
+  ...STATIC_LOOP_ICONS.map(icon => icon.name),  // Static PNG/JPG icons second
+  ...LUCIDE_ICONS,  // Lucide icons last
 ];
 
 interface IconSelectorProps {
@@ -55,7 +64,18 @@ export function IconSelector({
     : COMMON_ICONS;
 
   // Helper to get icon component
-  const getIconComponent = (iconName: string): IconComponent => {
+  const getIconComponent = (iconName: string): IconComponent | null => {
+    // First check if it's a custom SVG icon
+    if (iconName in CUSTOM_SVG_ICONS) {
+      return CUSTOM_SVG_ICONS[iconName];
+    }
+    
+    // Check if it's a static icon (return null to handle as image)
+    if (isStaticIcon(iconName)) {
+      return null;
+    }
+    
+    // Otherwise use Lucide icon
     const IconComp = (Icons as Record<string, IconComponent>)[iconName];
     return IconComp || Icons.Folder;
   };
@@ -208,6 +228,8 @@ export function IconSelector({
           filteredIcons.map((iconName) => {
             const IconComponent = getIconComponent(iconName);
             const isSelected = selectedIcon === iconName && !isCustomIconSelected;
+            const staticIconPath = getStaticIconPath(iconName);
+            const isStaticImage = staticIconPath !== undefined;
 
             return (
               <button
@@ -215,7 +237,7 @@ export function IconSelector({
                 type="button"
                 onClick={() => onSelectIcon(iconName)}
                 className={cn(
-                  "relative aspect-square rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-105",
+                  "relative aspect-square rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-105 p-1",
                   isSelected
                     ? "ring-2 ring-offset-2 dark:ring-offset-gray-900 shadow-lg scale-105"
                     : "hover:shadow-md"
@@ -226,12 +248,30 @@ export function IconSelector({
                 }}
                 title={iconName}
               >
-                <IconComponent
-                  className={cn(
-                    "h-5 w-5 transition-colors",
-                    isSelected ? "text-white" : "text-gray-700 dark:text-gray-300"
-                  )}
-                />
+                {/* Render static image icon */}
+                {isStaticImage ? (
+                  <img
+                    src={staticIconPath}
+                    alt={iconName}
+                    className="h-full w-full object-contain"
+                  />
+                ) : IconComponent ? (
+                  /* Render SVG component icon */
+                  <IconComponent
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      isSelected ? "text-white" : "text-gray-700 dark:text-gray-300"
+                    )}
+                  />
+                ) : (
+                  /* Fallback icon */
+                  <Icons.Folder
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      isSelected ? "text-white" : "text-gray-700 dark:text-gray-300"
+                    )}
+                  />
+                )}
               </button>
             );
           })
@@ -247,12 +287,23 @@ export function IconSelector({
       {selectedIcon && !isCustomIconSelected && (
         <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div
-            className="h-10 w-10 rounded-lg flex items-center justify-center"
+            className="h-10 w-10 rounded-lg flex items-center justify-center p-1"
             style={{ backgroundColor: color }}
           >
             {(() => {
               const IconComponent = getIconComponent(selectedIcon);
-              return <IconComponent className="h-5 w-5 text-white" />;
+              const staticIconPath = getStaticIconPath(selectedIcon);
+              
+              if (staticIconPath) {
+                // Render static image
+                return <img src={staticIconPath} alt={selectedIcon} className="h-full w-full object-contain" />;
+              } else if (IconComponent) {
+                // Render SVG component
+                return <IconComponent className="h-5 w-5 text-white" />;
+              } else {
+                // Fallback
+                return <Icons.Folder className="h-5 w-5 text-white" />;
+              }
             })()}
           </div>
           <div className="flex-1">
