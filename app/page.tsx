@@ -153,6 +153,22 @@ export default function HomePage() {
               {showArchived ? "Archived Contacts" : "Contacts"}
             </h1>
             <div className="flex items-center gap-2">
+              {/* Desktop: Add Contact Button */}
+              <Link href="/contacts/new" className="hidden lg:block">
+                <Button className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Contact
+                </Button>
+              </Link>
+              
+              {/* Desktop: Quick Capture Button */}
+              <Link href="/quick-capture" className="hidden lg:block">
+                <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 text-white">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Quick Capture
+                </Button>
+              </Link>
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -313,13 +329,19 @@ export default function HomePage() {
                   </h3>
                   <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md mb-2">
                     {selectedFilter === "All" 
-                      ? "Get started by adding your first contact using the blue button in the bottom right!"
+                      ? (
+                        <>
+                          <span className="lg:hidden">Get started by adding your first contact using the blue button in the bottom right!</span>
+                          <span className="hidden lg:inline">Get started by clicking "Add Contact" in the top right corner!</span>
+                        </>
+                      )
                       : `No contacts match the "${selectedFilter}" filter.`}
                   </p>
                   {selectedFilter === "All" && (
                     <div className="flex items-center gap-2 text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-4">
                       <Zap className="h-4 w-4" />
-                      <span>Use Quick Capture for networking events</span>
+                      <span className="lg:hidden">Use Quick Capture for networking events</span>
+                      <span className="hidden lg:inline">Tip: Use "Quick Capture" for fast entry at networking events</span>
                     </div>
                   )}
                 </div>
@@ -330,8 +352,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Floating Action Buttons - Stacked */}
-      <div className="fixed bottom-20 md:bottom-8 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] z-40 flex flex-col gap-3">
+      {/* Floating Action Buttons - Mobile & Tablet Only */}
+      <div className="lg:hidden fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-3">
         {/* Quick Capture FAB */}
         <Link href="/quick-capture">
           <div className="group relative">
