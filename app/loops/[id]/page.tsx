@@ -278,6 +278,7 @@ export default function LoopGroupDetailPage() {
   }
 
   const IconComponent = getIconComponent(loopGroup.icon_name);
+  const hasCustomIcon = !!loopGroup.custom_icon_url;
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
@@ -297,10 +298,18 @@ export default function LoopGroupDetailPage() {
               </Button>
               {/* Icon */}
               <div
-                className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-md flex items-center justify-center"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-md flex items-center justify-center overflow-hidden p-1.5"
                 style={{ backgroundColor: loopGroup.color }}
               >
-                <IconComponent className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                {hasCustomIcon ? (
+                  <img
+                    src={loopGroup.custom_icon_url}
+                    alt={loopGroup.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <IconComponent className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                )}
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">

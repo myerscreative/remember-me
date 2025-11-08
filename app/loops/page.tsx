@@ -54,6 +54,7 @@ function SortableLoopGroup({ group }: { group: LoopGroupWithCount }) {
   };
 
   const IconComponent = getIconComponent(group.icon_name);
+  const hasCustomIcon = !!group.custom_icon_url;
 
   return (
     <div
@@ -74,9 +75,17 @@ function SortableLoopGroup({ group }: { group: LoopGroupWithCount }) {
             backgroundColor: group.color,
           }}
         >
-          {/* Icon */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <IconComponent className="h-8 w-8 md:h-12 md:w-12 text-white drop-shadow-sm" />
+          {/* Icon - Show custom icon if available, otherwise show Lucide icon */}
+          <div className="absolute inset-0 flex items-center justify-center p-2">
+            {hasCustomIcon ? (
+              <img
+                src={group.custom_icon_url}
+                alt={group.name}
+                className="h-full w-full object-contain drop-shadow-sm"
+              />
+            ) : (
+              <IconComponent className="h-8 w-8 md:h-12 md:w-12 text-white drop-shadow-sm" />
+            )}
           </div>
 
           {/* Badge for count */}

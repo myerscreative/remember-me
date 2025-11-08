@@ -45,6 +45,8 @@ export function LoopGroupModal({
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [customIconBlob, setCustomIconBlob] = useState<Blob | null>(null);
+  const [customIconUrl, setCustomIconUrl] = useState<string | null>(null);
 
   const isEditing = !!loopGroup;
 
@@ -54,15 +56,31 @@ export function LoopGroupModal({
       setName(loopGroup.name);
       setSelectedIcon(loopGroup.icon_name);
       setSelectedColor(loopGroup.color);
+      setCustomIconUrl(loopGroup.custom_icon_url);
+      setCustomIconBlob(null); // Reset blob on edit
     } else {
       // Reset form when creating new
       setName("");
       setSelectedIcon("Folder");
       setSelectedColor(COLOR_PALETTE[0].value);
+      setCustomIconUrl(null);
+      setCustomIconBlob(null);
     }
     setError(null);
     setShowDeleteConfirm(false);
   }, [loopGroup, isOpen]);
+
+  const handleCustomIconSelect = (blob: Blob) => {
+    setCustomIconBlob(blob);
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(blob);
+    setCustomIconUrl(tempUrl);
+  };
+
+  const handleRemoveCustomIcon = () => {
+    setCustomIconBlob(null);
+    setCustomIconUrl(null);
+  };
 
   const handleDelete = async () => {
     if (!loopGroup) return;
@@ -78,6 +96,16 @@ export function LoopGroupModal({
         setError("You must be logged in");
         setIsDeleting(false);
         return;
+      }
+
+      // Delete the custom icon from storage if it exists
+      if (loopGroup.custom_icon_url) {
+        const iconPath = loopGroup.custom_icon_url.split('/').pop();
+        if (iconPath) {
+          await supabase.storage
+            .from('loop-group-icons')
+            .remove([`${user.id}/${iconPath}`]);
+        }
       }
 
       // Delete the loop group (CASCADE will delete person_loop_groups)
@@ -127,7 +155,53 @@ export function LoopGroupModal({
         return;
       }
 
+      // Upload custom icon to storage if provided
+      let uploadedIconUrl: string | null = null;
+      if (customIconBlob) {
+        const fileExt = 'png';
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('loop-group-icons')
+          .upload(filePath, customIconBlob, {
+            contentType: 'image/png',
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Error uploading icon:", uploadError);
+          setError("Failed to upload custom icon. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('loop-group-icons')
+          .getPublicUrl(filePath);
+
+        uploadedIconUrl = urlData.publicUrl;
+      }
+
+      // Determine which icon URL to use
+      const finalCustomIconUrl = customIconBlob
+        ? uploadedIconUrl
+        : customIconUrl
+        ? customIconUrl
+        : null;
+
       if (isEditing && loopGroup) {
+        // Delete old custom icon if being replaced
+        if (customIconBlob && loopGroup.custom_icon_url) {
+          const oldIconPath = loopGroup.custom_icon_url.split('/').pop();
+          if (oldIconPath) {
+            await supabase.storage
+              .from('loop-group-icons')
+              .remove([`${user.id}/${oldIconPath}`]);
+          }
+        }
+
         // Update existing loop group
         const { error: updateError } = await supabase
           .from("loop_groups")
@@ -135,6 +209,7 @@ export function LoopGroupModal({
             name: name.trim(),
             icon_name: selectedIcon,
             color: selectedColor,
+            custom_icon_url: finalCustomIconUrl,
             updated_at: new Date().toISOString(),
           })
           .eq("id", loopGroup.id)
@@ -168,6 +243,7 @@ export function LoopGroupModal({
             icon_name: selectedIcon,
             color: selectedColor,
             position: nextPosition,
+            custom_icon_url: finalCustomIconUrl,
           });
 
         if (insertError) {
@@ -352,6 +428,9 @@ export function LoopGroupModal({
                 selectedIcon={selectedIcon}
                 onSelectIcon={setSelectedIcon}
                 color={selectedColor}
+                customIconUrl={customIconUrl}
+                onCustomIconSelect={handleCustomIconSelect}
+                onRemoveCustomIcon={handleRemoveCustomIcon}
               />
             </div>
           </div>
