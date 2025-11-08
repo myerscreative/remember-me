@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Search, Settings, ChevronRight, Plus, Users, Star } from "lucide-react";
+import { Search, Settings, ChevronRight, Plus, Users, Star, Archive } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -58,6 +58,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showArchived, setShowArchived] = useState(false);
 
   // Load favorites from localStorage on mount
   useEffect(() => {
@@ -78,17 +79,25 @@ export default function HomePage() {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           setLoading(false);
           return;
         }
 
-        const { data: persons, error } = await supabase
+        let query = supabase
           .from("persons")
           .select("*")
-          .eq("user_id", user.id)
-          .order("name");
+          .eq("user_id", user.id);
+
+        // Filter by archived status
+        if (showArchived) {
+          query = query.eq("archived", true);
+        } else {
+          query = query.eq("archived", false);
+        }
+
+        const { data: persons, error } = await query.order("name");
 
         if (error) {
           console.error("Error fetching contacts:", error);
@@ -97,8 +106,8 @@ export default function HomePage() {
         }
 
         // Debug: Log contacts to verify birthday field
-        console.log("Fetched contacts:", persons?.map(p => ({ name: p.name, birthday: p.birthday })));
-        
+        console.log("Fetched contacts:", persons?.map(p => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
+
         setContacts(persons || []);
       } catch (error) {
         console.error("Error loading contacts:", error);
@@ -108,7 +117,7 @@ export default function HomePage() {
     }
 
     loadContacts();
-  }, []);
+  }, [showArchived]);
 
   // Toggle favorite status
   const handleToggleFavorite = (contactId: string, e: React.MouseEvent) => {
@@ -139,8 +148,27 @@ export default function HomePage() {
         <div className="max-w-[950px] mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex items-center justify-between pt-6 pb-4 md:pt-8 md:pb-6">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Contacts</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+              {showArchived ? "Archived Contacts" : "Contacts"}
+            </h1>
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowArchived(!showArchived)}
+                className={cn(
+                  "h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
+                  showArchived
+                    ? "bg-orange-100 hover:bg-orange-200 dark:bg-orange-900 dark:hover:bg-orange-800"
+                    : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                )}
+                title={showArchived ? "Show active contacts" : "Show archived contacts"}
+              >
+                <Archive className={cn(
+                  "h-5 w-5",
+                  showArchived ? "text-orange-700 dark:text-orange-300" : "text-gray-700 dark:text-gray-300"
+                )} />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"

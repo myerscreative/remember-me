@@ -36,6 +36,19 @@ export interface Database {
           notes: string | null
           last_contact: string | null
           follow_up_reminder: string | null
+          // Archive functionality
+          archived: boolean
+          archived_at: string | null
+          archived_reason: string | null
+          // First impression capture
+          first_impression: string | null
+          memorable_moment: string | null
+          // Relationship value tracking
+          relationship_value: string | null
+          what_i_offered: string | null
+          what_they_offered: string | null
+          // Story completeness
+          story_completeness: number
           created_at: string
           updated_at: string
         }
@@ -62,6 +75,19 @@ export interface Database {
           notes?: string | null
           last_contact?: string | null
           follow_up_reminder?: string | null
+          // Archive functionality
+          archived?: boolean
+          archived_at?: string | null
+          archived_reason?: string | null
+          // First impression capture
+          first_impression?: string | null
+          memorable_moment?: string | null
+          // Relationship value tracking
+          relationship_value?: string | null
+          what_i_offered?: string | null
+          what_they_offered?: string | null
+          // Story completeness
+          story_completeness?: number
           created_at?: string
           updated_at?: string
         }
@@ -88,6 +114,19 @@ export interface Database {
           notes?: string | null
           last_contact?: string | null
           follow_up_reminder?: string | null
+          // Archive functionality
+          archived?: boolean
+          archived_at?: string | null
+          archived_reason?: string | null
+          // First impression capture
+          first_impression?: string | null
+          memorable_moment?: string | null
+          // Relationship value tracking
+          relationship_value?: string | null
+          what_i_offered?: string | null
+          what_they_offered?: string | null
+          // Story completeness
+          story_completeness?: number
           created_at?: string
           updated_at?: string
         }
@@ -275,6 +314,19 @@ export interface Database {
           notes: string | null
           last_contact: string | null
           follow_up_reminder: string | null
+          // Archive functionality
+          archived: boolean
+          archived_at: string | null
+          archived_reason: string | null
+          // First impression capture
+          first_impression: string | null
+          memorable_moment: string | null
+          // Relationship value tracking
+          relationship_value: string | null
+          what_i_offered: string | null
+          what_they_offered: string | null
+          // Story completeness
+          story_completeness: number
           created_at: string
           updated_at: string
           tag_names: string[] | null

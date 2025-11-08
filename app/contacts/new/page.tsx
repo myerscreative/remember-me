@@ -38,6 +38,8 @@ export default function NewContactPage() {
     whyStayInContact: "",
     whatInteresting: "",
     whatsImportant: "",
+    firstImpression: "",
+    memorableMoment: "",
     tags: "",
     email: "",
     phone: "",
@@ -93,6 +95,8 @@ export default function NewContactPage() {
         why_stay_in_contact: formData.whyStayInContact.trim() || null,
         what_found_interesting: formData.whatInteresting.trim() || null,
         most_important_to_them: formData.whatsImportant.trim() || null,
+        first_impression: formData.firstImpression.trim() || null,
+        memorable_moment: formData.memorableMoment.trim() || null,
         email: formData.email.trim() || null,
         phone: formData.phone.trim() || null,
         linkedin: formData.linkedin.trim() || null,
@@ -393,6 +397,40 @@ export default function NewContactPage() {
                   }
                   placeholder="Leave blank if met directly"
                   className="h-11 md:h-12 rounded-lg border-gray-200 bg-white"
+                  disabled={isSaving}
+                />
+              </div>
+
+              {/* First Impression */}
+              <div className="space-y-2">
+                <Label htmlFor="firstImpression" className="text-sm md:text-base text-gray-700 font-medium">
+                  First impression
+                </Label>
+                <Textarea
+                  id="firstImpression"
+                  value={formData.firstImpression}
+                  onChange={(e) =>
+                    setFormData({ ...formData, firstImpression: e.target.value })
+                  }
+                  placeholder="What was your immediate impression when you first met?"
+                  className="min-h-[80px] rounded-lg border-gray-200 bg-white resize-none"
+                  disabled={isSaving}
+                />
+              </div>
+
+              {/* Memorable Moment */}
+              <div className="space-y-2">
+                <Label htmlFor="memorableMoment" className="text-sm md:text-base text-gray-700 font-medium">
+                  What made it memorable?
+                </Label>
+                <Textarea
+                  id="memorableMoment"
+                  value={formData.memorableMoment}
+                  onChange={(e) =>
+                    setFormData({ ...formData, memorableMoment: e.target.value })
+                  }
+                  placeholder="What made this first conversation or meeting memorable?"
+                  className="min-h-[80px] rounded-lg border-gray-200 bg-white resize-none"
                   disabled={isSaving}
                 />
               </div>

@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ImageCropModal } from "@/components/image-crop-modal";
+import { ArchiveContactDialog } from "@/components/archive-contact-dialog";
 
 // Helper function to get initials from first and last name
 const getInitials = (firstName: string, lastName: string | null): string => {
@@ -1076,17 +1077,29 @@ export default function ContactDetailPage({
               </Button>
             </Link>
             <h1 className="text-lg md:text-xl font-bold text-black">Profile</h1>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "h-10 w-10 rounded-full transition-colors",
-                isEditMode ? "bg-yellow-100 hover:bg-yellow-200" : "bg-gray-100 hover:bg-gray-200"
-              )}
-              onClick={() => setIsEditMode(!isEditMode)}
-            >
-              <Edit className={cn("h-5 w-5", isEditMode ? "text-yellow-600" : "text-gray-600")} />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link href={`/briefing/${id}`}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-purple-100 hover:bg-purple-200"
+                  title="Pre-meeting brief"
+                >
+                  <Sparkles className="h-5 w-5 text-purple-600" />
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-10 w-10 rounded-full transition-colors",
+                  isEditMode ? "bg-yellow-100 hover:bg-yellow-200" : "bg-gray-100 hover:bg-gray-200"
+                )}
+                onClick={() => setIsEditMode(!isEditMode)}
+              >
+                <Edit className={cn("h-5 w-5", isEditMode ? "text-yellow-600" : "text-gray-600")} />
+              </Button>
+            </div>
           </div>
 
           {/* Profile Section - Card Container */}
@@ -1687,7 +1700,7 @@ export default function ContactDetailPage({
             <div className="flex justify-center mb-6">
               <div className="flex gap-3 md:gap-4 w-full max-w-2xl">
                 {contact.phone && (
-                  <Button 
+                  <Button
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-12 md:h-14 rounded-lg transition-colors shadow-sm hover:shadow-md border-0"
                     onClick={() => window.location.href = `tel:${contact.phone}`}
                   >
@@ -1715,6 +1728,21 @@ export default function ContactDetailPage({
                     Text
                   </Button>
                 )}
+              </div>
+            </div>
+
+            {/* Archive Button */}
+            <div className="flex justify-center mb-6">
+              <div className="w-full max-w-2xl">
+                <ArchiveContactDialog
+                  contactId={id}
+                  contactName={getFullName(contact.firstName, contact.lastName)}
+                  isArchived={contact.archived || false}
+                  onSuccess={() => {
+                    // Refresh the page or redirect to home
+                    router.push("/");
+                  }}
+                />
               </div>
             </div>
 
