@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import { IconSelector } from "@/components/icon-selector";
 import { createClient } from "@/lib/supabase/client";
 import type { LoopGroup } from "@/types/database.types";
+import { useRouter } from "next/navigation";
 
 // Predefined color palette
 const COLOR_PALETTE = [
@@ -36,11 +37,14 @@ export function LoopGroupModal({
   onSuccess,
   loopGroup,
 }: LoopGroupModalProps) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Folder");
   const [selectedColor, setSelectedColor] = useState(COLOR_PALETTE[0].value);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isEditing = !!loopGroup;
 
@@ -57,7 +61,48 @@ export function LoopGroupModal({
       setSelectedColor(COLOR_PALETTE[0].value);
     }
     setError(null);
+    setShowDeleteConfirm(false);
   }, [loopGroup, isOpen]);
+
+  const handleDelete = async () => {
+    if (!loopGroup) return;
+
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setError("You must be logged in");
+        setIsDeleting(false);
+        return;
+      }
+
+      // Delete the loop group (CASCADE will delete person_loop_groups)
+      const { error: deleteError } = await supabase
+        .from("loop_groups")
+        .delete()
+        .eq("id", loopGroup.id)
+        .eq("user_id", user.id);
+
+      if (deleteError) {
+        console.error("Error deleting loop group:", deleteError);
+        setError("Failed to delete group. Please try again.");
+        setIsDeleting(false);
+        return;
+      }
+
+      // Success! Navigate back to loops page
+      router.push("/loops");
+      onClose();
+    } catch (err) {
+      console.error("Error deleting loop group:", err);
+      setError("An unexpected error occurred. Please try again.");
+      setIsDeleting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -145,10 +190,78 @@ export function LoopGroupModal({
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !isDeleting) {
       onClose();
     }
   };
+
+  // Show delete confirmation dialog
+  if (showDeleteConfirm) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          {/* Warning Header */}
+          <div className="flex items-center gap-3 p-6 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
+            <div className="rounded-full bg-red-100 dark:bg-red-900/40 p-2">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Delete Loop Group?
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                This action cannot be undone
+              </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+            <p className="text-gray-700 dark:text-gray-300">
+              Are you sure you want to delete <strong>{loopGroup?.name}</strong>?
+              Contacts in this group will not be deleted, only the group itself.
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isDeleting}
+              className="border-gray-300 dark:border-gray-600"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 min-w-[100px]"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -244,33 +357,51 @@ export function LoopGroupModal({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="border-gray-300 dark:border-gray-600"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !name.trim()}
-              className="min-w-[100px]"
-              style={{
-                backgroundColor: selectedColor,
-              }}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? "Updating..." : "Creating..."}
-                </>
-              ) : (
-                <>{isEditing ? "Update" : "Create"}</>
-              )}
-            </Button>
+          <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            {/* Delete button (only show when editing) */}
+            {isEditing ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSubmitting}
+                className="border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            ) : (
+              <div />
+            )}
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isSubmitting}
+                className="border-gray-300 dark:border-gray-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !name.trim()}
+                className="min-w-[100px]"
+                style={{
+                  backgroundColor: selectedColor,
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isEditing ? "Updating..." : "Creating..."}
+                  </>
+                ) : (
+                  <>{isEditing ? "Update" : "Create"}</>
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </div>

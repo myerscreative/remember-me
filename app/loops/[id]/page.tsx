@@ -11,6 +11,23 @@ import type { LoopGroup, Person } from "@/types/database.types";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoopGroupModal } from "@/components/loop-group-modal";
+import { ContactPickerModal } from "@/components/contact-picker-modal";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 // Type for icon component
 type IconComponent = React.ComponentType<{ className?: string }>;
@@ -47,6 +64,68 @@ const getGradient = (name: string): string => {
   return gradients[Math.abs(hash) % gradients.length];
 };
 
+// Sortable Contact Item Component
+function SortableContact({ contact }: { contact: Person }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: contact.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Link
+        href={`/contacts/${contact.id}`}
+        className="group flex items-start gap-3 md:gap-4 p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        {/* Avatar with gradient */}
+        <Avatar className="h-12 w-12 md:h-14 md:w-14 shrink-0">
+          <AvatarImage src={contact.photo_url || ""} />
+          <AvatarFallback
+            className={cn(
+              "bg-gradient-to-br text-white font-semibold text-sm md:text-base",
+              getGradient(contact.name)
+            )}
+          >
+            {getInitials(contact.name)}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Contact Info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-gray-900 dark:text-white text-base md:text-lg leading-tight mb-1">
+            {contact.name}
+          </h3>
+          {contact.phone && (
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-tight">
+              {contact.phone}
+            </p>
+          )}
+          {contact.email && (
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-tight">
+              {contact.email}
+            </p>
+          )}
+        </div>
+
+        {/* Chevron */}
+        <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 shrink-0 mt-1 transition-all duration-200 group-hover:translate-x-1" />
+      </Link>
+    </div>
+  );
+}
+
 export default function LoopGroupDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -56,6 +135,12 @@ export default function LoopGroupDetailPage() {
   const [contacts, setContacts] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isContactPickerOpen, setIsContactPickerOpen] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor)
+  );
 
   const loadData = async () => {
     try {
@@ -136,6 +221,54 @@ export default function LoopGroupDetailPage() {
     loadData();
   }, [loopGroupId, router]);
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = contacts.findIndex((contact) => contact.id === active.id);
+    const newIndex = contacts.findIndex((contact) => contact.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+
+    // Optimistically update UI
+    const newContacts = arrayMove(contacts, oldIndex, newIndex);
+    setContacts(newContacts);
+
+    // Update positions in database
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      // Update all positions
+      const updates = newContacts.map((contact, index) => ({
+        person_id: contact.id,
+        loop_group_id: loopGroupId,
+        position: index,
+      }));
+
+      const { error } = await supabase
+        .from("person_loop_groups")
+        .upsert(updates, { onConflict: "person_id,loop_group_id" });
+
+      if (error) {
+        console.error("Error updating positions:", error);
+        // Revert on error
+        loadData();
+      }
+    } catch (error) {
+      console.error("Error updating positions:", error);
+      // Revert on error
+      loadData();
+    }
+  };
+
   if (!loopGroup) {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
@@ -205,54 +338,31 @@ export default function LoopGroupDetailPage() {
                 <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md mb-6">
                   Add contacts to organize them in this loop group.
                 </p>
-                <Button className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600">
+                <Button
+                  onClick={() => setIsContactPickerOpen(true)}
+                  className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Contacts
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4 md:space-y-5">
-                {contacts.map((contact) => (
-                  <Link
-                    key={contact.id}
-                    href={`/contacts/${contact.id}`}
-                    className="group flex items-start gap-3 md:gap-4 p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200"
-                  >
-                    {/* Avatar with gradient */}
-                    <Avatar className="h-12 w-12 md:h-14 md:w-14 shrink-0">
-                      <AvatarImage src={contact.photo_url || ""} />
-                      <AvatarFallback
-                        className={cn(
-                          "bg-gradient-to-br text-white font-semibold text-sm md:text-base",
-                          getGradient(contact.name)
-                        )}
-                      >
-                        {getInitials(contact.name)}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    {/* Contact Info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900 dark:text-white text-base md:text-lg leading-tight mb-1">
-                        {contact.name}
-                      </h3>
-                      {contact.phone && (
-                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-tight">
-                          {contact.phone}
-                        </p>
-                      )}
-                      {contact.email && (
-                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-tight">
-                          {contact.email}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Chevron */}
-                    <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 shrink-0 mt-1 transition-all duration-200 group-hover:translate-x-1" />
-                  </Link>
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={contacts.map((c) => c.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-4 md:space-y-5">
+                    {contacts.map((contact) => (
+                      <SortableContact key={contact.id} contact={contact} />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
@@ -262,6 +372,7 @@ export default function LoopGroupDetailPage() {
       <div className="group relative">
         <Button
           size="icon"
+          onClick={() => setIsContactPickerOpen(true)}
           className="fixed bottom-20 md:bottom-8 right-4 md:right-8 lg:right-auto lg:left-1/2 lg:translate-x-[calc(2rem+50%)] h-14 w-14 md:h-16 md:w-16 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] z-40 transition-all duration-200 hover:scale-105"
           style={{ backgroundColor: loopGroup.color }}
         >
@@ -283,6 +394,18 @@ export default function LoopGroupDetailPage() {
           loadData(); // Reload data to reflect changes
         }}
         loopGroup={loopGroup}
+      />
+
+      {/* Contact Picker Modal */}
+      <ContactPickerModal
+        isOpen={isContactPickerOpen}
+        onClose={() => setIsContactPickerOpen(false)}
+        loopGroupId={loopGroupId}
+        loopGroupName={loopGroup?.name || ""}
+        onSuccess={() => {
+          setIsContactPickerOpen(false);
+          loadData(); // Reload data to show new contacts
+        }}
       />
     </div>
   );
