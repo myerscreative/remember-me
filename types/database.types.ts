@@ -249,6 +249,58 @@ export interface Database {
           updated_at?: string
         }
       }
+      loop_groups: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          icon_name: string
+          color: string
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          icon_name?: string
+          color?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          icon_name?: string
+          color?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      person_loop_groups: {
+        Row: {
+          person_id: string
+          loop_group_id: string
+          position: number
+          created_at: string
+        }
+        Insert: {
+          person_id: string
+          loop_group_id: string
+          position?: number
+          created_at?: string
+        }
+        Update: {
+          person_id?: string
+          loop_group_id?: string
+          position?: number
+          created_at?: string
+        }
+      }
     }
     Views: {
       persons_with_tags: {
@@ -291,6 +343,19 @@ export interface Database {
           email_count: number
         }
       }
+      loop_groups_with_counts: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          icon_name: string
+          color: string
+          position: number
+          created_at: string
+          updated_at: string
+          person_count: number
+        }
+      }
     }
     Functions: Record<string, never>
     Enums: Record<string, never>
@@ -323,4 +388,14 @@ export type InteractionUpdate = Database['public']['Tables']['interactions']['Up
 
 export type PersonWithTags = Database['public']['Views']['persons_with_tags']['Row']
 export type PersonInteractionCount = Database['public']['Views']['person_interaction_counts']['Row']
+
+export type LoopGroup = Database['public']['Tables']['loop_groups']['Row']
+export type LoopGroupInsert = Database['public']['Tables']['loop_groups']['Insert']
+export type LoopGroupUpdate = Database['public']['Tables']['loop_groups']['Update']
+
+export type PersonLoopGroup = Database['public']['Tables']['person_loop_groups']['Row']
+export type PersonLoopGroupInsert = Database['public']['Tables']['person_loop_groups']['Insert']
+export type PersonLoopGroupUpdate = Database['public']['Tables']['person_loop_groups']['Update']
+
+export type LoopGroupWithCount = Database['public']['Views']['loop_groups_with_counts']['Row']
 
