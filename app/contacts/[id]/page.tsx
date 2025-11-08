@@ -1059,9 +1059,9 @@ export default function ContactDetailPage({
 
   if (loading) {
     return (
-      <div className="flex flex-col h-screen bg-white overflow-hidden">
+      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-gray-500">Loading contact...</div>
+          <div className="text-gray-500 dark:text-gray-400">Loading contact...</div>
         </div>
       </div>
     );
@@ -1069,11 +1069,11 @@ export default function ContactDetailPage({
 
   if (error || !contact) {
     return (
-      <div className="flex flex-col h-screen bg-white overflow-hidden">
+      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-xl font-bold text-black mb-2">Contact not found</h2>
-            <p className="text-gray-500 mb-4">{error || "This contact doesn't exist or you don't have access to it."}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Contact not found</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">{error || "This contact doesn't exist or you don't have access to it."}</p>
             <Link href="/">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -1087,7 +1087,7 @@ export default function ContactDetailPage({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[850px] mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}
