@@ -28,6 +28,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ImageCropModal } from "@/components/image-crop-modal";
 import { ArchiveContactDialog } from "@/components/archive-contact-dialog";
+import { StoryCompletenessIndicator } from "@/components/story-completeness-indicator";
 
 // Helper function to get initials from first and last name
 const getInitials = (firstName: string, lastName: string | null): string => {
@@ -120,6 +121,10 @@ export default function ContactDetailPage({
   
   // Ignored suggestions (stored in localStorage, keyed by contactId and suggestion type)
   const [ignoredSuggestions, setIgnoredSuggestions] = useState<Set<string>>(new Set());
+
+  // Story completeness
+  const [storyCompleteness, setStoryCompleteness] = useState<number>(0);
+  const [missingStoryFields, setMissingStoryFields] = useState<string[]>([]);
 
   // Load AI suggestions preference and ignored suggestions from localStorage
   useEffect(() => {
@@ -264,7 +269,27 @@ export default function ContactDetailPage({
 
     fetchContact();
   }, [id, router]);
-  
+
+  // Fetch story completeness
+  useEffect(() => {
+    async function fetchStoryCompleteness() {
+      if (!contact) return;
+
+      try {
+        const response = await fetch(`/api/story-completeness/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setStoryCompleteness(data.completeness || 0);
+          setMissingStoryFields(data.missingFields || []);
+        }
+      } catch (error) {
+        console.error("Error fetching story completeness:", error);
+      }
+    }
+
+    fetchStoryCompleteness();
+  }, [id, contact]);
+
   // Get current synopsis based on active tab
   const getCurrentSynopsis = () => {
     switch (activeTab) {
@@ -1745,6 +1770,19 @@ export default function ContactDetailPage({
                 />
               </div>
             </div>
+
+            {/* Story Completeness Indicator */}
+            {storyCompleteness < 100 && (
+              <div className="flex justify-center mb-6">
+                <div className="w-full max-w-2xl">
+                  <StoryCompletenessIndicator
+                    completeness={storyCompleteness}
+                    missingFields={missingStoryFields}
+                    contactName={getFullName(contact.firstName, contact.lastName)}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Tags - Centered */}
             <div className="flex justify-center">

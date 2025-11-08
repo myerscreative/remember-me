@@ -7,16 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
-import { 
-  Users, 
-  MessageCircle, 
-  CheckCircle2, 
+import Link from "next/link";
+import {
+  Users,
+  MessageCircle,
+  CheckCircle2,
   TrendingUp,
   Lightbulb,
   Phone,
   UserPlus,
   Calendar,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle,
+  Archive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Person, Interaction } from "@/types/database.types";
@@ -60,6 +63,14 @@ interface UpcomingReminder {
   priority: 'high' | 'medium' | 'low';
 }
 
+interface DecayingRelationship {
+  person_id: string;
+  name: string;
+  last_contact_days: number;
+  interaction_count: number;
+  decay_severity: "mild" | "moderate" | "severe";
+}
+
 export default function InsightsPage() {
   const [timeRange, setTimeRange] = useState("30");
   const [loading, setLoading] = useState(true);
@@ -78,6 +89,7 @@ export default function InsightsPage() {
   const [topConnections, setTopConnections] = useState<TopConnection[]>([]);
   const [upcomingReminders, setUpcomingReminders] = useState<UpcomingReminder[]>([]);
   const [insightMessage, setInsightMessage] = useState<string>("");
+  const [decayingRelationships, setDecayingRelationships] = useState<DecayingRelationship[]>([]);
 
   // Helper to get initials
   const getInitials = (person: { first_name: string; last_name: string | null }): string => {
@@ -274,6 +286,17 @@ export default function InsightsPage() {
 
         setUpcomingReminders(upcomingData);
 
+        // Fetch decaying relationships
+        try {
+          const decayResponse = await fetch("/api/decay-alerts?days=180");
+          if (decayResponse.ok) {
+            const decayData = await decayResponse.json();
+            setDecayingRelationships(decayData.relationships || []);
+          }
+        } catch (error) {
+          console.error("Error fetching decaying relationships:", error);
+        }
+
         // Generate insight message
         let insight = "";
         if (activeThisWeek > 5) {
@@ -454,6 +477,74 @@ export default function InsightsPage() {
                 )}
               </div>
             </Card>
+
+            {/* Decaying Relationships */}
+            {decayingRelationships.length > 0 && (
+              <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 p-6 rounded-xl border-2 border-orange-200 dark:border-orange-800 shadow-sm">
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    <h2 className="text-xl font-semibold text-orange-900 dark:text-orange-100">Relationships Needing Attention</h2>
+                  </div>
+                  <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
+                    Consider reconnecting or archiving these contacts
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {decayingRelationships.slice(0, 5).map((relationship) => {
+                    const getSeverityColor = (severity: string) => {
+                      switch (severity) {
+                        case "severe":
+                          return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 border-red-300 dark:border-red-700";
+                        case "moderate":
+                          return "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 border-orange-300 dark:border-orange-700";
+                        default:
+                          return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700";
+                      }
+                    };
+
+                    const getSeverityText = (days: number) => {
+                      if (days > 365) return `${Math.floor(days / 365)} year${Math.floor(days / 365) > 1 ? 's' : ''}`;
+                      if (days > 180) return `${Math.floor(days / 30)} months`;
+                      return `${days} days`;
+                    };
+
+                    return (
+                      <Link
+                        key={relationship.person_id}
+                        href={`/contacts/${relationship.person_id}`}
+                        className="block"
+                      >
+                        <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all border-2 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md cursor-pointer">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                                {relationship.name}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {relationship.interaction_count} interaction{relationship.interaction_count !== 1 ? 's' : ''}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 flex-shrink-0">
+                            <Badge className={cn("text-xs font-medium", getSeverityColor(relationship.decay_severity))}>
+                              {getSeverityText(relationship.last_contact_days)} ago
+                            </Badge>
+                            <ChevronRight className="h-5 w-5 text-orange-400" />
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                {decayingRelationships.length > 5 && (
+                  <p className="text-sm text-orange-700 dark:text-orange-300 mt-4 text-center">
+                    + {decayingRelationships.length - 5} more relationship{decayingRelationships.length - 5 > 1 ? 's' : ''} needing attention
+                  </p>
+                )}
+              </Card>
+            )}
 
             {/* Top Connections */}
             <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">

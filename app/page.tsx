@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
+import { DecayAlertBanner } from "@/components/decay-alert-banner";
 
 const filterOptions = ["All", "Favorites", "Investor", "Startup", "Friend"];
 
@@ -233,6 +234,9 @@ export default function HomePage() {
               })}
             </div>
           </div>
+
+          {/* Decay Alert Banner - Only show for active contacts */}
+          {!showArchived && <DecayAlertBanner />}
 
           {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">
