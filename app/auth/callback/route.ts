@@ -5,6 +5,7 @@ import type { Database } from "@/types/database.types";
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const origin = requestUrl.origin;
 
   if (code) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -17,6 +18,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const response = NextResponse.redirect(new URL("/", origin));
+
     const supabase = createServerClient<Database>(
       supabaseUrl,
       supabaseAnonKey,
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest) {
           },
           setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              request.cookies.set(name, value, options)
+              response.cookies.set(name, value, options)
             );
           },
         },
@@ -35,10 +38,11 @@ export async function GET(request: NextRequest) {
     );
 
     await supabase.auth.exchangeCodeForSession(code);
+    return response;
   }
 
-  // Redirect to home page
-  return NextResponse.redirect(new URL("/", requestUrl.origin));
+  // Redirect to home page if no code
+  return NextResponse.redirect(new URL("/", origin));
 }
 
 
