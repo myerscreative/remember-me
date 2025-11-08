@@ -240,7 +240,7 @@ export default function NewContactPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -249,12 +249,12 @@ export default function NewContactPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200"
+                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <X className="h-5 w-5 text-gray-700" />
+                <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </Button>
             </Link>
-            <h1 className="text-lg md:text-xl font-bold text-black">New Contact</h1>
+            <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">New Contact</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
 

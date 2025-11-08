@@ -112,16 +112,16 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Crop Avatar</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Crop Avatar</h2>
           <button
             onClick={onCancel}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             disabled={processing}
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -141,7 +141,7 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
         </div>
 
         {/* Zoom Control */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Zoom
           </label>

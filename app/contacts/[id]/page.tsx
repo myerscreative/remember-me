@@ -1018,13 +1018,13 @@ export default function ContactDetailPage({
             </Button>
           )}
         </div>
-        <div className="bg-gray-50 rounded-lg p-4 md:p-5">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 md:p-5">
           {isEditing ? (
             <div className="space-y-3">
               <Textarea
                 value={localValue}
                 onChange={(e) => setLocalValue(e.target.value)}
-                className="bg-white border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
+                className="bg-white dark:bg-gray-800 border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
                 autoFocus
               />
               <div className="flex gap-2 justify-end">
@@ -1096,12 +1096,12 @@ export default function ContactDetailPage({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200"
+                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
               >
-                <ArrowLeft className="h-5 w-5 text-gray-700" />
+                <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </Button>
             </Link>
-            <h1 className="text-lg md:text-xl font-bold text-black">Profile</h1>
+            <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Profile</h1>
             <div className="flex items-center gap-2">
               <Link href={`/briefing/${id}`}>
                 <Button
@@ -1116,19 +1116,19 @@ export default function ContactDetailPage({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  "h-10 w-10 rounded-full transition-colors",
-                  isEditMode ? "bg-yellow-100 hover:bg-yellow-200" : "bg-gray-100 hover:bg-gray-200"
-                )}
+                  className={cn(
+                    "h-10 w-10 rounded-full transition-colors",
+                    isEditMode ? "bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50" : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  )}
                 onClick={() => setIsEditMode(!isEditMode)}
               >
-                <Edit className={cn("h-5 w-5", isEditMode ? "text-yellow-600" : "text-gray-600")} />
+                <Edit className={cn("h-5 w-5", isEditMode ? "text-yellow-600" : "text-gray-600 dark:text-gray-400")} />
               </Button>
             </div>
           </div>
 
           {/* Profile Section - Card Container */}
-          <div className="bg-gray-50 rounded-2xl p-8 mb-8 md:mb-10 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-8 mb-8 md:mb-10 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
             {/* Avatar and Name/Title - Centered Header */}
             <div className="flex flex-col items-center text-center mb-6">
               {/* Avatar with upload functionality */}
@@ -1209,7 +1209,7 @@ export default function ContactDetailPage({
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-2xl md:text-3xl font-bold text-black mb-2">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                       {contact.name}
                     </h2>
                     {isEditMode && (
@@ -1282,7 +1282,7 @@ export default function ContactDetailPage({
                               return (
                                 <div className="flex items-center gap-2">
                                   <Cake className="h-4 w-4 text-orange-500" />
-                                  <p className="text-sm md:text-base text-gray-600">
+                                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
                                     Birthday: {birthdayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                   </p>
                                   {isEditMode && (
@@ -1305,7 +1305,7 @@ export default function ContactDetailPage({
                             return (
                               <div className="flex items-center gap-2">
                                 <Cake className="h-4 w-4 text-orange-500" />
-                                <p className="text-sm md:text-base text-gray-600">
+                                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
                                   Birthday: {birthdayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                 </p>
                                 {isEditMode && (
@@ -1346,7 +1346,7 @@ export default function ContactDetailPage({
               </div>
 
               {/* Tab Navigation - Centered below name */}
-              <div className="w-full max-w-lg border-b border-gray-200">
+              <div className="w-full max-w-lg border-b border-gray-200 dark:border-gray-700">
                 <div className="flex justify-center gap-6 md:gap-8">
                   {tabs.map((tab) => (
                     <button
@@ -1355,8 +1355,8 @@ export default function ContactDetailPage({
                       className={cn(
                         "px-3 md:px-4 pb-3 pt-1 text-sm md:text-base font-medium transition-colors relative",
                         activeTab === tab
-                          ? "text-black"
-                          : "text-gray-500 hover:text-gray-700"
+                          ? "text-gray-900 dark:text-white"
+                          : "text-gray-500 hover:text-gray-700 dark:text-gray-300"
                       )}
                     >
                       {tab}
@@ -1398,7 +1398,7 @@ export default function ContactDetailPage({
                     
                     {/* Add/Edit Family Member Form */}
                     {(editingFamilyMember !== null) && (
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 gap-2">
                             <Input
@@ -1455,7 +1455,7 @@ export default function ContactDetailPage({
                         {familyMembers.map((member, index) => (
                           <div
                             key={index}
-                            className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center justify-between"
+                            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 flex items-center justify-between"
                           >
                             <div>
                               <span className="font-medium text-gray-900">{member.name}</span>
@@ -1466,7 +1466,7 @@ export default function ContactDetailPage({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 text-gray-400 hover:text-gray-600"
+                                  className="h-7 w-7 text-gray-400 hover:text-gray-600 dark:text-gray-400"
                                   onClick={() => handleEditFamilyMember(index)}
                                 >
                                   <Edit className="h-3 w-3" />
@@ -1512,7 +1512,7 @@ export default function ContactDetailPage({
                         <Textarea
                           value={localSynopsis}
                           onChange={(e) => setLocalSynopsis(e.target.value)}
-                          className="bg-white border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
+                          className="bg-white dark:bg-gray-800 border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
                           autoFocus
                         />
                         <div className="flex gap-2 justify-end">
@@ -1564,7 +1564,7 @@ export default function ContactDetailPage({
             {!editingSynopsis && filteredMissingInfo.length > 0 && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-5">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 md:p-5">
                     <div className="flex items-start gap-3">
                       <div className="rounded-full bg-blue-100 p-2 shrink-0 mt-0.5">
                         <Sparkles className="h-4 w-4 text-blue-600" />
@@ -1597,7 +1597,7 @@ export default function ContactDetailPage({
                         {filteredMissingInfo.map((info, index) => {
                           const suggestionKey = `${id}_${info.type}_${info.prompt.slice(0, 50)}`;
                           return (
-                            <div key={index} className="mb-3 last:mb-0 p-3 bg-white rounded-lg border border-blue-100">
+                            <div key={index} className="mb-3 last:mb-0 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-800">
                               <div className="flex items-start justify-between gap-2 mb-2">
                                 <div className="flex-1">
                                   <p className="text-sm md:text-base text-blue-800 mb-2">
@@ -1644,11 +1644,11 @@ export default function ContactDetailPage({
             {!editingSynopsis && filteredMissingInfo.length === 0 && aiSuggestionsEnabled && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4">
+                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 rounded-lg p-3 md:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">AI Suggestions are enabled</span>
+                        <Sparkles className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">AI Suggestions are enabled</span>
                       </div>
                       <Button
                         variant="ghost"
@@ -1669,11 +1669,11 @@ export default function ContactDetailPage({
             {!editingSynopsis && !aiSuggestionsEnabled && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4">
+                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 rounded-lg p-3 md:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">AI Suggestions are disabled</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">AI Suggestions are disabled</span>
                       </div>
                       <Button
                         variant="ghost"
@@ -1696,7 +1696,7 @@ export default function ContactDetailPage({
                 <div className="flex items-center justify-between mb-4 mt-6">
                   <h3 className="text-sm md:text-base font-semibold text-gray-900">Most Recent Interaction</h3>
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200 transition-all duration-200 hover:bg-gray-50 hover:shadow-sm cursor-default">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 transition-all duration-200 hover:bg-gray-50 hover:shadow-sm cursor-default">
                   <div className="flex items-start gap-3 md:gap-4">
                     <div className="rounded-full bg-blue-100 p-2 shrink-0">
                       <Mail className="h-6 w-6 text-blue-600" />
@@ -1795,7 +1795,7 @@ export default function ContactDetailPage({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-5 w-5 text-gray-400 hover:text-gray-600"
+                      className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-400"
                       onClick={() => setEditingTags(true)}
                     >
                       <Edit className="h-3 w-3" />
@@ -1808,7 +1808,7 @@ export default function ContactDetailPage({
                       {tags.map((tag) => (
                         <Badge
                           key={tag}
-                          className="bg-blue-50 text-blue-700 border-0 text-xs md:text-sm font-normal px-2 py-0.5 md:px-2.5 md:py-1 h-auto rounded flex items-center gap-1"
+                          className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 border-0 text-xs md:text-sm font-normal px-2 py-0.5 md:px-2.5 md:py-1 h-auto rounded flex items-center gap-1"
                         >
                           {tag}
                           <button
@@ -1863,7 +1863,7 @@ export default function ContactDetailPage({
                       tags.map((tag) => (
                         <Badge
                           key={tag}
-                          className="bg-blue-50 text-blue-700 border-0 text-xs md:text-sm font-normal px-2 py-1.5 h-auto rounded transition-colors hover:bg-blue-100 cursor-default"
+                          className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 border-0 text-xs md:text-sm font-normal px-2 py-1.5 h-auto rounded transition-colors hover:bg-blue-100 cursor-default"
                         >
                           {tag}
                         </Badge>
@@ -1933,12 +1933,12 @@ export default function ContactDetailPage({
                 contact.connections.map((connection: any, index: number) => (
                   <div
                     key={index}
-                    className="bg-gray-50 rounded-lg p-4 md:p-5"
+                    className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 md:p-5"
                   >
                     <p className="text-sm md:text-base font-medium text-gray-900 mb-1">
                       {connection.name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {connection.relationship}
                     </p>
                   </div>

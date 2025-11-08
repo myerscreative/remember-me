@@ -117,18 +117,18 @@ export default function BriefingPage({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 dark:border-purple-400 border-t-transparent"></div>
       </div>
     );
   }
 
   if (error || !contact) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white p-4">
+      <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-gray-900 p-4">
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-          <p className="text-gray-500 mb-4">{error || "Contact not found"}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">{error || "Contact not found"}</p>
           <Link href="/">
             <Button className="bg-purple-600 hover:bg-purple-700">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -145,7 +145,7 @@ export default function BriefingPage({
   const familyMembers = contact.family_members || [];
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
@@ -156,7 +156,7 @@ export default function BriefingPage({
                 size="icon"
                 className="h-10 w-10 rounded-full bg-white hover:bg-gray-100 shadow-sm"
               >
-                <ArrowLeft className="h-5 w-5 text-gray-700" />
+                <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </Button>
             </Link>
             <div className="flex items-center gap-2 text-purple-700">
@@ -177,7 +177,7 @@ export default function BriefingPage({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{fullName}</h1>
                   {contact.last_contact && (
                     <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
                       <Clock className="h-4 w-4" />
@@ -198,7 +198,7 @@ export default function BriefingPage({
                   <h3 className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">
                     Where You Met
                   </h3>
-                  <p className="text-sm text-gray-900">{contact.where_met}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{contact.where_met}</p>
                 </CardContent>
               </Card>
             )}
@@ -210,7 +210,7 @@ export default function BriefingPage({
                   <h3 className="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">
                     Who Introduced
                   </h3>
-                  <p className="text-sm text-gray-900">{contact.who_introduced}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{contact.who_introduced}</p>
                 </CardContent>
               </Card>
             )}
@@ -228,7 +228,7 @@ export default function BriefingPage({
                   {contact.interests.slice(0, 3).map((interest: string, index: number) => (
                     <div key={index} className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-gray-700">Ask about their interest in {interest}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Ask about their interest in {interest}</p>
                     </div>
                   ))}
                 </div>
@@ -259,11 +259,11 @@ export default function BriefingPage({
                 </div>
                 <div className="space-y-2">
                   {familyMembers.map((member: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-lg">
+                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg">
                       <Badge variant="secondary" className="bg-green-100 text-green-700">
                         {member.relationship}
                       </Badge>
-                      <span className="text-sm font-medium text-gray-900">{member.name}</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</span>
                     </div>
                   ))}
                 </div>

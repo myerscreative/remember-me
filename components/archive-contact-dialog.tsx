@@ -81,7 +81,7 @@ export function ArchiveContactDialog({
         variant={isArchived ? "outline" : "ghost"}
         size="sm"
         onClick={() => setShowDialog(true)}
-        className={isArchived ? "text-green-600 hover:text-green-700 border-green-200" : "text-gray-600 hover:text-gray-700"}
+        className={isArchived ? "text-green-600 hover:text-green-700 border-green-200" : "text-gray-600 hover:text-gray-700 dark:text-gray-300"}
       >
         {isArchived ? (
           <>
@@ -100,9 +100,9 @@ export function ArchiveContactDialog({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {isArchived ? "Unarchive Contact" : "Archive Contact"}
           </h2>
           <Button

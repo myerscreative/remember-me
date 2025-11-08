@@ -102,28 +102,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
           {/* Logo/Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">ReMember Me</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">ReMember Me</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               {isSignUp ? "Create your account" : "Welcome back"}
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email
               </Label>
               <Input
@@ -139,7 +139,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Password
               </Label>
               <Input
@@ -154,7 +154,7 @@ export default function LoginPage() {
                 minLength={6}
               />
               {isSignUp && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Password must be at least 6 characters
                 </p>
               )}
@@ -184,7 +184,7 @@ export default function LoginPage() {
                 setIsSignUp(!isSignUp);
                 setError(null);
               }}
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
             >
               {isSignUp
                 ? "Already have an account? Sign in"
@@ -195,7 +195,7 @@ export default function LoginPage() {
 
         {/* Back to app link */}
         <div className="mt-4 text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+          <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
             ← Back to app
           </Link>
         </div>
