@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { authenticateRequest } from "@/lib/supabase/auth";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,6 +14,12 @@ interface DetectRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError) {
+      return authError;
+    }
+
     // Check for API key
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
@@ -77,10 +84,12 @@ Be specific and actionable. The prompt should help users understand exactly what
       missingInfo: parsedData.missingInfo || [],
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Detection error:", error);
-    console.error("Error details:", JSON.stringify(error, null, 2));
-    
+    if (error instanceof Error) {
+      console.error("Error details:", error.message);
+    }
+
     // Return empty array on error so UI doesn't break
     return NextResponse.json({ missingInfo: [], error: error instanceof Error ? error.message : "Unknown error" });
   }

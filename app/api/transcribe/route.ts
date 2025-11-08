@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { authenticateRequest } from "@/lib/supabase/auth";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,6 +8,12 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError) {
+      return authError;
+    }
+
     // Check for API key
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
@@ -44,9 +51,9 @@ export async function POST(request: NextRequest) {
       transcript: transcription.text,
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Transcription error:", error);
-    
+
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json(
         { error: `OpenAI API error: ${error.message}` },
