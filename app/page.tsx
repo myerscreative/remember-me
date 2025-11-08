@@ -202,7 +202,7 @@ export default function HomePage() {
 
           {/* Filter Buttons */}
           <div className="pb-6 md:pb-8">
-            <div className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide md:overflow-x-visible">
+            <div className="flex justify-center gap-2 md:gap-3 overflow-x-auto scrollbar-hide md:overflow-x-visible">
               {filterOptions.map((filter) => {
                 const isSelected = selectedFilter === filter;
                 const isPrimary = isSelected && filter !== "All" && filter !== "Favorites";
