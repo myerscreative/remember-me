@@ -257,6 +257,7 @@ export interface Database {
           icon_name: string
           color: string
           position: number
+          custom_icon_url: string | null
           created_at: string
           updated_at: string
         }
@@ -267,6 +268,7 @@ export interface Database {
           icon_name?: string
           color?: string
           position?: number
+          custom_icon_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -277,6 +279,7 @@ export interface Database {
           icon_name?: string
           color?: string
           position?: number
+          custom_icon_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -351,6 +354,7 @@ export interface Database {
           icon_name: string
           color: string
           position: number
+          custom_icon_url: string | null
           created_at: string
           updated_at: string
           person_count: number
