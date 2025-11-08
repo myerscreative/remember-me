@@ -1,0 +1,19 @@
+{
+  "name": "ReMember Me",
+  "short_name": "ReMember Me",
+  "description": "Keep track of the people who matter most",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/next.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
