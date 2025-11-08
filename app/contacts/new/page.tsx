@@ -280,7 +280,7 @@ export default function NewContactPage() {
             <div className="space-y-6">
               {/* First Name */}
               <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="firstName" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   First Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -298,7 +298,7 @@ export default function NewContactPage() {
 
               {/* Last Name */}
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="lastName" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Last Name
                 </Label>
                 <Input
@@ -315,7 +315,7 @@ export default function NewContactPage() {
 
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="email" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Email
                 </Label>
                 <Input
@@ -333,7 +333,7 @@ export default function NewContactPage() {
 
               {/* Phone */}
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="phone" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Phone
                 </Label>
                 <Input
@@ -352,7 +352,7 @@ export default function NewContactPage() {
 
               {/* LinkedIn */}
               <div className="space-y-2">
-                <Label htmlFor="linkedin" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="linkedin" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   LinkedIn
                 </Label>
                 <Input
@@ -369,7 +369,7 @@ export default function NewContactPage() {
 
               {/* Where did we meet? */}
               <div className="space-y-2">
-                <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Where did we meet?
                 </Label>
                 <Input
@@ -386,7 +386,7 @@ export default function NewContactPage() {
 
               {/* Who introduced us? */}
               <div className="space-y-2">
-                <Label htmlFor="introducedBy" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="introducedBy" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Who introduced us?
                 </Label>
                 <Input
@@ -403,7 +403,7 @@ export default function NewContactPage() {
 
               {/* First Impression */}
               <div className="space-y-2">
-                <Label htmlFor="firstImpression" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="firstImpression" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   First impression
                 </Label>
                 <Textarea
@@ -420,7 +420,7 @@ export default function NewContactPage() {
 
               {/* Memorable Moment */}
               <div className="space-y-2">
-                <Label htmlFor="memorableMoment" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="memorableMoment" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   What made it memorable?
                 </Label>
                 <Textarea
@@ -437,7 +437,7 @@ export default function NewContactPage() {
 
               {/* Why stay in contact? */}
               <div className="space-y-2">
-                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Why stay in contact?
                 </Label>
                 <Textarea
@@ -454,7 +454,7 @@ export default function NewContactPage() {
 
               {/* What did I find interesting? */}
               <div className="space-y-2">
-                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   What did I find interesting?
                 </Label>
                 <Textarea
@@ -471,7 +471,7 @@ export default function NewContactPage() {
 
               {/* What's important to them? */}
               <div className="space-y-2">
-                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   What's important to them?
                 </Label>
                 <Textarea
@@ -488,7 +488,7 @@ export default function NewContactPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <Label htmlFor="tags" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="tags" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Tags
                 </Label>
                 <Input
