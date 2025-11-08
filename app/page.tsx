@@ -311,18 +311,16 @@ export default function HomePage() {
                   <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     No contacts found
                   </h3>
-                  <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md">
+                  <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md mb-2">
                     {selectedFilter === "All" 
-                      ? "Get started by adding your first contact!"
+                      ? "Get started by adding your first contact using the blue button in the bottom right!"
                       : `No contacts match the "${selectedFilter}" filter.`}
                   </p>
                   {selectedFilter === "All" && (
-                    <Link href="/contacts/new">
-                      <Button className="mt-6 bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Contact
-                      </Button>
-                    </Link>
+                    <div className="flex items-center gap-2 text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-4">
+                      <Zap className="h-4 w-4" />
+                      <span>Use Quick Capture for networking events</span>
+                    </div>
                   )}
                 </div>
               )}
