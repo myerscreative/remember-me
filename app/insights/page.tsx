@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Person, Interaction } from "@/types/database.types";
+import { ConnectionDiscoverySection } from "@/components/connection-discovery-section";
+import { RelationshipPatternsSection } from "@/components/relationship-patterns-section";
 
 // Types
 interface InsightsSummary {
@@ -593,6 +595,9 @@ export default function InsightsPage() {
                 )}
               </div>
             </Card>
+
+            {/* Relationship Patterns */}
+            <RelationshipPatternsSection />
           </div>
 
           {/* Right Column */}
@@ -698,6 +703,9 @@ export default function InsightsPage() {
                 </div>
               </div>
             </Card>
+
+            {/* Connection Discovery */}
+            <ConnectionDiscoverySection />
           </div>
         </div>
       </div>
