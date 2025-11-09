@@ -291,7 +291,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, firstName: e.target.value })
                   }
                   placeholder="First name"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -308,7 +308,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, lastName: e.target.value })
                   }
                   placeholder="Last name (optional)"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -326,7 +326,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   placeholder="email@example.com"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -345,7 +345,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, phone: formatted });
                   }}
                   placeholder="+1 (555) 123-4567"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -362,7 +362,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, linkedin: e.target.value })
                   }
                   placeholder="linkedin.com/in/username"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -379,7 +379,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whereMet: e.target.value })
                   }
                   placeholder="e.g., AI Summit, coffee shop, Zoom call"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -396,7 +396,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, introducedBy: e.target.value })
                   }
                   placeholder="Leave blank if met directly"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -413,7 +413,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, firstImpression: e.target.value })
                   }
                   placeholder="What was your immediate impression when you first met?"
-                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -430,7 +430,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, memorableMoment: e.target.value })
                   }
                   placeholder="What made this first conversation or meeting memorable?"
-                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -447,7 +447,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whyStayInContact: e.target.value })
                   }
                   placeholder="What's the value of this relationship?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -464,7 +464,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whatInteresting: e.target.value })
                   }
                   placeholder="What stood out about them?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -481,7 +481,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whatsImportant: e.target.value })
                   }
                   placeholder="Their priorities, values, goals..."
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -498,7 +498,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, tags: e.target.value })
                   }
                   placeholder="e.g., Investor, Friend, AI Summit (comma-separated)"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
                 />
               </div>
@@ -534,7 +534,7 @@ export default function NewContactPage() {
       </div>
 
       {/* Save Contact Button - Desktop */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-gray-200 p-6 shadow-lg" style={{ marginLeft: '16rem' }}>
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6 shadow-lg" style={{ marginLeft: '16rem' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button
             type="submit"

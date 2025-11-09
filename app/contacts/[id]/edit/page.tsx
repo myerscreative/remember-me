@@ -108,7 +108,7 @@ export default function EditContactPage({
             <div className="space-y-6">
               {/* Name */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="name" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Name
                 </Label>
                 <Input
@@ -119,13 +119,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="Full name"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
               {/* Where did we meet? */}
               <div className="space-y-2">
-                <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Where did we meet?
                 </Label>
                 <Input
@@ -135,13 +135,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, whereMet: e.target.value })
                   }
                   placeholder="e.g., AI Summit, coffee shop, Zoom call"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
               {/* Who introduced us? */}
               <div className="space-y-2">
-                <Label htmlFor="introducedBy" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="introducedBy" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Who introduced us?
                 </Label>
                 <Input
@@ -151,13 +151,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, introducedBy: e.target.value })
                   }
                   placeholder="Leave blank if met directly"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
               {/* Why stay in contact? */}
               <div className="space-y-2">
-                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Why stay in contact?
                 </Label>
                 <Textarea
@@ -167,13 +167,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, whyStayInContact: e.target.value })
                   }
                   placeholder="What's the value of this relationship?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                 />
               </div>
 
               {/* What did I find interesting? */}
               <div className="space-y-2">
-                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   What did I find interesting?
                 </Label>
                 <Textarea
@@ -183,13 +183,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, whatInteresting: e.target.value })
                   }
                   placeholder="What stood out about them?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                 />
               </div>
 
               {/* What's important to them? */}
               <div className="space-y-2">
-                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   What's important to them?
                 </Label>
                 <Textarea
@@ -199,13 +199,13 @@ export default function EditContactPage({
                     setFormData({ ...formData, whatsImportant: e.target.value })
                   }
                   placeholder="Their priorities, values, goals..."
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                 />
               </div>
 
               {/* Tags */}
               <div className="space-y-2">
-                <Label htmlFor="tags" className="text-sm md:text-base text-gray-700 font-medium">
+                <Label htmlFor="tags" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                   Tags
                 </Label>
                 <Input
@@ -215,7 +215,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, tags: e.target.value })
                   }
                   placeholder="e.g., Investor, Friend, AI Summit"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                 />
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function EditContactPage({
       </div>
 
       {/* Save Contact Button - Desktop */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 p-6" style={{ marginLeft: '16rem' }}>
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6" style={{ marginLeft: '16rem' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button
             type="submit"
