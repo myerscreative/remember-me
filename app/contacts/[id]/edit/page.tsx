@@ -119,7 +119,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="Full name"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 bg-white"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                 />
               </div>
 
@@ -135,7 +135,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, whereMet: e.target.value })
                   }
                   placeholder="e.g., AI Summit, coffee shop, Zoom call"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 bg-white"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                 />
               </div>
 
@@ -151,7 +151,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, introducedBy: e.target.value })
                   }
                   placeholder="Leave blank if met directly"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 bg-white"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                 />
               </div>
 
@@ -167,7 +167,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, whyStayInContact: e.target.value })
                   }
                   placeholder="What's the value of this relationship?"
-                  className="min-h-[100px] rounded-lg border-gray-200 bg-white resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
                 />
               </div>
 
@@ -183,7 +183,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, whatInteresting: e.target.value })
                   }
                   placeholder="What stood out about them?"
-                  className="min-h-[100px] rounded-lg border-gray-200 bg-white resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
                 />
               </div>
 
@@ -199,7 +199,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, whatsImportant: e.target.value })
                   }
                   placeholder="Their priorities, values, goals..."
-                  className="min-h-[100px] rounded-lg border-gray-200 bg-white resize-none"
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 resize-none"
                 />
               </div>
 
@@ -215,7 +215,7 @@ export default function EditContactPage({
                     setFormData({ ...formData, tags: e.target.value })
                   }
                   placeholder="e.g., Investor, Friend, AI Summit"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 bg-white"
+                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                 />
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function EditContactPage({
       </div>
 
       {/* Save Contact Button - Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 p-4 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 md:hidden">
         <Button
           type="submit"
           form="contact-form"
