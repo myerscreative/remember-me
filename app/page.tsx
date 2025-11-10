@@ -95,7 +95,8 @@ export default function HomePage() {
         if (showArchived) {
           query = query.eq("archived", true);
         } else {
-          query = query.eq("archived", false);
+          // Show only non-archived contacts (archived = false OR archived IS NULL)
+          query = query.or("archived.eq.false,archived.is.null");
         }
 
         const { data: persons, error } = await query.order("name");

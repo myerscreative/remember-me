@@ -41,19 +41,27 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content: `You are a helpful assistant that analyzes contact information text to identify incomplete or missing details that should be filled in.
+          content: `You are a helpful assistant that analyzes contact information text to identify TRULY incomplete or missing details that should be filled in.
 
-For ${context} context, detect:
-- FAMILY: Missing names of children, spouse, family members when quantities are mentioned (e.g., "two children" without names, "married" without spouse name)
-- PROFESSION: Missing specific job titles, company names, achievements, or career details when general descriptions are given
-- INTERESTS: Missing specific details about hobbies, activities, or interests when vague mentions appear
+IMPORTANT: Only flag information that is explicitly incomplete or contradictory, NOT information that could simply be "more detailed". The goal is to catch genuinely missing data, not to push for excessive detail.
+
+For ${context} context, detect ONLY these specific cases:
+- FAMILY: Missing names when quantities are explicitly mentioned (e.g., "has two children" or "married" WITHOUT any names at all, "three kids" without any names)
+- PROFESSION: Missing critical details when they're referenced but not provided (e.g., "works at" without company name, "recently changed jobs to" without specifying where)
+- INTERESTS: Missing specific items when vague placeholders are used (e.g., "enjoys several hobbies" without listing any, "likes sports" with no specific sports mentioned)
+
+DO NOT flag:
+- Profession titles that are already specific (e.g., "CEO", "Software Engineer", "Product Manager" are complete enough)
+- Company names or descriptions that are already mentioned (even if brief)
+- Information that exists but could theoretically be expanded
+- General interest descriptions that include at least one specific thing
 
 Return ONLY valid JSON in this exact format:
 {
   "missingInfo": [
     {
       "type": "children_names" | "spouse_name" | "job_title" | "company_name" | "interest_details" | "other",
-      "prompt": "A friendly, actionable prompt asking the user to add the missing information",
+      "prompt": "A friendly, actionable prompt asking the user to add the missing information. IMPORTANT: Always use the contact's first name in the prompt to personalize it (e.g., 'Please specify Sarah's job title' instead of 'Please specify the job title')",
       "suggestion": "Example or suggestion of what information should be added"
     }
   ]
@@ -61,7 +69,7 @@ Return ONLY valid JSON in this exact format:
 
 If no missing information is detected, return: { "missingInfo": [] }
 
-Be specific and actionable. The prompt should help users understand exactly what information is missing and why it would be valuable to add.`,
+Be conservative - only flag truly incomplete information, not opportunities for more detail. ALWAYS personalize prompts with the contact's first name.`,
         },
         {
           role: "user",

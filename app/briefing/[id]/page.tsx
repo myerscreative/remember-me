@@ -13,6 +13,9 @@ import {
   MessageCircle,
   Heart,
   Briefcase,
+  Eye,
+  MapPin,
+  UserPlus,
 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -117,7 +120,7 @@ export default function BriefingPage({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-[#1a1d24]">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 dark:border-purple-400 border-t-transparent"></div>
       </div>
     );
@@ -125,12 +128,12 @@ export default function BriefingPage({
 
   if (error || !contact) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-gray-900 p-4">
+      <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-[#1a1d24] p-4">
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white/90 mb-2">Error</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-4">{error || "Contact not found"}</p>
           <Link href="/">
-            <Button className="bg-purple-600 hover:bg-purple-700">
+            <Button className="bg-blue-600 hover:bg-blue-700">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Contacts
             </Button>
@@ -145,21 +148,21 @@ export default function BriefingPage({
   const familyMembers = contact.family_members || [];
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-2xl mx-auto w-full px-4 py-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <Link href={`/contacts/${id}`}>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-white hover:bg-gray-100 shadow-sm"
+                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-[#252931] hover:bg-gray-200 dark:hover:bg-[#2d3139] shadow-sm dark:shadow-md dark:shadow-black/20"
               >
                 <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </Button>
             </Link>
-            <div className="flex items-center gap-2 text-purple-700">
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <Briefcase className="h-5 w-5" />
               <span className="font-semibold text-sm">Meeting Brief</span>
             </div>
@@ -167,8 +170,8 @@ export default function BriefingPage({
           </div>
 
           {/* Contact Card */}
-          <Card className="mb-6 shadow-lg border-purple-200">
-            <CardContent className="p-6">
+          <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] shadow-lg dark:shadow-md dark:shadow-black/20">
+            <CardContent className="p-4">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={contact.photo_url || undefined} />
@@ -177,9 +180,9 @@ export default function BriefingPage({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{fullName}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white/90">{fullName}</h1>
                   {contact.last_contact && (
-                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                       <Clock className="h-4 w-4" />
                       Last contact: {getRelativeTime(contact.last_contact)}
                     </p>
@@ -190,27 +193,33 @@ export default function BriefingPage({
           </Card>
 
           {/* Quick Facts Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {/* Where You Met */}
             {contact.where_met && (
-              <Card className="border-l-4 border-l-blue-500">
+              <Card className="bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
                 <CardContent className="p-4">
-                  <h3 className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">
-                    Where You Met
-                  </h3>
-                  <p className="text-sm text-gray-900 dark:text-white">{contact.where_met}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      Where You Met
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-900 dark:text-gray-300">{contact.where_met}</p>
                 </CardContent>
               </Card>
             )}
 
             {/* Who Introduced */}
             {contact.who_introduced && (
-              <Card className="border-l-4 border-l-green-500">
+              <Card className="bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
                 <CardContent className="p-4">
-                  <h3 className="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">
-                    Who Introduced
-                  </h3>
-                  <p className="text-sm text-gray-900 dark:text-white">{contact.who_introduced}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <UserPlus className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      Who Introduced
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-900 dark:text-gray-300">{contact.who_introduced}</p>
                 </CardContent>
               </Card>
             )}
@@ -218,16 +227,16 @@ export default function BriefingPage({
 
           {/* Conversation Starters */}
           {contact.interests && contact.interests.length > 0 && (
-            <Card className="mb-6 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <MessageCircle className="h-5 w-5 text-purple-600" />
-                  <h2 className="text-lg font-bold text-purple-900">Conversation Starters</h2>
+            <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Conversation Starters</h2>
                 </div>
                 <div className="space-y-2">
                   {contact.interests.slice(0, 3).map((interest: string, index: number) => (
                     <div key={index} className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                       <p className="text-sm text-gray-700 dark:text-gray-300">Ask about their interest in {interest}</p>
                     </div>
                   ))}
@@ -238,32 +247,32 @@ export default function BriefingPage({
 
           {/* What's Important to Them */}
           {contact.most_important_to_them && (
-            <Card className="mb-6 bg-gradient-to-br from-pink-50 to-red-50 border-pink-200">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Heart className="h-5 w-5 text-pink-600" />
-                  <h2 className="text-lg font-bold text-pink-900">What's Important to Them</h2>
+            <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">What's Important to Them</h2>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">{contact.most_important_to_them}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{contact.most_important_to_them}</p>
               </CardContent>
             </Card>
           )}
 
           {/* Family to Remember */}
           {familyMembers.length > 0 && (
-            <Card className="mb-6 bg-gradient-to-br from-green-50 to-teal-50 border-green-200">
+            <Card className="mb-6 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Users className="h-5 w-5 text-green-600" />
-                  <h2 className="text-lg font-bold text-green-900">Family to Remember</h2>
+                  <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Family to Remember</h2>
                 </div>
                 <div className="space-y-2">
                   {familyMembers.map((member: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg">
-                      <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-[#1a1d24] rounded-lg border border-gray-200 dark:border-[#3a3f4b]">
+                      <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                         {member.relationship}
                       </Badge>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{member.name}</span>
                     </div>
                   ))}
                 </div>
@@ -273,36 +282,39 @@ export default function BriefingPage({
 
           {/* Why This Relationship Matters */}
           {contact.why_stay_in_contact && (
-            <Card className="mb-6 border-2 border-purple-300">
-              <CardContent className="p-5">
-                <h2 className="text-sm font-semibold text-purple-700 uppercase tracking-wider mb-2">
-                  Why This Relationship Matters
-                </h2>
-                <p className="text-gray-700 leading-relaxed">{contact.why_stay_in_contact}</p>
+            <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Briefcase className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Why This Relationship Matters</h2>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{contact.why_stay_in_contact}</p>
               </CardContent>
             </Card>
           )}
 
           {/* What You Found Interesting */}
           {contact.what_found_interesting && (
-            <Card className="mb-6">
-              <CardContent className="p-5">
-                <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">
-                  What You Found Interesting
-                </h2>
-                <p className="text-gray-700 leading-relaxed">{contact.what_found_interesting}</p>
+            <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">What You Found Interesting</h2>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{contact.what_found_interesting}</p>
               </CardContent>
             </Card>
           )}
 
           {/* First Impression */}
           {contact.first_impression && (
-            <Card className="mb-6 bg-teal-50 border-teal-200">
-              <CardContent className="p-5">
-                <h2 className="text-sm font-semibold text-teal-700 uppercase tracking-wider mb-2">
-                  Your First Impression
-                </h2>
-                <p className="text-gray-700 leading-relaxed italic">{contact.first_impression}</p>
+            <Card className="mb-4 bg-gray-50 dark:bg-[#252931] border border-gray-200 dark:border-[#3a3f4b] dark:shadow-md dark:shadow-black/20 border-l-4 border-l-blue-500 dark:border-l-blue-400">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Eye className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Your First Impression</h2>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic">{contact.first_impression}</p>
               </CardContent>
             </Card>
           )}
@@ -310,12 +322,12 @@ export default function BriefingPage({
           {/* Action Button */}
           <div className="flex gap-3 mb-8">
             <Link href={`/contacts/${id}`} className="flex-1">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-gray-300 dark:border-[#3a3f4b] hover:bg-gray-50 dark:hover:bg-[#2d3139]">
                 View Full Profile
               </Button>
             </Link>
             <Link href="/" className="flex-1">
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
                 Done
               </Button>
             </Link>

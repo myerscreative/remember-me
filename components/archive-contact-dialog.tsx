@@ -8,7 +8,6 @@ import {
   ArchiveRestore,
   X,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 interface ArchiveContactDialogProps {
   contactId: string;
@@ -37,39 +36,29 @@ export function ArchiveContactDialog({
 
     setLoading(true);
     try {
-      const supabase = createClient();
+      // Use API route that bypasses PostgREST schema cache
+      const response = await fetch("/api/archive-contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contactId,
+          archived: !isArchived, // Archive if not archived, unarchive if archived
+          archivedReason: isArchived ? null : reason.trim(),
+        }),
+      });
 
-      if (isArchived) {
-        // Unarchive
-        const { error } = await supabase
-          .from("persons")
-          .update({
-            archived: false,
-            archived_at: null,
-            archived_reason: null,
-          })
-          .eq("id", contactId);
-
-        if (error) throw error;
-      } else {
-        // Archive
-        const { error } = await supabase
-          .from("persons")
-          .update({
-            archived: true,
-            archived_at: new Date().toISOString(),
-            archived_reason: reason.trim(),
-          })
-          .eq("id", contactId);
-
-        if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to archive contact");
       }
 
       setShowDialog(false);
       onSuccess?.();
     } catch (error) {
       console.error("Error archiving contact:", error);
-      alert("Failed to archive contact. Please try again.");
+      alert(error instanceof Error ? error.message : "Failed to archive contact. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,20 +67,23 @@ export function ArchiveContactDialog({
   if (!showDialog) {
     return (
       <Button
-        variant={isArchived ? "outline" : "ghost"}
+        variant="outline"
         size="sm"
         onClick={() => setShowDialog(true)}
-        className={isArchived ? "text-green-600 hover:text-green-700 border-green-200" : "text-gray-600 hover:text-gray-700 dark:text-gray-300"}
+        className={isArchived 
+          ? "text-green-600 hover:text-green-700 border-green-200 dark:border-green-800 dark:text-green-400 w-full" 
+          : "text-red-600 hover:text-red-700 border-red-200 dark:border-red-900/50 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 w-full"
+        }
       >
         {isArchived ? (
           <>
             <ArchiveRestore className="h-4 w-4 mr-2" />
-            Unarchive
+            Unarchive Contact
           </>
         ) : (
           <>
             <Archive className="h-4 w-4 mr-2" />
-            Archive
+            Archive Contact
           </>
         )}
       </Button>
