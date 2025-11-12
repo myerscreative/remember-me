@@ -50,6 +50,8 @@ Extract the following information if mentioned:
 - LinkedIn profile URL or username
 - Where they met (location/event)
 - Who introduced them (person's name)
+- First impression (immediate impression when first meeting)
+- Memorable moment (what made the first conversation/meeting memorable)
 - Why stay in contact (reason/value)
 - What's interesting about them
 - What's important to them (their priorities/values/goals)
@@ -65,6 +67,8 @@ Return ONLY valid JSON in this exact format (use null for missing fields, empty 
   "linkedin": string | null,
   "whereMet": string | null,
   "introducedBy": string | null,
+  "firstImpression": string | null,
+  "memorableMoment": string | null,
   "whyStayInContact": string | null,
   "whatInteresting": string | null,
   "whatsImportant": string | null,
@@ -102,6 +106,8 @@ For misc, include any interesting details, anecdotes, or information that doesn'
       linkedin: parsedData.linkedin?.trim() || null,
       whereMet: parsedData.whereMet?.trim() || null,
       introducedBy: parsedData.introducedBy?.trim() || null,
+      firstImpression: parsedData.firstImpression?.trim() || null,
+      memorableMoment: parsedData.memorableMoment?.trim() || null,
       whyStayInContact: parsedData.whyStayInContact?.trim() || null,
       whatInteresting: parsedData.whatInteresting?.trim() || null,
       whatsImportant: parsedData.whatsImportant?.trim() || null,

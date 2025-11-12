@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, ChevronDown, ChevronUp, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,7 @@ export function StoryCompletenessIndicator({
   contactName,
 }: StoryCompletenessIndicatorProps) {
   const [expanded, setExpanded] = useState(false);
+  const [minimized, setMinimized] = useState(true);
 
   if (completeness >= 80) {
     return (
@@ -65,13 +66,13 @@ export function StoryCompletenessIndicator({
 
   const getColor = () => {
     if (completeness < 40) return {
-      bg: "from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950",
-      border: "border-red-200 dark:border-red-800",
-      icon: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400",
-      text: "text-red-900 dark:text-red-100",
-      subtext: "text-red-700 dark:text-red-300",
+      bg: "from-red-50 to-orange-50 dark:bg-red-900/20",
+      border: "border-red-200 dark:border-red-700/40",
+      icon: "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400",
+      text: "text-red-900 dark:text-red-300",
+      subtext: "text-red-700 dark:text-red-200",
       progress: "bg-red-600 dark:bg-red-500",
-      badge: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+      badge: "bg-red-100 text-red-700 dark:bg-red-800/50 dark:text-red-200",
     };
     if (completeness < 70) return {
       bg: "from-yellow-50 to-orange-50 dark:from-yellow-950 dark:to-orange-950",
@@ -100,8 +101,33 @@ export function StoryCompletenessIndicator({
     return "Just a few more details to capture the full context.";
   };
 
+  // Minimized view
+  if (minimized) {
+    return (
+      <Card 
+        className="border border-gray-200 dark:border-[#3a3f4b] bg-gray-50 dark:bg-[#252931] cursor-pointer transition-all hover:shadow-md dark:shadow-md dark:shadow-black/20"
+        onClick={() => setMinimized(false)}
+      >
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={cn("h-8 w-8 rounded-full flex items-center justify-center", colors.icon)}>
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Add important info to your memory
+              </p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Expanded view
   return (
-    <Card className={cn("border-2 bg-gradient-to-r", colors.border, colors.bg)}>
+    <Card className="border border-gray-200 dark:border-[#3a3f4b] bg-gray-50 dark:bg-[#252931] shadow-sm dark:shadow-md dark:shadow-black/20">
       <CardContent className="p-4">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -111,40 +137,63 @@ export function StoryCompletenessIndicator({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className={cn("text-sm font-semibold", colors.text)}>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-300">
                     Story {completeness}% Complete
                   </p>
                   <Badge className={colors.badge}>
                     {missingFields.length} missing
                   </Badge>
                 </div>
-                <p className={cn("text-xs", colors.subtext)}>
+                <p className="text-xs text-gray-700 dark:text-gray-400">
                   {getMessage()}
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setExpanded(!expanded)}
-              className={cn("h-8 w-8 p-0", colors.subtext)}
-            >
-              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setExpanded(!expanded)}
+                className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+                title={expanded ? "Show less" : "Show details"}
+              >
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMinimized(true)}
+                className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+                title="Minimize"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          {/* Progress Bar with Gradient */}
+          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden relative">
             <div
-              className={cn("h-full rounded-full transition-all duration-500", colors.progress)}
-              style={{ width: `${completeness}%` }}
+              className="h-full rounded-full transition-all duration-500 absolute left-0"
+              style={{ 
+                width: `${completeness}%`,
+                background: `linear-gradient(to right, 
+                  #ef4444 0%, 
+                  #dc2626 40%, 
+                  #f59e0b 60%, 
+                  #eab308 80%, 
+                  #22c55e 100%)`,
+                backgroundSize: `${100 / (completeness || 1) * 100}% 100%`,
+                backgroundPosition: 'left center',
+                backgroundRepeat: 'no-repeat'
+              }}
             />
           </div>
 
           {/* Missing Fields List */}
           {expanded && missingFields.length > 0 && (
-            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-              <p className={cn("text-xs font-medium mb-2", colors.subtext)}>
+            <div className="pt-2 border-t border-gray-200 dark:border-[#3a3f4b]">
+              <p className="text-xs font-medium mb-2 text-gray-700 dark:text-gray-400">
                 Add these details:
               </p>
               <div className="space-y-1">

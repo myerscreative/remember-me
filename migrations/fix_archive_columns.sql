@@ -88,3 +88,4 @@ CREATE INDEX IF NOT EXISTS idx_persons_archived
 ON public.persons(user_id, archived) 
 WHERE archived = false;
 
+

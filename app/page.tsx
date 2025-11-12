@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -60,6 +59,7 @@ export default function HomePage() {
   const [contacts, setContacts] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [showArchived, setShowArchived] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load favorites from localStorage on mount
   useEffect(() => {
@@ -79,10 +79,12 @@ export default function HomePage() {
     async function loadContacts() {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-        if (!user) {
-          setLoading(false);
+        if (userError || !user) {
+          console.error("Authentication error:", userError);
+          // Middleware should have redirected, but just in case
+          window.location.href = "/login";
           return;
         }
 
@@ -108,7 +110,7 @@ export default function HomePage() {
         }
 
         // Debug: Log contacts to verify birthday field
-        console.log("Fetched contacts:", persons?.map(p => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
+        console.log("Fetched contacts:", (persons as Person[])?.map(p => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
 
         setContacts(persons || []);
       } catch (error) {
@@ -136,12 +138,29 @@ export default function HomePage() {
     localStorage.setItem("networkFavorites", JSON.stringify(Array.from(newFavorites)));
   };
 
-  // Filter contacts based on selected filter
-  const filteredContacts = selectedFilter === "All" 
-    ? contacts 
-    : selectedFilter === "Favorites"
-    ? contacts.filter((contact) => favorites.has(contact.id))
-    : contacts; // For now, category filters not implemented (would need tags/categories)
+  // Filter contacts based on selected filter and search query
+  const filteredContacts = contacts
+    .filter((contact) => {
+      // Apply category filter
+      if (selectedFilter === "Favorites" && !favorites.has(contact.id)) {
+        return false;
+      }
+      // For now, other category filters not implemented (would need tags/categories)
+      
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const nameMatch = contact.name.toLowerCase().includes(query);
+        const emailMatch = contact.email?.toLowerCase().includes(query);
+        const phoneMatch = contact.phone?.toLowerCase().includes(query);
+        const notesMatch = contact.notes?.toLowerCase().includes(query);
+        const whereMetMatch = contact.where_met?.toLowerCase().includes(query);
+        
+        return nameMatch || emailMatch || phoneMatch || notesMatch || whereMetMatch;
+      }
+      
+      return true;
+    });
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
@@ -212,6 +231,8 @@ export default function HomePage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Who are you trying to remember?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-white dark:focus:bg-gray-700 transition-colors"
               />
             </div>
@@ -329,11 +350,13 @@ export default function HomePage() {
                     No contacts found
                   </h3>
                   <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md mb-2">
-                    {selectedFilter === "All" 
+                    {searchQuery.trim()
+                      ? `No contacts match "${searchQuery}"`
+                      : selectedFilter === "All" 
                       ? (
                         <>
                           <span className="lg:hidden">Get started by adding your first contact using the blue button in the bottom right!</span>
-                          <span className="hidden lg:inline">Get started by clicking "Add Contact" in the top right corner!</span>
+                          <span className="hidden lg:inline">Get started by clicking &quot;Add Contact&quot; in the top right corner!</span>
                         </>
                       )
                       : `No contacts match the "${selectedFilter}" filter.`}
@@ -342,7 +365,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-2 text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-4">
                       <Zap className="h-4 w-4" />
                       <span className="lg:hidden">Use Quick Capture for networking events</span>
-                      <span className="hidden lg:inline">Tip: Use "Quick Capture" for fast entry at networking events</span>
+                      <span className="hidden lg:inline">Tip: Use &quot;Quick Capture&quot; for fast entry at networking events</span>
                     </div>
                   )}
                 </div>

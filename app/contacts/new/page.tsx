@@ -24,6 +24,10 @@ interface ParsedContactData {
   whatInteresting?: string;
   whatsImportant?: string;
   tags?: string;
+  firstImpression?: string;
+  memorableMoment?: string;
+  familyMembers?: Array<{ name: string; relationship: string }>;
+  misc?: string;
 }
 
 export default function NewContactPage() {
@@ -95,8 +99,9 @@ export default function NewContactPage() {
         why_stay_in_contact: formData.whyStayInContact.trim() || null,
         what_found_interesting: formData.whatInteresting.trim() || null,
         most_important_to_them: formData.whatsImportant.trim() || null,
-        first_impression: formData.firstImpression.trim() || null,
-        memorable_moment: formData.memorableMoment.trim() || null,
+        // Temporarily commented out until schema cache refreshes
+        // first_impression: formData.firstImpression.trim() || null,
+        // memorable_moment: formData.memorableMoment.trim() || null,
         email: formData.email.trim() || null,
         phone: formData.phone.trim() || null,
         linkedin: formData.linkedin.trim() || null,
@@ -110,12 +115,14 @@ export default function NewContactPage() {
         .single();
 
       if (personError) {
-        console.error("Supabase insert error:", {
+        console.error("Supabase insert error:", personError);
+        console.error("Error details:", {
           message: personError.message,
           code: personError.code,
           details: personError.details,
           hint: personError.hint,
         });
+        console.error("Data being inserted:", personData);
         throw personError;
       }
 
@@ -187,21 +194,31 @@ export default function NewContactPage() {
       router.push("/");
     } catch (error) {
       console.error("Error saving contact:", error);
+      console.error("Full error object:", JSON.stringify(error, null, 2));
       
       // Provide more detailed error information
       let errorMessage = "Unknown error";
+      let errorDetails = "";
+      
       if (error instanceof Error) {
         errorMessage = error.message;
       } else if (typeof error === 'object' && error !== null) {
         // Handle Supabase errors
         if ('message' in error) {
           errorMessage = String(error.message);
-        } else if ('code' in error) {
-          errorMessage = `Error code: ${error.code}`;
+        }
+        if ('code' in error) {
+          errorDetails += `\nCode: ${error.code}`;
+        }
+        if ('details' in error) {
+          errorDetails += `\nDetails: ${error.details}`;
+        }
+        if ('hint' in error) {
+          errorDetails += `\nHint: ${error.hint}`;
         }
       }
       
-      alert(`Error saving contact: ${errorMessage}\n\nPlease check:\n1. You are logged in\n2. Supabase is configured correctly\n3. Your network connection`);
+      alert(`Error saving contact: ${errorMessage}${errorDetails}\n\nPlease check:\n1. You are logged in\n2. Supabase is configured correctly\n3. Your network connection`);
     } finally {
       setIsSaving(false);
     }
@@ -233,6 +250,8 @@ export default function NewContactPage() {
       whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
       whatInteresting: prev.whatInteresting || data.whatInteresting || "",
       whatsImportant: prev.whatsImportant || data.whatsImportant || "",
+      firstImpression: prev.firstImpression || data.firstImpression || "",
+      memorableMoment: prev.memorableMoment || data.memorableMoment || "",
       tags: prev.tags || data.tags || "",
       familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
       misc: prev.misc || data.misc || "",
@@ -499,6 +518,85 @@ export default function NewContactPage() {
                   }
                   placeholder="e.g., Investor, Friend, AI Summit (comma-separated)"
                   className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  disabled={isSaving}
+                />
+              </div>
+
+              {/* Family Members */}
+              <div className="space-y-2">
+                <Label className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  Family Members
+                </Label>
+                <div className="space-y-3">
+                  {formData.familyMembers.map((member, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={member.name}
+                        onChange={(e) => {
+                          const updated = [...formData.familyMembers];
+                          updated[index] = { ...member, name: e.target.value };
+                          setFormData({ ...formData, familyMembers: updated });
+                        }}
+                        placeholder="Name"
+                        className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white flex-1"
+                        disabled={isSaving}
+                      />
+                      <Input
+                        value={member.relationship}
+                        onChange={(e) => {
+                          const updated = [...formData.familyMembers];
+                          updated[index] = { ...member, relationship: e.target.value };
+                          setFormData({ ...formData, familyMembers: updated });
+                        }}
+                        placeholder="Relationship"
+                        className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white flex-1"
+                        disabled={isSaving}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const updated = formData.familyMembers.filter((_, i) => i !== index);
+                          setFormData({ ...formData, familyMembers: updated });
+                        }}
+                        className="h-11 md:h-12 w-11 md:w-12 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        disabled={isSaving}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        familyMembers: [...formData.familyMembers, { name: "", relationship: "" }]
+                      });
+                    }}
+                    className="w-full h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    disabled={isSaving}
+                  >
+                    + Add Family Member
+                  </Button>
+                </div>
+              </div>
+
+              {/* Misc Notes */}
+              <div className="space-y-2">
+                <Label htmlFor="misc" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  Additional Notes
+                </Label>
+                <Textarea
+                  id="misc"
+                  value={formData.misc}
+                  onChange={(e) =>
+                    setFormData({ ...formData, misc: e.target.value })
+                  }
+                  placeholder="Any other details or notes you want to remember..."
+                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
                   disabled={isSaving}
                 />
               </div>

@@ -26,6 +26,11 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error fetching decaying relationships:", error);
+      // Temporarily return empty array if function doesn't exist or columns are missing
+      // TODO: Re-enable after adding all required columns and functions
+      if (error.code === '42883' || error.code === '42703') {
+        return NextResponse.json({ relationships: [] });
+      }
       return NextResponse.json(
         { error: "Failed to fetch decaying relationships" },
         { status: 500 }

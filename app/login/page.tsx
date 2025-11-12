@@ -16,11 +16,13 @@ export default function LoginPage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Check if already logged in
   useEffect(() => {
@@ -37,10 +39,29 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     setIsLoading(true);
 
     try {
       const supabase = createClient();
+
+      if (isResetPassword) {
+        // Send password reset email
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+          formData.email,
+          {
+            redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+          }
+        );
+
+        if (resetError) {
+          throw resetError;
+        }
+
+        setSuccessMessage("Password reset email sent! Check your inbox.");
+        setIsLoading(false);
+        return;
+      }
 
       if (isSignUp) {
         // Sign up
@@ -109,9 +130,16 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">ReMember Me</h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {isSignUp ? "Create your account" : "Welcome back"}
+              {isResetPassword ? "Reset your password" : isSignUp ? "Create your account" : "Welcome back"}
             </p>
           </div>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -138,27 +166,44 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="••••••••"
-                className="mt-1 h-11"
-                disabled={isLoading}
-                minLength={6}
-              />
-              {isSignUp && (
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Password must be at least 6 characters
-                </p>
-              )}
-            </div>
+            {!isResetPassword && (
+              <div>
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="mt-1 h-11"
+                  disabled={isLoading}
+                  minLength={6}
+                />
+                {isSignUp && (
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Password must be at least 6 characters
+                  </p>
+                )}
+                {!isSignUp && (
+                  <div className="mt-2 text-right">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsResetPassword(true);
+                        setError(null);
+                        setSuccessMessage(null);
+                      }}
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <Button
               type="submit"
@@ -168,28 +213,43 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {isSignUp ? "Creating account..." : "Signing in..."}
+                  {isResetPassword ? "Sending reset link..." : isSignUp ? "Creating account..." : "Signing in..."}
                 </>
               ) : (
-                isSignUp ? "Sign Up" : "Sign In"
+                isResetPassword ? "Send Reset Link" : isSignUp ? "Sign Up" : "Sign In"
               )}
             </Button>
           </form>
 
-          {/* Toggle Sign Up/Sign In */}
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError(null);
-              }}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-            >
-              {isSignUp
-                ? "Already have an account? Sign in"
-                : "Don't have an account? Sign up"}
-            </button>
+          {/* Toggle Sign Up/Sign In/Reset Password */}
+          <div className="mt-6 text-center space-y-2">
+            {isResetPassword ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsResetPassword(false);
+                  setError(null);
+                  setSuccessMessage(null);
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                ← Back to sign in
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError(null);
+                  setSuccessMessage(null);
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                {isSignUp
+                  ? "Already have an account? Sign in"
+                  : "Don't have an account? Sign up"}
+              </button>
+            )}
           </div>
         </div>
 

@@ -4,14 +4,14 @@ import { updateSession } from "@/lib/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { response, user } = await updateSession(request);
 
-  // Protected routes that require authentication
-  const protectedRoutes = ["/contacts/new", "/contacts/edit", "/network"];
-  const isProtectedRoute = protectedRoutes.some((route) =>
+  // Public routes that don't require authentication
+  const publicRoutes = ["/login", "/auth/callback"];
+  const isPublicRoute = publicRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   );
 
-  // If accessing a protected route without authentication, redirect to login
-  if (isProtectedRoute && !user) {
+  // If accessing a non-public route without authentication, redirect to login
+  if (!isPublicRoute && !user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);

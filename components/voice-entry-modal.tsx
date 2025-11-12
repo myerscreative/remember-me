@@ -16,6 +16,8 @@ interface ParsedContactData {
   whyStayInContact?: string;
   whatInteresting?: string;
   whatsImportant?: string;
+  firstImpression?: string;
+  memorableMoment?: string;
   familyMembers?: Array<{ name: string; relationship: string }>;
   tags?: string;
   misc?: string;

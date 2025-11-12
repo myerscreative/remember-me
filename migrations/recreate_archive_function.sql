@@ -45,3 +45,4 @@ FROM information_schema.routines
 WHERE routine_name = 'archive_contact' 
 AND routine_schema = 'public';
 
+

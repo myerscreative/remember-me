@@ -108,6 +108,11 @@ export default function ContactDetailPage({
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [isEditMode, setIsEditMode] = useState(false);
+  const [editingContact, setEditingContact] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [phoneValue, setPhoneValue] = useState("");
+  const [hobbies, setHobbies] = useState("");
+  const [editingHobbies, setEditingHobbies] = useState(false);
   
   // AI prompting for missing information
   const [missingInfo, setMissingInfo] = useState<Array<{
@@ -238,6 +243,9 @@ export default function ContactDetailPage({
         setFirstName(contactData.firstName);
         setLastName(contactData.lastName || "");
         setFamilyMembers(contactData.familyMembers || []);
+        setEmailValue(contactData.email || "");
+        setPhoneValue(contactData.phone || "");
+        setHobbies(person.hobbies || "");
         // Initialize birthday value for editing (format as YYYY-MM-DD for input)
         if (contactData.birthday) {
           try {
@@ -433,11 +441,52 @@ export default function ContactDetailPage({
     }
   };
 
-  const handleSaveSynopsis = () => {
-    const setter = getCurrentSynopsisSetter();
-    setter(localSynopsis);
-    setEditingSynopsis(false);
-    // Here you would typically save to your backend/database
+  const handleSaveSynopsis = async () => {
+    try {
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      // Determine which field to update based on active tab
+      let updateData: any = {};
+      if (activeTab === "Profession") {
+        updateData.what_found_interesting = localSynopsis.trim() || null;
+      } else if (activeTab === "Family") {
+        updateData.family_notes = localSynopsis.trim() || null;
+      }
+
+      // Update synopsis in database
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update(updateData)
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      const setter = getCurrentSynopsisSetter();
+      setter(localSynopsis);
+      
+      // Update contact object
+      if (activeTab === "Profession") {
+        setContact({ ...contact, professionSynopsis: localSynopsis.trim(), profession: localSynopsis.trim() });
+      } else if (activeTab === "Family") {
+        setContact({ ...contact, familySynopsis: localSynopsis.trim(), familyNotes: localSynopsis.trim() });
+      }
+      
+      setEditingSynopsis(false);
+    } catch (err) {
+      console.error("Error saving synopsis:", err);
+      alert(err instanceof Error ? err.message : "Failed to save");
+    }
   };
 
   const handleCancelSynopsis = () => {
@@ -457,10 +506,85 @@ export default function ContactDetailPage({
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleSaveTags = () => {
-    setEditingTags(false);
-    setNewTagInput("");
-    // Here you would typically save to your backend/database
+  const handleSaveTags = async () => {
+    try {
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      // First, get existing tags for this person
+      const { data: existingPersonTags } = await supabase
+        .from("person_tags")
+        .select("tag_id, tags(name)")
+        .eq("person_id", id);
+
+      const existingTagNames = existingPersonTags?.map((pt: any) => pt.tags?.name).filter(Boolean) || [];
+
+      // Determine which tags to add and which to remove
+      const tagsToAdd = tags.filter(t => !existingTagNames.includes(t));
+      const tagsToRemove = existingTagNames.filter((t: string) => !tags.includes(t));
+
+      // Add new tags
+      for (const tagName of tagsToAdd) {
+        // First, ensure the tag exists in the tags table
+        const { data: existingTag } = await supabase
+          .from("tags")
+          .select("id, name")
+          .eq("name", tagName)
+          .eq("user_id", user.id)
+          .single();
+
+        let tagId = existingTag?.id;
+
+        if (!tagId) {
+          // Create the tag if it doesn't exist
+          const { data: newTag, error: tagError } = await supabase
+            .from("tags")
+            .insert({ name: tagName, user_id: user.id })
+            .select()
+            .single();
+
+          if (tagError) throw tagError;
+          tagId = newTag.id;
+        }
+
+        // Link the tag to the person
+        await supabase
+          .from("person_tags")
+          .insert({ person_id: id, tag_id: tagId });
+      }
+
+      // Remove tags
+      if (tagsToRemove.length > 0) {
+        const { data: tagsToDelete } = await supabase
+          .from("tags")
+          .select("id")
+          .in("name", tagsToRemove)
+          .eq("user_id", user.id);
+
+        if (tagsToDelete && tagsToDelete.length > 0) {
+          const tagIdsToDelete = tagsToDelete.map(t => t.id);
+          await supabase
+            .from("person_tags")
+            .delete()
+            .eq("person_id", id)
+            .in("tag_id", tagIdsToDelete);
+        }
+      }
+
+      // Update local state
+      setContact({ ...contact, tags });
+      setEditingTags(false);
+      setNewTagInput("");
+    } catch (err) {
+      console.error("Error saving tags:", err);
+      alert(err instanceof Error ? err.message : "Failed to save tags");
+    }
   };
 
   const handleCancelTags = () => {
@@ -488,10 +612,38 @@ export default function ContactDetailPage({
     setInterests(interests.filter((interest) => interest !== interestToRemove));
   };
 
-  const handleSaveInterests = () => {
-    setEditingInterests(false);
-    setNewInterestInput("");
-    // Here you would typically save to your backend/database
+  const handleSaveInterests = async () => {
+    try {
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      // Update interests in database
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update({ 
+          interests: interests.length > 0 ? interests : null
+        })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setContact({ ...contact, interests });
+      setEditingInterests(false);
+      setNewInterestInput("");
+    } catch (err) {
+      console.error("Error saving interests:", err);
+      alert(err instanceof Error ? err.message : "Failed to save interests");
+    }
   };
 
   const handleCancelInterests = () => {
@@ -505,6 +657,44 @@ export default function ContactDetailPage({
       e.preventDefault();
       handleAddInterest();
     }
+  };
+
+  const handleSaveHobbies = async () => {
+    try {
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      // Update hobbies in database
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update({ 
+          hobbies: hobbies.trim() || null
+        })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setContact({ ...contact, hobbies: hobbies.trim() });
+      setEditingHobbies(false);
+    } catch (err) {
+      console.error("Error saving hobbies:", err);
+      alert(err instanceof Error ? err.message : "Failed to save hobbies");
+    }
+  };
+
+  const handleCancelHobbies = () => {
+    setHobbies(contact?.hobbies || "");
+    setEditingHobbies(false);
   };
 
   const handleSaveBirthday = async (valueToSave?: string) => {
@@ -671,6 +861,60 @@ export default function ContactDetailPage({
       setLastName(contact.lastName || "");
     }
     setEditingName(false);
+  };
+
+  const handleSaveContact = async () => {
+    try {
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      // Update email and phone in database
+      const { data: updatedData, error: updateError } = await supabase
+        .from("persons")
+        .update({ 
+          email: emailValue.trim() || null,
+          phone: phoneValue.trim() || null,
+        })
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state with saved values
+      const updatedEmail = emailValue.trim();
+      const updatedPhone = phoneValue.trim();
+      const updatedTitle = updatedData?.linkedin || updatedEmail || "";
+      
+      setContact({ 
+        ...contact, 
+        email: updatedEmail, 
+        phone: updatedPhone,
+        title: updatedTitle 
+      });
+      setEditingContact(false);
+    } catch (err) {
+      console.error("Error saving contact info:", err);
+      alert(err instanceof Error ? err.message : "Failed to save contact info");
+    }
+  };
+
+  const handleCancelContact = () => {
+    // Reset to original values from contact
+    if (contact) {
+      setEmailValue(contact.email || "");
+      setPhoneValue(contact.phone || "");
+    }
+    setEditingContact(false);
   };
 
   const handleSaveFamilyMembers = async () => {
@@ -882,20 +1126,24 @@ export default function ContactDetailPage({
   // Detect missing information when synopsis or tab changes
   useEffect(() => {
     const detectMissingInfo = async () => {
-      // Get current synopsis based on active tab
+      // Get current synopsis based on active tab (use editing value if currently editing)
       let currentSynopsis: string;
-      switch (activeTab) {
-        case "Profession":
-          currentSynopsis = professionSynopsis;
-          break;
-        case "Family":
-          currentSynopsis = familySynopsis;
-          break;
-        case "Interests":
-          currentSynopsis = interestsSynopsis;
-          break;
-        default:
-          currentSynopsis = professionSynopsis;
+      if (editingSynopsis) {
+        currentSynopsis = localSynopsis;
+      } else {
+        switch (activeTab) {
+          case "Profession":
+            currentSynopsis = professionSynopsis;
+            break;
+          case "Family":
+            currentSynopsis = familySynopsis;
+            break;
+          case "Interests":
+            currentSynopsis = interestsSynopsis;
+            break;
+          default:
+            currentSynopsis = professionSynopsis;
+        }
       }
 
       if (!currentSynopsis || currentSynopsis.trim().length === 0) {
@@ -928,14 +1176,19 @@ export default function ContactDetailPage({
       }
     };
 
-    // Only detect when not editing, contact exists, and AI suggestions are enabled
-    if (!editingSynopsis && contact && aiSuggestionsEnabled) {
-      detectMissingInfo();
+    // Detect when contact exists and AI suggestions are enabled
+    if (contact && aiSuggestionsEnabled) {
+      // Debounce detection when editing to avoid too many API calls
+      const timeoutId = setTimeout(() => {
+        detectMissingInfo();
+      }, editingSynopsis ? 500 : 0); // 500ms delay when editing, immediate otherwise
+
+      return () => clearTimeout(timeoutId);
     } else if (!aiSuggestionsEnabled) {
       // Clear suggestions if disabled
       setMissingInfo([]);
     }
-  }, [activeTab, professionSynopsis, familySynopsis, interestsSynopsis, editingSynopsis, contact?.name, aiSuggestionsEnabled]);
+  }, [activeTab, professionSynopsis, familySynopsis, interestsSynopsis, editingSynopsis, localSynopsis, contact?.name, aiSuggestionsEnabled]);
 
   // Toggle AI suggestions
   const handleToggleAiSuggestions = () => {
@@ -1004,27 +1257,23 @@ export default function ContactDetailPage({
     return (
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-wider">
+          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {title}
           </h3>
-          {!isEditing && isEditMode && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              onClick={handleStartEdit}
-            >
-              <Edit className="h-3.5 w-3.5" />
-            </Button>
-          )}
         </div>
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 md:p-5">
+        <div 
+          className={cn(
+            "bg-gray-50 dark:bg-[#252931] rounded-lg p-4 md:p-5 shadow-sm dark:shadow-md dark:shadow-black/20",
+            !isEditing && isEditMode && "cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2d3139] transition-colors"
+          )}
+          onClick={() => !isEditing && isEditMode && handleStartEdit()}
+        >
           {isEditing ? (
             <div className="space-y-3">
               <Textarea
                 value={localValue}
                 onChange={(e) => setLocalValue(e.target.value)}
-                className="bg-white dark:bg-gray-800 border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
+                className="bg-white dark:bg-[#1a1d24] border-gray-200 dark:border-[#3a3f4b] text-sm md:text-base text-gray-700 dark:text-gray-300 min-h-[100px] resize-none"
                 autoFocus
               />
               <div className="flex gap-2 justify-end">
@@ -1048,8 +1297,8 @@ export default function ContactDetailPage({
               </div>
             </div>
           ) : (
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {content || <span className="text-gray-400 italic">Click edit to add content</span>}
+            <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+              {content || <span className="text-gray-400 italic">{isEditMode ? "Click to add content" : "No content yet"}</span>}
             </p>
           )}
         </div>
@@ -1059,7 +1308,7 @@ export default function ContactDetailPage({
 
   if (loading) {
     return (
-      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-gray-500 dark:text-gray-400">Loading contact...</div>
         </div>
@@ -1069,10 +1318,10 @@ export default function ContactDetailPage({
 
   if (error || !contact) {
     return (
-      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Contact not found</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white/90 mb-2">Contact not found</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-4">{error || "This contact doesn't exist or you don't have access to it."}</p>
             <Link href="/">
               <Button className="bg-blue-600 hover:bg-blue-700">
@@ -1087,7 +1336,7 @@ export default function ContactDetailPage({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[850px] mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -1096,12 +1345,12 @@ export default function ContactDetailPage({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-[#252931] hover:bg-gray-200 dark:hover:bg-[#2d3139] transition-colors"
               >
                 <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </Button>
             </Link>
-            <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Profile</h1>
+            <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white/90">Profile</h1>
             <div className="flex items-center gap-2">
               <Link href={`/briefing/${id}`}>
                 <Button
@@ -1118,7 +1367,7 @@ export default function ContactDetailPage({
                 size="icon"
                   className={cn(
                     "h-10 w-10 rounded-full transition-colors",
-                    isEditMode ? "bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50" : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    isEditMode ? "bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50" : "bg-gray-100 dark:bg-[#252931] hover:bg-gray-200 dark:hover:bg-[#2d3139]"
                   )}
                 onClick={() => setIsEditMode(!isEditMode)}
               >
@@ -1128,7 +1377,7 @@ export default function ContactDetailPage({
           </div>
 
           {/* Profile Section - Card Container */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-8 mb-8 md:mb-10 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+          <div className="bg-gray-50 dark:bg-[#252931] rounded-2xl p-8 mb-8 md:mb-10 border border-gray-100 dark:border-[#3a3f4b] shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-md dark:shadow-black/20">
             {/* Avatar and Name/Title - Centered Header */}
             <div className="flex flex-col items-center text-center mb-6">
               {/* Avatar with upload functionality */}
@@ -1209,24 +1458,100 @@ export default function ContactDetailPage({
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 
+                      className={cn(
+                        "text-2xl md:text-3xl font-bold text-gray-900 dark:text-white/90 mb-2",
+                        isEditMode && "cursor-pointer hover:text-gray-700 dark:hover:text-white transition-colors"
+                      )}
+                      onClick={() => isEditMode && setEditingName(true)}
+                    >
                       {contact.name}
                     </h2>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 mx-auto text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                        onClick={() => setEditingName(true)}
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                    )}
                   </>
                 )}
-                <p className="text-base md:text-lg text-gray-500 mt-2">
-                  {contact.title}
-                </p>
+                
+                {/* Email and Phone Section */}
+                <div className="mt-3">
+                  {editingContact ? (
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-2">
+                        <Input
+                          type="email"
+                          value={emailValue}
+                          onChange={(e) => setEmailValue(e.target.value)}
+                          placeholder="Email address"
+                          className="h-9 text-sm text-center"
+                          autoFocus
+                        />
+                        <Input
+                          type="tel"
+                          value={phoneValue}
+                          onChange={(e) => setPhoneValue(e.target.value)}
+                          placeholder="Phone number"
+                          className="h-9 text-sm text-center"
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          size="sm"
+                          onClick={handleSaveContact}
+                          className="h-8 bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Check className="h-3 w-3 mr-1" />
+                          Save
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCancelContact}
+                          className="h-8"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      {contact.email && (
+                        <div className="flex items-center justify-center gap-2">
+                          <Mail className="h-3.5 w-3.5 text-gray-400" />
+                          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+                            {contact.email}
+                          </p>
+                        </div>
+                      )}
+                      {contact.phone && (
+                        <div className="flex items-center justify-center gap-2">
+                          <Phone className="h-3.5 w-3.5 text-gray-400" />
+                          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+                            {contact.phone}
+                          </p>
+                        </div>
+                      )}
+                      {isEditMode && !contact.email && !contact.phone && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingContact(true)}
+                          className="h-7 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2d3139] mt-1"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add Contact Info
+                        </Button>
+                      )}
+                      {isEditMode && (contact.email || contact.phone) && (
+                        <button
+                          onClick={() => setEditingContact(true)}
+                          className="mt-1 text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                        >
+                          Click to edit
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
                 {/* Birthday Section */}
                 <div className="mt-2 flex items-center justify-center gap-2">
                   {editingBirthday ? (
@@ -1280,21 +1605,17 @@ export default function ContactDetailPage({
                             
                             if (!isNaN(birthdayDate.getTime())) {
                               return (
-                                <div className="flex items-center gap-2">
+                                <div 
+                                  className={cn(
+                                    "flex items-center gap-2",
+                                    isEditMode && "cursor-pointer hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                  )}
+                                  onClick={() => isEditMode && setEditingBirthday(true)}
+                                >
                                   <Cake className="h-4 w-4 text-orange-500" />
                                   <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
                                     Birthday: {birthdayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                   </p>
-                                  {isEditMode && (
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-6 w-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                      onClick={() => setEditingBirthday(true)}
-                                    >
-                                      <Edit className="h-3 w-3" />
-                                    </Button>
-                                  )}
                                 </div>
                               );
                             }
@@ -1303,21 +1624,17 @@ export default function ContactDetailPage({
                           const birthdayDate = new Date(contact.birthday);
                           if (!isNaN(birthdayDate.getTime())) {
                             return (
-                              <div className="flex items-center gap-2">
+                              <div 
+                                className={cn(
+                                  "flex items-center gap-2",
+                                  isEditMode && "cursor-pointer hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                )}
+                                onClick={() => isEditMode && setEditingBirthday(true)}
+                              >
                                 <Cake className="h-4 w-4 text-orange-500" />
                                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
                                   Birthday: {birthdayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                 </p>
-                                {isEditMode && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                    onClick={() => setEditingBirthday(true)}
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                )}
                               </div>
                             );
                           }
@@ -1346,7 +1663,7 @@ export default function ContactDetailPage({
               </div>
 
               {/* Tab Navigation - Centered below name */}
-              <div className="w-full max-w-lg border-b border-gray-200 dark:border-gray-700">
+              <div className="w-full max-w-lg border-b border-gray-200 dark:border-[#3a3f4b]">
                 <div className="flex justify-center gap-6 md:gap-8">
                   {tabs.map((tab) => (
                     <button
@@ -1355,13 +1672,13 @@ export default function ContactDetailPage({
                       className={cn(
                         "px-3 md:px-4 pb-3 pt-1 text-sm md:text-base font-medium transition-colors relative",
                         activeTab === tab
-                          ? "text-gray-900 dark:text-white"
-                          : "text-gray-500 hover:text-gray-700 dark:text-gray-300"
+                          ? "text-gray-900 dark:text-white/90"
+                          : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                       )}
                     >
                       {tab}
                       {activeTab === tab && (
-                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
                       )}
                     </button>
                   ))}
@@ -1372,11 +1689,148 @@ export default function ContactDetailPage({
             {/* Synopsis - Centered, readable width */}
             <div className="flex justify-center mb-6">
               <div className="w-full max-w-2xl">
-                {activeTab === "Family" ? (
+                {activeTab === "Interests" ? (
+                  /* Interests List */
+                  <div className="space-y-6">
+                    {/* Hobbies Section */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">Hobbies</h3>
+                      {editingHobbies ? (
+                        <div className="space-y-3">
+                          <Textarea
+                            value={hobbies}
+                            onChange={(e) => setHobbies(e.target.value)}
+                            className="bg-white dark:bg-[#1a1d24] border-gray-200 dark:border-[#3a3f4b] text-sm md:text-base text-gray-700 dark:text-gray-300 min-h-[100px] resize-none"
+                            placeholder="Describe their hobbies and activities..."
+                            autoFocus
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCancelHobbies}
+                              className="h-8"
+                            >
+                              <X className="h-3 w-3 mr-1" />
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={handleSaveHobbies}
+                              className="h-8 bg-blue-600 hover:bg-blue-700"
+                            >
+                              <Check className="h-3 w-3 mr-1" />
+                              Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className={cn(
+                            "bg-gray-50 dark:bg-[#252931] rounded-lg p-4 md:p-5 shadow-sm dark:shadow-md dark:shadow-black/20",
+                            isEditMode && "cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2d3139] transition-colors"
+                          )}
+                          onClick={() => isEditMode && setEditingHobbies(true)}
+                        >
+                          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {hobbies || <span className="text-gray-400 italic">{isEditMode ? "Click to add hobbies" : "No hobbies listed yet"}</span>}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Interests Tags Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">Interest Tags</h3>
+                      </div>
+                    
+                    {editingInterests ? (
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          {interests.map((interest) => (
+                            <Badge
+                              key={interest}
+                              className="bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-0 text-xs md:text-sm font-normal px-2 py-0.5 md:px-2.5 md:py-1 h-auto rounded flex items-center gap-1"
+                            >
+                              {interest}
+                              <button
+                                onClick={() => handleRemoveInterest(interest)}
+                                className="ml-1 hover:text-purple-900 dark:hover:text-purple-100"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            value={newInterestInput}
+                            onChange={(e) => setNewInterestInput(e.target.value)}
+                            onKeyPress={handleInterestKeyPress}
+                            placeholder="Add an interest..."
+                            className="flex-1 h-8 text-sm"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleAddInterest}
+                            className="h-8 bg-blue-600 hover:bg-blue-700"
+                            disabled={!newInterestInput.trim()}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCancelInterests}
+                            className="h-8"
+                          >
+                            <X className="h-3 w-3 mr-1" />
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveInterests}
+                            className="h-8 bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Check className="h-3 w-3 mr-1" />
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        className={cn(
+                          "flex flex-wrap gap-3 justify-center",
+                          isEditMode && "cursor-pointer"
+                        )}
+                        onClick={() => isEditMode && setEditingInterests(true)}
+                      >
+                        {interests.length > 0 ? (
+                          interests.map((interest) => (
+                            <Badge
+                              key={interest}
+                              className="bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-0 text-xs md:text-sm font-normal px-2 py-1.5 h-auto rounded transition-colors hover:bg-purple-100 dark:hover:bg-purple-900/30"
+                            >
+                              {interest}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+                            {isEditMode ? "Click to add interests" : "No interests added yet"}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    </div>
+                  </div>
+                ) : activeTab === "Family" ? (
                   /* Family Members List */
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm md:text-base font-semibold text-gray-900">Family Members</h3>
+                      <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">Family Members</h3>
                       {editingFamilyMember === null && (
                         isEditMode && (
                           <Button
@@ -1387,7 +1841,7 @@ export default function ContactDetailPage({
                               setNewFamilyMemberRelationship("");
                               setEditingFamilyMember(-1); // -1 means adding new
                             }}
-                            className="h-7 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                            className="h-7 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2d3139]"
                           >
                             <Plus className="h-3 w-3 mr-1" />
                             Add Family Member
@@ -1398,7 +1852,7 @@ export default function ContactDetailPage({
                     
                     {/* Add/Edit Family Member Form */}
                     {(editingFamilyMember !== null) && (
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <div className="bg-gray-50 dark:bg-[#252931] rounded-lg p-4 border border-gray-200 dark:border-[#3a3f4b]">
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 gap-2">
                             <Input
@@ -1455,11 +1909,11 @@ export default function ContactDetailPage({
                         {familyMembers.map((member, index) => (
                           <div
                             key={index}
-                            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 flex items-center justify-between"
+                            className="bg-gray-50 dark:bg-[#252931] rounded-lg p-4 border border-gray-200 dark:border-[#3a3f4b] flex items-center justify-between shadow-sm dark:shadow-md dark:shadow-black/20"
                           >
                             <div>
-                              <span className="font-medium text-gray-900">{member.name}</span>
-                              <span className="text-gray-500 ml-2">({member.relationship})</span>
+                              <span className="font-medium text-gray-900 dark:text-gray-300">{member.name}</span>
+                              <span className="text-gray-500 dark:text-gray-400 ml-2">({member.relationship})</span>
                             </div>
                             {isEditMode && (
                               <div className="flex gap-2">
@@ -1485,8 +1939,8 @@ export default function ContactDetailPage({
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-gray-400">
-                        <p className="text-sm">No family members added yet</p>
+                      <div className="text-center py-8">
+                        <p className="text-sm text-gray-400 dark:text-gray-500 italic">No family members added yet</p>
                       </div>
                     )}
 
@@ -1505,14 +1959,20 @@ export default function ContactDetailPage({
                     )}
                   </div>
                 ) : (
-                  /* Synopsis for Profession and Interests tabs */
-                  <>
+                  /* Synopsis for Profession and Family tabs */
+                  <div className="space-y-4">
+                    <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300 text-center">
+                      {activeTab === "Profession" ? "Professional Background" : "Family Notes"}
+                    </h3>
                     {editingSynopsis ? (
                       <div className="space-y-3">
                         <Textarea
                           value={localSynopsis}
                           onChange={(e) => setLocalSynopsis(e.target.value)}
-                          className="bg-white dark:bg-gray-800 border-gray-200 text-sm md:text-base text-gray-700 min-h-[100px] resize-none"
+                          className="bg-white dark:bg-[#1a1d24] border-gray-200 dark:border-[#3a3f4b] text-sm md:text-base text-gray-700 dark:text-gray-300 min-h-[100px] resize-none"
+                          placeholder={activeTab === "Profession" 
+                            ? "What do they do? What's interesting about their work?"
+                            : "Notes about their family background, dynamics, or important details..."}
                           autoFocus
                         />
                         <div className="flex gap-2 justify-end">
@@ -1536,42 +1996,47 @@ export default function ContactDetailPage({
                         </div>
                       </div>
                     ) : (
-                      <div className="relative group text-center">
-                        <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                          {getCurrentSynopsis()}
-                        </p>
-                        {isEditMode && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            onClick={() => {
-                              setLocalSynopsis(getCurrentSynopsis());
-                              setEditingSynopsis(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                      <div 
+                        className={cn(
+                          "relative text-center",
+                          isEditMode && "cursor-pointer"
                         )}
+                        onClick={() => {
+                          if (isEditMode) {
+                            setLocalSynopsis(getCurrentSynopsis());
+                            setEditingSynopsis(true);
+                          }
+                        }}
+                      >
+                        <p className={cn(
+                          "text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed",
+                          isEditMode && "hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        )}>
+                          {getCurrentSynopsis() || (
+                            <span className="text-gray-400 dark:text-gray-500 italic">
+                              {isEditMode ? "Click to add details" : "No details yet"}
+                            </span>
+                          )}
+                        </p>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* AI Prompt for Missing Information */}
-            {!editingSynopsis && filteredMissingInfo.length > 0 && (
+            {filteredMissingInfo.length > 0 && (activeTab === "Profession" || activeTab === "Family") && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 md:p-5">
+                  <div className="bg-blue-50 dark:bg-[#2d3139] border border-blue-200 dark:border-[#3a3f4b] rounded-lg p-4 md:p-5">
                     <div className="flex items-start gap-3">
-                      <div className="rounded-full bg-blue-100 p-2 shrink-0 mt-0.5">
-                        <Sparkles className="h-4 w-4 text-blue-600" />
+                      <div className="rounded-full bg-blue-100 dark:bg-blue-500/10 p-2 shrink-0 mt-0.5">
+                        <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm md:text-base font-semibold text-blue-900">
+                          <h4 className="text-sm md:text-base font-semibold text-blue-900 dark:text-gray-300">
                             Complete Your Profile
                           </h4>
                           <Button
@@ -1597,14 +2062,14 @@ export default function ContactDetailPage({
                         {filteredMissingInfo.map((info, index) => {
                           const suggestionKey = `${id}_${info.type}_${info.prompt.slice(0, 50)}`;
                           return (
-                            <div key={index} className="mb-3 last:mb-0 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-800">
+                            <div key={index} className="mb-3 last:mb-0 p-3 bg-white dark:bg-[#252931] rounded-lg border border-blue-100 dark:border-[#3a3f4b]">
                               <div className="flex items-start justify-between gap-2 mb-2">
                                 <div className="flex-1">
-                                  <p className="text-sm md:text-base text-blue-800 mb-2">
+                                  <p className="text-sm md:text-base text-blue-800 dark:text-gray-300 mb-2">
                                     {info.prompt}
                                   </p>
                                   {info.suggestion && (
-                                    <p className="text-xs md:text-sm text-blue-600 italic mb-2">
+                                    <p className="text-xs md:text-sm text-blue-600 dark:text-blue-400 italic mb-2">
                                       Example: {info.suggestion}
                                     </p>
                                   )}
@@ -1622,13 +2087,15 @@ export default function ContactDetailPage({
                               <Button
                                 size="sm"
                                 onClick={() => {
-                                  setLocalSynopsis(getCurrentSynopsis());
-                                  setEditingSynopsis(true);
+                                  if (!editingSynopsis) {
+                                    setLocalSynopsis(getCurrentSynopsis());
+                                    setEditingSynopsis(true);
+                                  }
                                 }}
                                 className="h-8 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm"
                               >
                                 <Edit className="h-3 w-3 mr-1.5" />
-                                Add This Information
+                                {editingSynopsis ? "See suggestions above while editing" : "Add This Information"}
                               </Button>
                             </div>
                           );
@@ -1641,10 +2108,10 @@ export default function ContactDetailPage({
             )}
             
             {/* AI Suggestions Toggle (shown when suggestions are disabled or no suggestions) */}
-            {!editingSynopsis && filteredMissingInfo.length === 0 && aiSuggestionsEnabled && (
+            {filteredMissingInfo.length === 0 && aiSuggestionsEnabled && (activeTab === "Profession" || activeTab === "Family") && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 rounded-lg p-3 md:p-4">
+                  <div className="bg-gray-50 dark:bg-[#2d3139] border border-gray-200 dark:border-[#3a3f4b] rounded-lg p-3 md:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-gray-500 dark:text-gray-400" />
@@ -1666,10 +2133,10 @@ export default function ContactDetailPage({
             )}
             
             {/* Show enable button when AI suggestions are disabled */}
-            {!editingSynopsis && !aiSuggestionsEnabled && (
+            {!aiSuggestionsEnabled && (activeTab === "Profession" || activeTab === "Family") && (
               <div className="flex justify-center mb-6">
                 <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 rounded-lg p-3 md:p-4">
+                  <div className="bg-gray-50 dark:bg-[#2d3139] border border-gray-200 dark:border-[#3a3f4b] rounded-lg p-3 md:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-gray-400" />
@@ -1694,25 +2161,25 @@ export default function ContactDetailPage({
             <div className="flex justify-center mb-6">
               <div className="w-full max-w-2xl">
                 <div className="flex items-center justify-between mb-4 mt-6">
-                  <h3 className="text-sm md:text-base font-semibold text-gray-900">Most Recent Interaction</h3>
+                  <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">Most Recent Interaction</h3>
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 transition-all duration-200 hover:bg-gray-50 hover:shadow-sm cursor-default">
+                <div className="bg-white dark:bg-[#252931] rounded-lg p-4 border border-gray-200 dark:border-[#3a3f4b] transition-all duration-200 hover:bg-gray-50 dark:hover:bg-[#2d3139] hover:shadow-sm dark:shadow-md dark:shadow-black/20 cursor-default">
                   <div className="flex items-start gap-3 md:gap-4">
-                    <div className="rounded-full bg-blue-100 p-2 shrink-0">
-                      <Mail className="h-6 w-6 text-blue-600" />
+                    <div className="rounded-full bg-blue-100 dark:bg-blue-500/10 p-2 shrink-0">
+                      <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm md:text-base font-semibold text-gray-900">
+                        <span className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">
                           {contact.mostRecentInteraction.type}
                         </span>
-                        <span className="text-xs md:text-sm text-gray-400">•</span>
-                        <span className="text-xs md:text-sm text-gray-400 flex items-center gap-1">
+                        <span className="text-xs md:text-sm text-gray-400 dark:text-gray-500">•</span>
+                        <span className="text-xs md:text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {contact.mostRecentInteraction.date}
                         </span>
                       </div>
-                      <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                      <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                         {contact.mostRecentInteraction.summary}
                       </p>
                     </div>
@@ -1788,19 +2255,9 @@ export default function ContactDetailPage({
             <div className="flex justify-center">
               <div className="w-full max-w-2xl">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <span className="text-xs md:text-sm font-medium text-gray-400 uppercase tracking-wider">
+                  <span className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 uppercase tracking-wide">
                     Tags
                   </span>
-                  {!editingTags && isEditMode && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-400"
-                      onClick={() => setEditingTags(true)}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
-                  )}
                 </div>
                 {editingTags ? (
                   <div className="space-y-3">
@@ -1858,19 +2315,25 @@ export default function ContactDetailPage({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-3 justify-center">
+                  <div 
+                    className={cn(
+                      "flex flex-wrap gap-3 justify-center",
+                      isEditMode && "cursor-pointer"
+                    )}
+                    onClick={() => isEditMode && setEditingTags(true)}
+                  >
                     {tags.length > 0 ? (
                       tags.map((tag) => (
                         <Badge
                           key={tag}
-                          className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 border-0 text-xs md:text-sm font-normal px-2 py-1.5 h-auto rounded transition-colors hover:bg-blue-100 cursor-default"
+                          className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-0 text-xs md:text-sm font-normal px-2 py-1.5 h-auto rounded transition-colors hover:bg-blue-100 dark:hover:bg-blue-900/30"
                         >
                           {tag}
                         </Badge>
                       ))
                     ) : (
                       <span className="text-xs text-gray-400 italic">
-                        No tags yet
+                        {isEditMode ? "Click to add tags" : "No tags yet"}
                       </span>
                     )}
                   </div>
@@ -1880,10 +2343,10 @@ export default function ContactDetailPage({
           </div>
 
           {/* Original Content Sections */}
-          <div className="pb-6 md:pb-12 border-t border-gray-200 pt-6 md:pt-8 mt-8 md:mt-10">
+          <div className="pb-6 md:pb-12 border-t border-gray-200 dark:border-[#3a3f4b] pt-6 md:pt-8 mt-8 md:mt-10">
             {/* Story Section */}
             <div className="space-y-6 md:space-y-8 mb-8">
-              <h2 className="text-xl md:text-2xl font-bold text-black mb-6">Story</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white/90 mb-6">Story</h2>
               {/* Where We Met */}
               <EditableSection
                 sectionKey="whereWeMet"
@@ -1917,7 +2380,7 @@ export default function ContactDetailPage({
 
             {/* Notes Section */}
             <div className="space-y-6 md:space-y-8 mb-8">
-              <h2 className="text-xl md:text-2xl font-bold text-black mb-6">Notes</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white/90 mb-6">Notes</h2>
               <EditableSection
                 sectionKey="notes"
                 title="Notes"
@@ -1928,14 +2391,14 @@ export default function ContactDetailPage({
 
             {/* Connections Section */}
             <div className="space-y-4">
-              <h2 className="text-xl md:text-2xl font-bold text-black mb-6">Connections</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white/90 mb-6">Connections</h2>
               {contact.connections && contact.connections.length > 0 ? (
                 contact.connections.map((connection: any, index: number) => (
                   <div
                     key={index}
-                    className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 md:p-5"
+                    className="bg-gray-50 dark:bg-[#252931] rounded-lg p-4 md:p-5 shadow-sm dark:shadow-md dark:shadow-black/20"
                   >
-                    <p className="text-sm md:text-base font-medium text-gray-900 mb-1">
+                    <p className="text-sm md:text-base font-medium text-gray-900 dark:text-gray-300 mb-1">
                       {connection.name}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -1944,7 +2407,7 @@ export default function ContactDetailPage({
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-400 italic">No connections listed</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 italic">No connections listed</p>
               )}
             </div>
           </div>

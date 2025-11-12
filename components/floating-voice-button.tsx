@@ -22,18 +22,6 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Don't show on certain pages where it might interfere
-  const hideOnPages = [
-    '/login',
-    '/signup',
-    '/contacts/new',
-    '/quick-capture',
-  ];
-
-  if (hideOnPages.includes(pathname)) {
-    return null;
-  }
-
   // Detect if we're on a contact detail page
   useEffect(() => {
     const contactMatch = pathname.match(/^\/contacts\/([^/]+)$/);
@@ -60,6 +48,18 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
       setCurrentPerson(null);
     }
   }, [pathname]);
+
+  // Don't show on certain pages where it might interfere
+  const hideOnPages = [
+    '/login',
+    '/signup',
+    '/contacts/new',
+    '/quick-capture',
+  ];
+
+  if (hideOnPages.includes(pathname)) {
+    return null;
+  }
 
   const handleVoiceDataApply = async (data: any) => {
     setIsSaving(true);
@@ -113,7 +113,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
       }
 
       // Close modal and navigate to the new contact
-      setIsModalOpen(false);
+      setIsNewContactModalOpen(false);
       router.push(`/contacts/${newContact.id}`);
       router.refresh();
 
