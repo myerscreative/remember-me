@@ -49,6 +49,14 @@ export interface Database {
           what_they_offered: string | null
           // Story completeness
           story_completeness: number
+          // Phase 1: New relationship tracking fields
+          relationship_summary: string | null
+          last_interaction_date: string | null
+          interaction_count: number
+          contact_importance: 'high' | 'medium' | 'low' | null
+          archive_status: boolean
+          has_context: boolean
+          imported: boolean
           created_at: string
           updated_at: string
         }
@@ -288,6 +296,41 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_stats: {
+        Row: {
+          id: string
+          user_id: string
+          contacts_with_context: number
+          total_contacts: number
+          voice_memos_added: number
+          last_activity_date: string | null
+          streak_days: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          contacts_with_context?: number
+          total_contacts?: number
+          voice_memos_added?: number
+          last_activity_date?: string | null
+          streak_days?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          contacts_with_context?: number
+          total_contacts?: number
+          voice_memos_added?: number
+          last_activity_date?: string | null
+          streak_days?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       persons_with_tags: {
@@ -327,6 +370,14 @@ export interface Database {
           what_they_offered: string | null
           // Story completeness
           story_completeness: number
+          // Phase 1: New relationship tracking fields
+          relationship_summary: string | null
+          last_interaction_date: string | null
+          interaction_count: number
+          contact_importance: 'high' | 'medium' | 'low' | null
+          archive_status: boolean
+          has_context: boolean
+          imported: boolean
           created_at: string
           updated_at: string
           tag_names: string[] | null
@@ -375,4 +426,8 @@ export type InteractionUpdate = Database['public']['Tables']['interactions']['Up
 
 export type PersonWithTags = Database['public']['Views']['persons_with_tags']['Row']
 export type PersonInteractionCount = Database['public']['Views']['person_interaction_counts']['Row']
+
+export type UserStats = Database['public']['Tables']['user_stats']['Row']
+export type UserStatsInsert = Database['public']['Tables']['user_stats']['Insert']
+export type UserStatsUpdate = Database['public']['Tables']['user_stats']['Update']
 
