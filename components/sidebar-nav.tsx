@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Network, Lightbulb, Settings, Download } from "lucide-react";
+import { Users, Bell, Network, Lightbulb, Settings, Download, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -17,6 +17,13 @@ const navItems = [
     href: "/import",
     label: "Import",
     icon: Download,
+    activeColor: "text-purple-600",
+    inactiveColor: "text-gray-600",
+  },
+  {
+    href: "/ai-batch",
+    label: "AI Batch",
+    icon: Sparkles,
     activeColor: "text-purple-600",
     inactiveColor: "text-gray-600",
   },
