@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Network, Activity, Settings, Download, Sparkles } from "lucide-react";
+import { Users, Bell, Network, Activity, Settings, Download, Sparkles, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -45,6 +45,13 @@ const navItems = [
     href: "/dashboard",
     label: "Dashboard",
     icon: Activity,
+    activeColor: "text-purple-600",
+    inactiveColor: "text-gray-600",
+  },
+  {
+    href: "/meeting-prep",
+    label: "Meeting Prep",
+    icon: Calendar,
     activeColor: "text-purple-600",
     inactiveColor: "text-gray-600",
   },
