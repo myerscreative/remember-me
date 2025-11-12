@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Network, Lightbulb, Settings, Download, Sparkles } from "lucide-react";
+import { Users, Bell, Network, Activity, Settings, Download, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -42,10 +42,10 @@ const navItems = [
     inactiveColor: "text-gray-600",
   },
   {
-    href: "/insights",
-    label: "Insights",
-    icon: Lightbulb,
-    activeColor: "text-yellow-500",
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: Activity,
+    activeColor: "text-purple-600",
     inactiveColor: "text-gray-600",
   },
   {
