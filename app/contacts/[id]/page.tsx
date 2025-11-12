@@ -1161,6 +1161,7 @@ export default function ContactDetailPage({
             text: currentSynopsis,
             context: activeTab as "Profession" | "Family" | "Interests",
             contactName: contact?.name || "",
+            familyMembers: activeTab === "Family" ? familyMembers : undefined, // Pass family members for context
           }),
         });
 
@@ -1188,7 +1189,7 @@ export default function ContactDetailPage({
       // Clear suggestions if disabled
       setMissingInfo([]);
     }
-  }, [activeTab, professionSynopsis, familySynopsis, interestsSynopsis, editingSynopsis, localSynopsis, contact?.name, aiSuggestionsEnabled]);
+  }, [activeTab, professionSynopsis, familySynopsis, interestsSynopsis, editingSynopsis, localSynopsis, contact?.name, aiSuggestionsEnabled, familyMembers]);
 
   // Toggle AI suggestions
   const handleToggleAiSuggestions = () => {
