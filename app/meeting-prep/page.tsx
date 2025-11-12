@@ -72,8 +72,37 @@ export default function MeetingPrepPage() {
   const [todaysMeetings, setTodaysMeetings] = useState<MeetingPrep[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for OAuth callback parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+
+    if (success === 'google_connected') {
+      setSuccessMessage('Google Calendar connected successfully!');
+      // Clear URL parameters
+      window.history.replaceState({}, '', '/meeting-prep');
+    } else if (success === 'microsoft_connected') {
+      setSuccessMessage('Microsoft Calendar connected successfully!');
+      // Clear URL parameters
+      window.history.replaceState({}, '', '/meeting-prep');
+    } else if (error) {
+      const errorMessages: Record<string, string> = {
+        'oauth_denied': 'Calendar permission was denied. Please try again and grant access.',
+        'missing_code': 'OAuth flow failed. Please try again.',
+        'config_missing': 'Calendar integration is not properly configured.',
+        'token_exchange_failed': 'Failed to exchange authorization code. Please try again.',
+        'missing_user_id': 'Authentication error. Please log in again.',
+        'db_error': 'Failed to save calendar connection. Please try again.',
+        'unexpected': 'An unexpected error occurred. Please try again.',
+      };
+      setError(errorMessages[error] || 'Failed to connect calendar. Please try again.');
+      // Clear URL parameters
+      window.history.replaceState({}, '', '/meeting-prep');
+    }
+
     loadMeetingPrep();
   }, []);
 
@@ -169,6 +198,25 @@ export default function MeetingPrepPage() {
                 Get relationship context before every meeting
               </p>
             </div>
+
+            {/* Success Alert */}
+            {successMessage && (
+              <Card className="border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-green-900 dark:text-green-200 mb-1">
+                        Success
+                      </h3>
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        {successMessage}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Error Alert */}
             {error && (

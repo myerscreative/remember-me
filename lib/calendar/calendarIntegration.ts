@@ -57,19 +57,7 @@ export async function requestCalendarPermission(
  * @returns Permission result
  */
 async function requestGoogleCalendarPermission(): Promise<CalendarPermissionResult> {
-  // Check if Google API is loaded
-  if (typeof window === 'undefined' || !window.gapi) {
-    return {
-      granted: false,
-      provider: 'google',
-      error: 'GOOGLE_API_NOT_LOADED',
-      userMessage: 'Google Calendar API is not loaded. Please refresh the page.',
-    };
-  }
-
   try {
-    // Initialize Google API client
-    // Note: This requires GOOGLE_CLIENT_ID to be set in environment
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
@@ -77,17 +65,21 @@ async function requestGoogleCalendarPermission(): Promise<CalendarPermissionResu
         granted: false,
         provider: 'google',
         error: 'MISSING_CLIENT_ID',
-        userMessage: 'Google Calendar is not configured. Please contact support.',
+        userMessage: 'Google Calendar is not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID.',
       };
     }
 
-    // Google OAuth flow would happen here
-    // For now, return a placeholder
+    // Redirect to OAuth route
+    if (typeof window !== 'undefined') {
+      window.location.href = '/api/auth/google';
+    }
+
+    // Return pending status (will be resolved after OAuth callback)
     return {
       granted: false,
       provider: 'google',
-      error: 'NOT_IMPLEMENTED',
-      userMessage: 'Google Calendar integration coming soon. Please check back later.',
+      error: 'PENDING',
+      userMessage: 'Redirecting to Google Calendar authorization...',
     };
   } catch (error: any) {
     return {
@@ -105,24 +97,38 @@ async function requestGoogleCalendarPermission(): Promise<CalendarPermissionResu
  * @returns Permission result
  */
 async function requestMicrosoftCalendarPermission(): Promise<CalendarPermissionResult> {
-  const clientId = process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID;
+  try {
+    const clientId = process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID;
 
-  if (!clientId) {
+    if (!clientId) {
+      return {
+        granted: false,
+        provider: 'microsoft',
+        error: 'MISSING_CLIENT_ID',
+        userMessage: 'Microsoft Calendar is not configured. Please set NEXT_PUBLIC_MICROSOFT_CLIENT_ID.',
+      };
+    }
+
+    // Redirect to OAuth route
+    if (typeof window !== 'undefined') {
+      window.location.href = '/api/auth/microsoft';
+    }
+
+    // Return pending status (will be resolved after OAuth callback)
     return {
       granted: false,
       provider: 'microsoft',
-      error: 'MISSING_CLIENT_ID',
-      userMessage: 'Microsoft Calendar is not configured. Please contact support.',
+      error: 'PENDING',
+      userMessage: 'Redirecting to Microsoft Calendar authorization...',
+    };
+  } catch (error: any) {
+    return {
+      granted: false,
+      provider: 'microsoft',
+      error: error.message,
+      userMessage: 'Failed to connect to Microsoft Calendar. Please try again.',
     };
   }
-
-  // Microsoft OAuth flow would happen here
-  return {
-    granted: false,
-    provider: 'microsoft',
-    error: 'NOT_IMPLEMENTED',
-    userMessage: 'Microsoft Calendar integration coming soon. Please check back later.',
-  };
 }
 
 /**
