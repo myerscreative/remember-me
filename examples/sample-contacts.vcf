@@ -1,0 +1,49 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:John Smith
+N:Smith;John;;;
+EMAIL;TYPE=INTERNET:john.smith@example.com
+TEL;TYPE=CELL:+1-555-123-4567
+BDAY:1985-03-15
+NOTE:Met at tech conference 2024. Interested in AI and startups.
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:Sarah Johnson
+N:Johnson;Sarah;;;
+EMAIL;TYPE=INTERNET:sarah.j@example.com
+TEL;TYPE=CELL:+1-555-234-5678
+BDAY:1990-07-22
+NOTE:Designer at Tesla. Passionate about sustainable tech.
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:Michael Chen
+N:Chen;Michael;;;
+EMAIL;TYPE=INTERNET:m.chen@example.com
+TEL;TYPE=WORK:+1-555-345-6789
+BDAY:1988-11-05
+NOTE:Software engineer. Met through LinkedIn.
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:Emily Davis
+N:Davis;Emily;;;
+EMAIL;TYPE=INTERNET:emily.davis@example.com
+TEL;TYPE=CELL:+1-555-456-7890
+BDAY:1992-04-18
+NOTE:Product manager at Google. Interested in AI UX.
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:David Wilson
+N:Wilson;David;;;
+EMAIL;TYPE=INTERNET:david.w@example.com
+TEL;TYPE=CELL:+1-555-567-8901
+BDAY:1987-09-30
+NOTE:Investor. Met at startup pitch event.
+END:VCARD
