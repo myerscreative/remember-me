@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Network, Lightbulb } from "lucide-react";
+import { Users, Bell, Activity, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -14,24 +14,24 @@ const navItems = [
     inactiveColor: "text-gray-600",
   },
   {
+    href: "/search",
+    label: "Search",
+    icon: Search,
+    activeColor: "text-purple-600",
+    inactiveColor: "text-gray-600",
+  },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: Activity,
+    activeColor: "text-purple-600",
+    inactiveColor: "text-gray-600",
+  },
+  {
     href: "/reminders",
     label: "Reminders",
     icon: Bell,
     activeColor: "text-yellow-600",
-    inactiveColor: "text-gray-600",
-  },
-  {
-    href: "/network",
-    label: "Network",
-    icon: Network,
-    activeColor: "text-gray-600",
-    inactiveColor: "text-gray-600",
-  },
-  {
-    href: "/insights",
-    label: "Insights",
-    icon: Lightbulb,
-    activeColor: "text-yellow-500",
     inactiveColor: "text-gray-600",
   },
 ];
