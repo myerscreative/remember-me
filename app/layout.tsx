@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { FloatingVoiceButton } from "@/components/floating-voice-button";
 import { ThemeProvider } from "./providers/theme-provider";
 
 const geistSans = Geist({
@@ -52,6 +53,7 @@ export default function RootLayout({
                 {children}
               </main>
               <BottomNav />
+              <FloatingVoiceButton />
             </div>
           </div>
         </ThemeProvider>
