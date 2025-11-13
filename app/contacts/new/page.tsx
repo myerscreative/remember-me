@@ -4,36 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, Mic, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { PersonInsert } from "@/types/database.types";
-import { VoiceEntryModal } from "@/components/voice-entry-modal";
+import { VoiceEntryModalEnhanced } from "@/components/voice-entry-modal-enhanced";
 import { formatPhoneNumber } from "@/lib/utils";
 
 interface ParsedContactData {
-  name?: string;
-  email?: string;
-  phone?: string;
-  linkedin?: string;
-  whereMet?: string;
-  introducedBy?: string;
-  whyStayInContact?: string;
-  whatInteresting?: string;
-  whatsImportant?: string;
-  tags?: string;
-  firstImpression?: string;
-  memorableMoment?: string;
-  familyMembers?: Array<{ name: string; relationship: string }>;
-  misc?: string;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  linkedin?: string | null;
+  company?: string | null;
+  jobTitle?: string | null;
+  whereMet?: string | null;
+  whenMet?: string | null;
+  introducedBy?: string | null;
+  whyStayInContact?: string | null;
+  whatInteresting?: string | null;
+  whatsImportant?: string | null;
+  interests?: string[] | null;
+  skills?: string[] | null;
+  familyMembers?: Array<{ name: string; relationship: string }> | null;
+  birthday?: string | null;
+  notes?: string | null;
+  tags?: string[] | null;
 }
 
 export default function NewContactPage() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [userId, setUserId] = useState<string>("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -48,9 +53,31 @@ export default function NewContactPage() {
     email: "",
     phone: "",
     linkedin: "",
+    interests: "",
+    skills: "",
+    company: "",
+    jobTitle: "",
+    birthday: "",
+    notes: "",
     familyMembers: [] as Array<{ name: string; relationship: string }>,
     misc: "",
   });
+
+  // Get user ID on mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUserId(user.id);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,7 +264,7 @@ export default function NewContactPage() {
       parsedFirstName = nameParts[0] || "";
       parsedLastName = nameParts.slice(1).join(" ") || "";
     }
-    
+
     // Merge voice data into form, preserving existing data where fields are already filled
     setFormData((prev) => ({
       firstName: prev.firstName || parsedFirstName || "",
@@ -245,17 +272,28 @@ export default function NewContactPage() {
       email: prev.email || data.email || "",
       phone: prev.phone || (data.phone ? formatPhoneNumber(data.phone) : ""),
       linkedin: prev.linkedin || data.linkedin || "",
+      company: prev.company || data.company || "",
+      jobTitle: prev.jobTitle || data.jobTitle || "",
       whereMet: prev.whereMet || data.whereMet || "",
       introducedBy: prev.introducedBy || data.introducedBy || "",
       whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
       whatInteresting: prev.whatInteresting || data.whatInteresting || "",
       whatsImportant: prev.whatsImportant || data.whatsImportant || "",
-      firstImpression: prev.firstImpression || data.firstImpression || "",
-      memorableMoment: prev.memorableMoment || data.memorableMoment || "",
-      tags: prev.tags || data.tags || "",
+      firstImpression: prev.firstImpression || "",
+      memorableMoment: prev.memorableMoment || "",
+      interests: prev.interests || (data.interests ? data.interests.join(", ") : ""),
+      skills: prev.skills || (data.skills ? data.skills.join(", ") : ""),
+      birthday: prev.birthday || data.birthday || "",
+      tags: prev.tags || (data.tags ? (Array.isArray(data.tags) ? data.tags.join(", ") : data.tags) : ""),
       familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
-      misc: prev.misc || data.misc || "",
+      notes: prev.notes || data.notes || "",
+      misc: prev.misc || data.notes || "", // Keep misc for backward compat
     }));
+  };
+
+  const handleSelectExistingContact = (contactId: string) => {
+    // Navigate to the existing contact for update
+    router.push(`/contacts/${contactId}`);
   };
 
   return (
@@ -606,10 +644,12 @@ export default function NewContactPage() {
       </div>
 
       {/* Voice Entry Modal */}
-      <VoiceEntryModal
+      <VoiceEntryModalEnhanced
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         onApply={handleVoiceDataApply}
+        onSelectExistingContact={handleSelectExistingContact}
+        userId={userId}
       />
 
       {/* Save Contact Button - Mobile */}
