@@ -48,7 +48,7 @@ const getGradient = (name: string): string => {
     "from-indigo-500 to-purple-500",
   ];
   let hash = 0;
-  for (let i < name.length; i++) {
+  for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
   return gradients[Math.abs(hash) % gradients.length];
