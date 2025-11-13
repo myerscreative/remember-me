@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const { response, user } = await updateSession(request);
 
   // Public routes that don't require authentication
-  const publicRoutes = ["/login", "/auth/callback"];
+  const publicRoutes = ["/login", "/auth/callback", "/reset-password"];
   const isPublicRoute = publicRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   );
