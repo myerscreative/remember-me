@@ -2,30 +2,13 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
-  // Use static export for mobile builds, standalone for web
-  output: process.env.NEXT_PUBLIC_BUILD_MODE === 'static' ? 'export' : 'standalone',
+  // Use default mode - deploy to Vercel with full functionality
+  // Mobile app will call the deployed API
   images: {
     unoptimized: true,
   },
-  // Trailing slashes for Capacitor compatibility
+  // Trailing slashes for better compatibility
   trailingSlash: true,
-  // Skip building dynamic routes for mobile - they'll be handled client-side
-  ...(process.env.NEXT_PUBLIC_BUILD_MODE === 'static' && {
-    exportPathMap: async function (
-      defaultPathMap,
-      { dev, dir, outDir, distDir, buildId }
-    ) {
-      // Only export static pages, skip dynamic routes
-      const paths: Record<string, any> = {};
-      for (const [path, route] of Object.entries(defaultPathMap)) {
-        // Skip dynamic routes (those with [])
-        if (!path.includes('[')) {
-          paths[path] = route;
-        }
-      }
-      return paths;
-    },
-  }),
 };
 
 const pwaConfig = withPWA({
