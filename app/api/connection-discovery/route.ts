@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all persons for this user
-    const { data: persons, error: personsError } = await supabase
+    const { data: persons, error: personsError } = await (supabase as any)
       .from("persons")
       .select("id, first_name, last_name, photo_url, who_introduced, where_met, interests")
       .eq("user_id", user.id)
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // 1. Find shared introducers (who introduced 2+ people)
     const introducerMap = new Map<string, typeof persons>();
-    persons.forEach((person) => {
+    persons.forEach((person: any) => {
       if (person.who_introduced && person.who_introduced.trim().length > 0) {
         const introducer = person.who_introduced.trim().toLowerCase();
         if (!introducerMap.has(introducer)) {
@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    introducerMap.forEach((contactList, introducer) => {
+    introducerMap.forEach((contactList: any, introducer: any) => {
       if (contactList.length >= 2) {
         discoveries.push({
           type: "shared_introducer",
-          persons: contactList.map((p) => ({
+          persons: contactList.map((p: any) => ({
             id: p.id,
             first_name: p.first_name,
             last_name: p.last_name,
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     // 2. Find shared locations (where_met)
     const locationMap = new Map<string, typeof persons>();
-    persons.forEach((person) => {
+    persons.forEach((person: any) => {
       if (person.where_met && person.where_met.trim().length > 0) {
         const location = person.where_met.trim().toLowerCase();
         if (!locationMap.has(location)) {
@@ -80,11 +80,11 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    locationMap.forEach((contactList, location) => {
+    locationMap.forEach((contactList: any, location: any) => {
       if (contactList.length >= 2) {
         discoveries.push({
           type: "shared_location",
-          persons: contactList.map((p) => ({
+          persons: contactList.map((p: any) => ({
             id: p.id,
             first_name: p.first_name,
             last_name: p.last_name,
@@ -98,9 +98,9 @@ export async function GET(request: NextRequest) {
 
     // 3. Find shared interests
     const interestMap = new Map<string, typeof persons>();
-    persons.forEach((person) => {
+    persons.forEach((person: any) => {
       if (person.interests && Array.isArray(person.interests)) {
-        person.interests.forEach((interest) => {
+        person.interests.forEach((interest: any) => {
           const interestLower = interest.trim().toLowerCase();
           if (!interestMap.has(interestLower)) {
             interestMap.set(interestLower, []);
@@ -110,16 +110,16 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    interestMap.forEach((contactList, interest) => {
+    interestMap.forEach((contactList: any, interest: any) => {
       if (contactList.length >= 2) {
         // Remove duplicates (same person might have same interest multiple times)
         const uniqueContacts = Array.from(
-          new Map(contactList.map((p) => [p.id, p])).values()
+          new Map(contactList.map((p: any) => [p.id, p])).values()
         );
         if (uniqueContacts.length >= 2) {
           discoveries.push({
             type: "shared_interest",
-            persons: uniqueContacts.map((p) => ({
+            persons: uniqueContacts.map((p: any) => ({
               id: p.id,
               first_name: p.first_name,
               last_name: p.last_name,

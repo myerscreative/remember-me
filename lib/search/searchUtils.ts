@@ -53,19 +53,19 @@ export async function searchPersonsFullText(
     let results = data || [];
 
     if (!options.includeArchived) {
-      results = results.filter(r => !r.archive_status);
+      results = results.filter((r: any) => !r.archive_status);
     }
 
     if (options.hasContext !== null && options.hasContext !== undefined) {
-      results = results.filter(r => r.has_context === options.hasContext);
+      results = results.filter((r: any) => r.has_context === options.hasContext);
     }
 
     if (options.imported !== null && options.imported !== undefined) {
-      results = results.filter(r => r.imported === options.imported);
+      results = results.filter((r: any) => r.imported === options.imported);
     }
 
     if (options.contactImportance) {
-      results = results.filter(r => r.contact_importance === options.contactImportance);
+      results = results.filter((r: any) => r.contact_importance === options.contactImportance);
     }
 
     if (options.limit) {

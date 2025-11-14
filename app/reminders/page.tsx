@@ -53,7 +53,7 @@ export default function RemindersPage() {
 
     try {
       // Fetch reminders with person information
-      const { data: remindersData, error } = await supabase
+      const { data: remindersData, error } = await (supabase as any)
         .from('reminders')
         .select(`
           *,
@@ -91,7 +91,7 @@ export default function RemindersPage() {
   async function toggleComplete(reminderId: string, currentStatus: boolean) {
     const supabase = createClient();
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('reminders')
       .update({ completed: !currentStatus })
       .eq('id', reminderId);
@@ -102,7 +102,7 @@ export default function RemindersPage() {
     }
 
     // Update local state
-    setReminders(reminders.map(r => 
+    setReminders(reminders.map((r: any) => 
       r.id === reminderId ? { ...r, completed: !currentStatus } : r
     ));
   }
@@ -112,7 +112,7 @@ export default function RemindersPage() {
 
     const supabase = createClient();
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('reminders')
       .delete()
       .eq('id', reminderId);
@@ -122,7 +122,7 @@ export default function RemindersPage() {
       return;
     }
 
-    setReminders(reminders.filter(r => r.id !== reminderId));
+    setReminders(reminders.filter((r: any) => r.id !== reminderId));
   }
 
   // Filter reminders

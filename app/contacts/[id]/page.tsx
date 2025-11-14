@@ -165,7 +165,7 @@ export default function ContactDetailPage({
         }
 
         // Fetch person with tags
-        const { data: person, error: personError } = await supabase
+        const { data: person, error: personError } = await (supabase as any)
           .from("persons")
           .select("*")
           .eq("id", id)
@@ -183,7 +183,7 @@ export default function ContactDetailPage({
         }
 
         // Fetch tags for this person
-        const { data: personTags, error: tagsError } = await supabase
+        const { data: personTags, error: tagsError } = await (supabase as any)
           .from("person_tags")
           .select("tag_id, tags(name)")
           .eq("person_id", id);
@@ -347,7 +347,7 @@ export default function ContactDetailPage({
         }
 
         // Update notes in database
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from("persons")
           .update({ 
             notes: value.trim() || null
@@ -374,7 +374,7 @@ export default function ContactDetailPage({
           router.push("/login?redirect=/contacts/" + id);
           return;
         }
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from("persons")
           .update({ where_met: value.trim() || null })
           .eq("id", id)
@@ -393,7 +393,7 @@ export default function ContactDetailPage({
           router.push("/login?redirect=/contacts/" + id);
           return;
         }
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from("persons")
           .update({ why_stay_in_contact: value.trim() || null })
           .eq("id", id)
@@ -412,7 +412,7 @@ export default function ContactDetailPage({
           router.push("/login?redirect=/contacts/" + id);
           return;
         }
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from("persons")
           .update({ most_important_to_them: value.trim() || null })
           .eq("id", id)
@@ -461,7 +461,7 @@ export default function ContactDetailPage({
       }
 
       // Update synopsis in database
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("persons")
         .update(updateData)
         .eq("id", id)
@@ -518,7 +518,7 @@ export default function ContactDetailPage({
       }
 
       // First, get existing tags for this person
-      const { data: existingPersonTags } = await supabase
+      const { data: existingPersonTags } = await (supabase as any)
         .from("person_tags")
         .select("tag_id, tags(name)")
         .eq("person_id", id);
@@ -526,13 +526,13 @@ export default function ContactDetailPage({
       const existingTagNames = existingPersonTags?.map((pt: any) => pt.tags?.name).filter(Boolean) || [];
 
       // Determine which tags to add and which to remove
-      const tagsToAdd = tags.filter(t => !existingTagNames.includes(t));
+      const tagsToAdd = tags.filter((t: any) => !existingTagNames.includes(t));
       const tagsToRemove = existingTagNames.filter((t: string) => !tags.includes(t));
 
       // Add new tags
       for (const tagName of tagsToAdd) {
         // First, ensure the tag exists in the tags table
-        const { data: existingTag } = await supabase
+        const { data: existingTag } = await (supabase as any)
           .from("tags")
           .select("id, name")
           .eq("name", tagName)
@@ -543,7 +543,7 @@ export default function ContactDetailPage({
 
         if (!tagId) {
           // Create the tag if it doesn't exist
-          const { data: newTag, error: tagError } = await supabase
+          const { data: newTag, error: tagError } = await (supabase as any)
             .from("tags")
             .insert({ name: tagName, user_id: user.id })
             .select()
@@ -554,22 +554,22 @@ export default function ContactDetailPage({
         }
 
         // Link the tag to the person
-        await supabase
+        await (supabase as any)
           .from("person_tags")
           .insert({ person_id: id, tag_id: tagId });
       }
 
       // Remove tags
       if (tagsToRemove.length > 0) {
-        const { data: tagsToDelete } = await supabase
+        const { data: tagsToDelete } = await (supabase as any)
           .from("tags")
           .select("id")
           .in("name", tagsToRemove)
           .eq("user_id", user.id);
 
         if (tagsToDelete && tagsToDelete.length > 0) {
-          const tagIdsToDelete = tagsToDelete.map(t => t.id);
-          await supabase
+          const tagIdsToDelete = tagsToDelete.map((t: any) => t.id);
+          await (supabase as any)
             .from("person_tags")
             .delete()
             .eq("person_id", id)
@@ -624,7 +624,7 @@ export default function ContactDetailPage({
       }
 
       // Update interests in database
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("persons")
         .update({ 
           interests: interests.length > 0 ? interests : null
@@ -671,7 +671,7 @@ export default function ContactDetailPage({
       }
 
       // Update hobbies in database
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("persons")
         .update({ 
           hobbies: hobbies.trim() || null
@@ -743,12 +743,12 @@ export default function ContactDetailPage({
             }
           }
         }
-      } else if (rawValue instanceof Date) {
+      } else if ((rawValue as any) instanceof Date) {
         // If it's a Date object, format as YYYY-MM-DD
-        if (!isNaN(rawValue.getTime())) {
-          const year = rawValue.getFullYear();
-          const month = String(rawValue.getMonth() + 1).padStart(2, '0');
-          const day = String(rawValue.getDate()).padStart(2, '0');
+        if (!isNaN((rawValue as any).getTime())) {
+          const year = (rawValue as any).getFullYear();
+          const month = String((rawValue as any).getMonth() + 1).padStart(2, '0');
+          const day = String((rawValue as any).getDate()).padStart(2, '0');
           birthdayToSave = `${year}-${month}-${day}`;
         } else {
           birthdayToSave = null;
@@ -759,7 +759,7 @@ export default function ContactDetailPage({
       }
 
       // Update birthday in database and return the updated row
-      const { data: updatedData, error: updateError } = await supabase
+      const { data: updatedData, error: updateError } = await (supabase as any)
         .from("persons")
         .update({ birthday: birthdayToSave })
         .eq("id", id)
@@ -830,7 +830,7 @@ export default function ContactDetailPage({
       }
 
       // Update name in database
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("persons")
         .update({ 
           first_name: firstName.trim(),
@@ -875,7 +875,7 @@ export default function ContactDetailPage({
       }
 
       // Update email and phone in database
-      const { data: updatedData, error: updateError } = await supabase
+      const { data: updatedData, error: updateError } = await (supabase as any)
         .from("persons")
         .update({ 
           email: emailValue.trim() || null,
@@ -929,7 +929,7 @@ export default function ContactDetailPage({
       }
 
       // Update family_members in database
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("persons")
         .update({ 
           family_members: familyMembers.length > 0 ? familyMembers : null
@@ -1038,7 +1038,7 @@ export default function ContactDetailPage({
           // Extract file path from URL
           const oldUrl = contact.avatar;
           const urlParts = oldUrl.split('/');
-          const fileIndex = urlParts.findIndex(part => part === 'avatars');
+          const fileIndex = urlParts.findIndex((part: any) => part === 'avatars');
           if (fileIndex !== -1) {
             const filePath = urlParts.slice(fileIndex + 1).join('/');
             await supabase.storage.from('avatars').remove([filePath]);
@@ -1054,7 +1054,7 @@ export default function ContactDetailPage({
       const fileName = `${id}-${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase
+      const { error: uploadError } = await (supabase as any)
         .storage
         .from('avatars')
         .upload(filePath, croppedImageBlob, {
@@ -1068,13 +1068,13 @@ export default function ContactDetailPage({
       }
 
       // Get public URL
-      const { data: { publicUrl } } = supabase
+      const { data: { publicUrl } } = (supabase as any)
         .storage
         .from('avatars')
         .getPublicUrl(filePath);
 
       // Update photo_url in database
-      const { data: updatedData, error: updateError } = await supabase
+      const { data: updatedData, error: updateError } = await (supabase as any)
         .from("persons")
         .update({ photo_url: publicUrl })
         .eq("id", id)

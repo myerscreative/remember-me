@@ -93,7 +93,7 @@ export default function BriefingPage({
           return;
         }
 
-        const { data: person, error: personError } = await supabase
+        const { data: person, error: personError } = await (supabase as any)
           .from("persons")
           .select("*")
           .eq("id", id)

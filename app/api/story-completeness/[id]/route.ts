@@ -20,7 +20,7 @@ export async function GET(
     }
 
     // Get the contact
-    const { data: person, error: personError } = await supabase
+    const { data: person, error: personError } = await (supabase as any)
       .from("persons")
       .select("*")
       .eq("id", id)
@@ -66,7 +66,7 @@ export async function GET(
     if (person.family_members && Array.isArray(person.family_members) && person.family_members.length > 0) score++;
 
     // Check for tags
-    const { data: tags } = await supabase
+    const { data: tags } = await (supabase as any)
       .from("person_tags")
       .select("tag_id")
       .eq("person_id", id)

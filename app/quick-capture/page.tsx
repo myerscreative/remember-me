@@ -52,7 +52,7 @@ export default function QuickCapturePage() {
       // If we have a contact name, try to find or create the contact
       if (contactName.trim()) {
         // Try to find existing contact by name
-        const { data: existingContacts } = await supabase
+        const { data: existingContacts } = await (supabase as any)
           .from("persons")
           .select("id, first_name, last_name")
           .eq("user_id", user.id)
@@ -74,7 +74,7 @@ export default function QuickCapturePage() {
         if (match) {
           personId = match.id;
           // Update the notes
-          await supabase
+          await (supabase as any)
             .from("persons")
             .update({
               notes: notes.trim(),
@@ -84,7 +84,7 @@ export default function QuickCapturePage() {
             .eq("id", personId);
         } else {
           // Create new contact
-          const { data: newPerson } = await supabase
+          const { data: newPerson } = await (supabase as any)
             .from("persons")
             .insert({
               user_id: user.id,
@@ -102,7 +102,7 @@ export default function QuickCapturePage() {
 
         // Create interaction record
         if (personId) {
-          await supabase.from("interactions").insert({
+          await (supabase as any).from("interactions").insert({
             user_id: user.id,
             person_id: personId,
             interaction_type: "meeting",

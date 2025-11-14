@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
       return authError;
     }
 
-    const supabase = createClient();
-    const { data, error } = await supabase
+    const supabase = await createClient();
+    const { data, error } = await (supabase as any)
       .from("calendar_preferences")
       .select("*")
       .eq("user_id", user.id)
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Don't expose tokens to frontend
-    const { access_token_encrypted, refresh_token_encrypted, ...safeData } = data;
+    const { access_token_encrypted, refresh_token_encrypted, ...safeData } = data as any;
 
     return NextResponse.json(safeData);
   } catch (error: unknown) {
@@ -76,8 +76,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
-    
+    const supabase = await createClient();
+
     // Update only the provided fields
     const updates: any = {
       updated_at: new Date().toISOString(),
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
     if (notification_time !== undefined) updates.notification_time = notification_time;
     if (only_known_contacts !== undefined) updates.only_known_contacts = only_known_contacts;
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("calendar_preferences")
       .update(updates)
       .eq("user_id", user.id)
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Don't expose tokens to frontend
-    const { access_token_encrypted, refresh_token_encrypted, ...safeData } = data;
+    const { access_token_encrypted, refresh_token_encrypted, ...safeData } = data as any;
 
     return NextResponse.json(safeData);
   } catch (error: unknown) {
@@ -126,10 +126,10 @@ export async function DELETE(request: NextRequest) {
       return authError;
     }
 
-    const supabase = createClient();
-    
+    const supabase = await createClient();
+
     // Delete calendar preferences (will cascade delete notifications)
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("calendar_preferences")
       .delete()
       .eq("user_id", user.id);

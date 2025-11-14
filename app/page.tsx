@@ -88,7 +88,7 @@ export default function HomePage() {
           return;
         }
 
-        let query = supabase
+        let query = (supabase as any)
           .from("persons")
           .select("*")
           .eq("user_id", user.id);
@@ -110,7 +110,7 @@ export default function HomePage() {
         }
 
         // Debug: Log contacts to verify birthday field
-        console.log("Fetched contacts:", (persons as Person[])?.map(p => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
+        console.log("Fetched contacts:", (persons as Person[])?.map((p: any) => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
 
         setContacts(persons || []);
       } catch (error) {

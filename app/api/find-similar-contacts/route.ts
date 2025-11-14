@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Fetch all contacts for the user with their tags
-    let query = supabase
+    let query = (supabase as any)
       .from("persons")
       .select(`
         id,
@@ -132,10 +132,10 @@ export async function POST(request: NextRequest) {
 
         // Extract common words (excluding common words like "at", "the", etc.)
         const commonWords = ["the", "at", "in", "on", "a", "an", "and", "or"];
-        const words1 = whereMet1.split(/\s+/).filter(w => w.length > 3 && !commonWords.includes(w));
-        const words2 = whereMet2.split(/\s+/).filter(w => w.length > 3 && !commonWords.includes(w));
+        const words1 = whereMet1.split(/\s+/).filter((w: string) => w.length > 3 && !commonWords.includes(w));
+        const words2 = whereMet2.split(/\s+/).filter((w: string) => w.length > 3 && !commonWords.includes(w));
 
-        const overlap = words1.filter(w => words2.some(w2 => w2.includes(w) || w.includes(w2)));
+        const overlap = words1.filter((w: string) => words2.some((w2: string) => w2.includes(w) || w.includes(w2)));
 
         if (overlap.length > 0) {
           reasons.push(`Met at similar location/event`);

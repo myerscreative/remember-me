@@ -85,7 +85,7 @@ confidence is 0-1 representing how certain you are.`,
       const supabase = await createClient();
 
       // Search for contact by name
-      const { data: contacts, error } = await supabase
+      const { data: contacts, error } = await (supabase as any)
         .from("persons")
         .select("*")
         .eq("user_id", userId)
@@ -98,7 +98,7 @@ confidence is 0-1 representing how certain you are.`,
         // If multiple matches, return them for user to choose
         matchedContact = contacts.length === 1 ? contacts[0] : {
           multiple: true,
-          matches: contacts.map(c => ({
+          matches: contacts.map((c: any) => ({
             id: c.id,
             name: c.name,
             email: c.email,
@@ -202,14 +202,14 @@ Extract interests and skills as arrays. For tags, infer from context (e.g., ment
       whyStayInContact: parsedData.whyStayInContact?.trim() || null,
       whatInteresting: parsedData.whatInteresting?.trim() || null,
       whatsImportant: parsedData.whatsImportant?.trim() || null,
-      interests: Array.isArray(parsedData.interests) ? parsedData.interests.filter(i => i?.trim()) : null,
-      skills: Array.isArray(parsedData.skills) ? parsedData.skills.filter(s => s?.trim()) : null,
+      interests: Array.isArray(parsedData.interests) ? parsedData.interests.filter((i: any) => i?.trim()) : null,
+      skills: Array.isArray(parsedData.skills) ? parsedData.skills.filter((s: any) => s?.trim()) : null,
       familyMembers: Array.isArray(parsedData.familyMembers)
         ? parsedData.familyMembers.filter((fm: any) => fm?.name && fm?.relationship)
         : null,
       birthday: parsedData.birthday?.trim() || null,
       notes: parsedData.notes?.trim() || null,
-      tags: Array.isArray(parsedData.tags) ? parsedData.tags.filter(t => t?.trim()) : null,
+      tags: Array.isArray(parsedData.tags) ? parsedData.tags.filter((t: any) => t?.trim()) : null,
     };
 
     return NextResponse.json({

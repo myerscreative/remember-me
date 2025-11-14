@@ -355,7 +355,7 @@ export default function NetworkPage() {
 
       try {
         // Fetch all contacts
-        const { data, error: personsError } = await supabase
+        const { data, error: personsError } = await (supabase as any)
           .from("persons")
           .select("*")
           .eq("user_id", user.id)
@@ -386,19 +386,19 @@ export default function NetworkPage() {
         }
 
         // Fetch all relationships
-        const personIds = persons.map(p => p.id);
+        const personIds = persons.map((p: any) => p.id);
         let relationships: Relationship[] = [];
         
         if (personIds.length > 0) {
           // Fetch relationships where any person is involved (as from_person or to_person)
-          const { data: data1, error: error1 } = await supabase
+          const { data: data1, error: error1 } = await (supabase as any)
             .from("relationships")
             .select("*")
             .in("from_person_id", personIds);
 
           if (error1) throw error1;
 
-          const { data: data2, error: error2 } = await supabase
+          const { data: data2, error: error2 } = await (supabase as any)
             .from("relationships")
             .select("*")
             .in("to_person_id", personIds);
@@ -589,7 +589,7 @@ export default function NetworkPage() {
         positionsInitialized.current = true;
         
         // Sort nodes: favorites first, then by recency
-        const sortedNodes = [...prevNodes].sort((a, b) => {
+        const sortedNodes = [...prevNodes].sort((a: any, b: any) => {
           const aIsFavorite = favorites.has(a.id);
           const bIsFavorite = favorites.has(b.id);
           

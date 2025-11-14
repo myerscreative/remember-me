@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get calendar preferences
-    const supabase = createClient();
-    const { data: preferences, error: prefError } = await supabase
+    const supabase = await createClient();
+    const { data: preferences, error: prefError } = await (supabase as any)
       .from("calendar_preferences")
       .select("*")
       .eq("user_id", user.id)
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       console.error("Token refresh error:", errorData);
       
       // Update error in database
-      await supabase
+      await (supabase as any)
         .from("calendar_preferences")
         .update({
           last_sync_error: `Token refresh failed: ${errorData.error || "Unknown error"}`,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     // Update tokens in database
     // TODO: Encrypt access token before storing
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from("calendar_preferences")
       .update({
         access_token_encrypted: access_token, // TODO: Encrypt this

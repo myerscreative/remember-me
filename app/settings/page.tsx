@@ -79,7 +79,7 @@ export default function SettingsPage() {
       setUser(authUser);
 
       // Load user settings from database
-      const { data: userSettings } = await supabase
+      const { data: userSettings } = await (supabase as any)
         .from('user_settings')
         .select('*')
         .eq('user_id', authUser.id)
@@ -102,7 +102,7 @@ export default function SettingsPage() {
       const supabase = createClient();
       
       // Upsert user settings
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_settings')
         .upsert({
           user_id: user.id,

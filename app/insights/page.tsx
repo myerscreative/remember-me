@@ -141,7 +141,7 @@ export default function InsightsPage() {
         const previousPeriodStart = new Date(startDate.getTime() - days * 24 * 60 * 60 * 1000);
 
         // Fetch all persons
-        const { data: persons } = await supabase
+        const { data: persons } = await (supabase as any)
           .from("persons")
           .select("*")
           .eq("user_id", user.id);
@@ -149,7 +149,7 @@ export default function InsightsPage() {
         const allPersons = persons || [];
 
         // Fetch interactions
-        const { data: interactions } = await supabase
+        const { data: interactions } = await (supabase as any)
           .from("interactions")
           .select("*")
           .eq("user_id", user.id);
@@ -160,12 +160,12 @@ export default function InsightsPage() {
         const totalContacts = allPersons.length;
         
         // Contacts added in current period
-        const currentPeriodContacts = allPersons.filter(p => 
+        const currentPeriodContacts = allPersons.filter((p: any) => 
           new Date(p.created_at) >= startDate
         ).length;
         
         // Contacts added in previous period
-        const previousPeriodContacts = allPersons.filter(p => {
+        const previousPeriodContacts = allPersons.filter((p: any) => {
           const created = new Date(p.created_at);
           return created >= previousPeriodStart && created < startDate;
         }).length;
@@ -180,17 +180,17 @@ export default function InsightsPage() {
         
         const activeThisWeek = new Set(
           allInteractions
-            .filter(i => new Date(i.interaction_date) >= weekAgo)
-            .map(i => i.person_id)
+            .filter((i: any) => new Date(i.interaction_date) >= weekAgo)
+            .map((i: any) => i.person_id)
         ).size;
 
         const activePreviousWeek = new Set(
           allInteractions
-            .filter(i => {
+            .filter((i: any) => {
               const date = new Date(i.interaction_date);
               return date >= twoWeeksAgo && date < weekAgo;
             })
-            .map(i => i.person_id)
+            .map((i: any) => i.person_id)
         ).size;
 
         const activeThisWeekChange = activePreviousWeek > 0
@@ -198,12 +198,12 @@ export default function InsightsPage() {
           : activeThisWeek > 0 ? 100 : 0;
 
         // Reminders completed (contacts with follow_up_reminder in past)
-        const remindersCompleted = allPersons.filter(p => {
+        const remindersCompleted = allPersons.filter((p: any) => {
           if (!p.follow_up_reminder) return false;
           return new Date(p.follow_up_reminder) < now && new Date(p.follow_up_reminder) >= startDate;
         }).length;
 
-        const remindersCompletedPrevious = allPersons.filter(p => {
+        const remindersCompletedPrevious = allPersons.filter((p: any) => {
           if (!p.follow_up_reminder) return false;
           const reminderDate = new Date(p.follow_up_reminder);
           return reminderDate < startDate && reminderDate >= previousPeriodStart;
@@ -225,7 +225,7 @@ export default function InsightsPage() {
         });
 
         // Calculate relationship health
-        const healthData: RelationshipHealth[] = allPersons.map(p => {
+        const healthData: RelationshipHealth[] = allPersons.map((p: any) => {
           const daysSinceContact = p.last_contact
             ? Math.floor((now.getTime() - new Date(p.last_contact).getTime()) / (1000 * 60 * 60 * 24))
             : 999;
@@ -245,13 +245,13 @@ export default function InsightsPage() {
             lastContact: daysSinceContact,
             healthScore: Math.round(healthScore),
           };
-        }).sort((a, b) => a.healthScore - b.healthScore).slice(0, 8);
+        }).sort((a: any, b: any) => a.healthScore - b.healthScore).slice(0, 8);
 
         setHealthList(healthData);
 
         // Calculate top connections
         const personInteractionCounts = new Map<string, number>();
-        allInteractions.forEach(i => {
+        allInteractions.forEach((i: any) => {
           personInteractionCounts.set(
             i.person_id,
             (personInteractionCounts.get(i.person_id) || 0) + 1
@@ -269,21 +269,21 @@ export default function InsightsPage() {
             } : null;
           })
           .filter((c): c is TopConnection => c !== null)
-          .sort((a, b) => b.interactionCount - a.interactionCount)
+          .sort((a: any, b: any) => b.interactionCount - a.interactionCount)
           .slice(0, 10);
 
         setTopConnections(topConnectionsData);
 
         // Upcoming reminders
         const upcomingData: UpcomingReminder[] = allPersons
-          .filter(p => p.follow_up_reminder && new Date(p.follow_up_reminder) >= now)
-          .map(p => ({
+          .filter((p: any) => p.follow_up_reminder && new Date(p.follow_up_reminder) >= now)
+          .map((p: any) => ({
             id: p.id,
             date: p.follow_up_reminder!,
             description: `Follow up with ${getFullName(p)}`,
             priority: 'medium' as const,
           }))
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .slice(0, 5);
 
         setUpcomingReminders(upcomingData);

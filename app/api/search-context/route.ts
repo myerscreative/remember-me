@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.rpc("search_persons_by_context", {
       p_user_id: user.id,
       search_query: query.trim(),
-    });
+    } as any);
 
     if (error) {
       console.error("Error searching contacts:", error);

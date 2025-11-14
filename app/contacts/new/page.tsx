@@ -135,7 +135,7 @@ export default function NewContactPage() {
       };
 
       // Insert person
-      const { data: newPerson, error: personError } = await supabase
+      const { data: newPerson, error: personError } = await (supabase as any)
         .from("persons")
         .insert(personData)
         .select()
@@ -157,8 +157,8 @@ export default function NewContactPage() {
       if (formData.tags.trim() && newPerson) {
         const tagNames = formData.tags
           .split(",")
-          .map(tag => tag.trim())
-          .filter(tag => tag.length > 0);
+          .map((tag: any) => tag.trim())
+          .filter((tag: any) => tag.length > 0);
 
         if (tagNames.length > 0) {
           // Get or create tags
@@ -166,7 +166,7 @@ export default function NewContactPage() {
           
           for (const tagName of tagNames) {
             // Check if tag exists
-            const { data: existingTag } = await supabase
+            const { data: existingTag } = await (supabase as any)
               .from("tags")
               .select("id")
               .eq("user_id", user.id)
@@ -179,7 +179,7 @@ export default function NewContactPage() {
               tagId = existingTag.id;
             } else {
               // Create new tag
-              const { data: newTag, error: tagError } = await supabase
+              const { data: newTag, error: tagError } = await (supabase as any)
                 .from("tags")
                 .insert({
                   user_id: user.id,
@@ -206,7 +206,7 @@ export default function NewContactPage() {
               tag_id: tagId,
             }));
 
-            const { error: linkError } = await supabase
+            const { error: linkError } = await (supabase as any)
               .from("person_tags")
               .insert(personTagInserts);
 

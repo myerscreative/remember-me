@@ -70,8 +70,8 @@ export async function GET(request: NextRequest) {
     expiryDate.setSeconds(expiryDate.getSeconds() + expires_in);
 
     // Store tokens in database
-    const supabase = createClient();
-    
+    const supabase = await createClient();
+
     // Get user from state or current session
     const userId = state;
     if (!userId) {
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     // TODO: Encrypt tokens before storing (implement encryption helper)
     // For now, storing as-is (NOT PRODUCTION READY)
-    const { error: dbError } = await supabase
+    const { error: dbError } = await (supabase as any)
       .from("calendar_preferences")
       .upsert({
         user_id: userId,
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         token_expiry: expiryDate.toISOString(),
         last_sync_at: new Date().toISOString(),
         notification_time: 30, // Default to 30 minutes
-      }, {
+      } as any, {
         onConflict: "user_id",
       });
 

@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get calendar preferences
-    const supabase = createClient();
-    const { data: preferences, error: prefError } = await supabase
+    const supabase = await createClient();
+    const { data: preferences, error: prefError } = await (supabase as any)
       .from("calendar_preferences")
       .select("*")
       .eq("user_id", user.id)
@@ -51,11 +51,11 @@ export async function GET(request: NextRequest) {
       console.error("Failed to fetch events:", error);
       
       // Update error in database
-      await supabase
+      await (supabase as any)
         .from("calendar_preferences")
         .update({
           last_sync_error: error instanceof Error ? error.message : "Failed to fetch events",
-        })
+        } as any)
         .eq("user_id", user.id);
 
       return NextResponse.json(
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     // Filter out meetings that have already been notified
     const newMeetings = [];
     for (const meeting of meetingsToNotify) {
-      const { data: existing } = await supabase
+      const { data: existing } = await (supabase as any)
         .from("meeting_notifications")
         .select("*")
         .eq("user_id", user.id)
@@ -87,13 +87,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Update sync status
-    await supabase
+    await (supabase as any)
       .from("calendar_preferences")
       .update({
         last_sync_at: new Date().toISOString(),
         last_sync_error: null,
         sync_count: (preferences.sync_count || 0) + 1,
-      })
+      } as any)
       .eq("user_id", user.id);
 
     return NextResponse.json({

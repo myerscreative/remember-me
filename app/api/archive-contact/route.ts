@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       p_user_id: user.id,
       p_archived: archived,
       p_reason: archivedReason || null,
-    });
+    } as any);
 
     if (error) {
       console.error("RPC error:", error);

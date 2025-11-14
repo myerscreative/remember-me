@@ -1,20 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { FloatingVoiceButton } from "@/components/floating-voice-button";
 import { ThemeProvider } from "./providers/theme-provider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "ReMember Me - Keep Track of People Who Matter",
@@ -42,9 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ThemeProvider>
           <div className="flex flex-col min-h-screen md:flex-row">
             <SidebarNav />

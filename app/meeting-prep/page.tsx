@@ -523,7 +523,7 @@ function MeetingPrepCard({ prep, router }: { prep: MeetingPrep; router: any }) {
               Known Contacts ({persons.length})
             </h4>
             <div className="space-y-3">
-              {persons.map((person) => (
+              {persons.map((person: any) => (
                 <div
                   key={person.id}
                   className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -562,7 +562,7 @@ function MeetingPrepCard({ prep, router }: { prep: MeetingPrep; router: any }) {
               Other Attendees ({unmatchedAttendees.length})
             </h4>
             <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              {unmatchedAttendees.map((attendee, idx) => (
+              {unmatchedAttendees.map((attendee: any, idx: any) => (
                 <div key={idx} className="flex items-center gap-2">
                   <span>•</span>
                   <span>{attendee.name || attendee.email}</span>

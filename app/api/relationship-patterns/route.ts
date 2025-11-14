@@ -23,13 +23,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all persons
-    const { data: persons } = await supabase
+    const { data: persons } = await (supabase as any)
       .from("persons")
       .select("id, first_name, last_name, created_at, last_contact, where_met, archived")
       .eq("user_id", user.id);
 
     // Fetch all interactions
-    const { data: interactions } = await supabase
+    const { data: interactions } = await (supabase as any)
       .from("interactions")
       .select("person_id, interaction_type, interaction_date")
       .eq("user_id", user.id);
@@ -42,18 +42,18 @@ export async function GET(request: NextRequest) {
     const now = new Date();
 
     // Pattern 1: Decay Analysis
-    const contactsWithInteractions = persons.filter((p) => {
-      const personInteractions = interactions?.filter((i) => i.person_id === p.id) || [];
+    const contactsWithInteractions = persons.filter((p: any) => {
+      const personInteractions = interactions?.filter((i: any) => i.person_id === p.id) || [];
       return personInteractions.length > 0;
     });
 
     if (contactsWithInteractions.length > 5) {
       // Calculate average time between interactions
       const timeBetweenInteractions: number[] = [];
-      contactsWithInteractions.forEach((person) => {
+      contactsWithInteractions.forEach((person: any) => {
         const personInteractions = (interactions || [])
-          .filter((i) => i.person_id === person.id)
-          .sort((a, b) => new Date(a.interaction_date).getTime() - new Date(b.interaction_date).getTime());
+          .filter((i: any) => i.person_id === person.id)
+          .sort((a: any, b: any) => new Date(a.interaction_date).getTime() - new Date(b.interaction_date).getTime());
 
         for (let i = 1; i < personInteractions.length; i++) {
           const diff = new Date(personInteractions[i].interaction_date).getTime() -
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
         );
 
         // Count contacts where last contact exceeds average by 2x
-        const fadingCount = contactsWithInteractions.filter((p) => {
+        const fadingCount = contactsWithInteractions.filter((p: any) => {
           if (!p.last_contact) return false;
           const daysSince = (now.getTime() - new Date(p.last_contact).getTime()) / (1000 * 60 * 60 * 24);
           return daysSince > avgDays * 2;
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
     // Pattern 2: Meeting Location Preference
     const locationCounts = new Map<string, number>();
-    persons.forEach((p) => {
+    persons.forEach((p: any) => {
       if (p.where_met && p.where_met.trim().length > 0) {
         const location = p.where_met.trim().toLowerCase();
         locationCounts.set(location, (locationCounts.get(location) || 0) + 1);
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     // Pattern 3: Interaction Type Preference
     if (interactions && interactions.length > 5) {
       const typeCounts = new Map<string, number>();
-      interactions.forEach((i) => {
+      interactions.forEach((i: any) => {
         typeCounts.set(i.interaction_type, (typeCounts.get(i.interaction_type) || 0) + 1);
       });
 
@@ -137,10 +137,10 @@ export async function GET(request: NextRequest) {
 
     // Pattern 4: Contact Growth Rate
     const last30Days = persons.filter(
-      (p) => new Date(p.created_at) > new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      (p: any) => new Date(p.created_at) > new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     ).length;
     const last90Days = persons.filter(
-      (p) => new Date(p.created_at) > new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      (p: any) => new Date(p.created_at) > new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
     ).length;
 
     if (last90Days > 5) {
@@ -161,8 +161,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Pattern 5: Archive Behavior
-    const archivedContacts = persons.filter((p) => p.archived).length;
-    const activeContacts = persons.filter((p) => !p.archived).length;
+    const archivedContacts = persons.filter((p: any) => p.archived).length;
+    const activeContacts = persons.filter((p: any) => !p.archived).length;
 
     if (persons.length > 10) {
       const archiveRate = Math.round((archivedContacts / persons.length) * 100);

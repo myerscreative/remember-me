@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Store notification record
-    const supabase = createClient();
-    const { data, error } = await supabase
+    const supabase = await createClient();
+    const { data, error } = await (supabase as any)
       .from("meeting_notifications")
       .upsert({
         user_id: user.id,
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         matched_contacts_count: matched_contacts_count || 0,
         notification_shown: notification_shown || false,
         notification_shown_at: notification_shown ? new Date().toISOString() : null,
-      }, {
+      } as any, {
         onConflict: "user_id,event_id",
       })
       .select()
@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
-    const { data, error } = await supabase
+    const supabase = await createClient();
+    const { data, error } = await (supabase as any)
       .from("meeting_notifications")
       .select("*")
       .eq("user_id", user.id)

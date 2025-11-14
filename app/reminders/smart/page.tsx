@@ -74,7 +74,7 @@ export default function SmartRemindersPage() {
     if (activeFilter === 'all') {
       setFilteredReminders(reminders);
     } else {
-      setFilteredReminders(reminders.filter(r => r.urgency === activeFilter));
+      setFilteredReminders(reminders.filter((r: any) => r.urgency === activeFilter));
     }
   }, [activeFilter, reminders]);
 
@@ -105,7 +105,7 @@ export default function SmartRemindersPage() {
 
       if (success) {
         // Remove from reminders list
-        setReminders(prev => prev.filter(r => r.id !== personId));
+        setReminders(prev => prev.filter((r: any) => r.id !== personId));
       }
     } catch (error) {
       console.error("Error marking as reached out:", error);
@@ -126,7 +126,7 @@ export default function SmartRemindersPage() {
 
       if (success) {
         // Remove from reminders list
-        setReminders(prev => prev.filter(r => r.id !== personId));
+        setReminders(prev => prev.filter((r: any) => r.id !== personId));
       }
     } catch (error) {
       console.error("Error snoozing reminder:", error);

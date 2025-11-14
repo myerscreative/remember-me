@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.rpc("get_decaying_relationships", {
       p_user_id: user.id,
       days_threshold: daysThreshold,
-    });
+    } as any);
 
     if (error) {
       console.error("Error fetching decaying relationships:", error);

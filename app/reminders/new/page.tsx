@@ -29,7 +29,7 @@ export default function NewReminderPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('persons')
       .select('id, name, first_name, last_name')
       .eq('user_id', user.id)
@@ -47,7 +47,7 @@ export default function NewReminderPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('reminders')
         .insert({
           user_id: user.id,

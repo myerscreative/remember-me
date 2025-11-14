@@ -152,7 +152,7 @@ export default function ImportContactsPage() {
         }
 
         // Insert batch
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('persons')
           .insert(contactsToInsert)
           .select();
