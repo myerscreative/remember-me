@@ -17,7 +17,7 @@ import type { CalendarEvent, Attendee, MeetingPrep } from "@/types/calendar";
 export async function matchAttendeesToPersons(
   event: CalendarEvent
 ): Promise<MeetingPrep> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get current user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -52,7 +52,7 @@ export async function matchAttendeesToPersons(
 
   try {
     // Query database for matching persons
-    const { data: matchedPersons, error } = await supabase
+    const { data: matchedPersons, error } = await (supabase as any)
       .from('persons')
       .select('*')
       .eq('user_id', user.id)
@@ -182,12 +182,12 @@ export async function getMeetingsRequiringNotification(
 export async function findPersonByEmail(
   attendeeEmail: string
 ): Promise<Person | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id)

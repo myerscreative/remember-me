@@ -2,11 +2,12 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Use static export for mobile builds, standalone for web
+  output: process.env.NEXT_PUBLIC_BUILD_MODE === 'static' ? 'export' : 'standalone',
   images: {
     unoptimized: true,
   },
-  // Disable trailing slashes for Capacitor compatibility
+  // Trailing slashes for Capacitor compatibility
   trailingSlash: true,
 };
 

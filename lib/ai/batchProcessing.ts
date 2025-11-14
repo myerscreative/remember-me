@@ -53,8 +53,8 @@ export async function batchGenerateSummaries(
 
       if (summary) {
         // Update person in database
-        const supabase = createClient();
-        const { error: updateError } = await supabase
+        const supabase = await createClient();
+        const { error: updateError } = await (supabase as any)
           .from('persons')
           .update({
             relationship_summary: summary,
@@ -156,14 +156,14 @@ export async function getContactsNeedingAI(
     limit?: number;
   } = {}
 ): Promise<Person[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return [];
   }
 
-  let query = supabase
+  let query = (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id)

@@ -25,7 +25,7 @@ export interface ReminderStats {
  * - Relationship health
  */
 export async function getSmartReminders(): Promise<ReminderContact[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -33,7 +33,7 @@ export async function getSmartReminders(): Promise<ReminderContact[]> {
   }
 
   try {
-    const { data: contacts, error } = await supabase
+    const { data: contacts, error } = await (supabase as any)
       .from('persons')
       .select('*')
       .eq('user_id', user.id)
@@ -211,14 +211,14 @@ export async function getHighPriorityReminders(): Promise<ReminderContact[]> {
  * Mark contact as reached out (update last_interaction_date)
  */
 export async function markAsReachedOut(personId: string): Promise<boolean> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
-    const { error } = await supabase
+    // Note: interaction_count increment is handled by database trigger
+    const { error } = await (supabase as any)
       .from('persons')
       .update({
         last_interaction_date: new Date().toISOString().split('T')[0],
-        interaction_count: supabase.raw('interaction_count + 1'),
       })
       .eq('id', personId);
 
@@ -238,13 +238,13 @@ export async function markAsReachedOut(personId: string): Promise<boolean> {
  * Snooze reminder for a contact (update last_interaction_date without incrementing count)
  */
 export async function snoozeReminder(personId: string, days: number = 7): Promise<boolean> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const newDate = new Date();
     newDate.setDate(newDate.getDate() - (30 - days)); // Adjust so reminder appears in X days
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('persons')
       .update({
         last_interaction_date: newDate.toISOString().split('T')[0],

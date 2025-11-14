@@ -48,7 +48,7 @@ export interface TopContact {
  * Get comprehensive dashboard statistics
  */
 export async function getDashboardStats(): Promise<DashboardStats | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -57,7 +57,7 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
 
   try {
     // Get all contacts for this user
-    const { data: allContacts, error } = await supabase
+    const { data: allContacts, error } = await (supabase as any)
       .from('persons')
       .select('*')
       .eq('user_id', user.id);
@@ -105,7 +105,7 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
  * Get interaction statistics
  */
 export async function getInteractionStats(): Promise<InteractionStats | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -113,7 +113,7 @@ export async function getInteractionStats(): Promise<InteractionStats | null> {
   }
 
   try {
-    const { data: contacts, error } = await supabase
+    const { data: contacts, error } = await (supabase as any)
       .from('persons')
       .select('*')
       .eq('user_id', user.id)
@@ -164,7 +164,7 @@ export async function getInteractionStats(): Promise<InteractionStats | null> {
  * Calculate relationship health breakdown
  */
 export async function getRelationshipHealth(): Promise<RelationshipHealth | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -172,7 +172,7 @@ export async function getRelationshipHealth(): Promise<RelationshipHealth | null
   }
 
   try {
-    const { data: contacts, error } = await supabase
+    const { data: contacts, error } = await (supabase as any)
       .from('persons')
       .select('last_interaction_date')
       .eq('user_id', user.id)
@@ -222,14 +222,14 @@ export async function getRelationshipHealth(): Promise<RelationshipHealth | null
  * Get top contacts by interaction count
  */
 export async function getTopContacts(limit: number = 10): Promise<TopContact[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('persons')
     .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, contact_importance, relationship_summary')
     .eq('user_id', user.id)
@@ -259,7 +259,7 @@ export async function getTopContacts(limit: number = 10): Promise<TopContact[]> 
  * Get contacts needing attention (using Phase 1 function)
  */
 export async function getContactsNeedingAttention(daysThreshold: number = 30): Promise<any[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -270,7 +270,7 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
     const { data, error } = await supabase.rpc('get_contacts_needing_attention', {
       p_user_id: user.id,
       days_threshold: daysThreshold,
-    });
+    } as any);
 
     if (error) {
       console.error('Contacts needing attention error:', error);
@@ -288,7 +288,7 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
  * Get growth trend (contacts added per month for last 6 months)
  */
 export async function getGrowthTrend(): Promise<{ month: string; count: number }[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -296,7 +296,7 @@ export async function getGrowthTrend(): Promise<{ month: string; count: number }
   }
 
   try {
-    const { data: contacts, error } = await supabase
+    const { data: contacts, error } = await (supabase as any)
       .from('persons')
       .select('created_at')
       .eq('user_id', user.id);

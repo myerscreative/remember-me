@@ -29,7 +29,7 @@ export async function searchPersonsFullText(
     return [];
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -41,7 +41,7 @@ export async function searchPersonsFullText(
     const { data, error } = await supabase.rpc('search_persons_fulltext', {
       p_user_id: user.id,
       search_query: query.trim(),
-    });
+    } as any);
 
     if (error) {
       console.error('Full-text search error:', error);
@@ -50,7 +50,7 @@ export async function searchPersonsFullText(
     }
 
     // Apply additional filters
-    let results = data || [];
+    let results = (data || []) as any;
 
     if (!options.includeArchived) {
       results = results.filter((r: any) => !r.archive_status);
@@ -90,7 +90,7 @@ export async function searchPersonsBasic(
     return [];
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -99,7 +99,7 @@ export async function searchPersonsBasic(
 
   const searchTerm = `%${query.trim()}%`;
 
-  let queryBuilder = supabase
+  let queryBuilder = (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id);
@@ -154,7 +154,7 @@ export async function searchPersonsBasic(
 export async function searchContactsNeedingAttention(
   daysThreshold: number = 30
 ): Promise<any[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -165,7 +165,7 @@ export async function searchContactsNeedingAttention(
     const { data, error } = await supabase.rpc('get_contacts_needing_attention', {
       p_user_id: user.id,
       days_threshold: daysThreshold,
-    });
+    } as any);
 
     if (error) {
       console.error('Contacts needing attention error:', error);
@@ -183,14 +183,14 @@ export async function searchContactsNeedingAttention(
  * Get recent contacts (last interaction)
  */
 export async function getRecentContacts(limit: number = 10): Promise<Person[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id)
@@ -213,14 +213,14 @@ export async function getContactsByImportance(
   importance: 'high' | 'medium' | 'low',
   limit?: number
 ): Promise<Person[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return [];
   }
 
-  let queryBuilder = supabase
+  let queryBuilder = (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id)
@@ -246,14 +246,14 @@ export async function getContactsByImportance(
  * Get imported contacts without context
  */
 export async function getImportedWithoutContext(limit?: number): Promise<Person[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return [];
   }
 
-  let queryBuilder = supabase
+  let queryBuilder = (supabase as any)
     .from('persons')
     .select('*')
     .eq('user_id', user.id)

@@ -26,12 +26,12 @@ export type {
 // import { Person, PersonInsert } from '@/lib/supabase/types';
 
 // Example Supabase function calls:
-// const { data } = await supabase.rpc('search_persons', {
+// const { data } = await supabase.rpc('search_persons', { as any
 //   search_query: 'john',
 //   current_user_id: user.id
 // });
 //
-// const { data } = await supabase.rpc('get_follow_up_reminders', {
+// const { data } = await supabase.rpc('get_follow_up_reminders', { as any
 //   current_user_id: user.id
 // });
 
