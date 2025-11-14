@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Filter out meetings that have already been notified
-    const newMeetings = [];
+    const newMeetings: any[] = [];
     for (const meeting of meetingsToNotify) {
       const { data: existing } = await (supabase as any)
         .from("meeting_notifications")

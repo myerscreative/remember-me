@@ -179,7 +179,7 @@ Extract interests and skills as arrays. For tags, infer from context (e.g., ment
     const parsedData = JSON.parse(parseResponse);
 
     // Step 4: Identify missing critical fields
-    const missingFields = [];
+    const missingFields: string[] = [];
     const criticalFields = ["name", "email", "phone"];
 
     for (const field of criticalFields) {

@@ -76,7 +76,7 @@ export function QuickVoiceMemoModal({
         attachmentData.person_id = personId;
       }
 
-      const { error: dbError } = await supabase
+      const { error: dbError } = await (supabase as any)
         .from("attachments")
         .insert([attachmentData]);
 

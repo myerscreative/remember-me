@@ -260,7 +260,7 @@ export default function InsightsPage() {
 
         const topConnectionsData: TopConnection[] = Array.from(personInteractionCounts.entries())
           .map(([personId, count]) => {
-            const person = allPersons.find(p => p.id === personId);
+            const person = allPersons.find((p: any) => p.id === personId);
             return person ? {
               id: person.id,
               name: getFullName(person),

@@ -28,15 +28,13 @@ import {
   formatEventTimeRange,
   getTimeUntilEvent,
   requestCalendarPermission,
-  type CalendarEvent,
-  type CalendarSyncStatus,
 } from "@/lib/calendar/calendarIntegration";
+import type { CalendarEvent, CalendarSyncStatus, MeetingPrep } from "@/types/calendar";
 import {
   matchAttendeesToPersons,
   getTodaysMeetings,
   sortMeetingPrepsByTime,
   getPersonContextSummary,
-  type MeetingPrep,
 } from "@/lib/calendar/meetingMatcher";
 
 // Helper function to get initials

@@ -10,9 +10,9 @@ import type { Person, PersonInsert, Tag, Interaction } from "@/lib/supabase/type
 
 // CREATE: Add a new person
 export async function addPerson(personData: PersonInsert) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .insert(personData)
     .select()
@@ -24,9 +24,9 @@ export async function addPerson(personData: PersonInsert) {
 
 // READ: Get all persons for current user
 export async function getPersons() {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .select("*")
     .order("name");
@@ -37,9 +37,9 @@ export async function getPersons() {
 
 // READ: Get single person with their tags
 export async function getPersonWithTags(personId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .select(`
       *,
@@ -57,9 +57,9 @@ export async function getPersonWithTags(personId: string) {
 
 // UPDATE: Update person information
 export async function updatePerson(personId: string, updates: Partial<PersonInsert>) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .update(updates)
     .eq("id", personId)
@@ -72,9 +72,9 @@ export async function updatePerson(personId: string, updates: Partial<PersonInse
 
 // DELETE: Remove a person
 export async function deletePerson(personId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from("persons")
     .delete()
     .eq("id", personId);
@@ -88,9 +88,9 @@ export async function deletePerson(personId: string) {
 
 // Get all tags for current user
 export async function getTags() {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("tags")
     .select("*")
     .order("name");
@@ -101,12 +101,12 @@ export async function getTags() {
 
 // Create a new tag
 export async function createTag(name: string, color: string = "#8b5cf6") {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("tags")
     .insert({ user_id: user.id, name, color })
     .select()
@@ -118,9 +118,9 @@ export async function createTag(name: string, color: string = "#8b5cf6") {
 
 // Add tag to person
 export async function addTagToPerson(personId: string, tagId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from("person_tags")
     .insert({ person_id: personId, tag_id: tagId });
 
@@ -129,9 +129,9 @@ export async function addTagToPerson(personId: string, tagId: string) {
 
 // Remove tag from person
 export async function removeTagFromPerson(personId: string, tagId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from("person_tags")
     .delete()
     .eq("person_id", personId)
@@ -151,12 +151,12 @@ export async function logInteraction(
   title?: string,
   notes?: string
 ) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("interactions")
     .insert({
       user_id: user.id,
@@ -174,9 +174,9 @@ export async function logInteraction(
 
 // Get all interactions for a person
 export async function getPersonInteractions(personId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("interactions")
     .select("*")
     .eq("person_id", personId)
@@ -192,12 +192,12 @@ export async function getPersonInteractions(personId: string) {
 
 // Full-text search using the database function
 export async function searchPersons(query: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .rpc("search_persons", {
       search_query: query,
       current_user_id: user.id,
@@ -209,9 +209,9 @@ export async function searchPersons(query: string) {
 
 // Filter persons by tag
 export async function getPersonsByTag(tagId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .select(`
       *,
@@ -228,12 +228,12 @@ export async function getPersonsByTag(tagId: string) {
 
 // Get persons who need follow-up
 export async function getFollowUpReminders() {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .rpc("get_follow_up_reminders", {
       current_user_id: user.id,
     });
@@ -244,12 +244,12 @@ export async function getFollowUpReminders() {
 
 // Get persons not contacted recently
 export async function getStaleContacts(daysAgo: number = 30) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons")
     .select("*")
     .or(`last_contact.is.null,last_contact.lt.${cutoffDate.toISOString()}`)
@@ -270,9 +270,9 @@ export async function createRelationship(
   relationshipType: string,
   context?: string
 ) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("relationships")
     .insert({
       from_person_id: fromPersonId,
@@ -290,9 +290,9 @@ export async function createRelationship(
 
 // Get all relationships for a person
 export async function getPersonRelationships(personId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("relationships")
     .select(`
       *,
@@ -311,9 +311,9 @@ export async function getPersonRelationships(personId: string) {
 
 // Get persons with their tags (using the view)
 export async function getPersonsWithTags() {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("persons_with_tags")
     .select("*")
     .order("name");
@@ -324,9 +324,9 @@ export async function getPersonsWithTags() {
 
 // Get interaction counts per person (using the view)
 export async function getInteractionCounts() {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("person_interaction_counts")
     .select("*")
     .order("total_interactions", { ascending: false });
@@ -345,14 +345,14 @@ export async function uploadAttachment(
   personId: string,
   attachmentType: 'voice_note' | 'document' | 'image' | 'other'
 ) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
   // Upload file to storage
   const filePath = `${user.id}/${personId}/${Date.now()}-${file.name}`;
-  const { error: uploadError } = await supabase
+  const { error: uploadError } = await (supabase as any)
     .storage
     .from("attachments")
     .upload(filePath, file);
@@ -360,13 +360,13 @@ export async function uploadAttachment(
   if (uploadError) throw uploadError;
 
   // Get public URL
-  const { data: { publicUrl } } = supabase
+  const { data: { publicUrl } } = (supabase as any)
     .storage
     .from("attachments")
     .getPublicUrl(filePath);
 
   // Create attachment record
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("attachments")
     .insert({
       user_id: user.id,
@@ -386,9 +386,9 @@ export async function uploadAttachment(
 
 // Get all attachments for a person
 export async function getPersonAttachments(personId: string) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("attachments")
     .select("*")
     .eq("person_id", personId)
@@ -404,9 +404,9 @@ export async function getPersonAttachments(personId: string) {
 
 // Subscribe to changes in persons table
 export function subscribeToPersons(callback: (person: Person) => void) {
-  const supabase = createClient();
+  const supabase = ( createClient()) as any;
   
-  const channel = supabase
+  const channel = (supabase as any)
     .channel("persons-changes")
     .on(
       "postgres_changes",

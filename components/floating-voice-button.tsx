@@ -30,7 +30,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
       // Fetch person name
       const fetchPersonName = async () => {
         const supabase = createClient();
-        const { data } = await supabase
+        const { data } = await (supabase as any)
           .from('persons')
           .select('id, name, first_name, last_name')
           .eq('id', personId)
@@ -100,7 +100,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
       };
 
       // Insert contact
-      const { data: newContact, error } = await supabase
+      const { data: newContact, error } = await (supabase as any)
         .from("persons")
         .insert([contactData])
         .select()
