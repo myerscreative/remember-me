@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,32 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  // Check for active session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          setError("Password reset link has expired or is invalid. Please request a new one.");
+          setTimeout(() => {
+            router.push("/login");
+          }, 3000);
+          return;
+        }
+        
+        setSessionChecked(true);
+      } catch (err) {
+        console.error("Error checking session:", err);
+        setError("Failed to verify session. Please try again.");
+      }
+    };
+    
+    checkSession();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +84,20 @@ export default function ResetPasswordPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading while checking session
+  if (!sessionChecked && !error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <span className="text-gray-600 dark:text-gray-400">
+            Verifying reset link...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
