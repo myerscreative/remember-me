@@ -106,3 +106,4 @@ If you encounter any errors when running the SQL:
 **Note**: These migrations use `ADD COLUMN IF NOT EXISTS`, so they're safe to run multiple times without causing errors.
 
 
+

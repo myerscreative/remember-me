@@ -45,3 +45,4 @@ SELECT 'Schema reload commands executed at: ' || NOW() as status;
 -- This forces a complete restart of all services
 
 
+

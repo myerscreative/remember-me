@@ -243,7 +243,8 @@ BEGIN
   NEW.updated_at = timezone('utc'::text, now());
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = '';
 
 -- Apply trigger to persons table
 CREATE TRIGGER update_persons_updated_at
@@ -277,7 +278,8 @@ BEGIN
     AND (last_contact IS NULL OR last_contact < NEW.interaction_date);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = '';
 
 CREATE TRIGGER update_last_contact_on_interaction
   AFTER INSERT ON interactions
@@ -487,7 +489,9 @@ CREATE POLICY "Users can delete their own interactions"
 -- ============================================
 
 -- View to get persons with their tags
-CREATE OR REPLACE VIEW persons_with_tags AS
+CREATE OR REPLACE VIEW persons_with_tags
+WITH (security_invoker = true)
+AS
 SELECT 
   p.*,
   array_agg(t.name) FILTER (WHERE t.name IS NOT NULL) as tag_names,
@@ -498,7 +502,9 @@ LEFT JOIN tags t ON pt.tag_id = t.id
 GROUP BY p.id;
 
 -- View to get interaction count per person
-CREATE OR REPLACE VIEW person_interaction_counts AS
+CREATE OR REPLACE VIEW person_interaction_counts
+WITH (security_invoker = true)
+AS
 SELECT 
   person_id,
   COUNT(*) as total_interactions,
@@ -548,7 +554,8 @@ BEGIN
     END,
     name;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$ LANGUAGE plpgsql STABLE
+SET search_path = '';
 
 -- Function to get persons needing follow-up
 CREATE OR REPLACE FUNCTION get_follow_up_reminders(
@@ -564,7 +571,8 @@ BEGIN
     AND follow_up_reminder <= timezone('utc'::text, now())
   ORDER BY follow_up_reminder ASC;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$ LANGUAGE plpgsql STABLE
+SET search_path = '';
 
 -- ============================================
 -- SEED DATA (Optional - for testing)
@@ -587,7 +595,8 @@ BEGIN
   ON CONFLICT (user_id, name) DO NOTHING;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = '';
 
 CREATE TRIGGER create_default_tags
   AFTER INSERT ON auth.users

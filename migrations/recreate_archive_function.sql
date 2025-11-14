@@ -46,3 +46,4 @@ WHERE routine_name = 'archive_contact'
 AND routine_schema = 'public';
 
 
+

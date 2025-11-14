@@ -9,3 +9,4 @@ SELECT name, birthday FROM persons WHERE name ILIKE '%Tom%';
 
 
 
+
