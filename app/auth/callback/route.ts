@@ -40,18 +40,20 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       token_hash,
       type: "recovery",
     });
 
-    if (error) {
+    if (error || !data.session) {
       console.error("Error verifying recovery token:", error);
       return NextResponse.redirect(
         new URL("/login?error=recovery_token_expired", origin)
       );
     }
 
+    // Session should now be established via cookies
+    console.log("Recovery session established for user:", data.user?.email);
     return response;
   }
 
