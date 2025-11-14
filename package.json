@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "build:mobile": "[ -d app/api ] && mv app/api ./api.tmp; [ -d app/auth/callback ] && mv app/auth/callback ./callback.tmp; NEXT_PUBLIC_BUILD_MODE=static next build --webpack; [ -d ./callback.tmp ] && mv ./callback.tmp app/auth/callback; [ -d ./api.tmp ] && mv ./api.tmp app/api; true",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cap:sync": "npm run build:mobile && npx cap sync",
+    "cap:ios": "npm run cap:sync && npx cap open ios"
   },
   "dependencies": {
     "@capacitor/app": "^7.1.0",

@@ -9,6 +9,23 @@ const nextConfig: NextConfig = {
   },
   // Trailing slashes for Capacitor compatibility
   trailingSlash: true,
+  // Skip building dynamic routes for mobile - they'll be handled client-side
+  ...(process.env.NEXT_PUBLIC_BUILD_MODE === 'static' && {
+    exportPathMap: async function (
+      defaultPathMap,
+      { dev, dir, outDir, distDir, buildId }
+    ) {
+      // Only export static pages, skip dynamic routes
+      const paths: Record<string, any> = {};
+      for (const [path, route] of Object.entries(defaultPathMap)) {
+        // Skip dynamic routes (those with [])
+        if (!path.includes('[')) {
+          paths[path] = route;
+        }
+      }
+      return paths;
+    },
+  }),
 };
 
 const pwaConfig = withPWA({
