@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Lightbulb, Users, MapPin, Heart, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getInitials, getGradient } from "@/lib/utils/contact-helpers";
 
 interface ConnectionDiscovery {
   type: "shared_introducer" | "shared_location" | "shared_interest" | "same_company";
@@ -19,32 +20,6 @@ interface ConnectionDiscovery {
   commonValue: string;
   count: number;
 }
-
-// Helper function to get initials
-const getInitials = (firstName: string, lastName: string | null): string => {
-  if (!firstName) return "";
-  const firstInitial = firstName.trim()[0]?.toUpperCase() || "";
-  const lastInitial = lastName?.trim()[0]?.toUpperCase() || "";
-  return (firstInitial + lastInitial) || firstName.substring(0, 2).toUpperCase();
-};
-
-// Helper function to get gradient
-const getGradient = (name: string): string => {
-  const gradients = [
-    "from-purple-500 to-blue-500",
-    "from-green-500 to-blue-500",
-    "from-orange-500 to-yellow-500",
-    "from-cyan-500 to-green-500",
-    "from-pink-500 to-red-500",
-    "from-indigo-500 to-purple-500",
-  ];
-  let hash = 0;
-  const fullName = name;
-  for (let i = 0; i < fullName.length; i++) {
-    hash = fullName.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return gradients[Math.abs(hash) % gradients.length];
-};
 
 const getTypeInfo = (type: string) => {
   switch (type) {

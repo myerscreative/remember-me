@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import type { Person, Interaction } from "@/types/database.types";
 import { ConnectionDiscoverySection } from "@/components/connection-discovery-section";
 import { RelationshipPatternsSection } from "@/components/relationship-patterns-section";
+import { getInitials as getInitialsHelper, getFullName as getFullNameHelper, getGradient as getGradientHelper } from "@/lib/utils/contact-helpers";
 
 // Types
 interface InsightsSummary {
@@ -93,34 +94,17 @@ export default function InsightsPage() {
   const [insightMessage, setInsightMessage] = useState<string>("");
   const [decayingRelationships, setDecayingRelationships] = useState<DecayingRelationship[]>([]);
 
-  // Helper to get initials
+  // Helper wrappers for person objects
   const getInitials = (person: { first_name: string; last_name: string | null }): string => {
-    const first = person.first_name.charAt(0).toUpperCase();
-    const last = person.last_name ? person.last_name.charAt(0).toUpperCase() : '';
-    return last ? first + last : first + (person.first_name.charAt(1) || '').toUpperCase();
+    return getInitialsHelper(person.first_name, person.last_name);
   };
 
-  // Helper to get full name
   const getFullName = (person: { first_name: string; last_name: string | null }): string => {
-    return person.last_name ? `${person.first_name} ${person.last_name}` : person.first_name;
+    return getFullNameHelper(person.first_name, person.last_name);
   };
 
-  // Helper to get gradient
   const getGradient = (person: { first_name: string; last_name: string | null }): string => {
-    const gradients = [
-      "from-purple-500 to-blue-500",
-      "from-green-500 to-blue-500",
-      "from-orange-500 to-yellow-500",
-      "from-cyan-500 to-green-500",
-      "from-pink-500 to-red-500",
-      "from-indigo-500 to-purple-500",
-    ];
-    const name = getFullName(person);
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return gradients[Math.abs(hash) % gradients.length];
+    return getGradientHelper(getFullName(person));
   };
 
   // Load data

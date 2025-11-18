@@ -29,37 +29,8 @@ import { useRouter } from "next/navigation";
 import { ImageCropModal } from "@/components/image-crop-modal";
 import { ArchiveContactDialog } from "@/components/archive-contact-dialog";
 import { StoryCompletenessIndicator } from "@/components/story-completeness-indicator";
-
-// Helper function to get initials from first and last name
-const getInitials = (firstName: string, lastName: string | null): string => {
-  if (!firstName) return "";
-  const firstInitial = firstName.trim()[0]?.toUpperCase() || "";
-  const lastInitial = lastName?.trim()[0]?.toUpperCase() || "";
-  return (firstInitial + lastInitial) || firstName.substring(0, 2).toUpperCase();
-};
-
-// Helper function to get full name
-const getFullName = (firstName: string, lastName: string | null): string => {
-  if (!firstName) return "";
-  return lastName ? `${firstName} ${lastName}`.trim() : firstName.trim();
-};
-
-// Helper function to get gradient color based on name hash
-const getGradient = (name: string): string => {
-  const gradients = [
-    "from-purple-500 to-blue-500",
-    "from-green-500 to-blue-500",
-    "from-orange-500 to-yellow-500",
-    "from-cyan-500 to-green-500",
-    "from-pink-500 to-red-500",
-    "from-indigo-500 to-purple-500",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return gradients[Math.abs(hash) % gradients.length];
-};
+import toast, { Toaster } from "react-hot-toast";
+import { getInitials, getFullName, getGradient } from "@/lib/utils/contact-helpers";
 
 const tabs = ["Profession", "Family", "Interests"];
 
@@ -364,7 +335,7 @@ export default function ContactDetailPage({
         setContact({ ...contact, notes: value.trim() });
       } catch (err) {
         console.error("Error saving notes:", err);
-        alert(err instanceof Error ? err.message : "Failed to save notes");
+        toast.error(err instanceof Error ? err.message : "Failed to save notes");
       }
     } else if (sectionKey === "whereWeMet" && value !== undefined) {
       try {
@@ -381,9 +352,10 @@ export default function ContactDetailPage({
           .eq("user_id", user.id);
         if (updateError) throw updateError;
         setStory({ ...story, whereWeMet: value.trim() });
+        toast.success("Location updated successfully!");
       } catch (err) {
         console.error("Error saving:", err);
-        alert(err instanceof Error ? err.message : "Failed to save");
+        toast.error(err instanceof Error ? err.message : "Failed to save");
       }
     } else if (sectionKey === "whyStayInContact" && value !== undefined) {
       try {
@@ -400,9 +372,10 @@ export default function ContactDetailPage({
           .eq("user_id", user.id);
         if (updateError) throw updateError;
         setStory({ ...story, whyStayInContact: value.trim() });
+        toast.success("Saved successfully!");
       } catch (err) {
         console.error("Error saving:", err);
-        alert(err instanceof Error ? err.message : "Failed to save");
+        toast.error(err instanceof Error ? err.message : "Failed to save");
       }
     } else if (sectionKey === "whatsImportant" && value !== undefined) {
       try {
@@ -419,9 +392,10 @@ export default function ContactDetailPage({
           .eq("user_id", user.id);
         if (updateError) throw updateError;
         setStory({ ...story, whatsImportant: value.trim() });
+        toast.success("Saved successfully!");
       } catch (err) {
         console.error("Error saving:", err);
-        alert(err instanceof Error ? err.message : "Failed to save");
+        toast.error(err instanceof Error ? err.message : "Failed to save");
       }
     }
   };
@@ -483,9 +457,10 @@ export default function ContactDetailPage({
       }
       
       setEditingSynopsis(false);
+      toast.success("Synopsis updated successfully!");
     } catch (err) {
       console.error("Error saving synopsis:", err);
-      alert(err instanceof Error ? err.message : "Failed to save");
+      toast.error(err instanceof Error ? err.message : "Failed to save");
     }
   };
 
@@ -581,9 +556,10 @@ export default function ContactDetailPage({
       setContact({ ...contact, tags });
       setEditingTags(false);
       setNewTagInput("");
+      toast.success("Tags saved!");
     } catch (err) {
       console.error("Error saving tags:", err);
-      alert(err instanceof Error ? err.message : "Failed to save tags");
+      toast.error(err instanceof Error ? err.message : "Failed to save tags");
     }
   };
 
@@ -640,9 +616,10 @@ export default function ContactDetailPage({
       setContact({ ...contact, interests });
       setEditingInterests(false);
       setNewInterestInput("");
+      toast.success("Interests saved!");
     } catch (err) {
       console.error("Error saving interests:", err);
-      alert(err instanceof Error ? err.message : "Failed to save interests");
+      toast.error(err instanceof Error ? err.message : "Failed to save interests");
     }
   };
 
@@ -686,9 +663,10 @@ export default function ContactDetailPage({
       // Update local state
       setContact({ ...contact, hobbies: hobbies.trim() });
       setEditingHobbies(false);
+      toast.success("Hobbies saved!");
     } catch (err) {
       console.error("Error saving hobbies:", err);
-      alert(err instanceof Error ? err.message : "Failed to save hobbies");
+      toast.error(err instanceof Error ? err.message : "Failed to save hobbies");
     }
   };
 
@@ -781,9 +759,10 @@ export default function ContactDetailPage({
       setBirthdayValue(birthdayToSave || "");
       setContact({ ...contact, birthday: updatedData.birthday });
       setEditingBirthday(false);
+      toast.success("Birthday updated!");
     } catch (err) {
       console.error("Error saving birthday:", err);
-      alert(err instanceof Error ? err.message : "Failed to save birthday");
+      toast.error(err instanceof Error ? err.message : "Failed to save birthday");
     }
   };
 
@@ -825,7 +804,7 @@ export default function ContactDetailPage({
 
       // Validate first name is not empty
       if (!firstName.trim()) {
-        alert("First name is required");
+        toast.error("First name is required");
         return;
       }
 
@@ -848,9 +827,10 @@ export default function ContactDetailPage({
       const fullName = getFullName(firstName.trim(), lastName.trim() || null);
       setContact({ ...contact, firstName: firstName.trim(), lastName: lastName.trim() || null, name: fullName });
       setEditingName(false);
+      toast.success("Name updated successfully!");
     } catch (err) {
       console.error("Error saving name:", err);
-      alert(err instanceof Error ? err.message : "Failed to save name");
+      toast.error(err instanceof Error ? err.message : "Failed to save name");
     }
   };
 
@@ -895,16 +875,17 @@ export default function ContactDetailPage({
       const updatedPhone = phoneValue.trim();
       const updatedTitle = updatedData?.linkedin || updatedEmail || "";
       
-      setContact({ 
-        ...contact, 
-        email: updatedEmail, 
+      setContact({
+        ...contact,
+        email: updatedEmail,
         phone: updatedPhone,
-        title: updatedTitle 
+        title: updatedTitle
       });
       setEditingContact(false);
+      toast.success("Contact info updated!");
     } catch (err) {
       console.error("Error saving contact info:", err);
-      alert(err instanceof Error ? err.message : "Failed to save contact info");
+      toast.error(err instanceof Error ? err.message : "Failed to save contact info");
     }
   };
 
@@ -946,9 +927,10 @@ export default function ContactDetailPage({
       setEditingFamilyMember(null);
       setNewFamilyMemberName("");
       setNewFamilyMemberRelationship("");
+      toast.success("Family members saved!");
     } catch (err) {
       console.error("Error saving family members:", err);
-      alert(err instanceof Error ? err.message : "Failed to save family members");
+      toast.error(err instanceof Error ? err.message : "Failed to save family members");
     }
   };
 
@@ -994,14 +976,14 @@ export default function ContactDetailPage({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      toast.error('Please select an image file');
       event.target.value = '';
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size must be less than 5MB');
+      toast.error('Image size must be less than 5MB');
       event.target.value = '';
       return;
     }
@@ -1088,9 +1070,10 @@ export default function ContactDetailPage({
 
       // Update local state
       setContact({ ...contact, avatar: publicUrl });
+      toast.success("Avatar updated successfully!");
     } catch (err) {
       console.error("Error uploading avatar:", err);
-      alert(err instanceof Error ? err.message : "Failed to upload avatar");
+      toast.error(err instanceof Error ? err.message : "Failed to upload avatar");
     } finally {
       setUploadingAvatar(false);
     }
@@ -1338,6 +1321,7 @@ export default function ContactDetailPage({
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
+      <Toaster position="top-center" />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[850px] mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}

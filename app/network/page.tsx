@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { Person, Relationship } from "@/types/database.types";
 import Link from "next/link";
 import { Search, Settings, Plus, Minus, RotateCcw } from "lucide-react";
+import { getInitialsFromFullName, formatBirthday } from "@/lib/utils/contact-helpers";
 
 interface NetworkNode {
   id: string;
@@ -78,33 +79,6 @@ export default function NetworkPage() {
     height += bottomPadding;
     
     return height;
-  };
-
-  // Format birthday for display
-  const formatBirthday = (birthday: string | null): string => {
-    if (!birthday) return '';
-    try {
-      const parts = birthday.split('-');
-      if (parts.length === 3) {
-        const month = parseInt(parts[1], 10) - 1;
-        const day = parseInt(parts[2], 10);
-        const date = new Date(2000, month, day);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      }
-    } catch (e) {
-      console.error('Error formatting birthday:', e);
-    }
-    return '';
-  };
-
-  // Get initials from name
-  const getInitials = (name: string): string => {
-    if (!name) return '?';
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
   };
 
   // Calculate network boundaries for smart panning limits
@@ -1155,7 +1129,7 @@ export default function NetworkPage() {
                       className="fill-white font-bold pointer-events-none select-none"
                       style={{ fontSize: "22px" }}
                     >
-                      {getInitials(node.person.first_name || node.person.name || '?')}
+                      {getInitialsFromFullName(node.person.first_name || node.person.name || '?')}
                     </text>
                   </>
                 )}

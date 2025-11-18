@@ -8,6 +8,7 @@ import {
   ArchiveRestore,
   X,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface ArchiveContactDialogProps {
   contactId: string;
@@ -30,7 +31,7 @@ export function ArchiveContactDialog({
 
   const handleArchive = async () => {
     if (!isArchived && reason.trim().length < 5) {
-      alert("Please provide a brief reason for archiving (at least 5 characters)");
+      toast.error("Please provide a brief reason for archiving (at least 5 characters)");
       return;
     }
 
@@ -54,11 +55,12 @@ export function ArchiveContactDialog({
         throw new Error(errorData.error || "Failed to archive contact");
       }
 
+      toast.success(isArchived ? "Contact unarchived successfully!" : "Contact archived successfully!");
       setShowDialog(false);
       onSuccess?.();
     } catch (error) {
       console.error("Error archiving contact:", error);
-      alert(error instanceof Error ? error.message : "Failed to archive contact. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to archive contact. Please try again.");
     } finally {
       setLoading(false);
     }

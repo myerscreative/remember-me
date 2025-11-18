@@ -8,6 +8,7 @@ import { QuickVoiceMemoModal } from "@/components/quick-voice-memo-modal";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface FloatingVoiceButtonProps {
   className?: string;
@@ -108,7 +109,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
 
       if (error) {
         console.error("Error saving contact:", error);
-        alert("Failed to save contact. Please try again.");
+        toast.error("Failed to save contact. Please try again.");
         return;
       }
 
@@ -119,7 +120,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
 
     } catch (error) {
       console.error("Error in handleVoiceDataApply:", error);
-      alert("Failed to save contact. Please try again.");
+      toast.error("Failed to save contact. Please try again.");
     } finally {
       setIsSaving(false);
     }

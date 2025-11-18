@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Zap, Mic, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { VoiceEntryModal } from "@/components/voice-entry-modal";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function QuickCapturePage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function QuickCapturePage() {
 
   const handleQuickSave = async () => {
     if (!notes.trim() && !contactName.trim()) {
-      alert("Please add some notes or a contact name");
+      toast.error("Please add some notes or a contact name");
       return;
     }
 
@@ -115,20 +116,22 @@ export default function QuickCapturePage() {
         router.push(`/contacts/${personId}`);
       } else {
         // Just save as a general note (could be extended to create a "quick notes" feature)
-        alert("Contact created with notes!");
+        toast.success("Contact created with notes!");
         router.push("/");
       }
     } catch (error) {
       console.error("Error saving quick capture:", error);
-      alert("Failed to save. Please try again.");
+      toast.error("Failed to save. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-cyan-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
-      <div className="flex-1 overflow-y-auto">
+    <>
+      <Toaster position="top-center" />
+      <div className="flex flex-col h-screen bg-gradient-to-br from-cyan-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
           <div className="mb-6">
@@ -235,12 +238,13 @@ export default function QuickCapturePage() {
         </div>
       </div>
 
-      {/* Voice Entry Modal */}
-      <VoiceEntryModal
-        isOpen={isVoiceModalOpen}
-        onClose={() => setIsVoiceModalOpen(false)}
-        onApply={handleVoiceData}
-      />
-    </div>
+        {/* Voice Entry Modal */}
+        <VoiceEntryModal
+          isOpen={isVoiceModalOpen}
+          onClose={() => setIsVoiceModalOpen(false)}
+          onApply={handleVoiceData}
+        />
+      </div>
+    </>
   );
 }

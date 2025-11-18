@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { PersonInsert } from "@/types/database.types";
 import { VoiceEntryModalEnhanced } from "@/components/voice-entry-modal-enhanced";
 import { formatPhoneNumber } from "@/lib/utils";
+import toast, { Toaster } from "react-hot-toast";
 
 interface ParsedContactData {
   name?: string | null;
@@ -81,9 +82,9 @@ export default function NewContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.firstName.trim()) {
-      alert("Please enter a first name");
+      toast.error("Please enter a first name");
       return;
     }
 
@@ -95,7 +96,7 @@ export default function NewContactPage() {
         supabase = createClient();
       } catch (configError) {
         console.error("Supabase configuration error:", configError);
-        alert("Supabase is not configured. Please check your environment variables.");
+        toast.error("Supabase is not configured. Please check your environment variables.");
         setIsSaving(false);
         return;
       }
@@ -245,7 +246,7 @@ export default function NewContactPage() {
         }
       }
       
-      alert(`Error saving contact: ${errorMessage}${errorDetails}\n\nPlease check:\n1. You are logged in\n2. Supabase is configured correctly\n3. Your network connection`);
+      toast.error(`Error saving contact: ${errorMessage}${errorDetails}`);
     } finally {
       setIsSaving(false);
     }
@@ -298,6 +299,7 @@ export default function NewContactPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+      <Toaster position="top-center" />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header */}

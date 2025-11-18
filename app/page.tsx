@@ -10,68 +10,51 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
 import { DecayAlertBanner } from "@/components/decay-alert-banner";
+import { getInitialsFromFullName, getGradient, formatBirthday } from "@/lib/utils/contact-helpers";
 
 const filterOptions = ["All", "Favorites", "Investor", "Startup", "Friend"];
 
-// Helper function to format birthday as "Month Day" (e.g., "Dec 1", "Nov 3")
-const formatBirthday = (birthday: string | null): string => {
-  if (!birthday) return "";
-  try {
-    // Parse the date string (format: YYYY-MM-DD)
-    const date = new Date(birthday + 'T00:00:00'); // Add time to avoid timezone issues
-    // Check if date is valid
-    if (isNaN(date.getTime())) return "";
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  } catch {
-    return "";
-  }
-};
-
-// Helper function to get initials from name
-const getInitials = (name: string): string => {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-};
-
-// Helper function to get gradient color based on name hash
-const getGradient = (name: string): string => {
-  const gradients = [
-    "from-purple-500 to-blue-500",
-    "from-green-500 to-blue-500",
-    "from-orange-500 to-yellow-500",
-    "from-cyan-500 to-green-500",
-    "from-pink-500 to-red-500",
-    "from-indigo-500 to-purple-500",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return gradients[Math.abs(hash) % gradients.length];
-};
-
 export default function HomePage() {
   const [selectedFilter, setSelectedFilter] = useState("All");
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<Person[]>([]);
+  const [contactTags, setContactTags] = useState<Map<string, string[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [migrating, setMigrating] = useState(false);
 
-  // Load favorites from localStorage on mount
+  // One-time migration: Move localStorage favorites to database
   useEffect(() => {
-    const savedFavorites = localStorage.getItem("networkFavorites");
-    if (savedFavorites) {
+    async function migrateFavorites() {
+      const savedFavorites = localStorage.getItem("networkFavorites");
+      if (!savedFavorites) return;
+
       try {
+        setMigrating(true);
         const favoriteIds = JSON.parse(savedFavorites);
-        setFavorites(new Set(favoriteIds));
+
+        if (favoriteIds && favoriteIds.length > 0) {
+          // Update all favorites in the database
+          for (const contactId of favoriteIds) {
+            await fetch("/api/toggle-favorite", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contactId, isFavorite: true }),
+            });
+          }
+
+          // Remove from localStorage after successful migration
+          localStorage.removeItem("networkFavorites");
+          console.log("Successfully migrated favorites to database");
+        }
       } catch (e) {
-        console.error("Error parsing favorites:", e);
+        console.error("Error migrating favorites:", e);
+      } finally {
+        setMigrating(false);
       }
     }
+
+    migrateFavorites();
   }, []);
 
   // Fetch contacts from Supabase
@@ -113,6 +96,28 @@ export default function HomePage() {
         console.log("Fetched contacts:", (persons as Person[])?.map((p: any) => ({ name: p.name, birthday: p.birthday, archived: p.archived })));
 
         setContacts(persons || []);
+
+        // Fetch tags for all contacts
+        if (persons && persons.length > 0) {
+          const { data: personTagsData } = await (supabase as any)
+            .from("person_tags")
+            .select("person_id, tags(name)")
+            .in("person_id", persons.map((p: any) => p.id));
+
+          // Build a map of person_id -> tag names
+          const tagsMap = new Map<string, string[]>();
+          personTagsData?.forEach((pt: any) => {
+            const personId = pt.person_id;
+            const tagName = pt.tags?.name;
+            if (tagName) {
+              if (!tagsMap.has(personId)) {
+                tagsMap.set(personId, []);
+              }
+              tagsMap.get(personId)?.push(tagName);
+            }
+          });
+          setContactTags(tagsMap);
+        }
       } catch (error) {
         console.error("Error loading contacts:", error);
       } finally {
@@ -124,29 +129,66 @@ export default function HomePage() {
   }, [showArchived]);
 
   // Toggle favorite status
-  const handleToggleFavorite = (contactId: string, e: React.MouseEvent) => {
+  const handleToggleFavorite = async (contactId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(contactId)) {
-      newFavorites.delete(contactId);
-    } else {
-      newFavorites.add(contactId);
+
+    // Find the contact and toggle its favorite status
+    const contact = contacts.find((c) => c.id === contactId);
+    if (!contact) return;
+
+    const newIsFavorite = !(contact as any).is_favorite;
+
+    // Optimistically update the UI
+    setContacts(
+      contacts.map((c) =>
+        c.id === contactId ? { ...c, is_favorite: newIsFavorite } as any : c
+      )
+    );
+
+    try {
+      // Call API to update in database
+      const response = await fetch("/api/toggle-favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactId, isFavorite: newIsFavorite }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update favorite status");
+      }
+    } catch (error) {
+      // Revert on error
+      console.error("Error toggling favorite:", error);
+      setContacts(
+        contacts.map((c) =>
+          c.id === contactId ? { ...c, is_favorite: !newIsFavorite } as any : c
+        )
+      );
     }
-    setFavorites(newFavorites);
-    localStorage.setItem("networkFavorites", JSON.stringify(Array.from(newFavorites)));
   };
 
   // Filter contacts based on selected filter and search query
   const filteredContacts = contacts
     .filter((contact) => {
       // Apply category filter
-      if (selectedFilter === "Favorites" && !favorites.has(contact.id)) {
-        return false;
+      if (selectedFilter === "All") {
+        // No filter - show all contacts
+      } else if (selectedFilter === "Favorites") {
+        if (!(contact as any).is_favorite) {
+          return false;
+        }
+      } else {
+        // Filter by tag (Investor, Startup, Friend, etc.)
+        const tags = contactTags.get(contact.id) || [];
+        const hasMatchingTag = tags.some(tag =>
+          tag.toLowerCase() === selectedFilter.toLowerCase()
+        );
+        if (!hasMatchingTag) {
+          return false;
+        }
       }
-      // For now, other category filters not implemented (would need tags/categories)
-      
+
       // Apply search filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -155,10 +197,10 @@ export default function HomePage() {
         const phoneMatch = contact.phone?.toLowerCase().includes(query);
         const notesMatch = contact.notes?.toLowerCase().includes(query);
         const whereMetMatch = contact.where_met?.toLowerCase().includes(query);
-        
+
         return nameMatch || emailMatch || phoneMatch || notesMatch || whereMetMatch;
       }
-      
+
       return true;
     });
 
@@ -300,7 +342,7 @@ export default function HomePage() {
                         getGradient(contact.name)
                       )}
                     >
-                      {getInitials(contact.name)}
+                      {getInitialsFromFullName(contact.name)}
                     </AvatarFallback>
                   </Avatar>
 
@@ -314,15 +356,15 @@ export default function HomePage() {
                         onClick={(e) => handleToggleFavorite(contact.id, e)}
                         className={cn(
                           "shrink-0 transition-all duration-200 hover:scale-110",
-                          favorites.has(contact.id) ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600 hover:text-amber-400"
+                          (contact as any).is_favorite ? "text-amber-500 dark:text-amber-400" : "text-gray-300 dark:text-gray-600 hover:text-amber-400"
                         )}
-                        title={favorites.has(contact.id) ? "Remove from favorites" : "Add to favorites"}
+                        title={(contact as any).is_favorite ? "Remove from favorites" : "Add to favorites"}
                       >
-                        <Star 
+                        <Star
                           className={cn(
                             "h-4 w-4 md:h-5 md:w-5",
-                            favorites.has(contact.id) && "fill-current"
-                          )} 
+                            (contact as any).is_favorite && "fill-current"
+                          )}
                         />
                       </button>
                     </div>

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function NewReminderPage() {
   const router = useRouter();
@@ -61,18 +62,21 @@ export default function NewReminderPage() {
 
       if (error) throw error;
 
+      toast.success("Reminder created successfully!");
       router.push('/reminders');
     } catch (error) {
       console.error('Error creating reminder:', error);
-      alert('Error creating reminder');
+      toast.error('Failed to create reminder. Please try again.');
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
+    <>
+      <Toaster position="top-center" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -225,6 +229,7 @@ export default function NewReminderPage() {
         </form>
       </div>
     </div>
+    </>
   );
 }
 

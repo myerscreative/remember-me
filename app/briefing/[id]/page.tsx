@@ -21,37 +21,7 @@ import { use, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-
-// Helper function to get initials from first and last name
-const getInitials = (firstName: string, lastName: string | null): string => {
-  if (!firstName) return "";
-  const firstInitial = firstName.trim()[0]?.toUpperCase() || "";
-  const lastInitial = lastName?.trim()[0]?.toUpperCase() || "";
-  return (firstInitial + lastInitial) || firstName.substring(0, 2).toUpperCase();
-};
-
-// Helper function to get full name
-const getFullName = (firstName: string, lastName: string | null): string => {
-  if (!firstName) return "";
-  return lastName ? `${firstName} ${lastName}`.trim() : firstName.trim();
-};
-
-// Helper function to get gradient color based on name hash
-const getGradient = (name: string): string => {
-  const gradients = [
-    "from-purple-500 to-blue-500",
-    "from-green-500 to-blue-500",
-    "from-orange-500 to-yellow-500",
-    "from-cyan-500 to-green-500",
-    "from-pink-500 to-red-500",
-    "from-indigo-500 to-purple-500",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return gradients[Math.abs(hash) % gradients.length];
-};
+import { getInitials, getFullName, getGradient } from "@/lib/utils/contact-helpers";
 
 // Helper to format relative time
 const getRelativeTime = (date: string | null): string => {

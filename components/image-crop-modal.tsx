@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface ImageCropModalProps {
   imageSrc: string;
@@ -105,7 +106,7 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
       onCropComplete(croppedBlob);
     } catch (error) {
       console.error("Error cropping image:", error);
-      alert("Failed to crop image. Please try again.");
+      toast.error("Failed to crop image. Please try again.");
       setProcessing(false);
     }
   };

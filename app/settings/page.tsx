@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  User, 
-  Network, 
-  Bell, 
-  Clock, 
-  Palette, 
-  Shield, 
+import {
+  User,
+  Network,
+  Bell,
+  Clock,
+  Palette,
+  Shield,
   ChevronRight,
   Save,
   Loader2
 } from "lucide-react";
 import { useTheme } from "@/app/providers/theme-provider";
+import toast, { Toaster } from "react-hot-toast";
 
 interface UserSettings {
   // Profile
@@ -114,10 +115,10 @@ export default function SettingsPage() {
 
       if (error) throw error;
 
-      alert('Settings saved successfully!');
+      toast.success('Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Error saving settings');
+      toast.error('Failed to save settings. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -133,6 +134,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+      <Toaster position="top-center" />
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-4">
@@ -512,7 +514,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => {
                   if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                    alert('Account deletion feature coming soon');
+                    toast('Account deletion feature coming soon', { icon: 'ℹ️' });
                   }
                 }}
                 className="w-full px-4 py-3 border border-red-300 dark:border-red-700 rounded-lg bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 font-medium"
