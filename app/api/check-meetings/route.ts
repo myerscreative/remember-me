@@ -3,6 +3,7 @@ import { authenticateRequest } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { fetchUpcomingEvents } from "@/lib/calendar/calendarIntegration";
 import { getMeetingsRequiringNotification } from "@/lib/calendar/meetingMatcher";
+import { decryptToken, isEncrypted } from "@/lib/utils/encryption";
 
 /**
  * Check Meetings API Endpoint
@@ -40,8 +41,28 @@ export async function GET(request: NextRequest) {
 
     const { provider, access_token_encrypted, notification_time } = preferences;
 
-    // TODO: Decrypt access token
-    const accessToken = access_token_encrypted;
+    // Decrypt access token (with backward compatibility for unencrypted tokens)
+    let accessToken: string;
+    try {
+      accessToken = isEncrypted(access_token_encrypted)
+        ? decryptToken(access_token_encrypted)
+        : access_token_encrypted;
+    } catch (decryptError) {
+      console.error("Token decryption error:", decryptError);
+
+      // Update error in database
+      await (supabase as any)
+        .from("calendar_preferences")
+        .update({
+          last_sync_error: "Failed to decrypt access token",
+        } as any)
+        .eq("user_id", user.id);
+
+      return NextResponse.json(
+        { error: "Failed to decrypt access token" },
+        { status: 500 }
+      );
+    }
 
     // Fetch upcoming events
     let events;

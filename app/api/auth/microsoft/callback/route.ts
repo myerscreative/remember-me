@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { encryptToken } from "@/lib/utils/encryption";
 
 /**
  * Microsoft OAuth Callback Route
@@ -80,16 +81,28 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Encrypt tokens before storing (implement encryption helper)
-    // For now, storing as-is (NOT PRODUCTION READY)
+    // Encrypt tokens before storing in database
+    let encryptedAccessToken: string;
+    let encryptedRefreshToken: string;
+
+    try {
+      encryptedAccessToken = encryptToken(access_token);
+      encryptedRefreshToken = encryptToken(refresh_token);
+    } catch (encryptError) {
+      console.error("Token encryption error:", encryptError);
+      return NextResponse.redirect(
+        `${request.nextUrl.origin}/meeting-prep?error=encryption_failed`
+      );
+    }
+
     const { error: dbError } = await (supabase as any)
       .from("calendar_preferences")
       .upsert({
         user_id: userId,
         provider: "microsoft",
         calendar_enabled: true,
-        access_token_encrypted: access_token, // TODO: Encrypt this
-        refresh_token_encrypted: refresh_token, // TODO: Encrypt this
+        access_token_encrypted: encryptedAccessToken,
+        refresh_token_encrypted: encryptedRefreshToken,
         token_expiry: expiryDate.toISOString(),
         last_sync_at: new Date().toISOString(),
         notification_time: 30, // Default to 30 minutes

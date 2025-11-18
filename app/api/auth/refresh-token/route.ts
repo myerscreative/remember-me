@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
+import { decryptToken, encryptToken, isEncrypted } from "@/lib/utils/encryption";
 
 /**
  * Token Refresh Endpoint
@@ -38,8 +39,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Decrypt refresh token
-    const refreshToken = refresh_token_encrypted; // Placeholder
+    // Decrypt refresh token (with backward compatibility for unencrypted tokens)
+    let refreshToken: string;
+    try {
+      refreshToken = isEncrypted(refresh_token_encrypted)
+        ? decryptToken(refresh_token_encrypted)
+        : refresh_token_encrypted;
+    } catch (decryptError) {
+      console.error("Token decryption error:", decryptError);
+      return NextResponse.json(
+        { error: "Failed to decrypt refresh token" },
+        { status: 500 }
+      );
+    }
 
     let tokenResponse;
 
@@ -117,22 +129,46 @@ export async function POST(request: NextRequest) {
     }
 
     const tokenData = await tokenResponse.json();
-    const { access_token, expires_in } = tokenData;
+    const { access_token, refresh_token: new_refresh_token, expires_in } = tokenData;
 
     // Calculate new token expiry
     const expiryDate = new Date();
     expiryDate.setSeconds(expiryDate.getSeconds() + expires_in);
 
+    // Encrypt new tokens before storing
+    let encryptedAccessToken: string;
+    let encryptedRefreshToken: string | undefined;
+
+    try {
+      encryptedAccessToken = encryptToken(access_token);
+      // Some providers (like Google) may provide a new refresh token
+      if (new_refresh_token) {
+        encryptedRefreshToken = encryptToken(new_refresh_token);
+      }
+    } catch (encryptError) {
+      console.error("Token encryption error:", encryptError);
+      return NextResponse.json(
+        { error: "Failed to encrypt tokens" },
+        { status: 500 }
+      );
+    }
+
     // Update tokens in database
-    // TODO: Encrypt access token before storing
+    const updateData: any = {
+      access_token_encrypted: encryptedAccessToken,
+      token_expiry: expiryDate.toISOString(),
+      last_sync_at: new Date().toISOString(),
+      last_sync_error: null, // Clear any previous errors
+    };
+
+    // Update refresh token if a new one was provided
+    if (encryptedRefreshToken) {
+      updateData.refresh_token_encrypted = encryptedRefreshToken;
+    }
+
     const { error: updateError } = await (supabase as any)
       .from("calendar_preferences")
-      .update({
-        access_token_encrypted: access_token, // TODO: Encrypt this
-        token_expiry: expiryDate.toISOString(),
-        last_sync_at: new Date().toISOString(),
-        last_sync_error: null, // Clear any previous errors
-      })
+      .update(updateData)
       .eq("user_id", user.id);
 
     if (updateError) {
