@@ -4,13 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap } from "lucide-react";
+import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap, List, Rows } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
 import { DecayAlertBanner } from "@/components/decay-alert-banner";
 import { getInitialsFromFullName, getGradient, formatBirthday } from "@/lib/utils/contact-helpers";
+import { ErrorFallback } from "@/components/error-fallback";
 
 const filterOptions = ["All", "Favorites", "Investor", "Startup", "Friend"];
 
@@ -19,11 +20,14 @@ export default function HomePage() {
   const [contacts, setContacts] = useState<Person[]>([]);
   const [contactTags, setContactTags] = useState<Map<string, string[]>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [migrating, setMigrating] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(false);
 
   // One-time migration: Move localStorage favorites to database
+  // Also load compact view preference from localStorage
   useEffect(() => {
     async function migrateFavorites() {
       const savedFavorites = localStorage.getItem("networkFavorites");
@@ -55,11 +59,23 @@ export default function HomePage() {
     }
 
     migrateFavorites();
+    
+    // Load compact view preference (default to true on mobile for better UX)
+    const savedViewMode = localStorage.getItem("contactsViewMode");
+    if (savedViewMode !== null) {
+      setIsCompactView(savedViewMode === "compact");
+    } else {
+      // Default to compact on mobile devices
+      const isMobile = window.innerWidth < 768;
+      setIsCompactView(isMobile);
+    }
   }, []);
 
   // Fetch contacts from Supabase
   useEffect(() => {
     async function loadContacts() {
+      // Reset error state
+      setError(null);
       try {
         const supabase = createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -120,6 +136,7 @@ export default function HomePage() {
         }
       } catch (error) {
         console.error("Error loading contacts:", error);
+        setError(error instanceof Error ? error : new Error("Failed to load contacts"));
       } finally {
         setLoading(false);
       }
@@ -168,6 +185,13 @@ export default function HomePage() {
     }
   };
 
+  // Toggle view mode
+  const toggleViewMode = () => {
+    const newMode = !isCompactView;
+    setIsCompactView(newMode);
+    localStorage.setItem("contactsViewMode", newMode ? "compact" : "normal");
+  };
+
   // Filter contacts based on selected filter and search query
   const filteredContacts = contacts
     .filter((contact) => {
@@ -204,6 +228,19 @@ export default function HomePage() {
       return true;
     });
 
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden items-center justify-center">
+        <ErrorFallback
+          error={error}
+          reset={() => window.location.reload()}
+          title="Contacts unavailable"
+          message="We ran into issues loading your contacts."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
       {/* Main Container - Centered on Desktop */}
@@ -231,6 +268,24 @@ export default function HomePage() {
                 </Button>
               </Link>
 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleViewMode}
+                className={cn(
+                  "h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
+                  isCompactView
+                    ? "bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800"
+                    : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                )}
+                title={isCompactView ? "Switch to normal view" : "Switch to compact view"}
+              >
+                {isCompactView ? (
+                  <List className="h-5 w-5 text-blue-700 dark:text-blue-300" />
+                ) : (
+                  <Rows className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                )}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -325,20 +380,36 @@ export default function HomePage() {
                 <p className="text-gray-500 dark:text-gray-400">Loading contacts...</p>
               </div>
             ) : (
-            <div className="space-y-4 md:space-y-5">
+            <div className={cn(
+              "space-y-2",
+              !isCompactView && "md:space-y-4 lg:space-y-5"
+            )}>
               {filteredContacts.length > 0 ? (
                 filteredContacts.map((contact) => (
                 <Link
                   key={contact.id}
                   href={`/contacts/${contact.id}`}
-                  className="group flex items-start gap-3 md:gap-4 p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200"
+                  className={cn(
+                    "group flex items-center gap-2 md:gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200",
+                    isCompactView 
+                      ? "p-2 md:p-2.5" 
+                      : "p-4 md:p-5 items-start"
+                  )}
                 >
                   {/* Avatar with gradient */}
-                  <Avatar className="h-12 w-12 md:h-14 md:w-14 shrink-0">
+                  <Avatar className={cn(
+                    "shrink-0",
+                    isCompactView 
+                      ? "h-8 w-8 md:h-9 md:w-9" 
+                      : "h-12 w-12 md:h-14 md:w-14"
+                  )}>
                     <AvatarImage src={contact.photo_url || ""} />
                     <AvatarFallback
                       className={cn(
-                        "bg-gradient-to-br text-white font-semibold text-sm md:text-base",
+                        "bg-gradient-to-br text-white font-semibold",
+                        isCompactView 
+                          ? "text-xs" 
+                          : "text-sm md:text-base",
                         getGradient(contact.name)
                       )}
                     >
@@ -348,8 +419,13 @@ export default function HomePage() {
 
                   {/* Contact Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-gray-900 dark:text-white text-base md:text-lg leading-tight">
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <h3 className={cn(
+                        "font-bold text-gray-900 dark:text-white leading-tight truncate",
+                        isCompactView 
+                          ? "text-sm md:text-base" 
+                          : "text-base md:text-lg"
+                      )}>
                         {contact.name}
                       </h3>
                       <button
@@ -362,15 +438,20 @@ export default function HomePage() {
                       >
                         <Star
                           className={cn(
-                            "h-4 w-4 md:h-5 md:w-5",
+                            isCompactView ? "h-3.5 w-3.5 md:h-4 md:w-4" : "h-4 w-4 md:h-5 md:w-5",
                             (contact as any).is_favorite && "fill-current"
                           )}
                         />
                       </button>
                     </div>
-                    {/* Birthday display - always show when available */}
-                    {contact.birthday && (
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1 leading-tight">
+                    {/* Birthday display - only show in normal view or if compact view has space */}
+                    {!isCompactView && contact.birthday && (
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-tight">
+                        {formatBirthday(contact.birthday)}
+                      </p>
+                    )}
+                    {isCompactView && contact.birthday && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight truncate">
                         {formatBirthday(contact.birthday)}
                       </p>
                     )}
@@ -380,7 +461,13 @@ export default function HomePage() {
                   </div>
 
                   {/* Chevron */}
-                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 shrink-0 mt-1 transition-all duration-200 group-hover:translate-x-1" />
+                  <ChevronRight className={cn(
+                    "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 shrink-0 transition-all duration-200 group-hover:translate-x-1",
+                    isCompactView 
+                      ? "h-4 w-4 md:h-5 md:w-5" 
+                      : "h-5 w-5 md:h-6 md:w-6",
+                    !isCompactView && "mt-1"
+                  )} />
                 </Link>
                 ))
               ) : (

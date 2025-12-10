@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ErrorFallback } from "@/components/error-fallback";
 import { 
   Bell, 
   Plus, 
@@ -35,6 +36,7 @@ export default function RemindersPage() {
   const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -43,6 +45,10 @@ export default function RemindersPage() {
   }, []);
 
   async function loadReminders() {
+    // Reset states
+    setLoading(true);
+    setError(null);
+    
     const supabase = createClient();
     
     const { data: { user } } = await supabase.auth.getUser();
@@ -71,7 +77,7 @@ export default function RemindersPage() {
       if (error) throw error;
 
       // Transform data to include person_name
-      const transformedReminders = remindersData?.map(reminder => ({
+      const transformedReminders = remindersData?.map((reminder: any) => ({
         ...reminder,
         person_name: reminder.persons 
           ? (reminder.persons.first_name 
@@ -83,6 +89,7 @@ export default function RemindersPage() {
       setReminders(transformedReminders);
     } catch (error) {
       console.error('Error loading reminders:', error);
+      setError(error instanceof Error ? error : new Error('Failed to load reminders'));
     } finally {
       setLoading(false);
     }
@@ -102,7 +109,7 @@ export default function RemindersPage() {
     }
 
     // Update local state
-    setReminders(reminders.map((r: any) => 
+    setReminders((reminders as any[]).map((r: any) => 
       r.id === reminderId ? { ...r, completed: !currentStatus } : r
     ));
   }
@@ -122,7 +129,7 @@ export default function RemindersPage() {
       return;
     }
 
-    setReminders(reminders.filter((r: any) => r.id !== reminderId));
+    setReminders((reminders as any[]).filter((r: any) => r.id !== reminderId));
   }
 
   // Filter reminders
@@ -188,6 +195,19 @@ export default function RemindersPage() {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-gray-600 dark:text-gray-400">Loading reminders...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <ErrorFallback
+          error={error}
+          reset={loadReminders}
+          title="Reminders unavailable"
+          message="We couldn't load your reminders. Please try again."
+        />
       </div>
     );
   }
@@ -397,6 +417,8 @@ export default function RemindersPage() {
     </div>
   );
 }
+
+
 
 
 

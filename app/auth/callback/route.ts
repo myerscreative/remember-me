@@ -54,7 +54,9 @@ export async function GET(request: NextRequest) {
 
     // Session should now be established via cookies
     console.log("Recovery session established for user:", data.user?.email);
-    return response;
+    
+    // Redirect to reset password page to allow user to set a new password
+    return NextResponse.redirect(new URL("/reset-password", origin));
   }
 
   // Handle regular auth code exchange (signup, login)

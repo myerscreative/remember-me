@@ -7,6 +7,7 @@ import type { Person, Relationship } from "@/types/database.types";
 import Link from "next/link";
 import { Search, Settings, Plus, Minus, RotateCcw } from "lucide-react";
 import { getInitialsFromFullName, formatBirthday } from "@/lib/utils/contact-helpers";
+import { ErrorFallback } from "@/components/error-fallback";
 
 interface NetworkNode {
   id: string;
@@ -26,6 +27,7 @@ export default function NetworkPage() {
   const [nodes, setNodes] = useState<NetworkNode[]>([]);
   const [edges, setEdges] = useState<NetworkEdge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fatalError, setFatalError] = useState<Error | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userProfile, setUserProfile] = useState<{ photo_url?: string | null; name?: string; email?: string } | null>(null);
@@ -309,25 +311,30 @@ export default function NetworkPage() {
   // Load data immediately
   useEffect(() => {
     async function loadNetwork() {
-      const supabase = createClient();
+      // Reset errors
+      setFatalError(null);
       
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      // Load user profile (photo_url from metadata or localStorage)
-      const userPhotoUrl = user.user_metadata?.photo_url || localStorage.getItem('userPhotoUrl');
-      const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'You';
-      setUserProfile({
-        photo_url: userPhotoUrl || null,
-        name: userName,
-        email: user.email || undefined
-      });
-
       try {
+        const supabase = createClient();
+        
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        // Load user profile (photo_url from metadata or localStorage)
+        const userPhotoUrl = user.user_metadata?.photo_url || localStorage.getItem('userPhotoUrl');
+        const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'You';
+        setUserProfile({
+          photo_url: userPhotoUrl || null,
+          name: userName,
+          email: user.email || undefined
+        });
+
         // Fetch all contacts
         const { data, error: personsError } = await (supabase as any)
           .from("persons")
@@ -449,8 +456,6 @@ export default function NetworkPage() {
           }
         };
         setTimeout(() => tryUpdateContainerSize(), 100);
-      } catch (error) {
-        console.error("Error loading network:", error);
       } finally {
         setLoading(false);
       }
@@ -878,6 +883,19 @@ export default function NetworkPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes.length, containerSize]);
+
+  if (fatalError) {
+    return (
+      <div className="flex h-[calc(100vh-64px)] items-center justify-center">
+        <ErrorFallback 
+          error={fatalError} 
+          reset={() => window.location.reload()} 
+          title="Network visualization failed"
+          message="We couldn't load your network graph. Please try reloading the page."
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return (

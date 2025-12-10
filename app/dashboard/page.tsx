@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ErrorFallback } from "@/components/error-fallback";
 import {
   Users,
   TrendingUp,
@@ -36,6 +37,7 @@ import { getInitials, getGradient } from "@/lib/utils/contact-helpers";
 export default function DashboardPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [interactionStats, setInteractionStats] = useState<InteractionStats | null>(null);
   const [relationshipHealth, setRelationshipHealth] = useState<RelationshipHealth | null>(null);
@@ -48,9 +50,16 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     setIsLoading(true);
+    setError(null);
 
     try {
-      const [statsData, interactionData, healthData, topData, attentionData] = await Promise.all([
+      const [
+        statsResult,
+        interactionResult,
+        healthResult,
+        topContactsResult,
+        attentionResult
+      ] = await Promise.all([
         getDashboardStats(),
         getInteractionStats(),
         getRelationshipHealth(),
@@ -58,13 +67,23 @@ export default function DashboardPage() {
         getContactsNeedingAttention(30),
       ]);
 
-      setStats(statsData);
-      setInteractionStats(interactionData);
-      setRelationshipHealth(healthData);
-      setTopContacts(topData);
-      setNeedingAttention(attentionData.slice(0, 5)); // Limit to 5
+      // Check for critical errors (stats or health are essential)
+      if (statsResult.error) throw statsResult.error;
+      if (interactionResult.error) throw interactionResult.error;
+      if (healthResult.error) throw healthResult.error;
+      
+      // Non-critical errors can be logged or handled gracefully
+      if (topContactsResult.error) console.error("Error fetching top contacts:", topContactsResult.error);
+      if (attentionResult.error) console.error("Error fetching attention list:", attentionResult.error);
+
+      setStats(statsResult.data);
+      setInteractionStats(interactionResult.data);
+      setRelationshipHealth(healthResult.data);
+      setTopContacts(topContactsResult.data || []);
+      setNeedingAttention((attentionResult.data || []).slice(0, 5));
     } catch (error) {
       console.error("Error loading dashboard data:", error);
+      setError(error instanceof Error ? error : new Error("Failed to load dashboard data"));
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +98,19 @@ export default function DashboardPage() {
             Loading dashboard...
           </span>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <ErrorFallback 
+          error={error} 
+          reset={loadDashboardData}
+          title="Dashboard unavailable"
+          message="We couldn't load your dashboard data. Please check your connection and try again."
+        />
       </div>
     );
   }

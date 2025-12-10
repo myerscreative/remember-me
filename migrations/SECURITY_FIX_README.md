@@ -66,3 +66,5 @@ After running the migration:
 - **Better Security**: RLS policies now properly enforced on views
 - **Safe Functions**: Protected against search path attacks
 
+
+

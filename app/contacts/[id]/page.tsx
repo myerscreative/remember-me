@@ -21,6 +21,10 @@ import {
   EyeOff,
   Cake,
   Camera,
+  Calendar,
+  Bell,
+  RefreshCw,
+  Info,
 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -31,6 +35,7 @@ import { ArchiveContactDialog } from "@/components/archive-contact-dialog";
 import { StoryCompletenessIndicator } from "@/components/story-completeness-indicator";
 import toast, { Toaster } from "react-hot-toast";
 import { getInitials, getFullName, getGradient } from "@/lib/utils/contact-helpers";
+import { ErrorFallback } from "@/components/error-fallback";
 
 const tabs = ["Profession", "Family", "Interests"];
 
@@ -84,6 +89,15 @@ export default function ContactDetailPage({
   const [phoneValue, setPhoneValue] = useState("");
   const [hobbies, setHobbies] = useState("");
   const [editingHobbies, setEditingHobbies] = useState(false);
+  
+  // Nurture tracking state
+  const [nextContactDate, setNextContactDate] = useState<string>("");
+  const [nextContactReason, setNextContactReason] = useState("");
+  const [lastContactedDate, setLastContactedDate] = useState<string>("");
+  const [editingNextContact, setEditingNextContact] = useState(false);
+  
+  // AI Suggestions drawer state
+  const [showSuggestionsDrawer, setShowSuggestionsDrawer] = useState(false);
   
   // AI prompting for missing information
   const [missingInfo, setMissingInfo] = useState<Array<{
@@ -187,6 +201,9 @@ export default function ContactDetailPage({
           notes: person.notes || "",
           profession: person.what_found_interesting || "",
           familyNotes: person.family_notes || "",
+          nextContactDate: person.next_contact_date || null,
+          nextContactReason: person.next_contact_reason || "",
+          lastContactedDate: person.last_contacted_date || null,
           mostRecentInteraction: {
             type: "Email",
             date: person.last_contact 
@@ -217,6 +234,9 @@ export default function ContactDetailPage({
         setEmailValue(contactData.email || "");
         setPhoneValue(contactData.phone || "");
         setHobbies(person.hobbies || "");
+        setNextContactDate(contactData.nextContactDate || "");
+        setNextContactReason(contactData.nextContactReason || "");
+        setLastContactedDate(contactData.lastContactedDate || "");
         // Initialize birthday value for editing (format as YYYY-MM-DD for input)
         if (contactData.birthday) {
           try {
@@ -766,6 +786,161 @@ export default function ContactDetailPage({
     }
   };
 
+  // Next Contact Date handlers
+  const handleSaveNextContact = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update({ 
+          next_contact_date: nextContactDate || null,
+          next_contact_reason: nextContactReason?.trim() || null
+        })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
+      setContact({ 
+        ...contact, 
+        nextContactDate: nextContactDate || null,
+        nextContactReason: nextContactReason?.trim() || ""
+      });
+      setEditingNextContact(false);
+    } catch (err) {
+      console.error("Error saving next contact date:", err);
+      alert(err instanceof Error ? err.message : "Failed to save next contact date");
+    }
+  };
+
+  const handleMarkAsContacted = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Suggest next contact date (60 days from now by default)
+      const suggestedNext = new Date();
+      suggestedNext.setDate(suggestedNext.getDate() + 60);
+      const suggestedNextStr = suggestedNext.toISOString().split('T')[0];
+
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update({ 
+          last_contacted_date: today,
+          next_contact_date: suggestedNextStr,
+          last_contact: new Date().toISOString()
+        })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
+      setLastContactedDate(today);
+      setNextContactDate(suggestedNextStr);
+      setContact({ 
+        ...contact, 
+        lastContactedDate: today,
+        nextContactDate: suggestedNextStr
+      });
+    } catch (err) {
+      console.error("Error marking as contacted:", err);
+      alert(err instanceof Error ? err.message : "Failed to mark as contacted");
+    }
+  };
+
+  const handleSnoozeNextContact = async (days: number) => {
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        router.push("/login?redirect=/contacts/" + id);
+        return;
+      }
+
+      const baseDate = nextContactDate ? new Date(nextContactDate) : new Date();
+      baseDate.setDate(baseDate.getDate() + days);
+      const newDate = baseDate.toISOString().split('T')[0];
+
+      const { error: updateError } = await supabase
+        .from("persons")
+        .update({ next_contact_date: newDate })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
+      setNextContactDate(newDate);
+      setContact({ ...contact, nextContactDate: newDate });
+    } catch (err) {
+      console.error("Error snoozing contact:", err);
+      alert(err instanceof Error ? err.message : "Failed to snooze");
+    }
+  };
+
+  const getUrgencyInfo = () => {
+    if (!nextContactDate) return null;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const contactDate = new Date(nextContactDate);
+    contactDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((contactDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return {
+        status: 'overdue',
+        color: 'text-red-600 dark:text-red-400',
+        bgColor: 'bg-red-50 dark:bg-red-900/20',
+        borderColor: 'border-red-200 dark:border-red-800',
+        label: `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''}`
+      };
+    } else if (diffDays === 0) {
+      return {
+        status: 'today',
+        color: 'text-orange-600 dark:text-orange-400',
+        bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+        borderColor: 'border-orange-200 dark:border-orange-800',
+        label: 'Today'
+      };
+    } else if (diffDays <= 3) {
+      return {
+        status: 'urgent',
+        color: 'text-yellow-600 dark:text-yellow-400',
+        bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+        borderColor: 'border-yellow-200 dark:border-yellow-800',
+        label: `In ${diffDays} day${diffDays !== 1 ? 's' : ''}`
+      };
+    } else if (diffDays <= 7) {
+      return {
+        status: 'soon',
+        color: 'text-blue-600 dark:text-blue-400',
+        bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+        borderColor: 'border-blue-200 dark:border-blue-800',
+        label: `In ${diffDays} days`
+      };
+    } else {
+      return {
+        status: 'upcoming',
+        color: 'text-green-600 dark:text-green-400',
+        bgColor: 'bg-green-50 dark:bg-green-900/20',
+        borderColor: 'border-green-200 dark:border-green-800',
+        label: `In ${diffDays} days`
+      };
+    }
+  };
+
   const handleCancelBirthday = () => {
     // Reset to original value from contact
     if (contact?.birthday) {
@@ -1290,6 +1465,9 @@ export default function ContactDetailPage({
     );
   };
 
+
+  // ...
+
   if (loading) {
     return (
       <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
@@ -1302,19 +1480,13 @@ export default function ContactDetailPage({
 
   if (error || !contact) {
     return (
-      <div className="flex flex-col h-screen bg-white dark:bg-[#1a1d24] overflow-hidden">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white/90 mb-2">Contact not found</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">{error || "This contact doesn't exist or you don't have access to it."}</p>
-            <Link href="/">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Contacts
-              </Button>
-            </Link>
-          </div>
-        </div>
+      <div className="min-h-screen bg-white dark:bg-[#1a1d24] flex items-center justify-center">
+        <ErrorFallback
+          error={error ? new Error(error) : new Error("Contact not found")}
+          reset={() => window.location.reload()}
+          title="Contact unavailable"
+          message={error || "This contact doesn't exist or you don't have access to it."}
+        />
       </div>
     );
   }
@@ -1645,35 +1817,123 @@ export default function ContactDetailPage({
                     </>
                   )}
                 </div>
+
+                {/* Next Contact Date - Always show below birthday */}
+                {!editingBirthday && (
+                  <div className="mt-3 flex items-center justify-center">
+                    {editingNextContact ? (
+                      <div className="w-full max-w-md space-y-3 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-semibold text-blue-900 dark:text-blue-300">
+                            Next Contact Date
+                          </label>
+                        </div>
+                        <Input
+                          type="date"
+                          value={nextContactDate}
+                          onChange={(e) => setNextContactDate(e.target.value)}
+                          className="bg-white dark:bg-[#1a1d24]"
+                          autoFocus
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setNextContactDate(contact?.nextContactDate || "");
+                              setEditingNextContact(false);
+                            }}
+                            className="h-8"
+                          >
+                            <X className="h-3 w-3 mr-1" />
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveNextContact}
+                            className="h-8 bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Check className="h-3 w-3 mr-1" />
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : nextContactDate ? (
+                      <div 
+                        className={cn(
+                          "mt-3 text-sm md:text-base",
+                          isEditMode && "cursor-pointer hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                        )}
+                        onClick={() => isEditMode && setEditingNextContact(true)}
+                      >
+                        <p className={cn(
+                          (() => {
+                            const urgency = getUrgencyInfo();
+                            if (urgency && (urgency.status === 'overdue' || urgency.status === 'today' || urgency.status === 'urgent')) {
+                              return urgency.color;
+                            }
+                            return "text-gray-600 dark:text-gray-400";
+                          })()
+                        )}>
+                          Reach out to {contact.firstName} on {new Date(nextContactDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                          {getUrgencyInfo() && ` (${getUrgencyInfo()?.label})`}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingNextContact(true);
+                          }}
+                          className="text-sm md:text-base font-semibold underline transition-colors text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
+                        >
+                          Don't lose touch. Set a reminder now!
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Tab Navigation - Centered below name */}
-              <div className="w-full max-w-lg border-b border-gray-200 dark:border-[#3a3f4b]">
-                <div className="flex justify-center gap-6 md:gap-8">
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={cn(
-                        "px-3 md:px-4 pb-3 pt-1 text-sm md:text-base font-medium transition-colors relative",
-                        activeTab === tab
-                          ? "text-gray-900 dark:text-white/90"
-                          : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                      )}
-                    >
-                      {tab}
-                      {activeTab === tab && (
-                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
-                      )}
-                    </button>
-                  ))}
+              {/* Tab Navigation with Content Grouping */}
+              <div className="w-full max-w-2xl mx-auto mt-6 bg-gray-50 dark:bg-[#252931] rounded-lg border border-gray-200 dark:border-[#3a3f4b] p-4 md:p-6 shadow-sm dark:shadow-md dark:shadow-black/20">
+                {/* Tabs Container */}
+                <div className="border-b border-gray-200 dark:border-[#3a3f4b] mb-6 -mx-4 md:-mx-6 px-4 md:px-6">
+                  <div className="flex justify-center gap-6 md:gap-8 relative">
+                    {tabs.map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                          "px-3 md:px-4 pb-3 pt-1 text-sm md:text-base font-medium transition-colors relative",
+                          activeTab === tab
+                            ? "text-gray-900 dark:text-white/90"
+                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                        )}
+                      >
+                        {tab}
+                        {activeTab === tab && (
+                          <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
+                        )}
+                      </button>
+                    ))}
+                    
+                    {/* AI Suggestions Badge */}
+                    {filteredMissingInfo.length > 0 && aiSuggestionsEnabled && (activeTab === "Profession" || activeTab === "Family") && (
+                      <button
+                        onClick={() => setShowSuggestionsDrawer(true)}
+                        className="absolute right-0 top-1 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs font-medium text-blue-700 dark:text-blue-300"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        {filteredMissingInfo.length} {filteredMissingInfo.length === 1 ? 'suggestion' : 'suggestions'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Synopsis - Centered, readable width */}
-            <div className="flex justify-center mb-6">
-              <div className="w-full max-w-2xl">
+                {/* Tab Content - Visually connected */}
+                <div className="min-h-[200px]">
                 {activeTab === "Interests" ? (
                   /* Interests List */
                   <div className="space-y-6">
@@ -2007,140 +2267,9 @@ export default function ContactDetailPage({
                     )}
                   </div>
                 )}
+                </div>
               </div>
             </div>
-
-            {/* AI Prompt for Missing Information */}
-            {filteredMissingInfo.length > 0 && (activeTab === "Profession" || activeTab === "Family") && (
-              <div className="flex justify-center mb-6">
-                <div className="w-full max-w-2xl">
-                  <div className="bg-blue-50 dark:bg-[#2d3139] border border-blue-200 dark:border-[#3a3f4b] rounded-lg p-4 md:p-5">
-                    <div className="flex items-start gap-3">
-                      <div className="rounded-full bg-blue-100 dark:bg-blue-500/10 p-2 shrink-0 mt-0.5">
-                        <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm md:text-base font-semibold text-blue-900 dark:text-gray-300">
-                            Complete Your Profile
-                          </h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleToggleAiSuggestions}
-                            className="h-7 text-xs text-blue-700 hover:text-blue-900 hover:bg-blue-100"
-                            title="Toggle AI Suggestions"
-                          >
-                            {aiSuggestionsEnabled ? (
-                              <>
-                                <EyeOff className="h-3 w-3 mr-1" />
-                                Hide
-                              </>
-                            ) : (
-                              <>
-                                <Eye className="h-3 w-3 mr-1" />
-                                Show
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                        {filteredMissingInfo.map((info, index) => {
-                          const suggestionKey = `${id}_${info.type}_${info.prompt.slice(0, 50)}`;
-                          return (
-                            <div key={index} className="mb-3 last:mb-0 p-3 bg-white dark:bg-[#252931] rounded-lg border border-blue-100 dark:border-[#3a3f4b]">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <div className="flex-1">
-                                  <p className="text-sm md:text-base text-blue-800 dark:text-gray-300 mb-2">
-                                    {info.prompt}
-                                  </p>
-                                  {info.suggestion && (
-                                    <p className="text-xs md:text-sm text-blue-600 dark:text-blue-400 italic mb-2">
-                                      Example: {info.suggestion}
-                                    </p>
-                                  )}
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleIgnoreSuggestion(info.type, info.prompt)}
-                                  className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-100 shrink-0"
-                                  title="Ignore this suggestion"
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              <Button
-                                size="sm"
-                                onClick={() => {
-                                  if (!editingSynopsis) {
-                                    setLocalSynopsis(getCurrentSynopsis());
-                                    setEditingSynopsis(true);
-                                  }
-                                }}
-                                className="h-8 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm"
-                              >
-                                <Edit className="h-3 w-3 mr-1.5" />
-                                {editingSynopsis ? "See suggestions above while editing" : "Add This Information"}
-                              </Button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* AI Suggestions Toggle (shown when suggestions are disabled or no suggestions) */}
-            {filteredMissingInfo.length === 0 && aiSuggestionsEnabled && (activeTab === "Profession" || activeTab === "Family") && (
-              <div className="flex justify-center mb-6">
-                <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 dark:bg-[#2d3139] border border-gray-200 dark:border-[#3a3f4b] rounded-lg p-3 md:p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">AI Suggestions are enabled</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleToggleAiSuggestions}
-                        className="h-7 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                      >
-                        <EyeOff className="h-3 w-3 mr-1" />
-                        Disable
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Show enable button when AI suggestions are disabled */}
-            {!aiSuggestionsEnabled && (activeTab === "Profession" || activeTab === "Family") && (
-              <div className="flex justify-center mb-6">
-                <div className="w-full max-w-2xl">
-                  <div className="bg-gray-50 dark:bg-[#2d3139] border border-gray-200 dark:border-[#3a3f4b] rounded-lg p-3 md:p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">AI Suggestions are disabled</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleToggleAiSuggestions}
-                        className="h-7 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        Enable
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Most Recent Interaction */}
             <div className="flex justify-center mb-6">
@@ -2209,19 +2338,21 @@ export default function ContactDetailPage({
             </div>
 
             {/* Archive Button */}
-            <div className="flex justify-center mb-6">
-              <div className="w-full max-w-2xl">
-                <ArchiveContactDialog
-                  contactId={id}
-                  contactName={getFullName(contact.firstName, contact.lastName)}
-                  isArchived={contact.archived || false}
-                  onSuccess={() => {
-                    // Refresh the page or redirect to home
-                    router.push("/");
-                  }}
-                />
+            {isEditMode && (
+              <div className="flex justify-center mb-6">
+                <div className="w-full max-w-2xl">
+                  <ArchiveContactDialog
+                    contactId={id}
+                    contactName={getFullName(contact.firstName, contact.lastName)}
+                    isArchived={contact.archived || false}
+                    onSuccess={() => {
+                      // Refresh the page or redirect to home
+                      router.push("/");
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Story Completeness Indicator */}
             {storyCompleteness < 100 && (
@@ -2398,6 +2529,96 @@ export default function ContactDetailPage({
           </div>
         </div>
       </div>
+
+      {/* AI Suggestions Slide-Out Drawer */}
+      {showSuggestionsDrawer && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 animate-fadeIn"
+            onClick={() => setShowSuggestionsDrawer(false)}
+          />
+          
+          {/* Drawer */}
+          <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-white dark:bg-[#1a1d24] shadow-2xl z-50 overflow-y-auto animate-slideInRight">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-[#1a1d24] border-b border-gray-200 dark:border-[#3a3f4b] p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Complete Profile
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowSuggestionsDrawer(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-[#252931] rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {filteredMissingInfo.length} suggestion{filteredMissingInfo.length !== 1 ? 's' : ''} to help you remember {contact.firstName} better
+              </p>
+              
+              {filteredMissingInfo.map((info, index) => {
+                const suggestionKey = `${id}_${info.type}_${info.prompt.slice(0, 50)}`;
+                return (
+                  <div key={index} className="p-4 bg-gray-50 dark:bg-[#252931] rounded-lg border border-gray-200 dark:border-[#3a3f4b]">
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-900 dark:text-gray-200 font-medium mb-2">
+                          {info.prompt}
+                        </p>
+                        {info.suggestion && (
+                          <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                            Example: {info.suggestion}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleIgnoreSuggestion(info.type, info.prompt)}
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#1a1d24] rounded transition-colors shrink-0"
+                        title="Ignore this suggestion"
+                      >
+                        <X className="h-4 w-4 text-gray-400" />
+                      </button>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setShowSuggestionsDrawer(false);
+                        if (!editingSynopsis) {
+                          setLocalSynopsis(getCurrentSynopsis());
+                          setEditingSynopsis(true);
+                        }
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Edit className="h-3 w-3 mr-1.5" />
+                      Add This Information
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-white dark:bg-[#1a1d24] border-t border-gray-200 dark:border-[#3a3f4b] p-4">
+              <Button
+                variant="outline"
+                onClick={handleToggleAiSuggestions}
+                className="w-full"
+              >
+                <EyeOff className="h-4 w-4 mr-2" />
+                Turn Off Suggestions
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Image Crop Modal */}
       {imageToCrop && (

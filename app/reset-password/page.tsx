@@ -18,11 +18,52 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
 
-  // Check for active session on mount
+  // Check for auth tokens in URL hash and session on mount
   useEffect(() => {
-    const checkSession = async () => {
+    const handleAuth = async () => {
       try {
         const supabase = createClient();
+        
+        // Check for tokens in URL hash (from password reset email)
+        // Supabase sends: #access_token=xxx&refresh_token=xxx&type=recovery
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const type = hashParams.get("type");
+        const errorCode = hashParams.get("error");
+        const errorDescription = hashParams.get("error_description");
+
+        // Handle error in hash
+        if (errorCode) {
+          console.error("Auth error:", errorCode, errorDescription);
+          setError(errorDescription || "Password reset link has expired or is invalid.");
+          setTimeout(() => router.push("/login"), 3000);
+          return;
+        }
+
+        // If we have recovery tokens in the hash, set the session
+        if (accessToken && type === "recovery") {
+          // Clear the hash from URL for security (tokens shouldn't stay in URL)
+          window.history.replaceState(null, "", window.location.pathname);
+          
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || "",
+          });
+
+          if (sessionError) {
+            console.error("Error setting session:", sessionError);
+            setError("Password reset link has expired or is invalid. Please request a new one.");
+            setTimeout(() => router.push("/login"), 3000);
+            return;
+          }
+
+          // Session is now set, user can reset password
+          setSessionChecked(true);
+          return;
+        }
+
+        // No tokens in hash, check for existing session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session) {
@@ -35,12 +76,12 @@ export default function ResetPasswordPage() {
         
         setSessionChecked(true);
       } catch (err) {
-        console.error("Error checking session:", err);
+        console.error("Error handling auth:", err);
         setError("Failed to verify session. Please try again.");
       }
     };
     
-    checkSession();
+    handleAuth();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/app/providers/theme-provider";
 import toast, { Toaster } from "react-hot-toast";
+import { ErrorFallback } from "@/components/error-fallback";
 
 interface UserSettings {
   // Profile
@@ -66,31 +67,44 @@ export default function SettingsPage() {
     show_last_contact: true,
     network_zoom_level: 100,
   });
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     async function loadSettings() {
-      const supabase = createClient();
+      // Reset error state
+      setError(null);
       
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) {
-        router.push('/login');
-        return;
+      try {
+        const supabase = createClient();
+        
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        if (authError || !authUser) {
+          router.push('/login');
+          return;
+        }
+
+        setUser(authUser);
+
+        // Load user settings from database
+        const { data: userSettings, error: settingsError } = await (supabase as any)
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .single();
+        
+        if (settingsError && settingsError.code !== 'PGRST116') { // Ignore "No rows found" error
+           throw settingsError;
+        }
+
+        if (userSettings) {
+          setSettings(prev => ({ ...prev, ...userSettings }));
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
+        setError(error instanceof Error ? error : new Error("Failed to load settings"));
+      } finally {
+        setLoading(false);
       }
-
-      setUser(authUser);
-
-      // Load user settings from database
-      const { data: userSettings } = await (supabase as any)
-        .from('user_settings')
-        .select('*')
-        .eq('user_id', authUser.id)
-        .single();
-
-      if (userSettings) {
-        setSettings(prev => ({ ...prev, ...userSettings }));
-      }
-
-      setLoading(false);
     }
 
     loadSettings();
@@ -128,6 +142,19 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+        <ErrorFallback
+          error={error}
+          reset={() => window.location.reload()}
+          title="Settings unavailable"
+          message="We couldn't load your settings."
+        />
       </div>
     );
   }

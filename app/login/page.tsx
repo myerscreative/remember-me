@@ -47,10 +47,11 @@ function LoginForm() {
 
       if (isResetPassword) {
         // Send password reset email
+        // Redirect directly to reset-password page which handles the code exchange client-side
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(
           formData.email,
           {
-            redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+            redirectTo: `${window.location.origin}/reset-password`,
           }
         );
 

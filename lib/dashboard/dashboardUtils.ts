@@ -47,12 +47,15 @@ export interface TopContact {
 /**
  * Get comprehensive dashboard statistics
  */
-export async function getDashboardStats(): Promise<DashboardStats | null> {
+/**
+ * Get comprehensive dashboard stats
+ */
+export async function getDashboardStats(): Promise<{ data: DashboardStats | null; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    return { data: null, error: new Error("User not authenticated") };
   }
 
   try {
@@ -64,7 +67,7 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
 
     if (error) {
       console.error('Error fetching contacts:', error);
-      return null;
+      return { data: null, error: new Error(error.message) };
     }
 
     const contacts = allContacts || [];
@@ -94,22 +97,22 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
       archived: contacts.filter(c => c.archive_status).length,
     };
 
-    return stats;
+    return { data: stats, error: null };
   } catch (error) {
     console.error('Error calculating dashboard stats:', error);
-    return null;
+    return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
   }
 }
 
 /**
  * Get interaction statistics
  */
-export async function getInteractionStats(): Promise<InteractionStats | null> {
+export async function getInteractionStats(): Promise<{ data: InteractionStats | null; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    return { data: null, error: new Error("User not authenticated") };
   }
 
   try {
@@ -121,7 +124,7 @@ export async function getInteractionStats(): Promise<InteractionStats | null> {
 
     if (error) {
       console.error('Error fetching contacts:', error);
-      return null;
+      return { data: null, error: new Error(error.message) };
     }
 
     const contactsList = contacts || [];
@@ -153,22 +156,22 @@ export async function getInteractionStats(): Promise<InteractionStats | null> {
       }).length,
     };
 
-    return stats;
+    return { data: stats, error: null };
   } catch (error) {
     console.error('Error calculating interaction stats:', error);
-    return null;
+    return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
   }
 }
 
 /**
  * Calculate relationship health breakdown
  */
-export async function getRelationshipHealth(): Promise<RelationshipHealth | null> {
+export async function getRelationshipHealth(): Promise<{ data: RelationshipHealth | null; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    return { data: null, error: new Error("User not authenticated") };
   }
 
   try {
@@ -180,7 +183,7 @@ export async function getRelationshipHealth(): Promise<RelationshipHealth | null
 
     if (error) {
       console.error('Error fetching contacts:', error);
-      return null;
+      return { data: null, error: new Error(error.message) };
     }
 
     const contactsList = contacts || [];
@@ -211,59 +214,66 @@ export async function getRelationshipHealth(): Promise<RelationshipHealth | null
       }
     });
 
-    return health;
+    return { data: health, error: null };
   } catch (error) {
     console.error('Error calculating relationship health:', error);
-    return null;
+    return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
   }
 }
 
 /**
  * Get top contacts by interaction count
  */
-export async function getTopContacts(limit: number = 10): Promise<TopContact[]> {
+export async function getTopContacts(limit: number = 10): Promise<{ data: TopContact[]; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return [];
+    return { data: [], error: new Error("User not authenticated") };
   }
 
-  const { data, error } = await (supabase as any)
-    .from('persons')
-    .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, contact_importance, relationship_summary')
-    .eq('user_id', user.id)
-    .or('archive_status.is.null,archive_status.eq.false')
-    .order('interaction_count', { ascending: false, nullsFirst: false })
-    .limit(limit);
+  try {
+    const { data, error } = await (supabase as any)
+      .from('persons')
+      .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, contact_importance, relationship_summary')
+      .eq('user_id', user.id)
+      .or('archive_status.is.null,archive_status.eq.false')
+      .order('interaction_count', { ascending: false, nullsFirst: false })
+      .limit(limit);
 
-  if (error) {
-    console.error('Error fetching top contacts:', error);
-    return [];
+    if (error) {
+      console.error('Error fetching top contacts:', error);
+      return { data: [], error: new Error(error.message) };
+    }
+
+    const topContacts = (data || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      firstName: c.first_name,
+      lastName: c.last_name,
+      photoUrl: c.photo_url,
+      interactionCount: c.interaction_count || 0,
+      lastInteractionDate: c.last_interaction_date,
+      contactImportance: c.contact_importance,
+      relationshipSummary: c.relationship_summary,
+    }));
+
+    return { data: topContacts, error: null };
+  } catch (error) {
+    console.error('Error getting top contacts:', error);
+    return { data: [], error: error instanceof Error ? error : new Error('Unknown error') };
   }
-
-  return (data || []).map(c => ({
-    id: c.id,
-    name: c.name,
-    firstName: c.first_name,
-    lastName: c.last_name,
-    photoUrl: c.photo_url,
-    interactionCount: c.interaction_count || 0,
-    lastInteractionDate: c.last_interaction_date,
-    contactImportance: c.contact_importance,
-    relationshipSummary: c.relationship_summary,
-  }));
 }
 
 /**
  * Get contacts needing attention (using Phase 1 function)
  */
-export async function getContactsNeedingAttention(daysThreshold: number = 30): Promise<any[]> {
+export async function getContactsNeedingAttention(daysThreshold: number = 30): Promise<{ data: any[]; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return [];
+    return { data: [], error: new Error("User not authenticated") };
   }
 
   try {
@@ -274,13 +284,13 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
 
     if (error) {
       console.error('Contacts needing attention error:', error);
-      return [];
+      return { data: [], error: new Error(error.message) };
     }
 
-    return data || [];
+    return { data: data || [], error: null };
   } catch (error) {
     console.error('Error fetching contacts needing attention:', error);
-    return [];
+    return { data: [], error: error instanceof Error ? error : new Error('Unknown error') };
   }
 }
 

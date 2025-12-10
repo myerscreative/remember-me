@@ -46,6 +46,9 @@ CREATE TABLE persons (
   -- Contact Tracking
   last_contact TIMESTAMP WITH TIME ZONE,
   follow_up_reminder TIMESTAMP WITH TIME ZONE,
+  next_contact_date DATE,
+  next_contact_reason TEXT,
+  last_contacted_date DATE,
   
   -- Metadata
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,

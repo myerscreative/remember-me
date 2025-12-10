@@ -8,3 +8,5 @@ COMMENT ON COLUMN persons.hobbies IS 'Text description of the person''s hobbies 
 
 
 
+
+
