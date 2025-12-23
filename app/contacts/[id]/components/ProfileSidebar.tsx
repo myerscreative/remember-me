@@ -3,10 +3,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, Clock, MapPin, Briefcase, Cake } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat } from 'lucide-react';
+import { FREQUENCY_PRESETS } from '@/lib/relationship-health';
 
 interface ProfileSidebarProps {
   contact: {
+    id: string;
     firstName: string;
     lastName?: string;
     photo_url?: string;
@@ -16,10 +18,12 @@ interface ProfileSidebarProps {
     birthday?: string;
     last_contact_date?: string;
     next_contact_date?: string;
+    target_frequency_days?: number;
   };
+  onFrequencyChange?: (days: number) => void;
 }
 
-export function ProfileSidebar({ contact }: ProfileSidebarProps) {
+export function ProfileSidebar({ contact, onFrequencyChange }: ProfileSidebarProps) {
   const initials = ((contact.firstName?.[0] || "") + (contact.lastName?.[0] || "")).toUpperCase();
   const fullName = `${contact.firstName} ${contact.lastName || ""}`.trim();
 
@@ -52,14 +56,34 @@ export function ProfileSidebar({ contact }: ProfileSidebarProps) {
         )}
 
         {/* 3. Status Badge */}
-        <div className="mb-8 mt-2">
+        <div className="mb-4 mt-2">
              <Badge className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 px-3 py-1.5 rounded-xl font-normal text-xs uppercase tracking-wide">
                 Next: {formatDate(contact.next_contact_date) || "Not scheduled"}
              </Badge>
         </div>
+
+        {/* 4. Target Frequency Selector */}
+        <div className="mb-8 w-full">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <Repeat className="w-4 h-4 text-gray-400" />
+            <span className="font-medium">Contact Cadence</span>
+          </div>
+          <select
+            value={contact.target_frequency_days || 30}
+            onChange={(e) => onFrequencyChange?.(parseInt(e.target.value))}
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-[#3a3f4b] bg-gray-50 dark:bg-[#2c3039] text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer appearance-none"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+          >
+            {FREQUENCY_PRESETS.map(preset => (
+              <option key={preset.days} value={preset.days}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* 4. Contact Details List */}
+      {/* 5. Contact Details List */}
       <div className="space-y-4 py-8 border-t border-b border-gray-100 dark:border-[#3a3f4b] mb-8">
         {contact.phone && (
           <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">

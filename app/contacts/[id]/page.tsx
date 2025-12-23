@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Clock, Sparkles, Check } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Sparkles, Check } from "lucide-react";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,13 @@ import { cn } from "@/lib/utils";
 import { ErrorFallback } from "@/components/error-fallback";
 import { Input } from "@/components/ui/input";
 
-// New Components
 import { ProfileSidebar } from "./components/ProfileSidebar";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { OverviewTab } from "./components/tabs/OverviewTab";
+import { StoryTab } from "./components/tabs/StoryTab";
+import { FamilyTab } from "./components/tabs/FamilyTab";
 
-const tabs = ["Overview", "Details", "History", "Family", "Interests"];
+const tabs = ["Overview", "Details", "Story", "Family", "Interests"];
 
 export default function ContactDetailPage({
   params,
@@ -122,6 +123,25 @@ export default function ContactDetailPage({
       }
   };
 
+  // Handle frequency change
+  const handleFrequencyChange = async (days: number) => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await (supabase as any).from("persons").update({
+        target_frequency_days: days
+      }).eq("id", id).eq("user_id", user.id);
+
+      // Update local state
+      setContact({ ...contact, target_frequency_days: days });
+      toast.success("Contact cadence updated!");
+    } catch {
+      toast.error("Failed to update cadence");
+    }
+  };
+
 
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#1a1d24]"><div className="animate-pulse text-gray-400">Loading profile...</div></div>;
@@ -142,7 +162,7 @@ export default function ContactDetailPage({
       
       {/* DESKTOP SIDEBAR (Hidden on Mobile) */}
       <div className="hidden md:block">
-        <ProfileSidebar contact={contact} />
+        <ProfileSidebar contact={contact} onFrequencyChange={handleFrequencyChange} />
       </div>
 
       {/* MAIN CONTENT AREA */}
@@ -258,17 +278,18 @@ export default function ContactDetailPage({
                     </div>
                 )}
                 
-                {activeTab === "History" && (
-                     <div className="text-center py-20 bg-gray-50 dark:bg-[#252931] rounded-2xl border border-dashed border-gray-200 dark:border-[#3a3f4b]">
-                        <Clock className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-                         <p className="text-gray-400">Interaction History coming here.</p>
-                     </div>
+                {activeTab === "Story" && (
+                    <StoryTab contact={contact} />
                 )}
                 
-                {(activeTab === "Family" || activeTab === "Interests") && (
+                {activeTab === "Family" && (
+                    <FamilyTab contactId={id} contactName={contact.name} />
+                )}
+                
+                {activeTab === "Interests" && (
                      <div className="text-center py-20 bg-gray-50 dark:bg-[#252931] rounded-2xl border border-dashed border-gray-200 dark:border-[#3a3f4b]">
                         <Sparkles className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-                         <p className="text-gray-400">{activeTab} details coming soon.</p>
+                         <p className="text-gray-400">Interests details coming soon.</p>
                      </div>
                 )}
             </div>
