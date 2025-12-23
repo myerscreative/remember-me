@@ -108,18 +108,41 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
       circle: number;
     }> = [];
 
-    Object.entries(circles).forEach(([circleNumStr, circleContacts]) => {
-      const circleNum = parseInt(circleNumStr);
-      let radius = 0;
-      let color = '';
-      
-      if (circleNum === 1) { radius = 60; color = '#10b981'; }
-      else if (circleNum === 2) { radius = 120; color = '#84cc16'; }
-      else if (circleNum === 3) { radius = 190; color = '#fbbf24'; }
-      else { radius = 270; color = '#f97316'; }
+    // Config for base radii of each health zone
+    const baseRadii = {
+      1: { start: 50, color: '#10b981' },   // Healthy core
+      2: { start: 110, color: '#84cc16' },  // Good zone
+      3: { start: 180, color: '#fbbf24' },  // Warning zone
+      4: { start: 260, color: '#f97316' },  // Dying zone
+    };
+    
+    // Max contacts per ring before creating new sub-ring
+    const MAX_PER_RING = 8;
+    // Spacing between sub-rings
+    const RING_SPACING = 25;
 
+    Object.entries(circles).forEach(([circleNumStr, circleContacts]) => {
+      const circleNum = parseInt(circleNumStr) as 1 | 2 | 3 | 4;
+      const { start: baseRadius, color } = baseRadii[circleNum];
+      
       circleContacts.forEach((contact, i) => {
-        const angle = (i / circleContacts.length) * Math.PI * 2;
+        // Determine which sub-ring this contact goes in
+        const subRingIndex = Math.floor(i / MAX_PER_RING);
+        // Position within the sub-ring
+        const positionInSubRing = i % MAX_PER_RING;
+        // How many contacts in this particular sub-ring
+        const contactsInThisSubRing = Math.min(
+          MAX_PER_RING, 
+          circleContacts.length - (subRingIndex * MAX_PER_RING)
+        );
+        
+        // Calculate radius for this sub-ring
+        const radius = baseRadius + (subRingIndex * RING_SPACING);
+        
+        // Calculate angle - offset each sub-ring slightly for visual variety
+        const angleOffset = (subRingIndex * Math.PI) / 8;
+        const angle = (positionInSubRing / contactsInThisSubRing) * Math.PI * 2 + angleOffset;
+        
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
         const rotation = (Math.atan2(y, x) * 180 / Math.PI) + 90;
