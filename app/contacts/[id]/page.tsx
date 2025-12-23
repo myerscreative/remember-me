@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Sparkles, Check } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Sparkles, Check, Repeat } from "lucide-react";
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -216,6 +217,24 @@ export default function ContactDetailPage({
                 )}
 
                 <p className="text-indigo-100 text-sm mb-6">{contact.linkedin || "Contact"}</p>
+                
+                {/* Mobile Frequency Selector */}
+                <div className="mb-6 flex justify-center w-full px-8">
+                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1 flex items-center gap-2 px-3 border border-white/20">
+                      <Repeat className="w-3.5 h-3.5 text-indigo-100" />
+                      <select 
+                        value={contact.target_frequency_days || 30}
+                        onChange={(e) => handleFrequencyChange(parseInt(e.target.value))}
+                        className="bg-transparent text-white text-sm focus:outline-none appearance-none cursor-pointer text-center font-medium"
+                      >
+                         {FREQUENCY_PRESETS.map(preset => (
+                            <option key={preset.days} value={preset.days} className="text-gray-900">
+                                {preset.label}
+                            </option>
+                         ))}
+                      </select>
+                   </div>
+                </div>
                 
                 {/* Mobile Actions */}
                 <div className="flex items-center gap-3 w-full max-w-xs mx-auto">
