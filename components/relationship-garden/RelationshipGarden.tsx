@@ -49,16 +49,16 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
     setPanOffset({ x: 0, y: 0 });
   };
 
-  // Pan handlers
+  // Pan handlers - work at any zoom level
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (zoom > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
-    }
+    // Prevent drag on zoom controls
+    if ((e.target as HTMLElement).closest('button')) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && zoom > 1) {
+    if (isDragging) {
       setPanOffset({
         x: e.clientX - dragStart.x,
         y: e.clientY - dragStart.y
@@ -192,7 +192,7 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
       
       {/* Zoom Controls */}
