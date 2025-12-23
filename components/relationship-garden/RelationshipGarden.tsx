@@ -1,7 +1,8 @@
 
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import Leaf from './Leaf';
 import { FilterType } from './CategoryFilters';
 
@@ -34,17 +35,44 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
     y: 0,
     contact: null,
   });
+  
+  // Zoom state
+  const [zoom, setZoom] = useState(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Constants
-  const CIRCLE_CONFIG = {
-    1: { radius: 100, color: '#10b981' }, // Innermost (doubled from proto 50 for better spacing visually?) No, let's stick to proto but maybe scale if needed. Proto had canvas 600px height.
-    // Proto: 50, 100, 160, 230.
-    // Let's use responsive radius if possible, or fixed. Fixed is easier for now.
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.5));
+  const handleReset = () => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  // Pan handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoom > 1) {
+      setPanOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   function getCircleAndColor(days: number) {
     if (days <= 7) {
-      return { circle: 1, radius: 60, color: '#10b981', status: 'Healthy' }; // Increased radius slightly
+      return { circle: 1, radius: 60, color: '#10b981', status: 'Healthy' };
     } else if (days <= 21) {
       return { circle: 2, radius: 120, color: '#84cc16', status: 'Good' };
     } else if (days <= 45) {
@@ -77,17 +105,11 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
       y: number;
       rotation: number;
       color: string;
-      circle: number; // Debugging
+      circle: number;
     }> = [];
 
-    // Center is relative to the container. Let's assume container is 600x600 or centered.
-    // We'll use 50% 50% and absolute positioning.
-    
     Object.entries(circles).forEach(([circleNumStr, circleContacts]) => {
       const circleNum = parseInt(circleNumStr);
-      // Determine radius for this group based on days (representative)
-      // Actually we need the radius from the config.
-      // We can pick a representative day count to get the config, or just hardcode map.
       let radius = 0;
       let color = '';
       
@@ -97,24 +119,10 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
       else { radius = 270; color = '#f97316'; }
 
       circleContacts.forEach((contact, i) => {
-        // angle
         const angle = (i / circleContacts.length) * Math.PI * 2;
-        
-        // Math matches prototype
-        // x = centerX + cos(angle) * radius 
-        // y = centerY + sin(angle) * radius
-        // But in CSS relative to center (0,0 is center), so just cos*r, sin*r
-        
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
-
-        // Rotation
-        // In prototype: atan2(y - centerY, x - centerX) * 180 / PI
-        // Here y and x are already relative to center.
-        // Also prototype adds offsets (-21, -24) for centering leaf.
-        // We'll handle centering with transform translate in CSS or here.
-        
-        const rotation = (Math.atan2(y, x) * 180 / Math.PI) + 90; // +90 to orient correctly (leaf points out)
+        const rotation = (Math.atan2(y, x) * 180 / Math.PI) + 90;
 
         calculatedLeaves.push({
           contact,
@@ -144,7 +152,7 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
   const handleLeafMove = (e: React.MouseEvent) => {
      setTooltip(prev => ({
        ...prev,
-       x: e.clientX, // Keep close to mouse
+       x: e.clientX,
        y: e.clientY - 60
      }));
   };
@@ -154,68 +162,106 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
   };
 
   return (
-    <div className="relative w-full h-[650px] bg-gradient-to-b from-white to-slate-50 rounded-xl overflow-hidden shadow-inner border border-slate-100" ref={containerRef}>
+    <div 
+      className="relative w-full h-[650px] bg-gradient-to-b from-white to-slate-50 rounded-xl overflow-hidden shadow-inner border border-slate-100" 
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+    >
       
-      {/* Guide Circles */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="absolute border border-dashed border-slate-200 rounded-full w-[120px] h-[120px]" />
-        <div className="absolute border border-dashed border-slate-200 rounded-full w-[240px] h-[240px]" />
-        <div className="absolute border border-dashed border-slate-200 rounded-full w-[380px] h-[380px]" />
-        <div className="absolute border border-dashed border-slate-200 rounded-full w-[540px] h-[540px]" />
-        
-        <div className="absolute text-xs font-semibold text-slate-300 uppercase tracking-widest pointer-events-none select-none">
-          Healthiest
+      {/* Zoom Controls */}
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+        <button
+          onClick={handleZoomIn}
+          className="p-2 bg-white/90 hover:bg-white border border-slate-200 rounded-lg shadow-sm transition-colors"
+          title="Zoom In"
+        >
+          <ZoomIn className="w-5 h-5 text-slate-600" />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="p-2 bg-white/90 hover:bg-white border border-slate-200 rounded-lg shadow-sm transition-colors"
+          title="Zoom Out"
+        >
+          <ZoomOut className="w-5 h-5 text-slate-600" />
+        </button>
+        <button
+          onClick={handleReset}
+          className="p-2 bg-white/90 hover:bg-white border border-slate-200 rounded-lg shadow-sm transition-colors"
+          title="Reset View"
+        >
+          <RotateCcw className="w-4 h-4 text-slate-600" />
+        </button>
+        <div className="text-center text-xs text-slate-500 font-medium mt-1">
+          {Math.round(zoom * 100)}%
         </div>
       </div>
 
-      {/* Info Badge */}
+      {/* Zoomable/Pannable Container */}
+      <div 
+        className="absolute inset-0 transition-transform duration-200"
+        style={{ 
+          transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
+          transformOrigin: 'center center'
+        }}
+      >
+        {/* Guide Circles */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute border border-dashed border-slate-200 rounded-full w-[120px] h-[120px]" />
+          <div className="absolute border border-dashed border-slate-200 rounded-full w-[240px] h-[240px]" />
+          <div className="absolute border border-dashed border-slate-200 rounded-full w-[380px] h-[380px]" />
+          <div className="absolute border border-dashed border-slate-200 rounded-full w-[540px] h-[540px]" />
+          
+          <div className="absolute text-xs font-semibold text-slate-300 uppercase tracking-widest pointer-events-none select-none">
+            Healthiest
+          </div>
+        </div>
+
+        {/* Leaves Container (Centered) */}
+        <div className="absolute top-1/2 left-1/2 w-0 h-0">
+          {leaves.map((leaf) => (
+            <div
+              key={leaf.contact.id}
+              className="absolute transition-all duration-700 ease-out"
+              style={{
+                transform: `translate(${leaf.x}px, ${leaf.y}px) translate(-50%, -50%) rotate(${leaf.rotation - 90}deg)`,
+                zIndex: 10 + leaf.circle,
+              }}
+            >
+              <Leaf 
+                color={leaf.color} 
+                initials={leaf.contact.initials}
+                onMouseEnter={(e) => handleLeafEnter(e, leaf.contact)}
+                onMouseMove={handleLeafMove}
+                onMouseLeave={handleLeafLeave}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Info Badge (outside zoom container) */}
       <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm border border-slate-200 p-4 rounded-xl shadow-sm text-right z-10">
         <div className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Showing</div>
         <div className="text-lg font-bold text-slate-800">
           {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
         </div>
+        <div className="text-xs text-slate-400 mt-1">
+          {filteredContacts.length} contacts
+        </div>
       </div>
 
-      {/* Leaves Container (Centered) */}
-      <div className="absolute top-1/2 left-1/2 w-0 h-0">
-        {leaves.map((leaf, i) => (
-          <div
-            key={leaf.contact.id}
-            className="absolute transition-all duration-700 ease-out"
-            style={{
-              transform: `translate(${leaf.x}px, ${leaf.y}px) translate(-50%, -50%) rotate(${leaf.rotation - 90}deg)`,
-              // -90 adjustment because we added +90 earlier, need to verify
-              // Actually prototype: rotation = atan2(dy, dx) ...
-              // Leaf points UP by default? The path:
-              // M 21 46 (bottom) ... 21 2 (top)
-              // So leaf points UP.
-              // Atan2(y, x) gives angle from X axis.
-              // If point is at (r, 0) -> angle 0. Leaf should point Right.
-              // So we need to rotate +90.
-              // Let's verify visual:
-              // top (0, -r) -> angle -90. Leaf should point Up. (-90 + 90 = 0). Correct.
-              zIndex: 10 + leaf.circle, // Inner circles on top? Or outer? Usually doesn't matter much if spaced.
-            }}
-          >
-            <Leaf 
-              color={leaf.color} 
-              initials={leaf.contact.initials}
-              onMouseEnter={(e) => handleLeafEnter(e, leaf.contact)}
-              onMouseMove={handleLeafMove}
-              onMouseLeave={handleLeafLeave}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Tooltip Portal could be better, but fixed pos works */}
+      {/* Tooltip (fixed position, outside zoom) */}
       {tooltip.visible && tooltip.contact && (
         <div 
           className="fixed z-[100] bg-slate-900/95 backdrop-blur text-white p-4 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] min-w-[200px] pointer-events-none transition-opacity duration-200"
           style={{ 
             left: tooltip.x, 
             top: tooltip.y,
-            transform: 'translate(16px, 0)' // Just offset a bit
+            transform: 'translate(16px, 0)'
           }}
         >
           <div className="font-semibold text-[15px] mb-2">{tooltip.contact.name}</div>
