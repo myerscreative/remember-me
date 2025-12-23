@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
 import GardenStats from '@/components/relationship-garden/GardenStats';
+import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
 import toast from 'react-hot-toast';
 
 // Health status types
@@ -83,6 +84,9 @@ export default function GardenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  
+  // Modal state for logging interactions
+  const [selectedContactForModal, setSelectedContactForModal] = useState<ExtendedContact | null>(null);
 
   // Fetch contacts from Supabase
   useEffect(() => {
@@ -408,7 +412,17 @@ export default function GardenPage() {
           
           {/* Garden View */}
           {viewMode === 'garden' && healthFilter === 'all' && (
-            <RelationshipGarden contacts={filteredContacts} filter={categoryFilter} />
+            <RelationshipGarden 
+              contacts={filteredContacts} 
+              filter={categoryFilter} 
+              onContactClick={(contact) => {
+                // Find the extended contact with dbId to pass to modal
+                const extendedContact = contacts.find(c => c.id === contact.id);
+                if (extendedContact) {
+                  setSelectedContactForModal(extendedContact);
+                }
+              }}
+            />
           )}
 
           {/* List View or Filtered Health View */}
@@ -511,6 +525,23 @@ export default function GardenPage() {
           </div>
         </div>
       </div>
+
+      {/* Log Interaction Modal */}
+      {selectedContactForModal && (
+        <LogInteractionModal
+          contact={{
+            id: selectedContactForModal.dbId,
+            name: selectedContactForModal.name,
+            initials: selectedContactForModal.initials,
+          }}
+          isOpen={!!selectedContactForModal}
+          onClose={() => setSelectedContactForModal(null)}
+          onSuccess={() => {
+            // Reload contacts to update positions
+            loadContacts();
+          }}
+        />
+      )}
     </div>
   );
 }

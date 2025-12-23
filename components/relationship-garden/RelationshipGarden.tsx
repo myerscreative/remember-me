@@ -15,11 +15,13 @@ export interface Contact {
   days: number;
   category: FilterType;
   lastContactDate?: string;
+  targetFrequencyDays?: number;  // For cadence-based health
 }
 
 interface RelationshipGardenProps {
   contacts: Contact[];
   filter: FilterType;
+  onContactClick?: (contact: Contact) => void;  // Callback when leaf is clicked
 }
 
 interface TooltipState {
@@ -45,7 +47,7 @@ function getStatusLabel(days: number): string {
   return 'Needs Love';
 }
 
-export default function RelationshipGarden({ contacts, filter }: RelationshipGardenProps) {
+export default function RelationshipGarden({ contacts, filter, onContactClick }: RelationshipGardenProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>({
     visible: false,
@@ -271,6 +273,7 @@ export default function RelationshipGarden({ contacts, filter }: RelationshipGar
                   onMouseEnter={(e) => handleLeafEnter(e, contact)}
                   onMouseMove={handleLeafMove}
                   onMouseLeave={handleLeafLeave}
+                  onClick={() => onContactClick?.(contact)}
                 />
               </div>
             ))}
