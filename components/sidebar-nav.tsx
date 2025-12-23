@@ -51,8 +51,8 @@ const navItems = [
     inactiveColor: "text-gray-600",
   },
   {
-    href: "/relationship-tree",
-    label: "Tree",
+    href: "/garden",
+    label: "Garden",
     icon: TreePine,
     activeColor: "text-green-600",
     inactiveColor: "text-gray-600",

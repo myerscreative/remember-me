@@ -89,15 +89,15 @@ export default function TreeWidget({ contacts = DEMO_CONTACTS, className = '' }:
 
   return (
     <Link 
-      href="/relationship-tree"
+      href="/garden"
       className={`block bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border border-green-200 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.01] overflow-hidden ${className}`}
     >
       <div className="p-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🌳</span>
-            <h3 className="text-lg font-semibold text-gray-800">Relationship Tree</h3>
+            <span className="text-2xl">🍃</span>
+            <h3 className="text-lg font-semibold text-gray-800">Relationship Garden</h3>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
