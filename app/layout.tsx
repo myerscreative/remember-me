@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { FloatingVoiceButton } from "@/components/floating-voice-button";
 import { ThemeProvider } from "./providers/theme-provider";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: "ReMember Me - Keep Track of People Who Matter",
@@ -32,18 +33,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <ThemeProvider>
-          <div className="flex flex-col min-h-screen md:flex-row">
-            <SidebarNav />
-            <div className="flex-1 md:ml-64">
-              <main className="flex-1">
-                {children}
-              </main>
-              <BottomNav />
-              <FloatingVoiceButton />
+        <SessionProvider>
+          <ThemeProvider>
+            <div className="flex flex-col min-h-screen md:flex-row">
+              <SidebarNav />
+              <div className="flex-1 md:ml-64">
+                <main className="flex-1">
+                  {children}
+                </main>
+                <BottomNav />
+                <FloatingVoiceButton />
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

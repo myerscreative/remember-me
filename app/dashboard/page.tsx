@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
 import { cn } from "@/lib/utils";
 import {
   getDashboardStats,
@@ -133,6 +134,9 @@ export default function DashboardPage() {
               Track and maintain your most important relationships
             </p>
           </div>
+
+          {/* Daily Practice Challenge */}
+          <DailyPracticeWidget />
 
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

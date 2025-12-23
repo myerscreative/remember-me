@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ImportProgress } from "@/components/import-progress";
 import {
   Upload,
@@ -11,6 +10,9 @@ import {
   ArrowLeft,
   Download,
   AlertCircle,
+  CheckSquare,
+  Square,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,6 +32,8 @@ export default function ImportContactsPage() {
   const [stage, setStage] = useState<ImportStage>('idle');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [parsedContacts, setParsedContacts] = useState<ImportedContact[]>([]);
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<number>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
   const [totalContacts, setTotalContacts] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
@@ -37,6 +41,55 @@ export default function ImportContactsPage() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Filter contacts by search query
+  const filteredContacts = useMemo(() => {
+    if (!searchQuery.trim()) return parsedContacts;
+    const query = searchQuery.toLowerCase();
+    return parsedContacts.filter((contact) => {
+      const name = contact.name?.toLowerCase() || '';
+      const email = contact.email?.toLowerCase() || '';
+      const phone = contact.phone?.toLowerCase() || '';
+      return name.includes(query) || email.includes(query) || phone.includes(query);
+    });
+  }, [parsedContacts, searchQuery]);
+
+  // Toggle individual contact selection
+  const toggleContact = (index: number) => {
+    setSelectedContactIds(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
+  // Select all contacts (respecting current filter)
+  const selectAll = () => {
+    const indicesToSelect = filteredContacts.map((_, i) => 
+      parsedContacts.indexOf(filteredContacts[i])
+    );
+    setSelectedContactIds(prev => {
+      const next = new Set(prev);
+      indicesToSelect.forEach(i => next.add(i));
+      return next;
+    });
+  };
+
+  // Deselect all contacts (respecting current filter)
+  const deselectAll = () => {
+    const indicesToDeselect = filteredContacts.map((_, i) => 
+      parsedContacts.indexOf(filteredContacts[i])
+    );
+    setSelectedContactIds(prev => {
+      const next = new Set(prev);
+      indicesToDeselect.forEach(i => next.delete(i));
+      return next;
+    });
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -94,6 +147,8 @@ export default function ImportContactsPage() {
       }
 
       setParsedContacts(contacts);
+      // Select all contacts by default
+      setSelectedContactIds(new Set(contacts.map((_, i) => i)));
       setTotalContacts(contacts.length);
       setStage('idle');
 
@@ -109,9 +164,12 @@ export default function ImportContactsPage() {
   };
 
   const handleStartImport = async () => {
-    if (parsedContacts.length === 0) return;
+    // Only import selected contacts
+    const contactsToImport = parsedContacts.filter((_, i) => selectedContactIds.has(i));
+    if (contactsToImport.length === 0) return;
 
     setStage('importing');
+    setTotalContacts(contactsToImport.length);
     setImportedCount(0);
     setFailedCount(0);
     setErrorMessage('');
@@ -124,8 +182,8 @@ export default function ImportContactsPage() {
         throw new Error('User not authenticated');
       }
 
-      // Batch contacts for efficient insertion
-      const batches = batchContacts(parsedContacts, 100);
+      // Batch selected contacts for efficient insertion
+      const batches = batchContacts(contactsToImport, 100);
       let totalImported = 0;
       let totalFailed = 0;
 
@@ -187,6 +245,8 @@ export default function ImportContactsPage() {
     setStage('idle');
     setSelectedFile(null);
     setParsedContacts([]);
+    setSelectedContactIds(new Set());
+    setSearchQuery('');
     setTotalContacts(0);
     setImportedCount(0);
     setFailedCount(0);
@@ -352,49 +412,122 @@ export default function ImportContactsPage() {
             </div>
           )}
 
-          {/* Parsed - Ready to Import */}
+          {/* Parsed - Select Contacts to Import */}
           {stage === 'idle' && parsedContacts.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <div className="space-y-4">
+                {/* Header */}
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
                     <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      Ready to import {parsedContacts.length} contact{parsedContacts.length !== 1 ? 's' : ''}
+                      Select contacts to import
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      From: {selectedFile?.name}
+                      {selectedContactIds.size} of {parsedContacts.length} selected • From: {selectedFile?.name}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-blue-900 dark:text-blue-100">
-                      <p className="font-medium">What happens next:</p>
-                      <ul className="list-disc list-inside mt-2 space-y-1 text-blue-800 dark:text-blue-200 text-xs">
-                        <li>All contacts will be marked as "imported"</li>
-                        <li>You can add context to them later using voice memos</li>
-                        <li>Duplicates have been removed automatically</li>
-                        <li>Invalid contacts were filtered out</li>
-                      </ul>
-                    </div>
+                {/* Search and Controls */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search contacts..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={selectAll}
+                      className="whitespace-nowrap"
+                    >
+                      <CheckSquare className="h-4 w-4 mr-1" />
+                      Select All
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={deselectAll}
+                      className="whitespace-nowrap"
+                    >
+                      <Square className="h-4 w-4 mr-1" />
+                      Deselect All
+                    </Button>
                   </div>
                 </div>
 
+                {/* Contact List */}
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+                  <div className="max-h-80 overflow-y-auto">
+                    {filteredContacts.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                        No contacts match your search
+                      </div>
+                    ) : (
+                      filteredContacts.map((contact) => {
+                        const originalIndex = parsedContacts.indexOf(contact);
+                        const isSelected = selectedContactIds.has(originalIndex);
+                        return (
+                          <label
+                            key={originalIndex}
+                            className={`flex items-center gap-3 p-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                              isSelected ? 'bg-purple-50 dark:bg-purple-900/20' : ''
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleContact(originalIndex)}
+                              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 dark:text-white truncate">
+                                {contact.name}
+                              </p>
+                              {(contact.email || contact.phone) && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                  {contact.email || contact.phone}
+                                </p>
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* Info Notice */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
+                      Selected contacts will be imported. Duplicates removed, invalid entries filtered.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={handleReset} className="flex-1">
                     Cancel
                   </Button>
                   <Button
                     onClick={handleStartImport}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                    disabled={selectedContactIds.size === 0}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
                   >
                     <Download className="mr-2 h-5 w-5" />
-                    Start Import
+                    Import {selectedContactIds.size} Contact{selectedContactIds.size !== 1 ? 's' : ''}
                   </Button>
                 </div>
               </div>

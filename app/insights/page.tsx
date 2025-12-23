@@ -94,6 +94,7 @@ export default function InsightsPage() {
   const [upcomingReminders, setUpcomingReminders] = useState<UpcomingReminder[]>([]);
   const [insightMessage, setInsightMessage] = useState<string>("");
   const [decayingRelationships, setDecayingRelationships] = useState<DecayingRelationship[]>([]);
+  const [error, setError] = useState<Error | null>(null);
 
   // Helper wrappers for person objects
   const getInitials = (person: { first_name: string; last_name: string | null }): string => {
@@ -107,15 +108,6 @@ export default function InsightsPage() {
   const getGradient = (person: { first_name: string; last_name: string | null }): string => {
     return getGradientHelper(getFullName(person));
   };
-
-
-// ... (existing imports)
-
-export default function InsightsPage() {
-  const [timeRange, setTimeRange] = useState("30");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  // ... (existing state)
 
   // Load data
   useEffect(() => {

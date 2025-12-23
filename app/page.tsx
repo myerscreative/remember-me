@@ -4,18 +4,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap, List, Rows } from "lucide-react";
+import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap, List, Rows, Brain } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
 import { DecayAlertBanner } from "@/components/decay-alert-banner";
 import { getInitialsFromFullName, getGradient, formatBirthday } from "@/lib/utils/contact-helpers";
+
 import { ErrorFallback } from "@/components/error-fallback";
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 const filterOptions = ["All", "Favorites", "Investor", "Startup", "Friend"];
 
+import { useRouter } from "next/navigation";
+
 export default function HomePage() {
+  const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [contacts, setContacts] = useState<Person[]>([]);
   const [contactTags, setContactTags] = useState<Map<string, string[]>>(new Map());
@@ -23,8 +28,9 @@ export default function HomePage() {
   const [error, setError] = useState<Error | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [migrating, setMigrating] = useState(false);
   const [isCompactView, setIsCompactView] = useState(false);
+  const [migrating, setMigrating] = useState(false);
+
 
   // One-time migration: Move localStorage favorites to database
   // Also load compact view preference from localStorage
@@ -252,6 +258,7 @@ export default function HomePage() {
               {showArchived ? "Archived Contacts" : "Contacts"}
             </h1>
             <div className="flex items-center gap-2">
+              <GoogleSignInButton />
               {/* Desktop: Add Contact Button */}
               <Link href="/contacts/new" className="hidden lg:block">
                 <Button className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600">
@@ -267,6 +274,16 @@ export default function HomePage() {
                   Quick Capture
                 </Button>
               </Link>
+
+                <Button 
+                   variant="ghost" 
+                   size="icon" 
+                   onClick={() => router.push('/practice')}
+                   className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40 transition-colors mr-2"
+                   title="Daily Practice"
+                >
+                   <Brain size={20} />
+                </Button>
 
               <Button
                 variant="ghost"
@@ -322,6 +339,7 @@ export default function HomePage() {
             </div>
           </div>
 
+          
           {/* Search Bar */}
           <div className="pb-6 md:pb-8">
             <div className="relative w-full">
@@ -330,7 +348,7 @@ export default function HomePage() {
                 placeholder="Who are you trying to remember?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-white dark:focus:bg-gray-700 transition-colors"
+                className="w-full pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-muted dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-card dark:focus:bg-gray-700 transition-colors"
               />
             </div>
           </div>
@@ -359,8 +377,8 @@ export default function HomePage() {
                         : isSelected
                         ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50"
                         : filter === "Favorites"
-                        ? "bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-700 dark:hover:border-amber-400"
-                        : "bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-700 dark:hover:border-blue-400"
+                        ? "bg-card dark:bg-gray-800 text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-700 dark:hover:border-amber-400"
+                        : "bg-card dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-700 dark:hover:border-blue-400"
                     )}
                   >
                     {filter}
@@ -369,6 +387,11 @@ export default function HomePage() {
               })}
             </div>
           </div>
+
+
+
+
+
 
           {/* Decay Alert Banner - Only show for active contacts */}
           {!showArchived && <DecayAlertBanner />}
@@ -390,7 +413,7 @@ export default function HomePage() {
                   key={contact.id}
                   href={`/contacts/${contact.id}`}
                   className={cn(
-                    "group flex items-center gap-2 md:gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200",
+                    "group flex items-center gap-2 md:gap-3 bg-card dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-muted/50 dark:hover:bg-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200",
                     isCompactView 
                       ? "p-2 md:p-2.5" 
                       : "p-4 md:p-5 items-start"
@@ -541,6 +564,9 @@ export default function HomePage() {
           </div>
         </Link>
       </div>
+
+
+
     </div>
   );
 }
