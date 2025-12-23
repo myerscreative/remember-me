@@ -3,12 +3,12 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Check, X, List, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, List, LayoutGrid } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
 import GardenStats from '@/components/relationship-garden/GardenStats';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 
 // Health status types
 type HealthStatus = 'all' | 'healthy' | 'good' | 'warning' | 'dying';
