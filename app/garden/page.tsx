@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Check, List, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
@@ -155,26 +155,55 @@ export default function GardenPage() {
     }
   }
 
-  // Mark as contacted today
-  async function markAsContacted(contact: ExtendedContact) {
+  // Set health status by calculating a date that puts them in that ring
+  async function setHealthStatus(contact: ExtendedContact, targetStatus: 'healthy' | 'good' | 'warning' | 'dying') {
     setUpdatingId(contact.dbId);
     try {
       const supabase = createClient();
-      const today = new Date().toISOString().split('T')[0];
+      
+      // Calculate the date that will result in the target status
+      // healthy: 0-7 days → set to today
+      // good: 8-21 days → set to 14 days ago (middle of range)
+      // warning: 22-45 days → set to 30 days ago (middle of range)
+      // dying: 45+ days → set to 60 days ago
+      const now = new Date();
+      let targetDate: Date;
+      let targetDays: number;
+      
+      switch (targetStatus) {
+        case 'healthy':
+          targetDays = 0;
+          targetDate = now;
+          break;
+        case 'good':
+          targetDays = 14;
+          targetDate = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));
+          break;
+        case 'warning':
+          targetDays = 30;
+          targetDate = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+          break;
+        case 'dying':
+          targetDays = 60;
+          targetDate = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
+          break;
+      }
+      
+      const dateString = targetDate.toISOString().split('T')[0];
       
       const { error } = await (supabase as any)
         .from('persons')
-        .update({ last_contact: today })
+        .update({ last_contact: dateString })
         .eq('id', contact.dbId);
 
       if (error) throw error;
       
       // Update local state
       setContacts(prev => prev.map(c => 
-        c.dbId === contact.dbId ? { ...c, days: 0 } : c
+        c.dbId === contact.dbId ? { ...c, days: targetDays } : c
       ));
       
-      toast.success(`Marked ${contact.name} as contacted today!`);
+      toast.success(`Moved ${contact.name} to ${healthConfig[targetStatus].label}!`);
     } catch (err) {
       console.error('Error updating contact:', err);
       toast.error('Failed to update contact');
@@ -427,30 +456,27 @@ export default function GardenPage() {
                           </div>
                         </div>
                         
-                        {/* Actions */}
-                        <button
-                          onClick={() => markAsContacted(contact)}
-                          disabled={updatingId === contact.dbId || contact.days === 0}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            contact.days === 0
-                              ? 'bg-emerald-100 text-emerald-700 cursor-default'
-                              : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-                          }`}
-                        >
+                        {/* Health Status Selector */}
+                        <div className="flex items-center gap-2">
                           {updatingId === contact.dbId ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : contact.days === 0 ? (
-                            <>
-                              <Check className="w-4 h-4" />
-                              Contacted Today
-                            </>
+                            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
                           ) : (
-                            <>
-                              <Check className="w-4 h-4" />
-                              Mark as Contacted
-                            </>
+                            <select
+                              value={status}
+                              onChange={(e) => setHealthStatus(contact, e.target.value as 'healthy' | 'good' | 'warning' | 'dying')}
+                              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium bg-white cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              style={{ 
+                                color: config.color,
+                                borderColor: config.color + '40'
+                              }}
+                            >
+                              <option value="healthy" style={{ color: '#10b981' }}>🟢 Healthy</option>
+                              <option value="good" style={{ color: '#84cc16' }}>🟡 Good</option>
+                              <option value="warning" style={{ color: '#fbbf24' }}>🟠 Warning</option>
+                              <option value="dying" style={{ color: '#f97316' }}>🔴 Needs Love</option>
+                            </select>
                           )}
-                        </button>
+                        </div>
                       </div>
                     );
                   })}
