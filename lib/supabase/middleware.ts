@@ -13,9 +13,9 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === "mock" || supabaseAnonKey === "mock") {
-    throw new Error(
-      "Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local file."
-    );
+    // Gracefully handle missing configuration instead of throwing
+    console.error("Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+    return { response: supabaseResponse, user: null };
   }
 
   const supabase = createServerClient<Database>(
