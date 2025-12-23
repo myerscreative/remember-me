@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
@@ -32,21 +32,69 @@ interface GameState {
   showFeedback: boolean;
 }
 
+// Mock event data - would normally fetch from /api/calendar/events
+const mockEvent: Event = {
+  id: 'evt-1',
+  title: 'Quarterly Business Review',
+  date: new Date(new Date().setDate(new Date().getDate() + 2)), // 2 days from now
+  attendees: [
+    { id: '1', name: 'Sarah Chen', initials: 'SC', company: 'TechCorp', role: 'CTO' },
+    { id: '2', name: 'Mike Johnson', initials: 'MJ', company: 'TechCorp', role: 'VP Engineering' },
+    { id: '3', name: 'James Wilson', initials: 'JW', company: 'TechCorp', role: 'Product Lead' },
+    { id: '4', name: 'Lisa Anderson', initials: 'LA', company: 'Legal', role: 'General Counsel' },
+  ]
+};
+
+// Pure function to generate questions - can be used for initial state and reset
+function generateQuestions(): Array<{
+  prompt: string;
+  correctAnswer: string;
+  choices: string[];
+  contact: Contact;
+}> {
+  const newQuestions: Array<{
+    prompt: string;
+    correctAnswer: string;
+    choices: string[];
+    contact: Contact;
+  }> = [];
+  const attendees = mockEvent.attendees;
+
+  for (let i = 0; i < 15; i++) {
+    const contact = attendees[Math.floor(Math.random() * attendees.length)];
+    const otherAttendees = attendees.filter(a => a.id !== contact.id);
+
+    let prompt = '';
+    let correctAnswer = '';
+    let choices: string[] = [];
+
+    const type = Math.random();
+
+    if (type < 0.4) {
+      // Face match style
+      prompt = `Which attendee is ${contact.role}?`;
+      correctAnswer = contact.name;
+      choices = [contact.name, ...otherAttendees.map(a => a.name)].sort(() => Math.random() - 0.5);
+    } else if (type < 0.7) {
+      // Role match
+      prompt = `What is ${contact.name}'s role?`;
+      correctAnswer = contact.role!;
+      choices = [contact.role!, ...otherAttendees.map(a => a.role!)].sort(() => Math.random() - 0.5);
+    } else {
+      // Initials match
+      prompt = `Which initials belong to ${contact.name}?`;
+      correctAnswer = contact.initials;
+      choices = [contact.initials, ...otherAttendees.map(a => a.initials)].sort(() => Math.random() - 0.5);
+    }
+
+    newQuestions.push({ prompt, correctAnswer, choices, contact });
+  }
+
+  return newQuestions;
+}
+
 export default function EventPrepGame() {
   const router = useRouter();
-  
-  // Mock event data - would normally fetch from /api/calendar/events
-  const mockEvent: Event = {
-      id: 'evt-1',
-      title: 'Quarterly Business Review',
-      date: new Date(new Date().setDate(new Date().getDate() + 2)), // 2 days from now
-      attendees: [
-          { id: '1', name: 'Sarah Chen', initials: 'SC', company: 'TechCorp', role: 'CTO' },
-          { id: '2', name: 'Mike Johnson', initials: 'MJ', company: 'TechCorp', role: 'VP Engineering' },
-          { id: '3', name: 'James Wilson', initials: 'JW', company: 'TechCorp', role: 'Product Lead' },
-          { id: '4', name: 'Lisa Anderson', initials: 'LA', company: 'Legal', role: 'General Counsel' },
-      ]
-  };
 
   const [gameState, setGameState] = useState<GameState>({
     currentQuestion: 0,
@@ -59,56 +107,8 @@ export default function EventPrepGame() {
     showFeedback: false,
   });
 
-  const [questions, setQuestions] = useState<Array<{
-    prompt: string;
-    correctAnswer: string;
-    choices: string[];
-    contact: Contact;
-  }>>([]);
-
-  const generateQuestions = useCallback(() => {
-    const newQuestions = [];
-    const attendees = mockEvent.attendees;
-
-    for (let i = 0; i < 15; i++) {
-        const contact = attendees[Math.floor(Math.random() * attendees.length)];
-        const otherAttendees = attendees.filter(a => a.id !== contact.id);
-
-        let prompt = '';
-        let correctAnswer = '';
-        let choices: string[] = [];
-
-        const type = Math.random();
-
-        if (type < 0.4) {
-            // Face match style
-            prompt = `Which attendee is ${contact.role}?`;
-            correctAnswer = contact.name;
-            choices = [contact.name, ...otherAttendees.map(a => a.name)].sort(() => Math.random() - 0.5);
-            // If fewer than 4 attendees, we might have duplicates or fewer choices if not robust.
-            // For mock, attendees length is 4, so it works perfectly.
-        } else if (type < 0.7) {
-             // Role match
-             prompt = `What is ${contact.name}'s role?`;
-             correctAnswer = contact.role!;
-             choices = [contact.role!, ...otherAttendees.map(a => a.role!)].sort(() => Math.random() - 0.5);
-        } else {
-             // Initials match
-             prompt = `Which initials belong to ${contact.name}?`;
-             correctAnswer = contact.initials;
-             choices = [contact.initials, ...otherAttendees.map(a => a.initials)].sort(() => Math.random() - 0.5);
-        }
-
-        newQuestions.push({ prompt, correctAnswer, choices, contact });
-    }
-
-    setQuestions(newQuestions);
-  }, []); // Dependencies
-
-  // Generate questions on mount
-  useEffect(() => {
-    generateQuestions();
-  }, [generateQuestions]);
+  // Use lazy initialization to generate questions on first render
+  const [questions, setQuestions] = useState(() => generateQuestions());
 
   function handleAnswer(selectedIndex: number) {
     if (gameState.showFeedback) return;
@@ -153,7 +153,7 @@ export default function EventPrepGame() {
       selectedAnswer: null,
       showFeedback: false,
     });
-    generateQuestions();
+    setQuestions(generateQuestions());
   }
 
   if (questions.length === 0) {

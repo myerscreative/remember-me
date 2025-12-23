@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
@@ -68,7 +68,7 @@ const allContacts: Contact[] = [
   }
 ];
 
-export default function QuickFireGame() {
+function QuickFireGameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -353,5 +353,20 @@ export default function QuickFireGame() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function QuickFireGame() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚡</div>
+          <p className="text-lg text-slate-600">Loading game...</p>
+        </div>
+      </div>
+    }>
+      <QuickFireGameContent />
+    </Suspense>
   );
 }

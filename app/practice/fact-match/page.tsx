@@ -64,7 +64,7 @@ export default function FactMatchGame() {
   }>>([]);
 
   const generateQuestions = useCallback(() => {
-    const newQuestions = [];
+    const newQuestions: { prompt: string; correct: Contact; choices: Contact[] }[] = [];
     const usedIndices = new Set<string>();
 
     const questionTypes = [

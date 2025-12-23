@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
@@ -31,7 +31,7 @@ const allContacts: Contact[] = [
   { id: '8', name: 'Lisa Anderson', initials: 'LA', interests: ['Reading', 'Wine', 'Tech'], group: 'work' },
 ];
 
-export default function InterestMatchGame() {
+function InterestMatchGameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -313,5 +313,20 @@ export default function InterestMatchGame() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function InterestMatchGame() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-linear-to-br from-green-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🎣</div>
+          <p className="text-lg text-slate-600">Loading game...</p>
+        </div>
+      </div>
+    }>
+      <InterestMatchGameContent />
+    </Suspense>
   );
 }

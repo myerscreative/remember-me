@@ -63,7 +63,7 @@ export default function StoryRecallGame() {
   }>>([]);
 
   const generateQuestions = useCallback(() => {
-    const newQuestions = [];
+    const newQuestions: { prompt: string; correctAnswer: string; choices: string[]; contact: Contact }[] = [];
     
     // Helper to pick random wrong answers from other contacts or general pool
     const getRandomWrongAnswers = (type: 'where' | 'topics' | 'reason', corrextText: string, count: number) => {

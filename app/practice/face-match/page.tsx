@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
@@ -41,7 +41,7 @@ const allContacts: Contact[] = [
   { id: '12', name: 'Emma Davis', initials: 'ED', group: 'work' }
 ];
 
-export default function FaceMatchGame() {
+function FaceMatchGameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -301,5 +301,20 @@ export default function FaceMatchGame() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function FaceMatchGame() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🎮</div>
+          <p className="text-lg text-slate-600">Loading game...</p>
+        </div>
+      </div>
+    }>
+      <FaceMatchGameContent />
+    </Suspense>
   );
 }

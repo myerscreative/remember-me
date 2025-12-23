@@ -94,7 +94,6 @@ export function SidebarNav() {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             
-            // @ts-expect-error - isGame check
             const showStreak = item.isGame && stats.currentStreak > 0;
 
             return (
