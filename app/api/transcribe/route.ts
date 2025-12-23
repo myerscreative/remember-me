@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { authenticateRequest } from "@/lib/supabase/auth";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to prevent build-time errors
+let openaiInstance: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiInstance;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +46,7 @@ export async function POST(request: NextRequest) {
     const file = new File([audioBlob], audioFile.name, { type: audioFile.type });
 
     // Call OpenAI Whisper API
-    const transcription = await openai.audio.transcriptions.create({
+    const transcription = await getOpenAI().audio.transcriptions.create({
       file: file,
       model: "whisper-1",
       language: "en", // Optional: specify language for better accuracy

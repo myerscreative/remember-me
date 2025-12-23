@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { authenticateRequest } from "@/lib/supabase/auth";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to prevent build-time errors
+let openaiInstance: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiInstance;
+}
 
 interface DetectRequest {
   text: string;
@@ -63,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use AI to detect incomplete information
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {

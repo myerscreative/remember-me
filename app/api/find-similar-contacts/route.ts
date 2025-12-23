@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to prevent build-time errors
+let openaiInstance: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiInstance;
+}
 
 interface SimilarContactsRequest {
   userId: string;
@@ -168,7 +173,7 @@ export async function POST(request: NextRequest) {
     if (topSimilar.length > 0 && process.env.OPENAI_API_KEY) {
       for (const similar of topSimilar) {
         try {
-          const summaryCompletion = await openai.chat.completions.create({
+          const summaryCompletion = await getOpenAI().chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
               {

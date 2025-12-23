@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { authenticateRequest } from "@/lib/supabase/auth";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to prevent build-time errors
+let openaiInstance: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiInstance;
+}
 
 interface ParseRequest {
   transcript: string;
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use GPT-4 to parse the transcript into structured data
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini", // Using gpt-4o-mini for cost efficiency, can upgrade to gpt-4 if needed
       messages: [
         {

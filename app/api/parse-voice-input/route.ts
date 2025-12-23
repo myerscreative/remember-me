@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to prevent build-time errors
+let openaiInstance: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiInstance;
+}
 
 interface ParseVoiceRequest {
   transcript: string;
@@ -39,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 1: Determine intent (new contact or update)
-    const intentCompletion = await openai.chat.completions.create({
+    const intentCompletion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -109,7 +114,7 @@ confidence is 0-1 representing how certain you are.`,
     }
 
     // Step 3: Parse the contact information
-    const parseCompletion = await openai.chat.completions.create({
+    const parseCompletion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
