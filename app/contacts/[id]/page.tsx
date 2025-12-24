@@ -23,6 +23,7 @@ import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
 import { InterestsTab } from "@/app/contacts/[id]/components/tabs/InterestsTab";
 import { ContactImportance } from "@/types/database.types";
+import { EditContactModal } from "./components/EditContactModal";
 
 const tabs = ["Overview", "Details", "Story", "Family", "Interests"];
 
@@ -43,6 +44,11 @@ export default function ContactDetailPage({
   const [isEditMode, setIsEditMode] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleRefresh = async () => {
+    window.location.reload();
+  };
 
   // Fetch Data
   useEffect(() => {
@@ -81,6 +87,10 @@ export default function ContactDetailPage({
                 whyStayInContact: person.why_stay_in_contact,
                 whatsImportant: person.most_important_to_them
             },
+            deep_lore: person.deep_lore,
+            important_dates: person.important_dates,
+            birthday: person.birthday,
+            custom_anniversary: person.custom_anniversary,
             // Legacy/Schema compat
             photo_url: person.photo_url || person.avatar_url, 
             familyMembers: person.family_members || [],
@@ -88,6 +98,7 @@ export default function ContactDetailPage({
             aiSummary: person.ai_summary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
+            whatFoundInteresting: person.what_found_interesting,
             importance: person.importance,
         };
 
@@ -180,7 +191,7 @@ export default function ContactDetailPage({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen">
       <Toaster position="top-center" />
       
       {/* DESKTOP SIDEBAR (Hidden on Mobile) */}
@@ -196,7 +207,7 @@ export default function ContactDetailPage({
       <div className="flex-1 flex flex-col min-w-0">
          
          {/* DESKTOP HEADER (Hidden on Mobile) */}
-         <ProfileHeader />
+         <ProfileHeader onEdit={() => setIsEditModalOpen(true)} />
 
          {/* MOBILE HEADER (Visible < 768px) */}
          <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white min-h-[300px] rounded-b-[2.5rem] p-6 shadow-xl relative overflow-hidden">
@@ -276,7 +287,7 @@ export default function ContactDetailPage({
 
 
          {/* SCROLLABLE CONTENT */}
-         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6">
+         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar">
 
             {/* TAB NAVIGATION */}
             <div className="flex items-center gap-8 border-b border-border/50 mb-8 overflow-x-auto scrollbar-hide">
@@ -328,7 +339,11 @@ export default function ContactDetailPage({
                 )}
                 
                 {activeTab === "Family" && (
-                    <FamilyTab contactId={id} contactName={contact.name} />
+                    <FamilyTab 
+                      contactId={id} 
+                      contactName={contact.name} 
+                      familyMembers={contact.family_members} 
+                    />
                 )}
                 
                 {activeTab === "Interests" && (
@@ -339,6 +354,12 @@ export default function ContactDetailPage({
          </main>
       
       </div>
+      <EditContactModal 
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        contact={contact}
+        onSuccess={handleRefresh}
+      />
     </div>
   );
 }

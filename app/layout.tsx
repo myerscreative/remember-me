@@ -26,6 +26,8 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import { QuickAddNoteFAB } from "@/components/QuickAddNoteFAB";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,6 +46,7 @@ export default function RootLayout({
                 </main>
                 <BottomNav />
                 <FloatingVoiceButton />
+                <QuickAddNoteFAB />
               </div>
             </div>
             <Toaster position="bottom-center" />

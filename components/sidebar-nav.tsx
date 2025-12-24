@@ -85,9 +85,9 @@ export function SidebarNav() {
   const { stats } = useGameStats();
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col z-40 shadow-sm">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">ReMember Me</h2>
+    <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-sidebar border-r border-sidebar-border flex-col z-40 shadow-sm">
+      <div className="p-6 border-b border-sidebar-border">
+        <h2 className="text-xl font-bold text-sidebar-foreground">ReMember Me</h2>
       </div>
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
@@ -103,8 +103,8 @@ export function SidebarNav() {
                 className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-lg transition-colors group",
                 isActive
-                    ? `${item.activeColor} dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30`
-                    : `${item.inactiveColor} dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700`
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-md"
+                    : `${item.inactiveColor} text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`
                 )}
             >
                 <div className="flex items-center gap-3">

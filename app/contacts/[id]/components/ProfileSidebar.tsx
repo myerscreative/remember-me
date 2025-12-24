@@ -38,7 +38,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
   };
 
   return (
-    <aside className="w-[350px] shrink-0 flex flex-col h-[calc(100vh-65px)] sticky top-[65px] bg-white dark:bg-[#252931] border-r border-gray-100 dark:border-[#3a3f4b] overflow-y-auto px-8 py-8">
+    <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto px-8 py-8">
       {/* 1. Profile Photo */}
       <div className="flex flex-col items-center">
         <div className="relative mb-6 group">

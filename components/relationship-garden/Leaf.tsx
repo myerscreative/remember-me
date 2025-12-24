@@ -42,8 +42,9 @@ export default function Leaf({
       className={`absolute cursor-pointer origin-center transition-all duration-500 ease-in-out hover:z-50 leaf-container ${className || ''}`}
       style={{
         ...style,
-        width: 42 * scale,
-        height: 48 * scale,
+        width: Math.max(44, 42 * scale),
+        height: Math.max(44, 48 * scale),
+        padding: '4px', // Extra touch area
       }}
       onClick={onClick}
       onMouseEnter={onMouseEnter}

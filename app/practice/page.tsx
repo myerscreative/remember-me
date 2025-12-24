@@ -6,6 +6,7 @@ import { ArrowLeft, User, Lightbulb, Trophy, Star, Zap } from "lucide-react";
 
 import { GameSetupModal } from "@/components/game/GameSetupModal";
 import { useGameStats } from "@/hooks/useGameStats";
+import { getBloomingContactsAction } from "@/app/actions/get-blooming-contacts";
 
 // Types
 interface GameMode {
@@ -60,14 +61,30 @@ export default function GameCenterPage() {
 
   // Mock data for Daily Challenge - Replace with real logic later
   // For now we'll pretend there's a daily goal of 100 XP or 1 game
-  const [dailyChallenge] = useState<DailyChallenge>({
+  // State for real daily challenge data
+  const [dailyChallenge, setDailyChallenge] = useState<DailyChallenge>({
     title: 'Master Your Top 10',
     description: 'Practice these 10 contacts you interact with the most.',
     reward: 200,
-    progress: Math.min(4, Math.floor(stats.gamesPlayed / 2)), // Fake progress based on games played
+    progress: 0,
     total: 10,
     completed: false,
   });
+
+  // Load real blooming contacts
+  useEffect(() => {
+    async function fetchBlooming() {
+      const res = await getBloomingContactsAction(10);
+      if (res.data) {
+        setDailyChallenge(prev => ({
+          ...prev,
+          progress: res.data.length,
+          completed: res.data.length >= prev.total
+        }));
+      }
+    }
+    fetchBlooming();
+  }, []);
 
   const gameModes: GameMode[] = [
     {

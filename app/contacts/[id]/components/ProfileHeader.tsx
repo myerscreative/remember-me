@@ -4,9 +4,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Edit, Settings } from 'lucide-react';
 
-export function ProfileHeader() {
+interface ProfileHeaderProps {
+  onEdit?: () => void;
+}
+
+export function ProfileHeader({ onEdit }: ProfileHeaderProps) {
   return (
-    <header className="h-[65px] flex items-center justify-between px-8 bg-white dark:bg-[#252931] border-b border-gray-100 dark:border-[#3a3f4b] sticky top-0 z-10 hidden md:flex">
+    <header className="h-[65px] flex items-center justify-between px-8 bg-sidebar border-b border-sidebar-border sticky top-0 z-10 hidden md:flex">
       {/* Left: Back Button */}
       <div className="flex-1">
         <Link href="/">
@@ -24,7 +28,12 @@ export function ProfileHeader() {
 
       {/* Right: Actions */}
       <div className="flex-1 flex justify-end gap-2">
-        <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 dark:hover:bg-[#2c3039] rounded-full transition-colors">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onEdit}
+          className="h-9 w-9 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 dark:hover:bg-[#2c3039] rounded-full transition-colors"
+        >
           <Edit className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2c3039] rounded-full transition-colors">

@@ -347,16 +347,16 @@ export default function SearchPage() {
                                     Imported
                                   </Badge>
                                 )}
-                                {contact.contact_importance && (
+                                {contact.importance && (
                                   <Badge
                                     variant="secondary"
                                     className={cn(
                                       "text-xs",
-                                      contact.contact_importance === "high" &&
+                                      contact.importance === "high" &&
                                         "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
                                     )}
                                   >
-                                    {contact.contact_importance}
+                                    {contact.importance}
                                   </Badge>
                                 )}
                               </div>

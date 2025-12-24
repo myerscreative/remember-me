@@ -24,6 +24,8 @@ export interface Database {
           email: string | null
           linkedin: string | null
           birthday: string | null
+          custom_anniversary: string | null
+          deep_lore: string | null
           family_members: Json | null
           where_met: string | null
           who_introduced: string | null
@@ -57,6 +59,7 @@ export interface Database {
           archive_status: boolean
           has_context: boolean
           imported: boolean
+          important_dates: Json | null
           created_at: string
           updated_at: string
         }
@@ -71,6 +74,8 @@ export interface Database {
           email?: string | null
           linkedin?: string | null
           birthday?: string | null
+          custom_anniversary?: string | null
+          deep_lore?: string | null
           family_members?: Json | null
           where_met?: string | null
           who_introduced?: string | null
@@ -96,6 +101,8 @@ export interface Database {
           what_they_offered?: string | null
           // Story completeness
           story_completeness?: number
+          imported?: boolean
+          important_dates?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -110,6 +117,8 @@ export interface Database {
           email?: string | null
           linkedin?: string | null
           birthday?: string | null
+          custom_anniversary?: string | null
+          deep_lore?: string | null
           family_members?: Json | null
           where_met?: string | null
           who_introduced?: string | null
@@ -143,6 +152,7 @@ export interface Database {
           archive_status?: boolean
           has_context?: boolean
           imported?: boolean
+          important_dates?: Json | null
           created_at?: string
           updated_at?: string
         }

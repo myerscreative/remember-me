@@ -97,51 +97,55 @@
 }
 
 .dark {
-  /* Richer, warmer background (Deep Midnight Purple/Slate) */
-  --background: oklch(0.18 0.04 265);
-  --foreground: oklch(0.985 0.01 265);
+  /* Master Prompt Update: Visual Hierarchy Restoration & Anti-Dreariness */
+  
+  /* 1. Primary Background (Main Content): Midnight Navy */
+  --background: #0F172A; 
+  --foreground: #F8FAFC; /* Slate 50 */
 
-  /* Lighter, slightly tinted cards that pop */
-  --card: oklch(0.23 0.05 265);
-  --card-foreground: oklch(0.985 0.01 265);
+  /* 3. Component Background (Cards/Widgets): Slate Navy */
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
 
-  --popover: oklch(0.23 0.05 265);
-  --popover-foreground: oklch(0.985 0.01 265);
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
 
-  /* Vibrant Brand Colors for Dark Mode */
-  --primary: oklch(0.7 0.19 265); /* Bright Indigo/Purple */
-  --primary-foreground: oklch(0.1 0.03 265);
+  /* Accents: Electric Blue (#3B82F6) */
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.3 0.06 265); /* Deep purple accent */
-  --secondary-foreground: oklch(0.985 0.01 265);
+  --secondary: #334155; /* Slate 700 */
+  --secondary-foreground: #F8FAFC;
 
-  --muted: oklch(0.25 0.04 265);
-  --muted-foreground: oklch(0.7 0.05 265);
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8; /* Slate 400 - Secondary Text */
 
-  --accent: oklch(0.3 0.06 265);
-  --accent-foreground: oklch(0.985 0.01 265);
+  --accent: #1E293B;
+  --accent-foreground: #F8FAFC;
 
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: 0.6 0.2 25; 
 
-  --border: oklch(0.35 0.05 265 / 30%);
-  --input: oklch(0.35 0.05 265 / 30%);
-  --ring: oklch(0.7 0.19 265);
+  /* Borders: #334155 for cards */
+  --border: #334155;
+  --input: #334155;
+  --ring: #3B82F6;
 
-  --chart-1: oklch(0.6 0.2 265);
-  --chart-2: oklch(0.7 0.15 180);
-  --chart-3: oklch(0.8 0.15 80);
-  --chart-4: oklch(0.6 0.25 300);
-  --chart-5: oklch(0.7 0.2 20);
+  /* Charts */
+  --chart-1: 0.75 0.2 250;
+  --chart-2: 0.6 0.1 245;
+  --chart-3: 0.5 0.1 245;
+  --chart-4: 0.7 0.1 245;
+  --chart-5: 0.8 0.1 245;
 
-  /* Sidebar matches background or slightly darker */
-  --sidebar: oklch(0.15 0.04 265);
-  --sidebar-foreground: oklch(0.985 0.01 265);
-  --sidebar-primary: oklch(0.7 0.19 265);
-  --sidebar-primary-foreground: oklch(0.1 0.03 265);
-  --sidebar-accent: oklch(0.25 0.04 265);
-  --sidebar-accent-foreground: oklch(0.985 0.01 265);
-  --sidebar-border: oklch(0.35 0.05 265 / 30%);
-  --sidebar-ring: oklch(0.7 0.19 265);
+  /* 2. Sidebar & Header Unification: Deep Navy */
+  --sidebar: #0B1120;
+  --sidebar-foreground: #94A3B8; /* Slate Gray for inactive */
+  --sidebar-primary: #3B82F6; /* Active state blue */
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1E293B; /* Hover state */
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #1E293B; /* Subtle border */
+  --sidebar-ring: #3B82F6;
 }
 
 @layer base {

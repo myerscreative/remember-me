@@ -1,286 +1,215 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Contact } from './mockContacts';
-import { calculateMatchScore } from './utils/matchUtils';
-import { calculateDaysAgo, getContactStatus } from './utils/dateUtils';
-import NetworkHeader from './components/NetworkHeader';
+
+import { useState, useEffect, useMemo } from 'react';
+import { networkService, NetworkData, SubTribe } from './components/NetworkDataService';
 import NetworkSearchBar from './components/NetworkSearchBar';
-import ContactsGrid from './components/ContactsGrid';
-import QuickFilters from './components/QuickFilters';
-import EmptyState from './components/EmptyState';
-import SuggestionPanel from './components/SuggestionPanel';
-import DetailsDrawer from './components/DetailsDrawer';
+import { TribeView } from './components/TribeView';
+import { LogInteractionModal } from './components/LogInteractionModal';
+import { NetworkDomainBar } from './components/NetworkDomainBar';
+import { NetworkSubTribeDrawer } from './components/NetworkSubTribeDrawer';
+import { NetworkTutorial, TutorialButton } from './components/NetworkTutorial';
 import { Loader2 } from 'lucide-react';
 
-// Get initials from name
-function getInitials(firstName: string, lastName: string | null, name: string): string {
-  if (firstName && lastName) {
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  }
-  if (firstName) {
-    return firstName.slice(0, 2).toUpperCase();
-  }
-  const parts = name.split(' ');
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-}
-
 export default function NetworkPage() {
-  const [viewMode, setViewMode] = useState<'compact' | 'standard' | 'detailed'>('standard');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedContact, setSelectedContact] = useState<Contact | undefined>(undefined);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [previewContact, setPreviewContact] = useState<Contact | null>(null);
-  
-  // Real data state
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [data, setData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Tutorial State
+  const [showTutorial, setShowTutorial] = useState(false);
+  
+  // New Domain Logic
+  const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null);
+  const [selectedSubTribeId, setSelectedSubTribeId] = useState<string | null>(null);
 
-  // Fetch real contacts from Supabase
+  const [nurtureTribe, setNurtureTribe] = useState<SubTribe | null>(null);
+  const [isNurtureModalOpen, setIsNurtureModalOpen] = useState(false);
+
   useEffect(() => {
-    async function loadContacts() {
+    // Check if tutorial should be shown
+    const hideTutorial = localStorage.getItem('hideTribeSearchTutorial');
+    if (!hideTutorial) {
+      setShowTutorial(true);
+    }
+
+    async function loadData() {
       try {
-        const supabase = createClient();
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-        if (userError || !user) {
-          setError('Please log in to view your network');
-          setLoading(false);
-          return;
-        }
-
-        // Fetch persons
-        const { data: persons, error: fetchError } = await (supabase as any)
-          .from('persons')
-          .select('id, name, first_name, last_name, photo_url, email, phone, notes, interests, last_contact, where_met')
-          .eq('user_id', user.id)
-          .eq('archived', false)
-          .order('name');
-
-        if (fetchError) {
-          console.error('Error fetching persons:', fetchError);
-          setError('Failed to load contacts');
-          setLoading(false);
-          return;
-        }
-
-        // Fetch person_tags with tag names
-        const personIds = persons?.map((p: any) => p.id) || [];
-        const { data: personTags } = await (supabase as any)
-          .from('person_tags')
-          .select('person_id, tags(name)')
-          .in('person_id', personIds);
-
-        // Build a map of person_id -> tag names
-        const tagsMap = new Map<string, string[]>();
-        personTags?.forEach((pt: any) => {
-          const personId = pt.person_id;
-          const tagName = pt.tags?.name;
-          if (tagName) {
-            if (!tagsMap.has(personId)) {
-              tagsMap.set(personId, []);
-            }
-            tagsMap.get(personId)?.push(tagName);
-          }
-        });
-
-        // Transform to network Contact format
-        const networkContacts: Contact[] = (persons || []).map((person: any, index: number) => {
-          const tags = tagsMap.get(person.id) || [];
-          const fullName = person.name || `${person.first_name || ''} ${person.last_name || ''}`.trim();
-          
-          return {
-            id: index + 1, // Network page expects numeric id
-            name: fullName,
-            initials: getInitials(person.first_name || '', person.last_name, fullName),
-            photo: person.photo_url || null,
-            role: '', // Not stored in current schema
-            location: person.where_met || '', // Use where_met as location fallback
-            interests: person.interests || [],
-            tags: tags,
-            lastContact: person.last_contact ? {
-              date: person.last_contact,
-              method: 'other' as const
-            } : undefined,
-            email: person.email || undefined,
-            phone: person.phone || undefined,
-            notes: person.notes || undefined,
-          };
-        });
-
-        setContacts(networkContacts);
-      } catch (err) {
-        console.error('Error loading contacts:', err);
-        setError('Failed to load contacts');
+        const networkData = await networkService.fetchNetworkData();
+        setData(networkData);
+      } catch (error) {
+        console.error('Failed to load network data:', error);
       } finally {
         setLoading(false);
       }
     }
-
-    loadContacts();
+    loadData();
   }, []);
 
-  // Filter Logic
-  const filteredContacts = useMemo(() => {
-    let results = contacts;
-    
-    // 1. Search Filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      results = results.filter((c) =>
-        c.name.toLowerCase().includes(term) ||
-        (c.role && c.role.toLowerCase().includes(term)) ||
-        (c.location && c.location.toLowerCase().includes(term)) ||
-        (c.tags && c.tags.some((t) => t.toLowerCase().includes(term))) ||
-        (c.interests && c.interests.some((i) => i.toLowerCase().includes(term)))
-      );
-    }
-
-    // 2. Quick Filters
-    if (activeFilters.length > 0) {
-      // Overdue
-      if (activeFilters.includes('overdue')) {
-        results = results.filter((c) => {
-          const days = calculateDaysAgo(c.lastContact?.date);
-          const status = getContactStatus(days);
-          return status === 'overdue';
-        });
-      }
-      
-      // Not Connected (never contacted or no record)
-      if (activeFilters.includes('notConnected')) {
-        results = results.filter((c) => {
-           const days = calculateDaysAgo(c.lastContact?.date);
-           return !c.lastContact || getContactStatus(days) === 'never';
-        });
-      }
-
-      // Shared Interests (Strong Matches, requires selection)
-      if (activeFilters.includes('shared') && selectedContact) {
-         results = results.filter((c) => {
-            if (c.id === selectedContact.id) return false;
-            const { level } = calculateMatchScore(selectedContact, c);
-            return level === 'strong' || level === 'medium';
-         });
-      }
-
-      // Same Location
-      if (activeFilters.includes('sameLocation')) {
-        const locationCounts: Record<string, number> = {};
-        contacts.forEach(person => {
-          if (person.location) {
-            locationCounts[person.location] = (locationCounts[person.location] || 0) + 1;
-          }
-        });
-        
-        const locations = Object.keys(locationCounts);
-        if (locations.length > 0) {
-            const mostCommonLocation = locations.reduce((a, b) => 
-                locationCounts[a] > locationCounts[b] ? a : b
-            );
-            results = results.filter(c => c.location === mostCommonLocation);
-        }
-      }
-    }
-    
-    return results;
-  }, [searchTerm, activeFilters, selectedContact, contacts]);
-
-  const handleClearFilters = () => {
-    setSearchTerm('');
-    setActiveFilters([]);
-    setSelectedContact(undefined);
+  const handleNurtureTribe = (tribe: SubTribe) => {
+    setNurtureTribe(tribe);
+    setIsNurtureModalOpen(true);
   };
+  
+  // Derived state for the UI
+  const selectedDomainGroup = useMemo(() => {
+      if (!data || !selectedDomainId) return null;
+      return data.domains.find(d => d.domain.id === selectedDomainId);
+  }, [data, selectedDomainId]);
+  
+  // Transform selected SubTribe into Legacy "Tribe" format for TribeView compatibility
+  // Or simpler: Reuse TribeView but pass specific data
+  const displayedTribes = useMemo(() => {
+    if (!data) return [];
 
-  // Search Results Info Logic
-  const showSearchResults = searchTerm.length > 0;
-  const matchCount = filteredContacts.length;
+    // 1. Search Mode overrides everything
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        // Fallback to legacy style filtering
+        // TODO: Refactor legacy search logic to be cleaner or reuse a helper
+        // For now, let's just do a quick scan of all contacts in all domains
+        // Alternatively, reuse the existing logic if we kept the `tribes` data?
+        // Actually NetworkDataService returns `tribes` property still? 
+        // In my last edit I REMOVED `tribes` from NetworkData interface return but I might have kept the method.
+        // Let's check `NetworkDataService`. Ah, I removed `tribes` from the interface in the `replace_file_content` call.
+        // So we need to reconstruct flat tribes if searching.
+        
+        // Let's group all contacts by some logic or just show "Search Results" tribe?
+        // Let's create a single "Search Results" tribe.
+        const allContacts = data.contacts;
+        const matching = allContacts.filter(c => 
+             c.name.toLowerCase().includes(term) ||
+             (c.where_met && c.where_met.toLowerCase().includes(term)) ||
+             (c.interests && c.interests.some(i => i.toLowerCase().includes(term))) ||
+             (c.tags && c.tags.some(t => t.toLowerCase().includes(term)))
+        );
+        
+        if (matching.length === 0) return [];
+        
+        const searchTribe: SubTribe = {
+            id: 'search-results',
+            name: `Results for "${searchTerm}"`,
+            domainId: 'search',
+            memberCount: matching.length,
+            members: matching
+        };
+        return [searchTribe];
+    }
+    
+    // 2. Domain Mode
+    if (selectedDomainId && selectedSubTribeId && selectedDomainGroup) {
+        const subTribe = selectedDomainGroup.subTribes.find(st => st.id === selectedSubTribeId);
+        if (subTribe) {
+             // SubTribe already has the correct format, just return it
+             return [subTribe];
+        }
+    }
+    
+    // 3. Just Domain selected -> Show nothing? Or show all in domain?
+    // Prompt says: "When a user clicks Travel, expand ... sub-tags ... Once a sub-tag is selected, show the contacts"
+    // So if just domain is selected, we show sub-tags drawer (handled below), but main view might be empty or "Select a tag" state.
+    
+    return [];
+  }, [data, searchTerm, selectedDomainId, selectedSubTribeId, selectedDomainGroup]);
 
-  // Loading state
+
   if (loading) {
-    return (
-      <div className="p-4 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600 mb-2" />
-          <p className="text-gray-600">Loading your network...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="p-4 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <a href="/login" className="text-blue-600 hover:underline">
-            Go to Login
-          </a>
-        </div>
-      </div>
-    );
+     return (
+       <div className="flex h-screen items-center justify-center">
+         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+       </div>
+     );
   }
 
   return (
-    <div className="p-4 relative min-h-screen">
-      <NetworkHeader viewMode={viewMode} setViewMode={setViewMode} />
-      <NetworkSearchBar onSearch={setSearchTerm} />
-      
-      {/* Search Results Summary */}
-      {showSearchResults && (
-        <div className="mb-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-           <div className="flex justify-between items-center">
-              <p className="text-gray-700">
-                Found <span className="font-semibold text-indigo-600">{matchCount}</span> {matchCount === 1 ? 'person' : 'people'} matching &quot;{searchTerm}&quot;
+    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header Area */}
+        <div className="text-center space-y-4 pt-8 pb-4 relative">
+          <div className="absolute top-4 right-0">
+            <TutorialButton onClick={() => setShowTutorial(true)} />
+          </div>
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+            {selectedDomainGroup ? selectedDomainGroup.domain.name : 'Tribe Search'}
+          </h1>
+          {!selectedDomainGroup && !searchTerm && (
+              <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto">
+                Discover connections, nurture groups, and see your network as a living ecosystem.
               </p>
-              <button onClick={() => setSearchTerm('')} className="text-sm text-gray-400 hover:text-gray-600">Clear</button>
-           </div>
-           
-           {/* Suggestion for many matches */}
-           {matchCount >= 3 && (
-             <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex justify-between items-center text-sm">
-               <p className="text-indigo-800">💡 These {matchCount} people match &quot;{searchTerm}&quot; - consider creating a group event!</p>
-               <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-medium hover:bg-indigo-700 transition">
-                 Create Event
-               </button>
-             </div>
-           )}
+          )}
         </div>
-      )}
 
-      <QuickFilters activeFilters={activeFilters} setActiveFilters={setActiveFilters} />
-      
-      {filteredContacts.length > 0 ? (
-        <ContactsGrid
-          contacts={filteredContacts}
-          selectedContact={selectedContact}
-          viewMode={viewMode}
-          onSelectContact={(contact) => {
-            if (selectedContact?.id === contact.id) {
-              setSelectedContact(undefined);
-            } else {
-              setSelectedContact(contact);
-            }
-          }}
-          onPreviewContact={setPreviewContact}
-        />
-      ) : (
-        <EmptyState onClearFilters={handleClearFilters} />
-      )}
-      
-      {/* Show suggestions if we have some candidates */}
-      {!showSearchResults && contacts.length > 0 && <SuggestionPanel suggestions={contacts.slice(0, 3)} />}
+        {/* Search Input - Always visible? Or hidden when domain active? 
+            Prompt: "Default: When no domain is selected, show the Search Bar. 
+            On Selection: Clicking a Domain... reveal only sub-tags"
+            
+            Let's keep Search Bar always accessible but maybe less prominent if domain selected.
+        */}
+        <div className="max-w-xl mx-auto">
+          <NetworkSearchBar onSearch={(val) => {
+              setSearchTerm(val);
+              // Clear domain selection if searching?
+              if (val) {
+                  setSelectedDomainId(null);
+                  setSelectedSubTribeId(null);
+              }
+          }} />
+        </div>
 
-      {/* Details Drawer */}
-      <DetailsDrawer 
-        contact={previewContact} 
-        isOpen={!!previewContact} 
-        onClose={() => setPreviewContact(null)} 
+        {/* Domain Bar */}
+        {!searchTerm && data && (
+            <NetworkDomainBar 
+                domains={data.domains.map(g => g.domain)} 
+                selectedDomainId={selectedDomainId}
+                onSelectDomain={(id) => {
+                    setSelectedDomainId(id);
+                    setSelectedSubTribeId(null); // Reset sub-selection
+                }}
+            />
+        )}
+        
+        {/* Sub-Tribe Drawer */}
+        {!searchTerm && selectedDomainGroup && (
+            <NetworkSubTribeDrawer 
+                isOpen={!!selectedDomainId}
+                subTribes={selectedDomainGroup.subTribes}
+                selectedSubTribeId={selectedSubTribeId}
+                onSelectSubTribe={setSelectedSubTribeId}
+                color={selectedDomainGroup.domain.color || '#6366f1'}
+            />
+        )}
+
+        {/* Results View */}
+        {(searchTerm || (selectedDomainId && selectedSubTribeId)) && (
+          <TribeView 
+            tribes={displayedTribes} 
+            searchTerm={searchTerm || (selectedDomainGroup?.subTribes.find(s => s.id === selectedSubTribeId)?.name || '')} 
+            onNurtureTribe={handleNurtureTribe} 
+          />
+        )}
+        
+        {/* Instructions / Empty State */}
+        {!searchTerm && !selectedSubTribeId && selectedDomainId && (
+            <div className="text-center py-20 animate-in fade-in zoom-in-95 duration-500">
+                <p className="text-gray-400 text-lg">Select a category above to explore your {selectedDomainGroup?.domain.name} tribe.</p>
+            </div>
+        )}
+      </div>
+
+      <LogInteractionModal 
+        isOpen={isNurtureModalOpen} 
+        onClose={() => setIsNurtureModalOpen(false)} 
+        tribe={nurtureTribe} 
+      />
+
+      <NetworkTutorial 
+        isOpen={showTutorial}
+        onClose={(dontShowAgain) => {
+          setShowTutorial(false);
+          if (dontShowAgain) {
+            localStorage.setItem('hideTribeSearchTutorial', 'true');
+          }
+        }}
       />
     </div>
   );

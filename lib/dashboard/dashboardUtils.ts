@@ -235,7 +235,7 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
   try {
     const { data, error } = await (supabase as any)
       .from('persons')
-      .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, contact_importance, relationship_summary')
+      .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, importance, relationship_summary')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false')
       .order('interaction_count', { ascending: false, nullsFirst: false })
@@ -254,7 +254,7 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
       photoUrl: c.photo_url,
       interactionCount: c.interaction_count || 0,
       lastInteractionDate: c.last_interaction_date,
-      contactImportance: c.contact_importance,
+      contactImportance: c.importance,
       relationshipSummary: c.relationship_summary,
     }));
 
@@ -392,9 +392,10 @@ export function calculateRelationshipScore(contact: Person): number {
   else if (interactionCount >= 1) score += 5;
 
   // Importance (0-20 points)
-  if (contact.contact_importance === 'high') score += 20;
-  else if (contact.contact_importance === 'medium') score += 10;
-  else if (contact.contact_importance === 'low') score += 5;
+  // Importance (0-20 points)
+  if (contact.importance === 'high') score += 20;
+  else if (contact.importance === 'medium') score += 10;
+  else if (contact.importance === 'low') score += 5;
 
   // Context (0-10 points)
   if (contact.has_context) score += 10;
@@ -428,4 +429,226 @@ export function formatDaysSince(date: string | null): string {
   if (daysSince < 30) return `${Math.floor(daysSince / 7)} weeks ago`;
   if (daysSince < 365) return `${Math.floor(daysSince / 30)} months ago`;
   return `${Math.floor(daysSince / 365)} years ago`;
+}
+
+export interface TribeHealth {
+  name: string;
+  count: number;
+  avgDaysSince: number;
+  maxDaysSince: number;
+  isThirsty: boolean;
+  contacts: { id: string; name: string }[];
+}
+
+/**
+ * Get tribe health sorted by "thirstiness"
+ */
+export async function getTribeHealth(): Promise<{ data: TribeHealth[]; error: Error | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { data: [], error: new Error("User not authenticated") };
+  }
+
+  try {
+    // 1. Fetch contacts with their tags
+    const { data, error } = await (supabase as any)
+      .from('persons')
+      .select(`
+        id, 
+        name, 
+        last_interaction_date,
+        person_tags(tags(name))
+      `)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+
+    const tribesMap = new Map<string, TribeHealth>();
+
+    data.forEach((person: any) => {
+      const tags = person.person_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || [];
+      const lastInteraction = person.last_interaction_date ? new Date(person.last_interaction_date).getTime() : 0;
+      const daysSince = lastInteraction ? Math.floor((Date.now() - lastInteraction) / (1000 * 60 * 60 * 24)) : 999;
+
+      tags.forEach((tagName: string) => {
+        if (!tribesMap.has(tagName)) {
+          tribesMap.set(tagName, {
+            name: tagName,
+            count: 0,
+            avgDaysSince: 0,
+            maxDaysSince: 0,
+            isThirsty: false,
+            contacts: []
+          });
+        }
+
+        const tribe = tribesMap.get(tagName)!;
+        tribe.count++;
+        tribe.contacts.push({ id: person.id, name: person.name });
+        tribe.maxDaysSince = Math.max(tribe.maxDaysSince, daysSince);
+        tribe.avgDaysSince += daysSince;
+      });
+    });
+
+    // Finalize averages and "thirst" flag
+    const tribes = Array.from(tribesMap.values()).map(tribe => {
+      tribe.avgDaysSince = Math.round(tribe.avgDaysSince / tribe.count);
+      tribe.isThirsty = tribe.avgDaysSince > 90; // 90-day average threshold
+      return tribe;
+    });
+
+    // Sort by average thirst descending (oldest first)
+    tribes.sort((a, b) => b.avgDaysSince - a.avgDaysSince);
+
+    return { data: tribes, error: null };
+  } catch (error: any) {
+    console.error('Error calculating tribe health:', error);
+    return { data: [], error: error instanceof Error ? error : new Error(error.message) };
+  }
+}
+/**
+ * Get the most healthy (Blooming) contacts
+ */
+export async function getBloomingContacts(limit: number = 10): Promise<{ data: any[]; error: Error | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { data: [], error: new Error("User not authenticated") };
+  }
+
+  try {
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    
+    const { data, error } = await (supabase as any)
+      .from('persons')
+      .select('id, name, last_interaction_date, photo_url')
+      .eq('user_id', user.id)
+      .gte('last_interaction_date', fourteenDaysAgo)
+      .order('last_interaction_date', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error('Error fetching blooming contacts:', error);
+    return { data: [], error: error instanceof Error ? error : new Error(error.message) };
+  }
+}
+export interface Milestone {
+  contactId: string;
+  contactName: string;
+  type: 'birthday' | 'professional' | 'anniversary' | 'other';
+  label: string;
+  date: string;
+  daysRemaining: number;
+  isThirsty?: boolean;
+}
+
+/**
+ * Get upcoming milestones (birthdays and important dates) within 30 days
+ */
+export async function getMilestones(): Promise<{ data: Milestone[]; error: Error | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { data: [], error: new Error("User not authenticated") };
+  }
+
+  try {
+    const { data: contacts, error } = await (supabase as any)
+      .from('persons')
+      .select('id, name, birthday, custom_anniversary, important_dates, last_interaction_date')
+      .eq('user_id', user.id)
+      .or('archive_status.is.null,archive_status.eq.false');
+
+    if (error) throw error;
+
+    const milestones: Milestone[] = [];
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    contacts.forEach((contact: any) => {
+      // Calculate Thirstiness (Over 45 days)
+      let isThirsty = false;
+      if (contact.last_interaction_date) {
+        const lastInteraction = new Date(contact.last_interaction_date);
+        const diffTime = Math.abs(today.getTime() - lastInteraction.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 45) isThirsty = true;
+      } else {
+        isThirsty = true; // Never contacted is thirsty
+      }
+
+      const processDate = (dateStr: string | null, label: string, type: Milestone['type']) => {
+        if (!dateStr) return;
+        
+        const d = new Date(dateStr);
+        // Set to current year to calculate days remaining
+        const nextOccurence = new Date(currentYear, d.getMonth(), d.getDate());
+        
+        // If it already passed this year, check next year
+        if (nextOccurence < today) {
+          nextOccurence.setFullYear(currentYear + 1);
+        }
+
+        const daysRemaining = Math.ceil((nextOccurence.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (daysRemaining <= 30) {
+          milestones.push({
+            contactId: contact.id,
+            contactName: contact.name,
+            type,
+            label,
+            date: dateStr,
+            daysRemaining,
+            isThirsty
+          });
+        }
+      };
+
+      // 1. Check Birthday
+      processDate(contact.birthday, 'Birthday', 'birthday');
+
+      // 2. Check Custom Anniversary
+      processDate(contact.custom_anniversary, 'Anniversary', 'anniversary');
+
+      // 3. Check Important Dates (JSONB array)
+      const importantDates = Array.isArray(contact.important_dates) ? contact.important_dates : [];
+      importantDates.forEach((idate: any) => {
+        if (idate.date) {
+          let type: Milestone['type'] = 'other';
+          const labelLower = (idate.label || '').toLowerCase();
+          if (labelLower.includes('anniversary')) type = 'anniversary';
+          else if (labelLower.includes('work') || labelLower.includes('professional') || labelLower.includes('start')) type = 'professional';
+          
+          processDate(idate.date, idate.label || 'Important Date', type);
+        }
+      });
+    });
+
+    // Sort by days remaining
+    milestones.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+    // Filter for unique contact milestones (pick soonest) and limit to 5
+    const seen = new Set();
+    const uniqueMilestones: Milestone[] = [];
+    for (const m of milestones) {
+      const key = `${m.contactId}-${m.label}`;
+      if (!seen.has(key)) {
+        uniqueMilestones.push(m);
+        seen.add(key);
+      }
+      if (uniqueMilestones.length >= 5) break;
+    }
+
+    return { data: uniqueMilestones, error: null };
+  } catch (error: any) {
+    console.error('Error fetching milestones:', error);
+    return { data: [], error: error instanceof Error ? error : new Error(error.message) };
+  }
 }

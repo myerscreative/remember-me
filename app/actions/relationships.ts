@@ -53,7 +53,7 @@ export async function getRelationshipsForContact(contactId: string): Promise<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: contacts, error: contactsError } = await (supabase as any)
       .from('persons')
-      .select('id, name, first_name, last_name, photo_url, last_interaction_date, contact_importance')
+      .select('id, name, first_name, last_name, photo_url, last_interaction_date, importance')
       .in('id', linkedIds);
 
     if (contactsError) {
@@ -69,8 +69,8 @@ export async function getRelationshipsForContact(contactId: string): Promise<{
 
       // Default target frequency based on importance
       let targetFrequency = 30;
-      if (person?.contact_importance === 'high') targetFrequency = 14;
-      if (person?.contact_importance === 'low') targetFrequency = 90;
+      if (person?.importance === 'high') targetFrequency = 14;
+      if (person?.importance === 'low') targetFrequency = 90;
 
       return {
         id: linkedContactId,

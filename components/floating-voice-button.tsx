@@ -94,7 +94,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
         what_found_interesting: data.whatInteresting || null,
         most_important_to_them: data.whatsImportant || null,
         family_members: data.familyMembers || null,
-        interests: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : null,
+        interests: (data.interests || data.tags) ? (data.interests || data.tags).split(',').map((t: string) => t.trim()) : null,
         notes: data.misc || null,
         imported: false, // This is a manually added contact via voice
         has_context: true, // Voice capture means it has context
@@ -111,6 +111,17 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
         console.error("Error saving contact:", error);
         toast.error("Failed to save contact. Please try again.");
         return;
+      }
+
+      // If there are interests, we need to ensure they are added to the dedicated interests table
+      if (data.interests) {
+        const interestsList = data.interests.split(',').map((i: string) => i.trim());
+        const { toggleInterest } = await import("@/app/actions/toggle-interest");
+        for (const interestName of interestsList) {
+            if (interestName) {
+                await toggleInterest(newContact.id, interestName);
+            }
+        }
       }
 
       // Close modal and navigate to the new contact

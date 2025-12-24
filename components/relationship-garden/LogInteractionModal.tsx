@@ -17,6 +17,7 @@ interface LogInteractionModalProps {
   onClose: () => void;
   onSuccess?: () => void;
   onUpdateImportance?: (newImportance: 'high' | 'medium' | 'low') => Promise<void>;
+  initialNote?: string;
 }
 
 export default function LogInteractionModal({ 
@@ -24,10 +25,11 @@ export default function LogInteractionModal({
   isOpen, 
   onClose,
   onSuccess,
-  onUpdateImportance
+  onUpdateImportance,
+  initialNote = ''
 }: LogInteractionModalProps) {
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(initialNote);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;

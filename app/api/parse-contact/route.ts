@@ -18,7 +18,7 @@ interface ParseRequest {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const { user, error: authError } = await authenticateRequest(request);
+    const { error: authError } = await authenticateRequest(request);
     if (authError) {
       return authError;
     }
@@ -60,7 +60,8 @@ Extract the following information if mentioned:
 - Why stay in contact (reason/value)
 - What's interesting about them
 - What's important to them (their priorities/values/goals)
-- Family members: Extract names and relationships (e.g., "has four kids: Sarah, John, Emma, Mike" or "married to Jane" or "two children: Tom and Lisa")
+- Family members: Extract names, relationships, and any extra details mentioned like their birthday, hobbies, or specific interests (e.g., "wife Sarah who loves tennis and has a birthday on June 1st").
+- Interests (passions, hobbies, things they enjoy like "Golf", "Cooking", "Lake", "Wakeboarding")
 - Tags (comma-separated, based on context like "Friend", "Work", "Investor", etc.)
 - Misc: Any other information that doesn't fit into the above categories (random facts, anecdotes, personal details, etc.)
 
@@ -77,7 +78,8 @@ Return ONLY valid JSON in this exact format (use null for missing fields, empty 
   "whyStayInContact": string | null,
   "whatInteresting": string | null,
   "whatsImportant": string | null,
-  "familyMembers": [{"name": string, "relationship": string}] | null,
+  "familyMembers": [{"name": string, "relationship": string, "birthday": string | null, "hobbies": string | null, "interests": string | null}] | null,
+  "interests": string | null,
   "tags": string | null,
   "misc": string | null
 }
@@ -116,7 +118,17 @@ For misc, include any interesting details, anecdotes, or information that doesn'
       whyStayInContact: parsedData.whyStayInContact?.trim() || null,
       whatInteresting: parsedData.whatInteresting?.trim() || null,
       whatsImportant: parsedData.whatsImportant?.trim() || null,
-      familyMembers: Array.isArray(parsedData.familyMembers) ? parsedData.familyMembers.filter((fm: any) => fm?.name && fm?.relationship) : null,
+      familyMembers: Array.isArray(parsedData.familyMembers) 
+        ? parsedData.familyMembers.filter((fm: any) => fm?.name && fm?.relationship)
+            .map((fm: any) => ({
+              name: fm.name?.trim(),
+              relationship: fm.relationship?.trim(),
+              birthday: fm.birthday?.trim() || null,
+              hobbies: fm.hobbies?.trim() || null,
+              interests: fm.interests?.trim() || null,
+            }))
+        : null,
+      interests: parsedData.interests?.trim() || null,
       tags: parsedData.tags?.trim() || null,
       misc: parsedData.misc?.trim() || null,
     };

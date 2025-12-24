@@ -60,15 +60,15 @@ export async function getSmartReminders(): Promise<ReminderContact[]> {
 
       // Determine thresholds based on importance
       let threshold = 30; // Default: 30 days
-      if (contact.contact_importance === 'high') {
+      if (contact.importance === 'high') {
         threshold = 14; // High priority: 2 weeks
-      } else if (contact.contact_importance === 'medium') {
+      } else if (contact.importance === 'medium') {
         threshold = 21; // Medium priority: 3 weeks
       }
 
       // Only create reminder if past threshold
       if (daysSince >= threshold) {
-        const urgency = determineUrgency(daysSince, contact.contact_importance);
+        const urgency = determineUrgency(daysSince, contact.importance);
         const suggestedAction = getSuggestedAction(contact, daysSince);
         const reminderReason = getReminderReason(contact, daysSince);
 
@@ -140,7 +140,7 @@ function getSuggestedAction(contact: Person, daysSince: number): string {
   ];
 
   // High priority gets more formal suggestions
-  if (contact.contact_importance === 'high') {
+  if (contact.importance === 'high') {
     if (daysSince >= 60) {
       return 'Schedule a meeting or call';
     }
@@ -157,7 +157,7 @@ function getSuggestedAction(contact: Person, daysSince: number): string {
 function getReminderReason(contact: Person, daysSince: number): string {
   const name = contact.first_name || contact.name;
 
-  if (contact.contact_importance === 'high') {
+  if (contact.importance === 'high') {
     if (daysSince >= 60) {
       return `It's been ${daysSince} days since you last connected with ${name}. High priority contacts need regular attention.`;
     }
@@ -204,7 +204,7 @@ export async function getRemindersByUrgency(
  */
 export async function getHighPriorityReminders(): Promise<ReminderContact[]> {
   const allReminders = await getSmartReminders();
-  return allReminders.filter(r => r.contact_importance === 'high');
+  return allReminders.filter(r => r.importance === 'high');
 }
 
 /**

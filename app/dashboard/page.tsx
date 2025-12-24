@@ -9,30 +9,41 @@ import {
   Users,
   TrendingUp,
   AlertCircle,
-  CheckCircle2,
-  Clock,
   Star,
   Zap,
   Activity,
+  RefreshCw,
   Heart,
-  MessageCircle,
+  TrendingDown,
+  ChevronRight,
+  Droplets,
+  Smartphone,
+  LayoutDashboard,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
+import GardenLeafWidget from '@/components/dashboard/GardenLeafWidget';
+import { DailyBriefingCard } from '@/components/DailyBriefingCard';
+import { getDailyBriefing, type DailyBriefing } from '@/app/actions/get-daily-briefing';
+import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
 import { cn } from "@/lib/utils";
+import { autoMapTribes } from "@/app/actions/auto-map-tribes";
+import { MilestoneRadar } from "@/components/MilestoneRadar";
+import { TriageMode } from "@/components/dashboard/TriageMode";
 import {
   getDashboardStats,
-  getInteractionStats,
+  getContactsNeedingAttention,
+  getTribeHealth,
   getRelationshipHealth,
   getTopContacts,
-  getContactsNeedingAttention,
-  formatDaysSince,
   type DashboardStats,
-  type InteractionStats,
+  type TribeHealth,
   type RelationshipHealth,
   type TopContact,
 } from "@/lib/dashboard/dashboardUtils";
+import { createClient } from "@/lib/supabase/client";
 import { getInitials, getGradient } from "@/lib/utils/contact-helpers";
 
 export default function DashboardPage() {
@@ -40,10 +51,17 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [interactionStats, setInteractionStats] = useState<InteractionStats | null>(null);
+  const [needingAttention, setNeedingAttention] = useState<any[]>([]);
+  const [tribeHealth, setTribeHealth] = useState<TribeHealth[]>([]);
   const [relationshipHealth, setRelationshipHealth] = useState<RelationshipHealth | null>(null);
   const [topContacts, setTopContacts] = useState<TopContact[]>([]);
-  const [needingAttention, setNeedingAttention] = useState<any[]>([]);
+  const [allContacts, setAllContacts] = useState<any[]>([]);
+  const [briefing, setBriefing] = useState<DailyBriefing | null>(null);
+  
+  // Modal State
+  const [selectedTribe, setSelectedTribe] = useState<TribeHealth | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTriageActive, setIsTriageActive] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -56,32 +74,50 @@ export default function DashboardPage() {
     try {
       const [
         statsResult,
-        interactionResult,
+        attentionResult,
+        tribesResult,
         healthResult,
-        topContactsResult,
-        attentionResult
+        topResult,
+        briefingResult
       ] = await Promise.all([
         getDashboardStats(),
-        getInteractionStats(),
+        getContactsNeedingAttention(30),
+        getTribeHealth(),
         getRelationshipHealth(),
         getTopContacts(5),
-        getContactsNeedingAttention(30),
+        getDailyBriefing(),
       ]);
 
-      // Check for critical errors (stats or health are essential)
+      // Fetch all contacts for the TreeWidget (using a simpler select)
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: contacts } = await (supabase as any)
+          .from('persons')
+          .select('id, name, last_interaction_date, person_tags(tags(name))')
+          .eq('user_id', user.id);
+        
+        if (contacts) {
+          setAllContacts(contacts.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            lastContact: c.last_interaction_date,
+            tags: c.person_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || []
+          })));
+        }
+      }
+
+      // Check for critical errors
       if (statsResult.error) throw statsResult.error;
-      if (interactionResult.error) throw interactionResult.error;
-      if (healthResult.error) throw healthResult.error;
       
-      // Non-critical errors can be logged or handled gracefully
-      if (topContactsResult.error) console.error("Error fetching top contacts:", topContactsResult.error);
       if (attentionResult.error) console.error("Error fetching attention list:", attentionResult.error);
 
       setStats(statsResult.data);
-      setInteractionStats(interactionResult.data);
-      setRelationshipHealth(healthResult.data);
-      setTopContacts(topContactsResult.data || []);
       setNeedingAttention((attentionResult.data || []).slice(0, 5));
+      setTribeHealth(tribesResult.data || []);
+      setRelationshipHealth(healthResult.data);
+      setTopContacts(topResult.data || []);
+      setBriefing(briefingResult.data);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       setError(error instanceof Error ? error : new Error("Failed to load dashboard data"));
@@ -116,465 +152,357 @@ export default function DashboardPage() {
     );
   }
 
-  const contextPercentage = stats
-    ? Math.round((stats.withContext / stats.totalContacts) * 100) || 0
-    : 0;
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen bg-background pb-16 md:pb-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Activity className="h-8 w-8 text-purple-600" />
-              Relationship Health Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Track and maintain your most important relationships
-            </p>
-          </div>
-
-          {/* Daily Practice Challenge */}
-          <DailyPracticeWidget />
-
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Total Contacts */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      Total Contacts
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stats?.totalContacts || 0}
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {stats?.recentlyAdded || 0} added this month
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* High Priority */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      High Priority
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stats?.highPriority || 0}
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                    <Star className="h-6 w-6 text-red-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {stats?.mediumPriority || 0} medium, {stats?.lowPriority || 0} low
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Needing Attention */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      Need Attention
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stats?.needingAttention || 0}
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                    <AlertCircle className="h-6 w-6 text-orange-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  30+ days since last contact
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Context Added */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      With Context
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {contextPercentage}%
-                    </p>
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {stats?.withContext || 0} of {stats?.totalContacts || 0} contacts
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Relationship Health */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-purple-600" />
-                  Relationship Health
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {relationshipHealth && (
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <Activity className="h-8 w-8 text-purple-600" />
+                Relationship Health
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Track and maintain your most important relationships
+              </p>
+            </div>
+            
+            {/* Triage Toggle - Mobile Only */}
+            <div className="md:hidden">
+              <Button
+                onClick={() => setIsTriageActive(!isTriageActive)}
+                variant={isTriageActive ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "rounded-full font-bold uppercase tracking-tighter text-[10px] h-9 px-4 gap-2",
+                  isTriageActive ? "bg-orange-600 hover:bg-orange-700" : "border-orange-200 text-orange-600"
+                )}
+              >
+                {isTriageActive ? (
                   <>
-                    {/* Healthy */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          Healthy (≤30 days)
-                        </span>
-                        <span className="font-semibold text-green-600">
-                          {relationshipHealth.healthy}
-                        </span>
-                      </div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-green-500 transition-all duration-500"
-                          style={{
-                            width: `${
-                              (relationshipHealth.healthy /
-                                (relationshipHealth.healthy +
-                                  relationshipHealth.warning +
-                                  relationshipHealth.needsAttention +
-                                  relationshipHealth.noData || 1)) *
-                              100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Warning */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          Warning (30-60 days)
-                        </span>
-                        <span className="font-semibold text-yellow-600">
-                          {relationshipHealth.warning}
-                        </span>
-                      </div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-yellow-500 transition-all duration-500"
-                          style={{
-                            width: `${
-                              (relationshipHealth.warning /
-                                (relationshipHealth.healthy +
-                                  relationshipHealth.warning +
-                                  relationshipHealth.needsAttention +
-                                  relationshipHealth.noData || 1)) *
-                              100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Needs Attention */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          Needs Attention (60+ days)
-                        </span>
-                        <span className="font-semibold text-red-600">
-                          {relationshipHealth.needsAttention}
-                        </span>
-                      </div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-red-500 transition-all duration-500"
-                          style={{
-                            width: `${
-                              (relationshipHealth.needsAttention /
-                                (relationshipHealth.healthy +
-                                  relationshipHealth.warning +
-                                  relationshipHealth.needsAttention +
-                                  relationshipHealth.noData || 1)) *
-                              100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* No Data */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          No Interaction Data
-                        </span>
-                        <span className="font-semibold text-gray-600">
-                          {relationshipHealth.noData}
-                        </span>
-                      </div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gray-400 transition-all duration-500"
-                          style={{
-                            width: `${
-                              (relationshipHealth.noData /
-                                (relationshipHealth.healthy +
-                                  relationshipHealth.warning +
-                                  relationshipHealth.needsAttention +
-                                  relationshipHealth.noData || 1)) *
-                              100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
+                    <LayoutDashboard className="h-4 w-4" />
+                    Standard
+                  </>
+                ) : (
+                  <>
+                    <Smartphone className="h-4 w-4" />
+                    Triage
                   </>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Interaction Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-purple-600" />
-                  Interaction Statistics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {interactionStats && (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          This Week
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {interactionStats.contactsThisWeek}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          This Month
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {interactionStats.contactsThisMonth}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          This Year
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {interactionStats.contactsThisYear}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          Avg Interactions
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {interactionStats.avgInteractionCount}
-                        </p>
-                      </div>
-                    </div>
-
-                    {interactionStats.contactsWithNoInteractions > 0 && (
-                      <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3 border border-orange-200 dark:border-orange-800">
-                        <p className="text-sm text-orange-800 dark:text-orange-200">
-                          <AlertCircle className="h-4 w-4 inline mr-2" />
-                          {interactionStats.contactsWithNoInteractions} contacts have no
-                          recorded interactions
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </CardContent>
-            </Card>
+              </Button>
+            </div>
           </div>
 
-          {/* Top Contacts */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
-                  Top Contacts
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => router.push("/")}
-                >
-                  View All
-                </Button>
+          {/* Conditional View Rendering */}
+          {isTriageActive ? (
+            <TriageMode 
+              contacts={needingAttention.map(c => ({
+                id: c.id,
+                name: c.name,
+                first_name: c.first_name,
+                last_name: c.last_name,
+                photo_url: c.photo_url,
+                days_since_contact: Math.floor((Date.now() - new Date(c.last_interaction_date).getTime()) / (1000 * 60 * 60 * 24)),
+                importance: c.importance
+              }))} 
+              onActionComplete={() => {
+                setIsTriageActive(false);
+                loadDashboardData();
+              }}
+            />
+          ) : (
+            <>
+              {/* Daily Practice Challenge */}
+              <DailyPracticeWidget />
+
+              {/* Morning Briefing */}
+              {briefing && <DailyBriefingCard briefing={briefing} onActionComplete={loadDashboardData} />}
+
+              {/* Main Content Grid with Sidebar */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Left Column (8 units) */}
+                <div className="lg:col-span-8 space-y-6">
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Contacts</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.totalContacts || 0}</p>
+                          </div>
+                          <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Users className="h-6 w-6 text-blue-600" />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{stats?.recentlyAdded || 0} added this month</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">High Priority</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.highPriority || 0}</p>
+                          </div>
+                          <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                            <Star className="h-6 w-6 text-red-600" />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Requires attention</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-purple-600" />
+                        Quick Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <Button onClick={() => router.push("/contacts/new")} className="w-full bg-purple-600 hover:bg-purple-700 font-bold">
+                          <Users className="h-4 w-4 mr-2" /> Add New
+                        </Button>
+                        <Button onClick={() => router.push("/import")} variant="outline" className="w-full font-bold">
+                          <TrendingUp className="h-4 w-4 mr-2" /> Import
+                        </Button>
+                        <Button onClick={() => router.push("/ai-batch")} variant="outline" className="w-full font-bold">
+                          <Zap className="h-4 w-4 mr-2" /> AI Batch
+                        </Button>
+                        <Button
+                          onClick={async () => {
+                            const loadingToast = toast.loading("Igniting real data...");
+                            const res = await autoMapTribes();
+                            toast.dismiss(loadingToast);
+                            if (res.success) {
+                              toast.success(`Ignition Success! ${res.count} contacts mapped.`);
+                              loadDashboardData();
+                            } else {
+                              toast.error(res.error || "Ignition failed");
+                            }
+                          }}
+                          variant="outline"
+                          className="w-full border-orange-500 text-orange-500 hover:bg-orange-500/10 font-bold"
+                        >
+                          <RefreshCw className="h-4 w-4 mr-2" /> Ignition
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Needing Attention List */}
+                  {needingAttention.length > 0 && (
+                    <Card className="border-orange-200 dark:border-orange-800">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                          <AlertCircle className="h-5 w-5" />
+                          Needs Nurture
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {needingAttention.map((contact) => (
+                            <div
+                              key={contact.id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                              onClick={() => router.push(`/contacts/${contact.id}`)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10">
+                                  <AvatarImage src={contact.photo_url || undefined} />
+                                  <AvatarFallback className={cn("bg-linear-to-br text-white font-semibold", getGradient(contact.name || ""))}>
+                                    {getInitials(contact.first_name, contact.last_name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-semibold">{contact.name}</p>
+                                  <p className="text-xs text-gray-500">{contact.days_since_contact} days since contact</p>
+                                </div>
+                              </div>
+                              <Badge variant="secondary" className="bg-orange-100 text-orange-700">{contact.days_since_contact}d</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Relationship Health Breakdown */}
+                  {relationshipHealth && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card className="bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">Blooming</p>
+                              <p className="text-3xl font-black text-emerald-700 dark:text-emerald-300">{relationshipHealth.healthy}</p>
+                            </div>
+                            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                              <Heart className="h-5 w-5 text-emerald-600" fill="currentColor" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card className="bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-amber-600 dark:text-amber-400 font-bold uppercase tracking-tight">Warning</p>
+                              <p className="text-3xl font-black text-amber-700 dark:text-amber-300">{relationshipHealth.warning}</p>
+                            </div>
+                            <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                              <AlertCircle className="h-5 w-5 text-amber-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-rose-50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-rose-600 dark:text-rose-400 font-bold uppercase tracking-tight">Thirsty</p>
+                              <p className="text-3xl font-black text-rose-700 dark:text-rose-300">{relationshipHealth.needsAttention}</p>
+                            </div>
+                            <div className="h-10 w-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                              <TrendingDown className="h-5 w-5 text-rose-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+
+                  {/* Top Contacts Section */}
+                  {topContacts.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Star className="h-5 w-5 text-amber-500" fill="currentColor" />
+                          Momentum Leaders
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {topContacts.map((contact) => (
+                            <div
+                              key={contact.id}
+                              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                              onClick={() => router.push(`/contacts/${contact.id}`)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10">
+                                  <AvatarImage src={contact.photoUrl || undefined} />
+                                  <AvatarFallback className={cn("bg-linear-to-br text-white font-semibold", getGradient(contact.name || ""))}>
+                                    {getInitials(contact.firstName, contact.lastName)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-semibold">{contact.name}</p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-xs text-gray-500">{contact.interactionCount} Interactions</p>
+                                    {contact.contactImportance === 'high' && (
+                                      <Badge className="h-4 px-1.5 text-[8px] bg-red-100 text-red-700 border-red-200">HIGH</Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <ChevronRight className="h-4 w-4 text-gray-400" />
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                </div>
+
+                {/* Right Column (Sidebar) */}
+                <div className="lg:col-span-4 space-y-6">
+                  {/* Tribe Health Sidebar Widget */}
+                  <Card className="bg-sidebar border-border shadow-none rounded-none">
+                    <CardHeader className="border-b border-[#1E293B] pb-4">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-[#38BDF8] flex items-center gap-2 uppercase font-black tracking-tighter text-sm">
+                          <Droplets className="h-4 w-4" />
+                          Tribe Health
+                        </CardTitle>
+                        <Badge className="bg-[#38BDF8] text-[#0F172A] font-black rounded-none">THIRSTY</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-4 px-0">
+                      <div className="divide-y divide-[#1E293B]">
+                        {[
+                          ...tribeHealth.filter(t => ["NASA", "Basketball", "Japan"].includes(t.name)),
+                          ...tribeHealth.filter(t => !["NASA", "Basketball", "Japan"].includes(t.name))
+                        ].slice(0, 5).map((tribe) => (
+                          <div key={tribe.name} className="p-4 flex items-center justify-between group hover:bg-[#1E293B]/50 transition-colors">
+                            <div>
+                              <p className="text-white font-black uppercase tracking-tight">{tribe.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] text-slate-500 font-bold uppercase">{tribe.count} members</span>
+                                <span className="text-[10px] text-[#38BDF8] font-black uppercase">
+                                  {tribe.maxDaysSince > 0 ? `${tribe.maxDaysSince}d overdue` : 'FRESH'}
+                                </span>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                setSelectedTribe(tribe);
+                                setIsModalOpen(true);
+                              }}
+                              className="h-10 w-10 bg-[#1E293B] group-hover:bg-[#38BDF8] group-hover:text-[#0F172A] flex items-center justify-center transition-all border border-[#334155] rounded-none"
+                            >
+                              <Droplets className="h-5 w-5" />
+                            </button>
+                          </div>
+                        ))}
+                        {tribeHealth.length === 0 && (
+                          <div className="p-8 text-center text-slate-500 text-xs font-bold uppercase tracking-widest">
+                            Tribe data loading...
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <MilestoneRadar />
+
+                  {/* Garden Visualization Widget */}
+                  <GardenLeafWidget contacts={allContacts} />
+
+                  {/* System Status Card */}
+                  <Card className="bg-card border-border rounded-none shadow-none text-card-foreground">
+                    <CardContent className="p-6 space-y-4">
+                      <h4 className="font-black uppercase tracking-tighter text-sm">System Status</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed font-bold">
+                        STABILITY: <span className="text-green-500">OPTIMAL</span><br/>
+                        ACTION LOOP: <span className="text-[#38BDF8]">READY</span>
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              {topContacts.length > 0 ? (
-                <div className="space-y-3">
-                  {topContacts.map((contact, index) => (
-                    <div
-                      key={contact.id}
-                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                      onClick={() => router.push(`/contacts/${contact.id}`)}
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <span className="text-lg font-bold text-gray-400 w-6">
-                          #{index + 1}
-                        </span>
-                        <Avatar className="h-10 w-10 flex-shrink-0">
-                          <AvatarImage src={contact.photoUrl || undefined} />
-                          <AvatarFallback
-                            className={cn(
-                              "bg-gradient-to-br text-white font-semibold text-sm",
-                              getGradient(contact.name)
-                            )}
-                          >
-                            {getInitials(contact.firstName, contact.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 dark:text-white truncate">
-                            {contact.firstName} {contact.lastName || ""}
-                          </p>
-                          {contact.relationshipSummary && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                              {contact.relationshipSummary}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {contact.interactionCount} interactions
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatDaysSince(contact.lastInteractionDate)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  No interaction data available yet
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Contacts Needing Attention */}
-          {needingAttention.length > 0 && (
-            <Card className="border-orange-200 dark:border-orange-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-                  <Clock className="h-5 w-5" />
-                  Contacts Needing Attention
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {needingAttention.map((contact) => (
-                    <div
-                      key={contact.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
-                      onClick={() => router.push(`/contacts/${contact.id}`)}
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <Avatar className="h-10 w-10 flex-shrink-0">
-                          <AvatarImage src={contact.photo_url || undefined} />
-                          <AvatarFallback
-                            className={cn(
-                              "bg-gradient-to-br text-white font-semibold text-sm",
-                              getGradient(contact.name || "")
-                            )}
-                          >
-                            {getInitials(contact.first_name, contact.last_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 dark:text-white">
-                            {contact.name || `${contact.first_name} ${contact.last_name || ""}`}
-                          </p>
-                          {contact.relationship_summary && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                              {contact.relationship_summary}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
-                          {contact.days_since_contact} days
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            </>
           )}
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-purple-600" />
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <Button
-                  onClick={() => router.push("/contacts/new")}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Add New Contact
-                </Button>
-                <Button
-                  onClick={() => router.push("/import")}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Import Contacts
-                </Button>
-                <Button
-                  onClick={() => router.push("/ai-batch")}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  AI Batch Process
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
+
+      <LogGroupInteractionModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={loadDashboardData}
+        tribeName={selectedTribe?.name || ""}
+        contacts={selectedTribe?.contacts || []}
+      />
     </div>
   );
 }

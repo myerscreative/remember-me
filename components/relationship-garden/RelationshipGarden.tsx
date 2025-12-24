@@ -1,7 +1,7 @@
-
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Leaf from './Leaf';
 import { FilterType } from './CategoryFilters';
 
@@ -36,17 +36,17 @@ interface TooltipState {
 
 // Get color based on days since contact
 function getColorForDays(days: number): string {
-  if (days <= 7) return '#10b981';   // Green - Healthy
-  if (days <= 21) return '#84cc16';  // Lime - Good
-  if (days <= 45) return '#fbbf24';  // Yellow - Warning
-  return '#f97316';                   // Orange - Dying
+  if (days <= 14) return '#10b981';   // Green - Blooming
+  if (days <= 45) return '#84cc16';   // Lime - Nourished
+  if (days <= 120) return '#fbbf24';  // Yellow - Thirsty
+  return '#f97316';                   // Orange - Fading
 }
 
 // Get status label
 function getStatusLabel(days: number): string {
-  if (days <= 7) return 'Blooming';
-  if (days <= 21) return 'Nourished';
-  if (days <= 45) return 'Thirsty';
+  if (days <= 14) return 'Blooming';
+  if (days <= 45) return 'Nourished';
+  if (days <= 120) return 'Thirsty';
   return 'Fading';
 }
 
@@ -60,8 +60,20 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   });
   
   // Zoom state with localStorage persistence
-  const [zoom, setZoom] = useState(100);
-  const [defaultZoom, setDefaultZoom] = useState(100);
+  const [zoom, setZoom] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gardenDefaultZoom');
+      return saved ? parseInt(saved) : 100;
+    }
+    return 100;
+  });
+  const [defaultZoom, setDefaultZoom] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gardenDefaultZoom');
+      return saved ? parseInt(saved) : 100;
+    }
+    return 100;
+  });
   const [saved, setSaved] = useState(false);
   
   // Pan state
@@ -69,15 +81,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Load default zoom from localStorage
-  useEffect(() => {
-    const savedZoom = localStorage.getItem('gardenDefaultZoom');
-    if (savedZoom) {
-      const parsed = parseInt(savedZoom);
-      setDefaultZoom(parsed);
-      setZoom(parsed);
-    }
-  }, []);
+  // Load default zoom - now handled in useState initializer
 
   // Zoom handlers
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 120));
@@ -111,35 +115,74 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     setIsDragging(false);
   };
 
-  // Wheel Zoom Handler
+  // Touch Zoom & Pan logic
+  const touchStartRef = useRef<{ dist: number, zoom: number } | null>(null);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        touchStartRef.current = { dist, zoom };
+      } else if (e.touches.length === 1) {
+          setIsDragging(true);
+          setDragStart({ x: e.touches[0].clientX - panOffset.x, y: e.touches[0].clientY - panOffset.y });
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchStartRef.current) {
+        e.preventDefault();
+        const dist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        const ratio = dist / touchStartRef.current.dist;
+        const newZoom = Math.min(Math.max(touchStartRef.current.zoom * ratio, 50), 150);
+        setZoom(newZoom);
+      } else if (e.touches.length === 1 && isDragging) {
+          setPanOffset({
+            x: e.touches[0].clientX - dragStart.x,
+            y: e.touches[0].clientY - dragStart.y
+          });
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchStartRef.current = null;
+      setIsDragging(false);
+    };
+
     const onWheel = (e: WheelEvent) => {
-      // Support Ctrl/Cmd/Alt + Scroll for zoom
       if (e.ctrlKey || e.metaKey || e.altKey) {
         e.preventDefault();
         e.stopPropagation();
-        
         const delta = e.deltaY;
         setZoom(prev => {
-          // Determine direction
           const direction = delta > 0 ? -1 : 1; 
-          // Smaller steps for wheel (5%)
           const newZoom = prev + (direction * 5);
-          return Math.min(Math.max(newZoom, 50), 120);
+          return Math.min(Math.max(newZoom, 50), 150);
         });
       }
     };
 
-    // Passive: false is required to use preventDefault
+    container.addEventListener('touchstart', onTouchStart, { passive: false });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
     container.addEventListener('wheel', onWheel, { passive: false });
 
     return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
       container.removeEventListener('wheel', onWheel);
     };
-  }, []);
+  }, [zoom, isDragging, dragStart, panOffset]);
 
 
   // Filter contacts
@@ -161,9 +204,9 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
     filteredContacts.forEach(contact => {
       const days = contact.days;
-      if (days <= 7) buckets.healthy.push(contact);
-      else if (days <= 21) buckets.good.push(contact);
-      else if (days <= 45) buckets.warning.push(contact);
+      if (days <= 14) buckets.healthy.push(contact);
+      else if (days <= 45) buckets.good.push(contact);
+      else if (days <= 120) buckets.warning.push(contact);
       else buckets.needsLove.push(contact);
     });
 
@@ -374,29 +417,38 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
               const isHovered = hoveredContactId === contact.id.toString();
               
               return (
-              <div
+              <motion.div
                 key={contact.id}
-                className="absolute transition-all duration-500 ease-out"
-                  style={{
-                    transform: `translate(${x}px, ${y}px) rotate(${rotation}deg)`,
-                    zIndex: isHovered ? 50 : 1,
-                    filter: isHovered ? `drop-shadow(0 0 15px ${color})` : 'none',
-                    // Optimize: only apply transition to transform if needed, but 500ms is standard here
-                  }}
-                >
-                  <Leaf 
-                    color={color} 
-                    initials={contact.initials}
-                    scale={isHovered ? scale * 1.3 : scale} // Scale up by 30% on hover for clear feedback
-                  onMouseEnter={(e) => {
-                    handleLeafEnter(e, contact);
-                    // Also trigger the parent hover state so sidebar updates if we ever bidirectionally link that way
-                  }}
+                layout
+                initial={false}
+                animate={{
+                  x,
+                  y,
+                  rotate: rotation,
+                  scale: isHovered ? 1.1 : 1,
+                  filter: isHovered ? `drop-shadow(0 0 15px ${color})` : 'none',
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 70,
+                  damping: 20,
+                  mass: 1
+                }}
+                className="absolute"
+                style={{
+                  zIndex: isHovered ? 50 : 1,
+                }}
+              >
+                <Leaf 
+                  color={color} 
+                  initials={contact.initials}
+                  scale={isHovered ? scale * 1.3 : scale} 
+                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
                   onMouseMove={handleLeafMove}
                   onMouseLeave={handleLeafLeave}
                   onClick={() => onContactClick?.(contact)}
                 />
-              </div>
+              </motion.div>
             )})}
           </div>
         </div>
@@ -404,7 +456,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div 
-            className="fixed z-[1000] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto"
+            className="fixed z-1000 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto"
             style={{ 
               left: tooltip.x, 
               top: tooltip.y,

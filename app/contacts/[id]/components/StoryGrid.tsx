@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Heart, Star, Edit2, Plus, Save, Loader2 } from 'lucide-react';
+import { MapPin, Heart, Star, Edit2, Plus, Sparkles, Save, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
@@ -13,6 +13,7 @@ interface StoryGridProps {
     whereWeMet?: string;
     whyStayInContact?: string;
     whatsImportant?: string;
+    whatFoundInteresting?: string;
   };
 }
 
@@ -23,7 +24,8 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
   const [localStory, setLocalStory] = useState({
     whereWeMet: story?.whereWeMet || '',
     whyStayInContact: story?.whyStayInContact || '',
-    whatsImportant: story?.whatsImportant || ''
+    whatsImportant: story?.whatsImportant || '',
+    whatFoundInteresting: story?.whatFoundInteresting || ''
   });
 
   const handleEdit = (field: string, currentValue: string) => {
@@ -47,6 +49,7 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
       if (field === 'whereWeMet') updateData.where_met = editValue;
       if (field === 'whyStayInContact') updateData.why_stay_in_contact = editValue;
       if (field === 'whatsImportant') updateData.most_important_to_them = editValue;
+      if (field === 'whatFoundInteresting') updateData.what_found_interesting = editValue;
 
       const { error } = await (supabase as any)
         .from('persons')
@@ -70,7 +73,7 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
   const renderCard = (
     title: string,
     icon: React.ReactNode,
-    field: 'whereWeMet' | 'whyStayInContact' | 'whatsImportant',
+    field: 'whereWeMet' | 'whyStayInContact' | 'whatsImportant' | 'whatFoundInteresting',
     value: string,
     placeholder: string
   ) => {
@@ -80,14 +83,15 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     const colors = {
       whereWeMet: 'indigo',
       whyStayInContact: 'rose',
-      whatsImportant: 'amber'
+      whatsImportant: 'amber',
+      whatFoundInteresting: 'emerald'
     };
-    const c = colors[field as keyof typeof colors];
 
     const cardStyles = {
       whereWeMet: 'bg-white dark:bg-[#1f2937]/60 border-indigo-100 dark:border-indigo-500/20 hover:border-indigo-200 dark:hover:border-indigo-500/40',
       whyStayInContact: 'bg-white dark:bg-[#1f2937]/60 border-rose-100 dark:border-rose-500/20 hover:border-rose-200 dark:hover:border-rose-500/40',
-      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-amber-100 dark:border-amber-500/20 hover:border-amber-200 dark:hover:border-amber-500/40'
+      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-amber-100 dark:border-amber-500/20 hover:border-amber-200 dark:hover:border-amber-500/40',
+      whatFoundInteresting: 'bg-white dark:bg-[#1f2937]/60 border-emerald-100 dark:border-emerald-500/20 hover:border-emerald-200 dark:hover:border-emerald-500/40'
     };
 
     const activeStyle = cardStyles[field as keyof typeof cardStyles];
@@ -96,7 +100,12 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
       <div className={`group relative flex flex-col h-full ${activeStyle} border rounded-[0.875rem] shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${field === 'whereWeMet' ? 'bg-indigo-50 dark:bg-indigo-500/10' : field === 'whyStayInContact' ? 'bg-rose-50 dark:bg-rose-500/10' : 'bg-amber-50 dark:bg-amber-500/10'}`}>
+            <div className={`p-2 rounded-lg ${
+            field === 'whereWeMet' ? 'bg-indigo-50 dark:bg-indigo-500/10' : 
+            field === 'whyStayInContact' ? 'bg-rose-50 dark:bg-rose-500/10' : 
+            field === 'whatsImportant' ? 'bg-amber-50 dark:bg-amber-500/10' :
+            'bg-emerald-50 dark:bg-emerald-500/10'
+          }`}>
               {icon}
             </div>
             <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{title}</span>
@@ -185,6 +194,13 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
         'whatsImportant',
         localStory.whatsImportant,
         "Add what's important"
+      )}
+      {renderCard(
+        'Points of Interest',
+        <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />, 
+        'whatFoundInteresting',
+        localStory.whatFoundInteresting,
+        'Add interesting details'
       )}
     </div>
   );
