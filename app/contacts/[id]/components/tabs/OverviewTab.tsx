@@ -5,7 +5,9 @@ import { StoryGrid } from '@/app/contacts/[id]/components/StoryGrid';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Plus, Tag, X, Loader2 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sparkles, Plus, Tag, X, Loader2, Info } from 'lucide-react';
+import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
 import toast from 'react-hot-toast';
@@ -123,6 +125,21 @@ export function OverviewTab({ contact }: OverviewTabProps) {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[1.25rem] font-semibold text-[#111827] dark:text-white flex items-center gap-2">
               <span className="text-2xl">📖</span> The Story
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-slate-400 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Story info" role="button" />
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]">
+                   <p className="text-slate-300 text-[11px] leading-relaxed mb-3">
+                     <span className="text-white font-bold">Capture the Narrative.</span> Use these fields to document the foundation of your bond.
+                   </p>
+                   <ul className="space-y-2 text-[11px] text-slate-400 list-disc pl-4">
+                      <li>&apos;Where We Met&apos; provides context for the origin.</li>
+                      <li>&apos;Why Stay in Contact&apos; reminds you of the relationship&apos;s value.</li>
+                      <li>&apos;What Matters&apos; and &apos;Points of Interest&apos; store the &apos;Deep Lore&apos; that makes your reach-outs feel personal.</li>
+                   </ul>
+                </PopoverContent>
+              </Popover>
             </h2>
             <button className="bg-white dark:bg-[#1f2937] text-[#6366f1] dark:text-indigo-400 border border-[#e5e7eb] dark:border-[#374151] rounded-[0.5rem] px-3 py-1 text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#374151] transition-colors shadow-sm">Edit</button>
           </div>
@@ -137,26 +154,36 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       </section>
 
       {/* Memory Prompt */}
-      <section>
-        <div className="group bg-white dark:bg-[#252931]/50 border-2 border-dashed border-[#d1d5db] dark:border-[#374151] rounded-[0.875rem] p-5 flex items-center justify-between hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-500/5 transition-all duration-300 cursor-pointer mb-8">
-          <span className="text-[#9ca3af] dark:text-gray-400 text-lg group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">✨ Add important info to your memory</span>
-          <button className="text-[#9ca3af] dark:text-gray-500 text-2xl group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">+</button>
-        </div>
+      <section className="mb-8">
+        <MemoryCapture contactId={contact.id} />
       </section>
 
       {/* Tags & Interests Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Tags Section */}
-        <div className="bg-card border border-border rounded-2xl p-6 min-h-[200px] flex flex-col">
+        <div className="bg-[#1E293B] border border-[#334155] rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[13px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-teal-500 dark:text-teal-400" /> Tags
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <Tag className="w-3.5 h-3.5 text-teal-400" /> Tags
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Tags info" role="button" />
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" align="start">
+                  <p className="text-slate-300 text-[11px] leading-relaxed mb-3">
+                    <span className="text-white font-bold">Organize your Tribes.</span> Group contacts by commonalities (e.g., &apos;NASA&apos;, &apos;Japan&apos;, &apos;Family&apos;).
+                  </p>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    This allows you to monitor the health of entire groups at once on your <span className="text-white font-bold">Dashboard</span>.
+                  </p>
+                </PopoverContent>
+              </Popover>
             </h3>
             <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setIsTagsOpen(!isTagsOpen)}
-                className={cn("h-6 w-6 p-0 text-gray-400 hover:text-indigo-600", isTagsOpen && "text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10")}
+                className={cn("h-6 w-6 p-0 text-slate-400 hover:text-white hover:bg-white/5", isTagsOpen && "text-teal-400 bg-teal-400/10")}
             >
               <Plus className={cn("w-4 h-4 transition-transform", isTagsOpen && "rotate-45")} />
             </Button>
@@ -167,19 +194,19 @@ export function OverviewTab({ contact }: OverviewTabProps) {
               tags.map((tag: string, i: number) => (
                 <Badge 
                     key={i} 
-                    className="group bg-[#f3f4f6] dark:bg-gray-800 text-[#4b5563] dark:text-gray-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.8125rem] font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-default pr-2"
+                    className="group bg-[#0F172A] border border-[#334155] text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-teal-500/50 hover:text-teal-400 transition-all cursor-default pr-2"
                 >
                     {tag}
                     <button 
                         onClick={() => handleRemoveTag(tag)}
-                        className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
+                        className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-400 focus:opacity-100"
                     >
                         <X className="w-3 h-3" />
                     </button>
                 </Badge>
               ))
             ) : (
-              !isTagsOpen && <p className="text-sm text-gray-400 italic">No tags added yet.</p>
+              !isTagsOpen && <p className="text-xs font-medium text-slate-600 uppercase tracking-widest mt-2">No tags set</p>
             )}
           </div>
 
@@ -203,16 +230,29 @@ export function OverviewTab({ contact }: OverviewTabProps) {
         </div>
 
         {/* Interests Section */}
-        <div className="bg-card border border-border rounded-2xl p-6 min-h-[200px] flex flex-col">
+        <div className="bg-[#1E293B] border border-[#334155] rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[13px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-500 dark:text-purple-400" /> Interests
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Interests
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Interests info" role="button" />
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" align="start">
+                  <p className="text-slate-300 text-[11px] leading-relaxed mb-3">
+                    <span className="text-white font-bold">Personalize your Touch.</span> Log specific likes or hobbies here.
+                  </p>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Use these details to craft meaningful messages that resonate when it&apos;s time to water the relationship.
+                  </p>
+                </PopoverContent>
+              </Popover>
             </h3>
             <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setIsInterestsOpen(!isInterestsOpen)}
-                className={cn("h-6 w-6 p-0 text-gray-400 hover:text-indigo-600", isInterestsOpen && "text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10")}
+                className={cn("h-6 w-6 p-0 text-slate-400 hover:text-white hover:bg-white/5", isInterestsOpen && "text-purple-400 bg-purple-400/10")}
             >
               <Plus className={cn("w-4 h-4 transition-transform", isInterestsOpen && "rotate-45")} />
             </Button>
@@ -223,19 +263,19 @@ export function OverviewTab({ contact }: OverviewTabProps) {
               interests.map((interest: string, i: number) => (
                 <Badge 
                     key={i} 
-                    className="group bg-[#f3f4f6] dark:bg-gray-800 text-[#4b5563] dark:text-gray-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.8125rem] font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-default pr-2"
+                    className="group bg-[#0F172A] border border-[#334155] text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-purple-500/50 hover:text-purple-400 transition-all cursor-default pr-2"
                 >
                     {interest}
                     <button 
                         onClick={() => handleRemoveInterest(interest)}
-                        className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
+                        className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-400 focus:opacity-100"
                     >
                         <X className="w-3 h-3" />
                     </button>
                 </Badge>
               ))
             ) : (
-                !isInterestsOpen && <p className="text-sm text-gray-400 italic">No interests added yet.</p>
+                !isInterestsOpen && <p className="text-xs font-medium text-slate-600 uppercase tracking-widest mt-2">No interests set</p>
             )}
           </div>
 

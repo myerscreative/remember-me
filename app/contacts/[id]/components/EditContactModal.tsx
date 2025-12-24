@@ -27,6 +27,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
     email: "",
     phone: "",
     linkedin: "",
+    company: "",
+    jobTitle: "",
+    birthday: "",
   });
 
   // Load initial data when contact changes or modal opens
@@ -38,6 +41,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
         email: contact.email || "",
         phone: contact.phone || "",
         linkedin: contact.linkedin || "",
+        company: contact.company || "",
+        jobTitle: contact.job_title || contact.jobTitle || "",
+        birthday: contact.birthday || "",
       });
     }
   }, [contact, isOpen]);
@@ -64,6 +70,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       email: formData.email.trim() || null,
       phone: formData.phone.trim() || null,
       linkedin: formData.linkedin.trim() || null,
+      company: formData.company.trim() || null,
+      job_title: formData.jobTitle.trim() || null,
+      birthday: formData.birthday || null,
     };
 
     try {
@@ -147,6 +156,37 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
               placeholder="linkedin.com/in/username"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="company">Company</Label>
+              <Input
+                id="company"
+                value={formData.company}
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                placeholder="Company Name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="jobTitle">Job Title</Label>
+              <Input
+                id="jobTitle"
+                value={formData.jobTitle}
+                onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                placeholder="Job Title"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+             <Label htmlFor="birthday">Birthday</Label>
+             <Input
+               id="birthday"
+               type="date"
+               value={formData.birthday}
+               onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+             />
           </div>
 
           <DialogFooter>

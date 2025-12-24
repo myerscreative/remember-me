@@ -24,6 +24,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  colorScheme: "dark light",
 };
 
 import { QuickAddNoteFAB } from "@/components/QuickAddNoteFAB";
@@ -35,6 +36,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var localTheme = localStorage.getItem('theme');
+                  var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (localTheme === 'dark' || (!localTheme && sysTheme)) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <SessionProvider>
           <ThemeProvider>

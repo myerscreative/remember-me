@@ -139,18 +139,43 @@ export default function ContactDetailPage({
   };
 
   // Handle frequency change
+  // Handle frequency change
   const handleFrequencyChange = async (days: number) => {
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Calculate new next_contact_date if last_contact_date exists
+      let nextContactDate = contact?.next_contact_date;
+      
+      // If we have a last contact date, calculate the next one
+      if (contact?.last_contact_date) {
+        const lastDate = new Date(contact.last_contact_date);
+        const nextDate = new Date(lastDate);
+        nextDate.setDate(lastDate.getDate() + days);
+        nextContactDate = nextDate.toISOString();
+      } else {
+        // If no last contact date (Manual Mode), setting a cadence implies we should start tracking
+        // Set next contact date to specific days from TODAY to kickstart the cycle
+        const today = new Date();
+        const nextDate = new Date(today);
+        nextDate.setDate(today.getDate() + days);
+        nextContactDate = nextDate.toISOString();
+      }
+
       await (supabase as any).from("persons").update({
-        target_frequency_days: days
+        target_frequency_days: days,
+        next_contact_date: nextContactDate
       }).eq("id", id).eq("user_id", user.id);
 
       // Update local state
-      setContact({ ...contact, target_frequency_days: days });
+      setContact({ 
+        ...contact, 
+        target_frequency_days: days,
+        next_contact_date: nextContactDate 
+      });
+      
       toast.success("Contact cadence updated!");
     } catch {
       toast.error("Failed to update cadence");

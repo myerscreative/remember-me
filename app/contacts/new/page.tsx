@@ -426,6 +426,40 @@ export default function NewContactPage() {
                 />
               </div>
 
+              {/* Company & Job Title */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                    Company
+                  </Label>
+                  <Input
+                    id="company"
+                    value={formData.company}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company: e.target.value })
+                    }
+                    placeholder="Company Name"
+                    className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                    disabled={isSaving}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="jobTitle" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                    Job Title
+                  </Label>
+                  <Input
+                    id="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={(e) =>
+                      setFormData({ ...formData, jobTitle: e.target.value })
+                    }
+                    placeholder="Job Title"
+                    className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                    disabled={isSaving}
+                  />
+                </div>
+              </div>
+
               {/* Where did we meet? */}
               <div className="space-y-2">
                 <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
