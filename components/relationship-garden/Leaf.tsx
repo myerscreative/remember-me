@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 
 interface LeafProps {
@@ -10,6 +9,7 @@ interface LeafProps {
   onMouseLeave?: (e: React.MouseEvent) => void;
   onMouseMove?: (e: React.MouseEvent) => void;
   initials?: string;
+  scale?: number;
 }
 
 // Helper to darken color for gradient/stroke
@@ -30,7 +30,8 @@ export default function Leaf({
   onMouseEnter,
   onMouseLeave,
   onMouseMove,
-  initials 
+  initials,
+  scale = 1
 }: LeafProps) {
   const darker = useMemo(() => adjustBrightness(color, -20), [color]);
   const darkest = useMemo(() => adjustBrightness(color, -40), [color]);
@@ -38,8 +39,12 @@ export default function Leaf({
 
   return (
     <div 
-      className={`absolute w-[42px] h-[48px] cursor-pointer origin-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:z-50 leaf-container ${className || ''}`}
-      style={style}
+      className={`absolute cursor-pointer origin-center transition-all duration-500 ease-in-out hover:z-50 leaf-container ${className || ''}`}
+      style={{
+        ...style,
+        width: 42 * scale,
+        height: 48 * scale,
+      }}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -73,7 +78,10 @@ export default function Leaf({
         />
       </svg>
       {initials && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-bold text-white drop-shadow-md pointer-events-none select-none tracking-wide">
+        <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-bold text-white drop-shadow-md pointer-events-none select-none tracking-wide"
+            style={{ fontSize: `${10 * scale}px` }} 
+        >
           {initials}
         </div>
       )}

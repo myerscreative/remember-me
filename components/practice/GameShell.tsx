@@ -56,26 +56,27 @@ export function GameShell({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <Button variant="ghost" size="sm" onClick={onExit} className="gap-1 text-gray-500 hover:text-red-500">
+      <div className="flex items-center justify-between mb-6 bg-white dark:bg-[#1f2937] p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+        <Button variant="ghost" size="sm" onClick={onExit} className="gap-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
            <ArrowLeft size={18} /> Quit
         </Button>
         
-        <div className="flex divide-x divide-gray-200">
+        <div className="flex divide-x divide-gray-200 dark:divide-gray-700">
             <div className="px-6 flex flex-col items-center">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Time</span>
-                <span className={`text-2xl font-black font-mono ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-gray-800'}`}>
+                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Time</span>
+                <span className={`text-2xl font-black font-mono ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-gray-800 dark:text-gray-100'}`}>
                     {formatTime(timeLeft)}
                 </span>
             </div>
             <div className="px-6 flex flex-col items-center">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Score</span>
-                <span className="text-2xl font-black text-indigo-600 animate-in zoom-in duration-300 key={currentScore}">
+                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Score</span>
+                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 animate-in zoom-in duration-300 key={currentScore}">
                     {currentScore}
                 </span>
             </div>
         </div>
       </div>
+      
       
       <div className="relative">
           {children}
@@ -95,7 +96,7 @@ interface GameOverProps {
 
 export function GameOverScreen({ score, bestScore, streak, xpEarned, onPlayAgain, onExit }: GameOverProps) {
     return (
-        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 mt-12 animate-in slide-in-from-bottom-8 fade-in duration-700">
+        <div className="max-w-md mx-auto bg-white dark:bg-[#1f2937] rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 mt-12 animate-in slide-in-from-bottom-8 fade-in duration-700">
             <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-10 text-center text-white">
                 <div className="inline-flex items-center justify-center p-4 bg-white/20 rounded-full mb-6 backdrop-blur-md">
                    <Trophy size={48} className="text-yellow-300 drop-shadow-md" />
@@ -106,14 +107,14 @@ export function GameOverScreen({ score, bestScore, streak, xpEarned, onPlayAgain
             
             <div className="p-8">
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div className="p-4 bg-gray-50 rounded-2xl text-center border border-gray-100">
-                        <div className="text-xs font-bold text-gray-400 uppercase mb-1">Best</div>
-                        <div className="text-xl font-bold text-gray-900">{Math.max(score, bestScore)}</div>
-                        {score >= bestScore && score > 0 && <span className="text-xs text-green-600 font-bold">NEW RECORD!</span>}
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl text-center border border-gray-100 dark:border-gray-700">
+                        <div className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Best</div>
+                        <div className="text-xl font-bold text-gray-900 dark:text-white">{Math.max(score, bestScore)}</div>
+                        {score >= bestScore && score > 0 && <span className="text-xs text-green-600 dark:text-green-400 font-bold">NEW RECORD!</span>}
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-2xl text-center border border-gray-100">
-                        <div className="text-xs font-bold text-gray-400 uppercase mb-1">XP Earned</div>
-                        <div className="text-xl font-bold text-indigo-600">+{xpEarned}</div>
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl text-center border border-gray-100 dark:border-gray-700">
+                        <div className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">XP Earned</div>
+                        <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">+{xpEarned}</div>
                     </div>
                 </div>
 
@@ -125,10 +126,10 @@ export function GameOverScreen({ score, bestScore, streak, xpEarned, onPlayAgain
                 )}
 
                 <div className="space-y-3">
-                    <Button onClick={onPlayAgain} className="w-full py-6 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-200">
+                    <Button onClick={onPlayAgain} className="w-full py-6 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-200 dark:shadow-none">
                         Play Again
                     </Button>
-                    <Button variant="ghost" onClick={onExit} className="w-full py-6 text-gray-500 hover:text-gray-900">
+                    <Button variant="ghost" onClick={onExit} className="w-full py-6 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                         Back to Menu
                     </Button>
                 </div>

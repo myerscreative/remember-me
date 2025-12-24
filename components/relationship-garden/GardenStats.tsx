@@ -3,19 +3,19 @@ import React from 'react';
 
 interface GardenStatsProps {
   stats: {
-    healthy: number;
-    good: number;
-    warning: number;
-    dying: number;
+    blooming: number;
+    nourished: number;
+    thirsty: number;
+    fading: number;
   };
 }
 
 export default function GardenStats({ stats }: GardenStatsProps) {
   const statItems = [
-    { label: 'Healthy', value: stats.healthy, color: '#10b981' },
-    { label: 'Good', value: stats.good, color: '#84cc16' },
-    { label: 'Warning', value: stats.warning, color: '#fbbf24' },
-    { label: 'Dying', value: stats.dying, color: '#f97316' },
+    { label: 'Blooming', value: stats.blooming, color: '#22c55e' },
+    { label: 'Nourished', value: stats.nourished, color: '#84cc16' },
+    { label: 'Thirsty', value: stats.thirsty, color: '#eab308' },
+    { label: 'Fading', value: stats.fading, color: '#f97316' },
   ];
 
   return (

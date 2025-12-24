@@ -37,6 +37,12 @@ interface Achievement {
   total?: number;
 }
 
+// Helper to convert hex to rgb for CSS variables
+const hexToRgb = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : '0 0 0';
+};
+
 export default function GameCenterPage() {
   const router = useRouter();
   const { stats, isLoaded } = useGameStats();
@@ -204,19 +210,19 @@ export default function GameCenterPage() {
   if (!isLoaded) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-[#111827] pb-20 transition-colors duration-300">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.back()}
-                className="text-gray-600 hover:text-gray-900 transition p-2 hover:bg-gray-100 rounded-xl"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
               >
                 <ArrowLeft size={24} />
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">Game Center</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Game Center</h1>
             </div>
 
             <div className="flex items-center gap-2">
@@ -229,25 +235,25 @@ export default function GameCenterPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Level & Stats Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6 mb-8 transition-all hover:shadow-md">
+        <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8 transition-all hover:shadow-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+              <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
                 Current Level
               </p>
               <div className="flex items-baseline gap-3">
-                <h2 className="text-4xl font-black text-gray-900">Level {stats.level}</h2>
-                <span className="text-lg font-bold text-indigo-600">Pro Networker</span>
+                <h2 className="text-4xl font-black text-gray-900 dark:text-white">Level {stats.level}</h2>
+                <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">Pro Networker</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 px-6 py-4 bg-linear-to-br from-orange-50 to-red-50 rounded-2xl border border-orange-100 shadow-sm">
-              <div className="bg-white p-2 rounded-xl shadow-sm">
+            <div className="flex items-center gap-4 px-6 py-4 bg-linear-to-br from-orange-50 to-red-50 dark:from-orange-900/10 dark:to-red-900/10 rounded-2xl border border-orange-100 dark:border-orange-500/10 shadow-sm">
+              <div className="bg-white dark:bg-[#1f2937] p-2 rounded-xl shadow-sm">
                   <span className="text-2xl">🔥</span>
               </div>
               <div>
-                <p className="text-xs font-bold text-orange-600 uppercase tracking-wider">Streak</p>
-                <p className="text-2xl font-black text-orange-600">
+                <p className="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider">Streak</p>
+                <p className="text-2xl font-black text-orange-600 dark:text-orange-400">
                   {stats.currentStreak} {stats.currentStreak === 1 ? 'Day' : 'Days'}
                 </p>
               </div>
@@ -256,11 +262,11 @@ export default function GameCenterPage() {
 
           {/* XP Progress Bar */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm font-bold text-gray-500">
+            <div className="flex items-center justify-between text-sm font-bold text-gray-500 dark:text-gray-400">
                 <span>{xpInLevel.toLocaleString()} XP</span>
                 <span>{xpRequired.toLocaleString()} XP to Level {stats.level + 1}</span>
             </div>
-            <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+            <div className="relative h-4 bg-gray-100 dark:bg-gray-900/50 rounded-full overflow-hidden shadow-inner">
               <div
                 className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
                 style={{ width: `${xpProgress}%` }}
@@ -292,12 +298,12 @@ export default function GameCenterPage() {
 
             <div className="relative p-8 md:p-10">
               <div className="flex flex-wrap items-center gap-3 mb-6">
-                <div className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full border border-white/10 shadow-lg">
+                <div className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
                   <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                      <Star size={12} className="fill-white" /> Daily Challenge
                   </span>
                 </div>
-                <div className="px-4 py-1.5 bg-black/20 backdrop-blur-md rounded-full border border-white/5">
+                <div className="px-4 py-2 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5">
                   <span className="text-xs font-medium text-white/90">
                     ⏰ Resets in {resetTime || "--"}
                   </span>
@@ -306,9 +312,21 @@ export default function GameCenterPage() {
 
               <h2 className="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">{dailyChallenge.title}</h2>
               <p className="text-lg text-indigo-50 mb-2 max-w-xl font-medium">{dailyChallenge.description}</p>
-              <p className="text-sm text-indigo-100 mb-8 font-medium bg-indigo-900/30 inline-block px-3 py-1 rounded-lg">
-                Reward: <span className="font-bold text-white uppercase tracking-wide">{dailyChallenge.reward} XP</span>
-              </p>
+              <div className="flex items-center gap-4 mb-8">
+                <div className="px-6 py-4 bg-indigo-900/40 rounded-2xl border border-indigo-500/20 backdrop-blur-sm h-full flex items-center">
+                  <span className="text-sm text-indigo-100 font-medium mr-2">Reward:</span>
+                  <span className="text-base font-bold text-white uppercase tracking-wide">{dailyChallenge.reward} XP</span>
+                </div>
+                
+                {!dailyChallenge.completed && (
+                   <button 
+                    onClick={() => handleGameLaunch('daily-challenge')}
+                    className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200"
+                   >
+                     {dailyChallenge.progress > 0 ? 'Continue Challenge' : 'Start Challenge'}
+                   </button>
+                )}
+              </div>
 
               {/* Progress Section */}
               {dailyChallenge.progress > 0 && !dailyChallenge.completed && (
@@ -326,15 +344,11 @@ export default function GameCenterPage() {
                 </div>
               )}
 
-              {dailyChallenge.completed ? (
+              {dailyChallenge.completed && (
                 <div className="inline-flex items-center gap-3 px-8 py-4 bg-green-500/20 backdrop-blur-md rounded-2xl border border-green-500/30 text-green-100 font-bold text-lg">
                   <span className="text-2xl">✅</span>
                   Challenge Complete!
                 </div>
-              ) : (
-                <button className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200">
-                  {dailyChallenge.progress > 0 ? 'Continue Challenge' : 'Start Challenge'}
-                </button>
               )}
             </div>
           </div>
@@ -343,40 +357,41 @@ export default function GameCenterPage() {
         {/* Game Modes Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-8">
-            <div className="p-3 bg-indigo-100 text-indigo-600 rounded-2xl">
-                <Zap size={24} className="fill-indigo-600" />
+            <div className="p-3 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl">
+                <Zap size={24} className="fill-indigo-600 dark:fill-indigo-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Game Modes</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Game Modes</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gameModes.map((mode) => (
               <div
                 key={mode.id}
-                className="group bg-white rounded-3xl shadow-sm border border-gray-200 p-8 hover:border-indigo-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 relative overflow-hidden"
+                className="group bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm dark:shadow-[0_0_25px_-5px_rgba(var(--glow-rgb),0.2)] border border-gray-200 dark:border-gray-800 p-8 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl dark:hover:shadow-[0_0_50px_-10px_rgba(var(--glow-rgb),0.5)] transition-all duration-300 cursor-pointer transform hover:-translate-y-1 relative overflow-hidden"
                 onClick={() => handleGameLaunch(mode.id)}
+                style={{ '--glow-rgb': hexToRgb(mode.iconColor) } as React.CSSProperties}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-bl-[100px] -mr-8 -mt-8 transition-colors group-hover:bg-indigo-50/50" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 dark:bg-gray-800/50 rounded-bl-[100px] -mr-8 -mt-8 transition-colors group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-500/10" />
                 
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-6 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm"
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-6 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm bg-opacity-10"
                   style={{ backgroundColor: `${mode.iconColor}15`, color: mode.iconColor }}
                 >
                   {mode.icon}
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-2 relative z-10">{mode.title}</h3>
-                <p className="text-sm text-gray-500 mb-6 line-clamp-2 font-medium relative z-10">{mode.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 relative z-10">{mode.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 font-medium relative z-10">{mode.description}</p>
 
-                <div className="flex items-center justify-between mt-auto relative z-10 border-t border-gray-100 pt-6">
-                  <div className="text-xs font-bold bg-gray-100 px-3 py-1 rounded-lg text-gray-500 uppercase tracking-wide">
+                <div className="flex items-center justify-between mt-auto relative z-10 border-t border-gray-100 dark:border-gray-800 pt-6">
+                  <div className="text-xs font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                     Best: {
                         mode.id === 'face-match' ? stats.bestScores.faceMatch : 
                         mode.id === 'fact-match' ? stats.bestScores.factMatch : 
                         0
                     }
                   </div>
-                  <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm group-hover:gap-3 transition-all">
+                  <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm group-hover:gap-3 transition-all">
                     <span>Play</span>
                     <ArrowLeft className="rotate-180 w-4 h-4" />
                   </div>
@@ -389,49 +404,49 @@ export default function GameCenterPage() {
         {/* Stats & Achievements Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Your Stats */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-8">
             <div className="flex items-center gap-3 mb-8">
-               <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">
+               <div className="p-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl">
                    <div className="text-xl">📊</div>
                </div>
-               <h2 className="text-xl font-bold text-gray-900">Your Stats</h2>
+               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Stats</h2>
             </div>
 
             {stats.gamesPlayed === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
                 <div className="text-6xl mb-4 opacity-50">🎮</div>
-                <p className="text-gray-900 font-bold mb-2">No games played yet</p>
-                <p className="text-sm text-gray-500 max-w-xs mx-auto">Start playing to track your stats and level up!</p>
+                <p className="text-gray-900 dark:text-white font-bold mb-2">No games played yet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Start playing to track your stats and level up!</p>
               </div>
             ) : (
               <div className="space-y-5">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                  <span className="text-gray-600 font-medium">Total Games</span>
-                  <span className="font-bold text-gray-900 text-lg">{stats.gamesPlayed}</span>
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Total Games</span>
+                  <span className="font-bold text-gray-900 dark:text-white text-lg">{stats.gamesPlayed}</span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                  <span className="text-gray-600 font-medium">Total Score</span>
-                  <span className="font-bold text-gray-900 text-lg">{stats.totalXP.toLocaleString()} pts</span>
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Total Score</span>
+                  <span className="font-bold text-gray-900 dark:text-white text-lg">{stats.totalXP.toLocaleString()} pts</span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                  <span className="text-gray-600 font-medium">Best Streak</span>
-                  <span className="font-bold text-orange-600 text-lg">🔥 {stats.currentStreak} days</span>
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Best Streak</span>
+                  <span className="font-bold text-orange-600 dark:text-orange-400 text-lg">🔥 {stats.currentStreak} days</span>
                 </div>
               </div>
             )}
 
-            <button className="w-full mt-8 px-6 py-4 bg-gray-100 text-gray-900 font-bold rounded-2xl hover:bg-gray-200 transition-colors">
+            <button className="w-full mt-8 px-6 py-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
               View Detailed Stats
             </button>
           </div>
 
           {/* Recent Achievements */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-8">
             <div className="flex items-center gap-3 mb-8">
-               <div className="p-2 bg-yellow-100 text-yellow-600 rounded-xl">
+               <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-xl">
                    <div className="text-xl">🏆</div>
                </div>
-               <h2 className="text-xl font-bold text-gray-900">Achievements</h2>
+               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Achievements</h2>
             </div>
 
             <div className="space-y-4">
@@ -440,14 +455,14 @@ export default function GameCenterPage() {
                   key={achievement.id}
                   className={`flex items-start gap-4 p-4 rounded-2xl border transition-all ${
                     achievement.unlocked
-                      ? 'bg-amber-50/50 border-amber-200/60'
-                      : 'bg-gray-50 border-transparent opacity-60 grayscale-[0.5]'
+                      ? 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/60 dark:border-amber-500/20'
+                      : 'bg-gray-50 dark:bg-gray-800/50 border-transparent opacity-60 grayscale-[0.5]'
                   }`}
                 >
-                  <div className="text-3xl bg-white p-2 rounded-xl shadow-sm">{achievement.icon}</div>
+                  <div className="text-3xl bg-white dark:bg-[#1f2937] p-2 rounded-xl shadow-sm">{achievement.icon}</div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 text-sm mb-1">{achievement.title}</h4>
-                    <p className="text-xs text-gray-500 font-medium leading-relaxed">{achievement.description}</p>
+                    <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{achievement.title}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{achievement.description}</p>
                     
                     {achievement.progress !== undefined && achievement.total && !achievement.unlocked && (
                       <div className="mt-3">
@@ -455,7 +470,7 @@ export default function GameCenterPage() {
                           <span>{achievement.progress}/{achievement.total}</span>
                           <span>{Math.round((achievement.progress / achievement.total) * 100)}%</span>
                         </div>
-                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-linear-to-r from-amber-400 to-orange-400 rounded-full"
                             style={{ width: `${(achievement.progress / achievement.total) * 100}%` }}
@@ -465,7 +480,7 @@ export default function GameCenterPage() {
                     )}
                   </div>
                   {achievement.unlocked && (
-                    <div className="text-green-500 bg-green-100 rounded-full p-1">
+                    <div className="text-green-500 bg-green-100 dark:bg-green-900/20 rounded-full p-1">
                         <ArrowLeft className="rotate-180 w-3 h-3" strokeWidth={4} />
                     </div>
                   )}
@@ -473,7 +488,7 @@ export default function GameCenterPage() {
               ))}
             </div>
 
-            <button className="w-full mt-8 px-6 py-4 bg-gray-100 text-gray-900 font-bold rounded-2xl hover:bg-gray-200 transition-colors">
+            <button className="w-full mt-8 px-6 py-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
               View All Achievements
             </button>
           </div>

@@ -5,6 +5,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { FloatingVoiceButton } from "@/components/floating-voice-button";
 import { ThemeProvider } from "./providers/theme-provider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "ReMember Me - Keep Track of People Who Matter",
@@ -45,6 +46,7 @@ export default function RootLayout({
                 <FloatingVoiceButton />
               </div>
             </div>
+            <Toaster position="bottom-center" />
           </ThemeProvider>
         </SessionProvider>
       </body>

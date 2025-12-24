@@ -77,12 +77,29 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     const isEditing = editingCard === field;
     const isEmpty = !value || value.trim() === '';
 
+    const colors = {
+      whereWeMet: 'indigo',
+      whyStayInContact: 'rose',
+      whatsImportant: 'amber'
+    };
+    const c = colors[field as keyof typeof colors];
+
+    const cardStyles = {
+      whereWeMet: 'bg-white dark:bg-[#1f2937]/60 border-indigo-100 dark:border-indigo-500/20 hover:border-indigo-200 dark:hover:border-indigo-500/40',
+      whyStayInContact: 'bg-white dark:bg-[#1f2937]/60 border-rose-100 dark:border-rose-500/20 hover:border-rose-200 dark:hover:border-rose-500/40',
+      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-amber-100 dark:border-amber-500/20 hover:border-amber-200 dark:hover:border-amber-500/40'
+    };
+
+    const activeStyle = cardStyles[field as keyof typeof cardStyles];
+
     return (
-      <div className="group relative flex flex-col h-full bg-white dark:bg-[#252931] border border-[#f3f4f6] rounded-[0.875rem] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow p-6">
+      <div className={`group relative flex flex-col h-full ${activeStyle} border rounded-[0.875rem] shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {icon}
-            <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#9ca3af]">{title}</span>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${field === 'whereWeMet' ? 'bg-indigo-50 dark:bg-indigo-500/10' : field === 'whyStayInContact' ? 'bg-rose-50 dark:bg-rose-500/10' : 'bg-amber-50 dark:bg-amber-500/10'}`}>
+              {icon}
+            </div>
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{title}</span>
           </div>
           {!isEditing && (
             <Button
@@ -128,12 +145,12 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
             </div>
           ) : (
             <div
-              className={`text-[15px] leading-relaxed cursor-pointer pb-1 ${isEmpty ? 'text-gray-400 dark:text-gray-500 italic py-4 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg flex items-center justify-center gap-2 hover:border-indigo-200 dark:hover:border-indigo-200' : 'text-gray-900 dark:text-gray-100'}`}
+              className={`text-[15px] leading-relaxed cursor-pointer pb-1 ${isEmpty ? 'text-gray-400 dark:text-gray-500 italic py-4 border-2 border-dashed border-gray-200 dark:border-gray-700/50 rounded-lg flex items-center justify-center gap-2 hover:border-indigo-300 dark:hover:border-indigo-400/50' : 'text-gray-900 dark:text-gray-100'}`}
               onClick={() => handleEdit(field, value)}
             >
               {isEmpty ? (
                 <>
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <span className="text-sm not-italic">{placeholder}</span>
                 </>
               ) : (
@@ -150,21 +167,21 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {renderCard(
         'Where We Met',
-        <MapPin className="w-4 h-4 text-gray-400 group-hover:text-indigo-400 transition-colors" />, 
+        <MapPin className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />, 
         'whereWeMet',
         localStory.whereWeMet,
         'Add where you met'
       )}
       {renderCard(
         'Why Stay in Contact',
-        <Heart className="w-4 h-4 text-gray-400 group-hover:text-rose-400 transition-colors" />, 
+        <Heart className="w-4 h-4 text-rose-500 dark:text-rose-400" />, 
         'whyStayInContact',
         localStory.whyStayInContact,
         'Add why this matters'
       )}
       {renderCard(
         'What Matters to Them',
-        <Star className="w-4 h-4 text-gray-400 group-hover:text-amber-400 transition-colors" />, 
+        <Star className="w-4 h-4 text-amber-500 dark:text-amber-400" />, 
         'whatsImportant',
         localStory.whatsImportant,
         "Add what's important"

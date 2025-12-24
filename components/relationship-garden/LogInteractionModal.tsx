@@ -11,17 +11,20 @@ interface LogInteractionModalProps {
     id: string;
     name: string;
     initials: string;
+    importance?: 'high' | 'medium' | 'low';
   };
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  onUpdateImportance?: (newImportance: 'high' | 'medium' | 'low') => Promise<void>;
 }
 
 export default function LogInteractionModal({ 
   contact, 
   isOpen, 
   onClose,
-  onSuccess 
+  onSuccess,
+  onUpdateImportance
 }: LogInteractionModalProps) {
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
   const [note, setNote] = useState('');
@@ -40,8 +43,19 @@ export default function LogInteractionModal({
         note: note.trim() || undefined,
       });
 
+const SUCCESS_SEEDS = [
+  "Relationship successfully watered! 🌱",
+  "You just planted a seed of connection. ✨",
+  "Relationship Nourished! Moved to the inner circle. 🌸",
+  "Intentionality pays off. Your garden is growing. 🌿",
+  "Connection refreshed. That large leaf is blooming again! 🍃"
+];
+
+// ... inside handleSubmit ...
+
       if (result.success) {
-        toast.success(`Logged interaction with ${contact.name}!`);
+        const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
+        toast.success(randomMessage, { icon: '🌱', duration: 4000 });
         setNote('');
         onSuccess?.();
         onClose();
@@ -72,12 +86,26 @@ export default function LogInteractionModal({
               {contact.initials}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                 Log Connection
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                with {contact.name}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  with {contact.name}
+                </p>
+                {onUpdateImportance && (
+                  <select
+                    value={contact.importance || 'medium'}
+                    onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
+                    className="ml-2 text-xs py-0.5 px-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <option value="high">⭐ High</option>
+                    <option value="medium">🔹 Medium</option>
+                    <option value="low">▫️ Casual</option>
+                  </select>
+                )}
+              </div>
             </div>
           </div>
           <button

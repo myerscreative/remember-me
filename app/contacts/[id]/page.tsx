@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Sparkles, Check, Repeat } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Check, Repeat } from "lucide-react";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
@@ -19,8 +19,10 @@ import { Input } from "@/components/ui/input";
 import { ProfileSidebar } from "./components/ProfileSidebar";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { OverviewTab } from "./components/tabs/OverviewTab";
-import { StoryTab } from "./components/tabs/StoryTab";
-import { FamilyTab } from "./components/tabs/FamilyTab";
+import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
+import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
+import { InterestsTab } from "@/app/contacts/[id]/components/tabs/InterestsTab";
+import { ContactImportance } from "@/types/database.types";
 
 const tabs = ["Overview", "Details", "Story", "Family", "Interests"];
 
@@ -86,6 +88,7 @@ export default function ContactDetailPage({
             aiSummary: person.ai_summary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
+            importance: person.contact_importance,
         };
 
         setContact(fullContact);
@@ -143,9 +146,28 @@ export default function ContactDetailPage({
     }
   };
 
+  // Handle importance change
+  const handleImportanceChange = async (importance: ContactImportance) => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await (supabase as any).from("persons").update({
+        contact_importance: importance
+      }).eq("id", id).eq("user_id", user.id);
+
+      setContact({ ...contact, importance });
+      toast.success(`Priority set to ${importance}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update priority");
+    }
+  };
+
 
   if (loading) {
-     return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#1a1d24]"><div className="animate-pulse text-gray-400">Loading profile...</div></div>;
+     return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Loading profile...</div></div>;
   }
 
   if (error || !contact) {
@@ -158,12 +180,16 @@ export default function ContactDetailPage({
   }
 
   return (
-    <div className="flex min-h-screen bg-white dark:bg-[#1a1d24]">
+    <div className="flex min-h-screen bg-background">
       <Toaster position="top-center" />
       
       {/* DESKTOP SIDEBAR (Hidden on Mobile) */}
-      <div className="hidden md:block">
-        <ProfileSidebar contact={contact} onFrequencyChange={handleFrequencyChange} />
+      <div className="hidden md:block border-r border-border/50">
+        <ProfileSidebar 
+            contact={contact} 
+            onFrequencyChange={handleFrequencyChange}
+            onImportanceChange={handleImportanceChange}
+        />
       </div>
 
       {/* MAIN CONTENT AREA */}
@@ -253,7 +279,7 @@ export default function ContactDetailPage({
          <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6">
 
             {/* TAB NAVIGATION */}
-            <div className="flex items-center gap-8 border-b border-gray-100 dark:border-[#3a3f4b] mb-8 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-8 border-b border-border/50 mb-8 overflow-x-auto scrollbar-hide">
                 {tabs.map((tab) => (
                     <button
                         key={tab}
@@ -261,13 +287,13 @@ export default function ContactDetailPage({
                         className={cn(
                             "pb-3 text-[15px] font-medium transition-all relative whitespace-nowrap",
                             activeTab === tab 
-                                ? "text-indigo-600 dark:text-indigo-400" 
-                                : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                ? "text-primary dark:text-primary" 
+                                : "text-muted-foreground hover:text-foreground"
                         )}
                     >
                         {tab}
                         {activeTab === tab && (
-                            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-indigo-500 rounded-t-full shadow-[0_-2px_6px_rgba(99,102,241,0.2)]" />
+                            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-t-full shadow-[0_-2px_6px_rgba(99,102,241,0.2)]" />
                         )}
                     </button>
                 ))}
@@ -281,16 +307,16 @@ export default function ContactDetailPage({
                 
                 {activeTab === "Details" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                        <div className="bg-gray-50 dark:bg-[#252931] rounded-2xl p-6">
-                            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Contact Info</h3>
+                        <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm">
+                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Contact Info</h3>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <Phone className="w-4 h-4 text-gray-400" />
-                                    <span className="text-gray-900 dark:text-white">{contact.phone || "No phone"}</span>
+                                    <Phone className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-foreground">{contact.phone || "No phone"}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Mail className="w-4 h-4 text-gray-400" />
-                                    <span className="text-gray-900 dark:text-white">{contact.email || "No email"}</span>
+                                    <Mail className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-foreground">{contact.email || "No email"}</span>
                                 </div>
                             </div>
                         </div>
@@ -306,10 +332,7 @@ export default function ContactDetailPage({
                 )}
                 
                 {activeTab === "Interests" && (
-                     <div className="text-center py-20 bg-gray-50 dark:bg-[#252931] rounded-2xl border border-dashed border-gray-200 dark:border-[#3a3f4b]">
-                        <Sparkles className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-                         <p className="text-gray-400">Interests details coming soon.</p>
-                     </div>
+                    <InterestsTab contactId={id} />
                 )}
             </div>
 

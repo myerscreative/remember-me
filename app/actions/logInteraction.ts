@@ -23,14 +23,16 @@ export async function logInteraction({ personId, type, note }: LogInteractionInp
 
   try {
     // Insert interaction record and update person's last_interaction_date in parallel
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [interactionResult, updateResult] = await Promise.all([
-      supabase.from('interactions').insert({
+      (supabase as any).from('interactions').insert({
         person_id: personId,
         user_id: user.id,
         type,
-        note: note || null,
+        // Map 'note' input to 'notes' column to match standard schema
+        notes: note || null,
       }),
-      supabase.from('persons').update({
+      (supabase as any).from('persons').update({
         last_interaction_date: now,
         last_contact: now.split('T')[0], // Also update last_contact for backwards compatibility
       }).eq('id', personId),

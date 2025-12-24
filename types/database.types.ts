@@ -331,6 +331,95 @@ export interface Database {
           updated_at?: string
         }
       }
+      contact_facts: {
+        Row: {
+          id: string
+          contact_id: string
+          category: 'career' | 'family' | 'interest' | 'goal' | 'general'
+          content: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          contact_id: string
+          category?: 'career' | 'family' | 'interest' | 'goal' | 'general'
+          content: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          contact_id?: string
+          category?: 'career' | 'family' | 'interest' | 'goal' | 'general'
+          content?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      inter_contact_relationships: {
+        Row: {
+          id: string
+          user_id: string
+          contact_id_a: string
+          contact_id_b: string
+          relationship_type: 'parent' | 'child' | 'spouse' | 'partner' | 'sibling' | 'friend' | 'colleague' | 'other'
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          contact_id_a: string
+          contact_id_b: string
+          relationship_type: 'parent' | 'child' | 'spouse' | 'partner' | 'sibling' | 'friend' | 'colleague' | 'other'
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          contact_id_a?: string
+          contact_id_b?: string
+          relationship_type?: 'parent' | 'child' | 'spouse' | 'partner' | 'sibling' | 'friend' | 'colleague' | 'other'
+          notes?: string | null
+          created_at?: string
+        }
+      }
+      interests: {
+        Row: {
+          id: string
+          name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          created_at?: string
+        }
+      }
+      person_interests: {
+        Row: {
+          person_id: string
+          interest_id: string
+          created_at: string
+        }
+        Insert: {
+          person_id: string
+          interest_id: string
+          created_at?: string
+        }
+        Update: {
+          person_id?: string
+          interest_id?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       persons_with_tags: {
@@ -431,3 +520,53 @@ export type UserStats = Database['public']['Tables']['user_stats']['Row']
 export type UserStatsInsert = Database['public']['Tables']['user_stats']['Insert']
 export type UserStatsUpdate = Database['public']['Tables']['user_stats']['Update']
 
+// Inter-contact relationship types (new family/connections feature)
+export type ContactImportance = 'high' | 'medium' | 'low';
+export type RelationshipRole = 'parent' | 'child' | 'spouse' | 'partner' | 'sibling' | 'friend' | 'colleague' | 'other';
+
+export interface InterContactRelationship {
+  id: string;
+  user_id: string;
+  contact_id_a: string;
+  contact_id_b: string;
+  relationship_type: RelationshipRole;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InterContactRelationshipInsert {
+  id?: string;
+  user_id: string;
+  contact_id_a: string;
+  contact_id_b: string;
+  relationship_type: RelationshipRole;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface InterContactRelationshipUpdate {
+  id?: string;
+  user_id?: string;
+  contact_id_a?: string;
+  contact_id_b?: string;
+  relationship_type?: RelationshipRole;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Linked contact with health data (for Family tab display)
+export interface LinkedContact {
+  id: string;
+  name: string;
+  first_name: string;
+  last_name: string | null;
+  photo_url: string | null;
+  relationship_id: string;
+  relationship_type: RelationshipRole;
+  is_inverse: boolean; // true if current contact is contact_id_b
+  last_interaction_date: string | null;
+  target_frequency_days: number | null;
+}

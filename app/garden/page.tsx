@@ -8,27 +8,42 @@ import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
 import GardenStats from '@/components/relationship-garden/GardenStats';
+import NurtureSidebar from '@/components/relationship-garden/NurtureSidebar';
+import GardenLegend from '@/components/relationship-garden/GardenLegend';
 import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
 import toast from 'react-hot-toast';
 
 // Health status types
-type HealthStatus = 'all' | 'healthy' | 'good' | 'warning' | 'dying';
+type HealthStatus = 'all' | 'blooming' | 'nourished' | 'thirsty' | 'fading';
 
 // Health colors and config
 const healthConfig = {
-  healthy: { color: '#10b981', label: 'Healthy', range: '0-7 days', bgClass: 'bg-emerald-500' },
-  good: { color: '#84cc16', label: 'Good', range: '8-21 days', bgClass: 'bg-lime-500' },
-  warning: { color: '#fbbf24', label: 'Warning', range: '22-45 days', bgClass: 'bg-amber-400' },
-  dying: { color: '#f97316', label: 'Needs Love', range: '45+ days', bgClass: 'bg-orange-500' },
+  blooming: { color: '#22c55e', label: 'Blooming', range: '0-7 days', bgClass: 'bg-emerald-500' },
+  nourished: { color: '#84cc16', label: 'Nourished', range: '8-21 days', bgClass: 'bg-lime-500' },
+  thirsty: { color: '#eab308', label: 'Thirsty', range: '22-45 days', bgClass: 'bg-yellow-500' },
+  fading: { color: '#f97316', label: 'Fading', range: '45+ days', bgClass: 'bg-orange-500' },
 };
 
 // Get health status from days
-function getHealthStatus(days: number): 'healthy' | 'good' | 'warning' | 'dying' {
-  if (days <= 7) return 'healthy';
-  if (days <= 21) return 'good';
-  if (days <= 45) return 'warning';
-  return 'dying';
+function getHealthStatus(days: number): 'blooming' | 'nourished' | 'thirsty' | 'fading' {
+  if (days <= 7) return 'blooming';
+  if (days <= 21) return 'nourished';
+  if (days <= 45) return 'thirsty';
+  return 'fading';
 }
+
+// Success Seeds Messages
+const SUCCESS_SEEDS = [
+  "Relationship successfully watered! 🌱",
+  "You just planted a seed of connection. ✨",
+  "Relationship Nourished! Moved to the inner circle. 🌸",
+  "Intentionality pays off. Your garden is growing. 🌿",
+  "Connection refreshed. That large leaf is blooming again! 🍃"
+];
+
+// ... (mapTagsToCategory, calculateDaysSinceContact, getInitials remain same) ...
+
+
 
 // Map tag names to garden categories
 function mapTagsToCategory(tagNames: string[]): FilterType {
@@ -87,6 +102,7 @@ export default function GardenPage() {
   
   // Modal state for logging interactions
   const [selectedContactForModal, setSelectedContactForModal] = useState<ExtendedContact | null>(null);
+  const [hoveredContactId, setHoveredContactId] = useState<string | null>(null);
 
   // Fetch contacts from Supabase
   useEffect(() => {
@@ -107,7 +123,7 @@ export default function GardenPage() {
       // Fetch persons
       const { data: persons, error: fetchError } = await (supabase as any)
         .from('persons')
-        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at')
+        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance')
         .eq('user_id', user.id)
         .eq('archived', false)
         .order('name');
@@ -146,6 +162,7 @@ export default function GardenPage() {
           name: person.name || `${person.first_name} ${person.last_name || ''}`.trim(),
           initials: getInitials(person.first_name, person.last_name, person.name),
           days: calculateDaysSinceContact(person.last_contact, person.last_interaction_date),
+          importance: person.importance || 'medium',
           category: mapTagsToCategory(tagNames),
         };
       });
@@ -159,8 +176,32 @@ export default function GardenPage() {
     }
   }
 
+  // Set importance
+  async function setImportance(contact: ExtendedContact, newImportance: 'high' | 'medium' | 'low') {
+    setUpdatingId(contact.dbId);
+    try {
+      const supabase = createClient();
+      const { error } = await (supabase as any)
+        .from('persons')
+        .update({ importance: newImportance })
+        .eq('id', contact.dbId);
+
+      if (error) throw error;
+      
+      setContacts(prev => prev.map(c => 
+        c.dbId === contact.dbId ? { ...c, importance: newImportance } : c
+      ));
+      toast.success('Updated importance');
+    } catch (err) {
+      console.error('Error updating importance:', err);
+      toast.error('Failed to update importance');
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   // Set health status by calculating a date that puts them in that ring
-  async function setHealthStatus(contact: ExtendedContact, targetStatus: 'healthy' | 'good' | 'warning' | 'dying') {
+  async function setHealthStatus(contact: ExtendedContact, targetStatus: 'blooming' | 'nourished' | 'thirsty' | 'fading') {
     setUpdatingId(contact.dbId);
     try {
       const supabase = createClient();
@@ -175,19 +216,19 @@ export default function GardenPage() {
       let targetDays: number;
       
       switch (targetStatus) {
-        case 'healthy':
+        case 'blooming':
           targetDays = 0;
           targetDate = now;
           break;
-        case 'good':
+        case 'nourished':
           targetDays = 14;
           targetDate = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));
           break;
-        case 'warning':
+        case 'thirsty':
           targetDays = 30;
           targetDate = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
           break;
-        case 'dying':
+        case 'fading':
           targetDays = 60;
           targetDate = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
           break;
@@ -223,7 +264,7 @@ export default function GardenPage() {
       filtered = filtered.filter(c => c.category === categoryFilter);
     }
 
-    const s = { healthy: 0, good: 0, warning: 0, dying: 0 };
+    const s = { blooming: 0, nourished: 0, thirsty: 0, fading: 0 };
     filtered.forEach(c => {
       const status = getHealthStatus(c.days);
       s[status]++;
@@ -290,20 +331,20 @@ export default function GardenPage() {
   // Empty state
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 font-sans">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors">
+        <div className="max-w-[1400px] mx-auto px-4 py-8">
           <div className="mb-8">
-            <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-800 mb-4 transition-colors">
+            <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-4 transition-colors">
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">🍃 Relationship Garden</h1>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">🍃 Relationship Garden</h1>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-12 text-center transition-colors">
             <p className="text-6xl mb-4">🌱</p>
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Your garden is empty</h2>
-            <p className="text-slate-500 mb-6">Add some contacts to see them bloom in your garden!</p>
+            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Your garden is empty</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">Add some contacts to see them bloom in your garden!</p>
             <Link 
               href="/contacts/new" 
               className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -316,28 +357,66 @@ export default function GardenPage() {
     );
   }
 
+  // Quick Log handler
+  const handleQuickLog = async (contact: { id: string | number, name: string }) => {
+    // Optimistic update
+    const extendedContact = contacts.find(c => c.id === contact.id);
+    if (!extendedContact) return;
+
+    setContacts(prev => prev.map(c => 
+      c.id === contact.id ? { ...c, days: 0 } : c
+    ));
+
+    // Server update
+    try {
+      const { logInteraction } = await import('@/app/actions/logInteraction');
+      const result = await logInteraction({
+        personId: extendedContact.dbId,
+        type: 'text', // Quick Log assumes a quick check-in/text
+        note: '⚡ Quick Log'
+      });
+      if (result.success) {
+        const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
+        toast.success(randomMessage, { icon: '🌱', duration: 4000 });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to log interaction");
+      loadContacts(); // Reload to be safe
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors">
+      <div className="max-w-[1400px] mx-auto px-4 py-8">
         
         {/* Header */}
         <div className="mb-6">
-          <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-800 mb-4 transition-colors">
+          <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">🍃 Relationship Garden</h1>
-              <p className="text-slate-500">Click a health status to see contacts in that group</p>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">🍃 Relationship Garden</h1>
+              <p className="text-slate-500 dark:text-slate-400">Click a health status to see contacts in that group</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/triage"
+                className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
+                title="Rapidly prioritize contacts"
+              >
+                🚨 Triage
+              </Link>
               <button
                 onClick={() => setViewMode('garden')}
                 className={`p-2 rounded-lg border transition-colors ${
                   viewMode === 'garden' 
-                    ? 'bg-slate-900 text-white border-slate-900' 
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 title="Garden View"
               >
@@ -347,8 +426,8 @@ export default function GardenPage() {
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg border transition-colors ${
                   viewMode === 'list' 
-                    ? 'bg-slate-900 text-white border-slate-900' 
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 title="List View"
               >
@@ -359,14 +438,14 @@ export default function GardenPage() {
         </div>
 
         {/* Health Status Bar (clickable filters) */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 mb-4">
+        <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setHealthFilter('all')}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 healthFilter === 'all'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-slate-900 dark:bg-slate-700 text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               All ({contacts.length})
@@ -381,7 +460,7 @@ export default function GardenPage() {
                   onClick={() => setHealthFilter(status)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                     healthFilter === status
-                      ? 'ring-2 ring-offset-2 ring-slate-900'
+                      ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-500 dark:ring-offset-[#1e293b]'
                       : 'hover:opacity-80'
                   }`}
                   style={{ 
@@ -408,61 +487,90 @@ export default function GardenPage() {
         />
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 pb-10">
+        <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 pb-10 transition-colors">
           
-          {/* Garden View */}
-          {viewMode === 'garden' && healthFilter === 'all' && (
-            <RelationshipGarden 
-              contacts={filteredContacts} 
-              filter={categoryFilter} 
-              onContactClick={(contact) => {
-                // Find the extended contact with dbId to pass to modal
-                const extendedContact = contacts.find(c => c.id === contact.id);
-                if (extendedContact) {
-                  setSelectedContactForModal(extendedContact);
-                }
-              }}
-            />
+            {viewMode === 'garden' && healthFilter === 'all' && (
+              <div className="flex flex-col lg:flex-row gap-6 items-start max-w-[1280px] mx-auto justify-center">
+              <div className="flex-1 w-full min-w-0">
+                <RelationshipGarden 
+                  contacts={filteredContacts} 
+                  filter={categoryFilter} 
+                  onContactClick={(contact) => {
+                    const extendedContact = contacts.find(c => c.id === contact.id);
+                    if (extendedContact) {
+                      setSelectedContactForModal(extendedContact);
+                    }
+                  }}
+                  onQuickLog={handleQuickLog}
+                  hoveredContactId={hoveredContactId}
+                />
+              </div>
+              
+              <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0 h-full">
+                <NurtureSidebar 
+                  contacts={contacts} 
+                  onQuickLog={handleQuickLog} 
+                  onHover={setHoveredContactId}
+                />
+                <GardenLegend />
+              </div>
+            </div>
           )}
 
           {/* List View or Filtered Health View */}
           {(viewMode === 'list' || healthFilter !== 'all') && (
             <div className="space-y-3">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-slate-800">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
                   {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
                   <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
                 </h3>
               </div>
               
               {filteredContacts.length === 0 ? (
-                <div className="text-center py-12 text-slate-500">
+                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                   No contacts in this category
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredContacts.map(contact => {
                     const status = getHealthStatus(contact.days);
                     const config = healthConfig[status];
                     return (
-                      <div key={contact.dbId} className="py-4 flex items-center justify-between">
+                      <div 
+                        key={contact.dbId} 
+                        onClick={() => window.location.href = `/contacts/${contact.dbId}`}
+                        className="group py-4 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/40 transition-colors flex items-center justify-between cursor-pointer"
+                      >
                         <div className="flex items-center gap-4">
                           {/* Status indicator */}
                           <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                            className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                             style={{ backgroundColor: config.color }}
                           >
                             {contact.initials}
                           </div>
                           
                           <div>
-                            <Link 
-                              href={`/contacts/${contact.dbId}`}
-                              className="font-medium text-slate-800 hover:text-blue-600"
-                            >
-                              {contact.name}
-                            </Link>
-                            <div className="text-sm text-slate-500 flex items-center gap-2">
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                {contact.name}
+                              </span>
+                              
+                              {/* Connect Now Button */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const extendedContact = contacts.find(c => c.id === contact.id);
+                                  if (extendedContact) setSelectedContactForModal(extendedContact);
+                                }}
+                                className="hidden group-hover:inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                              >
+                                Connect Now
+                              </button>
+                            </div>
+                            
+                            <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
                               <span>{contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`}</span>
                               <span>•</span>
                               <span className="capitalize">{contact.category}</span>
@@ -470,26 +578,41 @@ export default function GardenPage() {
                           </div>
                         </div>
                         
-                        {/* Health Status Selector */}
-                        <div className="flex items-center gap-2">
-                          {updatingId === contact.dbId ? (
-                            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                          ) : (
-                            <select
-                              value={status}
-                              onChange={(e) => setHealthStatus(contact, e.target.value as 'healthy' | 'good' | 'warning' | 'dying')}
-                              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium bg-white cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              style={{ 
-                                color: config.color,
-                                borderColor: config.color + '40'
-                              }}
-                            >
-                              <option value="healthy" style={{ color: '#10b981' }}>🟢 Healthy</option>
-                              <option value="good" style={{ color: '#84cc16' }}>🟡 Good</option>
-                              <option value="warning" style={{ color: '#fbbf24' }}>🟠 Warning</option>
-                              <option value="dying" style={{ color: '#f97316' }}>🔴 Needs Love</option>
-                            </select>
-                          )}
+                        {/* Controls */}
+                        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                          {/* Importance Selector */}
+                          <select
+                            value={contact.importance || 'medium'}
+                            onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
+                            disabled={updatingId === contact.dbId}
+                            className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-600 dark:text-slate-300"
+                          >
+                            <option value="high">⭐ High</option>
+                            <option value="medium">🔹 Medium</option>
+                            <option value="low">▫️ Casual</option>
+                          </select>
+
+                          {/* Health Status Selector */}
+                          <div className="flex items-center gap-2">
+                            {updatingId === contact.dbId ? (
+                              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                            ) : (
+                              <select
+                                value={status}
+                                onChange={(e) => setHealthStatus(contact, e.target.value as 'blooming' | 'nourished' | 'thirsty' | 'fading')}
+                                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                style={{ 
+                                  color: config.color,
+                                  borderColor: config.color + '40'
+                                }}
+                              >
+                                <option value="blooming" style={{ color: '#22c55e' }}>🟢 Blooming</option>
+                                <option value="nourished" style={{ color: '#84cc16' }}>🟡 Nourished</option>
+                                <option value="thirsty" style={{ color: '#eab308' }}>🟠 Thirsty</option>
+                                <option value="fading" style={{ color: '#f97316' }}>🔴 Fading</option>
+                              </select>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -504,25 +627,10 @@ export default function GardenPage() {
             <GardenStats stats={stats} />
           )}
 
-          {/* Legend */}
-          <div className="mt-8 bg-slate-50 rounded-xl p-6 border border-slate-100">
-            <div className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">
-              📍 Position = Relationship Health
-            </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-3">
-              {[
-                { label: 'Inner Circle: 0-7 days (Healthy)', color: '#10b981' },
-                { label: 'Ring 2: 8-21 days (Good)', color: '#84cc16' },
-                { label: 'Ring 3: 22-45 days (Warning)', color: '#fbbf24' },
-                { label: 'Outer Ring: 45+ days (Needs Love)', color: '#f97316' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-2 text-sm text-slate-600">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Vertical spacing for bottom of list view */}
+          {viewMode === 'list' && (
+            <div className="h-4"></div>
+          )}
         </div>
       </div>
 
@@ -533,9 +641,11 @@ export default function GardenPage() {
             id: selectedContactForModal.dbId,
             name: selectedContactForModal.name,
             initials: selectedContactForModal.initials,
+            importance: selectedContactForModal.importance,
           }}
           isOpen={!!selectedContactForModal}
           onClose={() => setSelectedContactForModal(null)}
+          onUpdateImportance={(newImp) => setImportance(selectedContactForModal, newImp)}
           onSuccess={() => {
             // Reload contacts to update positions
             loadContacts();
