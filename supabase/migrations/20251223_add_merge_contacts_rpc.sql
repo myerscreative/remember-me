@@ -19,12 +19,8 @@ BEGIN
     SET person_id = keeper_id 
     WHERE person_id = duplicate_id;
 
-    -- 2. Move Meetings
-    -- Check if table exists (dynamic SQL not needed if we assume schema is consistent, but safe to wrap)
-    -- Assuming meetings exists as per schema exploration
-    UPDATE meetings 
-    SET contact_id = keeper_id 
-    WHERE contact_id = duplicate_id;
+    -- 2. Move Meetings - REMOVED (Table does not exist, covered by interactions)
+    -- UPDATE meetings SET contact_id = keeper_id WHERE contact_id = duplicate_id;
 
     -- 3. Move Contact Facts
     UPDATE contact_facts 

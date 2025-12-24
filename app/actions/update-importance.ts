@@ -9,7 +9,7 @@ export async function updatePersonImportance(personId: string, importance: 'high
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from('persons')
-    .update({ contact_importance: importance })
+    .update({ importance: importance })
     .eq('id', personId)
 
   if (error) {

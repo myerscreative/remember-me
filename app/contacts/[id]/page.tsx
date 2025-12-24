@@ -88,7 +88,7 @@ export default function ContactDetailPage({
             aiSummary: person.ai_summary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
-            importance: person.contact_importance,
+            importance: person.importance,
         };
 
         setContact(fullContact);
@@ -154,7 +154,7 @@ export default function ContactDetailPage({
       if (!user) return;
 
       await (supabase as any).from("persons").update({
-        contact_importance: importance
+        importance
       }).eq("id", id).eq("user_id", user.id);
 
       setContact({ ...contact, importance });
