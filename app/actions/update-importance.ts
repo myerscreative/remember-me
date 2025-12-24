@@ -6,9 +6,10 @@ import { revalidatePath } from 'next/cache'
 export async function updatePersonImportance(personId: string, importance: 'high' | 'medium' | 'low') {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
     .from('persons')
-    .update({ importance })
+    .update({ contact_importance: importance })
     .eq('id', personId)
 
   if (error) {
