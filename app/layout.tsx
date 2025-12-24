@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
-import { FloatingVoiceButton } from "@/components/floating-voice-button";
+import { FABWrapper } from "@/components/FABWrapper";
 import { ThemeProvider } from "./providers/theme-provider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { Toaster } from "react-hot-toast";
@@ -26,8 +26,6 @@ export const viewport: Viewport = {
   userScalable: false,
   colorScheme: "dark light",
 };
-
-import { QuickAddNoteFAB } from "@/components/QuickAddNoteFAB";
 
 export default function RootLayout({
   children,
@@ -67,8 +65,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <BottomNav />
-                <FloatingVoiceButton />
-                <QuickAddNoteFAB />
+                <FABWrapper />
               </div>
             </div>
             <Toaster position="bottom-center" />

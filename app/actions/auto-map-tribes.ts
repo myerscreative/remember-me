@@ -36,7 +36,7 @@ export async function autoMapTribes() {
 
     // 2. Ensure tribal tags exist
     for (const rule of TRIBE_RULES) {
-      const { data: tag, error: tagError } = await supabase
+      const { data: tag, error: tagError } = await (supabase as any)
         .from('tags')
         .select('id')
         .eq('name', rule.tribe)
@@ -44,7 +44,7 @@ export async function autoMapTribes() {
 
       let tagId;
       if (!tag) {
-        const { data: newTag, error: createError } = await supabase
+        const { data: newTag, error: createError } = await (supabase as any)
           .from('tags')
           .insert({ name: rule.tribe })
           .select('id')
@@ -62,7 +62,7 @@ export async function autoMapTribes() {
 
         if (matches) {
           // Check if already tagged
-          const { data: existing } = await supabase
+          const { data: existing } = await (supabase as any)
             .from('person_tags')
             .select('*')
             .eq('person_id', contact.id)
@@ -70,7 +70,7 @@ export async function autoMapTribes() {
             .maybeSingle();
 
           if (!existing) {
-            await supabase
+            await (supabase as any)
               .from('person_tags')
               .insert({ person_id: contact.id, tag_id: tagId });
             updatedCount++;
