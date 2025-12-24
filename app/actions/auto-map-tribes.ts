@@ -56,7 +56,7 @@ export async function autoMapTribes() {
       }
 
       // 3. Scan contacts and map
-      for (const contact of contacts) {
+      for (const contact of contacts as any[]) {
         const searchStr = `${contact.notes || ''} ${contact.relationship_summary || ''} ${contact.what_found_interesting || ''}`.toLowerCase();
         const matches = rule.keywords.some(kw => searchStr.includes(kw.toLowerCase()));
 
