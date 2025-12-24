@@ -60,6 +60,9 @@ export interface Database {
           has_context: boolean
           imported: boolean
           important_dates: Json | null
+          // Career fields
+          company: string | null
+          job_title: string | null
           created_at: string
           updated_at: string
         }
@@ -103,6 +106,9 @@ export interface Database {
           story_completeness?: number
           imported?: boolean
           important_dates?: Json | null
+          // Career fields
+          company?: string | null
+          job_title?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -153,6 +159,9 @@ export interface Database {
           has_context?: boolean
           imported?: boolean
           important_dates?: Json | null
+          // Career fields
+          company?: string | null
+          job_title?: string | null
           created_at?: string
           updated_at?: string
         }
