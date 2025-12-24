@@ -1,17 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-
-// ... (imports)
-
-// ... (component code)
-
-        <DialogHeader>
-          <DialogTitle>Edit Contact Info</DialogTitle>
-          <DialogDescription>
-            Make changes to your contact&apos;s profile here. Click save when you&apos;re done.
-          </DialogDescription>
-        </DialogHeader>
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,29 +8,25 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { formatPhoneNumber } from "@/lib/utils";
 
 interface EditContactModalProps {
   isOpen: boolean;
   onClose: () => void;
-  contact: any; // Using any for now to match the flexible structure of the page
+  contact: any;
   onSuccess: () => void;
 }
 
 export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditContactModalProps) {
-  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Form State
+
+  // Form State - only fields that exist in the database
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     linkedin: "",
-    company: "",
-    jobTitle: "",
   });
 
   // Load initial data when contact changes or modal opens
@@ -53,58 +38,39 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
         email: contact.email || "",
         phone: contact.phone || "",
         linkedin: contact.linkedin || "",
-        company: contact.company || "",
-        jobTitle: contact.job_title || contact.jobTitle || "",
       });
     }
   }, [contact, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.firstName.trim()) {
       toast.error("First name is required");
       return;
     }
 
     setIsSaving(true);
-    
-    // Define fullName first so it's available for updates
-    const fullName = formData.lastName.trim() 
+
+    const fullName = formData.lastName.trim()
       ? `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim()
       : formData.firstName.trim();
 
-    // Construct payload with only compatible fields
-    // We intentionally exclude 'id' and 'user_id' from updates
-    const allowedColumns = [
-      'first_name', 'last_name', 'name', 'email', 'phone', 
-      'linkedin', 'company', 'job_title'
-    ];
-
-    const rawUpdates: Record<string, any> = {
+    // Only include fields that exist in the persons table
+    const updates = {
       first_name: formData.firstName.trim(),
       last_name: formData.lastName.trim() || null,
       name: fullName,
       email: formData.email.trim() || null,
       phone: formData.phone.trim() || null,
       linkedin: formData.linkedin.trim() || null,
-      company: formData.company.trim() || null,
-      job_title: formData.jobTitle.trim() || null,
     };
-
-    // Filter to only allowed columns and non-undefined values
-    const updates = Object.fromEntries(
-      Object.entries(rawUpdates)
-        .filter(([key, value]) => allowedColumns.includes(key) && value !== undefined)
-    );
-
-    // Log the payload to debug PGRST204
-    console.log("Submitting updates to persons table:", updates);
 
     try {
       const supabase = createClient();
-      
-      const { error } = await supabase
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from("persons")
         .update(updates)
         .eq("id", contact.id);
@@ -112,11 +78,10 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       if (error) throw error;
 
       toast.success("Contact updated successfully");
-      onSuccess(); // Triggers refresh
+      onSuccess();
       onClose();
     } catch (error) {
-      console.error("Error updating contact:", JSON.stringify(error, null, 2));
-      console.error("Updates payload:", updates);
+      console.error("Error updating contact:", error);
       toast.error("Failed to update contact");
     } finally {
       setIsSaving(false);
@@ -182,27 +147,6 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
               placeholder="linkedin.com/in/username"
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
-              <Input
-                id="company"
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                placeholder="Company Name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="jobTitle">Job Title</Label>
-              <Input
-                id="jobTitle"
-                value={formData.jobTitle}
-                onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                placeholder="Job Title"
-              />
-            </div>
           </div>
 
           <DialogFooter>
