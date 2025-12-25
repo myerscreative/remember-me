@@ -8,6 +8,7 @@ export interface ImportedContact {
   phone: string | null;
   birthday: string | null;
   notes: string | null;
+  photo: string | null; // Base64 encoded photo data
   imported: boolean;
   has_context: boolean;
 }
@@ -32,6 +33,7 @@ export function parseVCF(vcfContent: string): ImportedContact[] {
     let phone = '';
     let birthday = '';
     let notes = '';
+    let photo = '';
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
@@ -81,6 +83,11 @@ export function parseVCF(vcfContent: string): ImportedContact[] {
         notes = extractValue(line);
         notes = notes.replace(/\\n/g, '\n').replace(/\\,/g, ',');
       }
+
+      // Parse PHOTO (base64 encoded)
+      else if (/^PHOTO[:;]/i.test(line)) {
+        photo = extractPhotoData(line);
+      }
     }
 
     // Use full name if structured name not available
@@ -105,6 +112,7 @@ export function parseVCF(vcfContent: string): ImportedContact[] {
       phone: phone || null,
       birthday: birthday || null,
       notes: notes || null,
+      photo: photo || null,
       imported: true,
       has_context: false,
     });
@@ -173,6 +181,7 @@ export function parseCSV(csvContent: string): ImportedContact[] {
       phone: phone ? normalizePhone(phone) : null,
       birthday: birthday ? normalizeBirthday(birthday) : null,
       notes: notes || null,
+      photo: null, // CSV doesn't support photos
       imported: true,
       has_context: false,
     });
@@ -291,6 +300,38 @@ function extractValue(line: string): string {
   if (colonIndex === -1) return '';
 
   return line.substring(colonIndex + 1).trim();
+}
+
+/**
+ * Extract photo data from vCard PHOTO line
+ * Handles formats: PHOTO;ENCODING=BASE64:data or PHOTO;VALUE=URI:data
+ */
+function extractPhotoData(line: string): string {
+  const colonIndex = line.indexOf(':');
+  if (colonIndex === -1) return '';
+
+  const data = line.substring(colonIndex + 1).trim();
+  
+  // If it looks like a data URI, return as-is
+  if (data.startsWith('data:')) {
+    return data;
+  }
+  
+  // If it's raw base64 data, detect the image type from the header
+  if (data.length > 0) {
+    // JPEG starts with /9j, PNG with iVBOR, GIF with R0lGO
+    if (data.startsWith('/9j')) {
+      return `data:image/jpeg;base64,${data}`;
+    } else if (data.startsWith('iVBOR')) {
+      return `data:image/png;base64,${data}`;
+    } else if (data.startsWith('R0lGO')) {
+      return `data:image/gif;base64,${data}`;
+    }
+    // Default to JPEG
+    return `data:image/jpeg;base64,${data}`;
+  }
+  
+  return '';
 }
 
 /**

@@ -13,6 +13,8 @@ import {
   CheckSquare,
   Square,
   Search,
+  Image,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,11 +27,14 @@ import {
   batchContacts,
   type ImportedContact,
 } from "@/lib/contacts/importUtils";
+import { syncAvatarsFromVCF } from "@/lib/contacts/avatarSyncUtils";
 
-type ImportStage = 'idle' | 'parsing' | 'importing' | 'complete' | 'error';
+type ImportStage = 'idle' | 'parsing' | 'importing' | 'syncing' | 'complete' | 'error';
+type ImportMode = 'full' | 'avatars';
 
 export default function ImportContactsPage() {
   const [stage, setStage] = useState<ImportStage>('idle');
+  const [importMode, setImportMode] = useState<ImportMode>('full');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [parsedContacts, setParsedContacts] = useState<ImportedContact[]>([]);
   const [selectedContactIds, setSelectedContactIds] = useState<Set<number>>(new Set());
@@ -37,6 +42,8 @@ export default function ImportContactsPage() {
   const [totalContacts, setTotalContacts] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
+  const [avatarsUpdated, setAvatarsUpdated] = useState(0);
+  const [avatarsSkipped, setAvatarsSkipped] = useState(0);
   const [currentContact, setCurrentContact] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -241,8 +248,47 @@ export default function ImportContactsPage() {
     }
   };
 
+  // Handle avatar-only sync (Safe Re-import)
+  const handleAvatarSync = async () => {
+    if (parsedContacts.length === 0) return;
+
+    setStage('syncing');
+    setImportMode('avatars');
+    setErrorMessage('');
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      setCurrentContact('Processing avatars...');
+
+      const result = await syncAvatarsFromVCF(parsedContacts, user.id);
+
+      setAvatarsUpdated(result.updated);
+      setAvatarsSkipped(result.skipped);
+
+      if (result.errors.length > 0) {
+        setErrorMessage(result.errors.join(', '));
+      }
+
+      setStage('complete');
+
+    } catch (error) {
+      console.error('Avatar sync error:', error);
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Failed to sync avatars'
+      );
+      setStage('error');
+    }
+  };
+
   const handleReset = () => {
     setStage('idle');
+    setImportMode('full');
     setSelectedFile(null);
     setParsedContacts([]);
     setSelectedContactIds(new Set());
@@ -250,6 +296,8 @@ export default function ImportContactsPage() {
     setTotalContacts(0);
     setImportedCount(0);
     setFailedCount(0);
+    setAvatarsUpdated(0);
+    setAvatarsSkipped(0);
     setCurrentContact('');
     setErrorMessage('');
     if (fileInputRef.current) {
@@ -511,23 +559,35 @@ export default function ImportContactsPage() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                     <p className="text-xs text-blue-800 dark:text-blue-200">
-                      Selected contacts will be imported. Duplicates removed, invalid entries filtered.
+                      <strong>Full Import:</strong> Creates new contacts. <strong>Sync Avatars:</strong> Updates only photos for existing contacts (preserves Story, Interests, Tags).
                     </p>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={handleReset} className="flex-1">
-                    Cancel
-                  </Button>
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={handleReset} className="flex-1">
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleStartImport}
+                      disabled={selectedContactIds.size === 0}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
+                    >
+                      <Download className="mr-2 h-5 w-5" />
+                      Import {selectedContactIds.size} Contact{selectedContactIds.size !== 1 ? 's' : ''}
+                    </Button>
+                  </div>
+                  
+                  {/* Avatar Sync Button */}
                   <Button
-                    onClick={handleStartImport}
-                    disabled={selectedContactIds.size === 0}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
+                    onClick={handleAvatarSync}
+                    variant="outline"
+                    className="w-full border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20"
                   >
-                    <Download className="mr-2 h-5 w-5" />
-                    Import {selectedContactIds.size} Contact{selectedContactIds.size !== 1 ? 's' : ''}
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Sync Avatars Only (Safe Re-import)
                   </Button>
                 </div>
               </div>
@@ -548,17 +608,41 @@ export default function ImportContactsPage() {
 
               {/* Actions after completion */}
               {stage === 'complete' && (
-                <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <Button variant="outline" onClick={handleReset} className="flex-1">
-                    Import More
-                  </Button>
-                  <Button
-                    onClick={handleViewContacts}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700"
-                  >
-                    <Users className="mr-2 h-5 w-5" />
-                    View Contacts
-                  </Button>
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                  {/* Avatar sync success message */}
+                  {importMode === 'avatars' && (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Image className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-green-800 dark:text-green-200">
+                            Success! Updated avatars for {avatarsUpdated} contact{avatarsUpdated !== 1 ? 's' : ''}.
+                          </p>
+                          <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                            All existing Story notes, Interests, and Tags were preserved.
+                          </p>
+                          {avatarsSkipped > 0 && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                              {avatarsSkipped} contact{avatarsSkipped !== 1 ? 's' : ''} skipped (no match or already has photo)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={handleReset} className="flex-1">
+                      Import More
+                    </Button>
+                    <Button
+                      onClick={handleViewContacts}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700"
+                    >
+                      <Users className="mr-2 h-5 w-5" />
+                      View Contacts
+                    </Button>
+                  </div>
                 </div>
               )}
 

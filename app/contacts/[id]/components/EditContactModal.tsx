@@ -30,6 +30,8 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
     company: "",
     jobTitle: "",
     birthday: "",
+    lastContactDate: "",
+    lastContactMethod: "",
   });
 
   // Load initial data when contact changes or modal opens
@@ -44,6 +46,8 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
         company: contact.company || "",
         jobTitle: contact.job_title || contact.jobTitle || "",
         birthday: contact.birthday || "",
+        lastContactDate: contact.last_interaction_date?.split('T')[0] || contact.last_contact_date?.split('T')[0] || "",
+        lastContactMethod: contact.last_contact_method || "",
       });
     }
   }, [contact, isOpen]);
@@ -63,7 +67,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       : formData.firstName.trim();
 
     // Only include fields that exist in the persons table
-    const updates = {
+    const updates: Record<string, string | null> = {
       first_name: formData.firstName.trim(),
       last_name: formData.lastName.trim() || null,
       name: fullName,
@@ -73,6 +77,8 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       company: formData.company.trim() || null,
       job_title: formData.jobTitle.trim() || null,
       birthday: formData.birthday || null,
+      last_interaction_date: formData.lastContactDate || null,
+      last_contact_method: formData.lastContactMethod || null,
     };
 
     try {
@@ -187,6 +193,37 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                value={formData.birthday}
                onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
              />
+          </div>
+
+          {/* Last Contact Section */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Last Contact (for backfilling)</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="lastContactDate">Date</Label>
+                <Input
+                  id="lastContactDate"
+                  type="date"
+                  value={formData.lastContactDate}
+                  onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastContactMethod">Method</Label>
+                <select
+                  id="lastContactMethod"
+                  value={formData.lastContactMethod}
+                  onChange={(e) => setFormData({ ...formData, lastContactMethod: e.target.value })}
+                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">Select method...</option>
+                  <option value="call">Call</option>
+                  <option value="email">Email</option>
+                  <option value="text">Text</option>
+                  <option value="meeting">Meeting</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <DialogFooter>

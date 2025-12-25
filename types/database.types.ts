@@ -54,6 +54,7 @@ export interface Database {
           // Phase 1: New relationship tracking fields
           relationship_summary: string | null
           last_interaction_date: string | null
+          last_contact_method: string | null
           interaction_count: number
           importance: 'high' | 'medium' | 'low' | null
           archive_status: boolean

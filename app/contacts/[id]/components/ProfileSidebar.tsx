@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat, Info } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat, Info, Edit2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
@@ -23,15 +24,18 @@ interface ProfileSidebarProps {
     jobTitle?: string;
     birthday?: string;
     last_contact_date?: string;
+    last_contact_method?: string;
     next_contact_date?: string;
     target_frequency_days?: number;
     importance?: ContactImportance;
   };
   onFrequencyChange?: (days: number) => void;
   onImportanceChange?: (importance: ContactImportance) => void;
+  onContactAction?: (method: 'call' | 'email' | 'text') => void;
+  onLastContactChange?: (date: string, method: string) => void;
 }
 
-export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange }: ProfileSidebarProps) {
+export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange, onContactAction, onLastContactChange }: ProfileSidebarProps) {
   const initials = ((contact.firstName?.[0] || "") + (contact.lastName?.[0] || "")).toUpperCase();
   const fullName = `${contact.firstName} ${contact.lastName || ""}`.trim();
 
@@ -39,6 +43,21 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  // Helper to format contact method
+  const formatMethod = (method?: string) => {
+    if (!method) return null;
+    const methods: Record<string, string> = { call: 'Call', email: 'Email', text: 'Text', meeting: 'Meeting' };
+    return methods[method.toLowerCase()] || method;
+  };
+
+  // Build last contact display string
+  const lastContactDisplay = () => {
+    const date = formatDate(contact.last_contact_date);
+    const method = formatMethod(contact.last_contact_method);
+    if (!date) return 'Never';
+    return method ? `${date} via ${method}` : date;
   };
 
   return (
@@ -125,17 +144,24 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
             </a>
           </div>
         )}
-        <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-            <Clock className="w-4 h-4 text-gray-400 shrink-0" />
-            <span>Last seen: {formatDate(contact.last_contact_date) || "Never"}</span>
-        </div>
+        <LastContactEditor 
+          currentDate={contact.last_contact_date}
+          currentMethod={contact.last_contact_method}
+          displayText={lastContactDisplay()}
+          onSave={(date, method) => onLastContactChange?.(date, method)}
+        />
       </div>
 
       {/* 5. Primary Actions */}
       <div className="space-y-3">
         <Button 
           className="w-full bg-[#6366f1] hover:bg-[#5558dd] text-white shadow-sm h-auto py-3.5 text-sm font-medium rounded-xl transition-all hover:-translate-y-0.5 border-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-          onClick={() => contact.phone && window.open(`tel:${contact.phone}`)}
+          onClick={() => {
+            if (contact.phone) {
+              window.open(`tel:${contact.phone}`);
+              onContactAction?.('call');
+            }
+          }}
           disabled={!contact.phone}
         >
           <Phone className="w-4 h-4 mr-2" />
@@ -145,7 +171,12 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
             <Button 
               variant="outline" 
               className="w-full bg-[#f9fafb] dark:bg-[#2c3039] border-[#e5e7eb] dark:border-[#3a3f4b] text-[#4b5563] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#343942] h-auto py-3.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => contact.email && window.open(`mailto:${contact.email}`)}
+              onClick={() => {
+                if (contact.email) {
+                  window.open(`mailto:${contact.email}`);
+                  onContactAction?.('email');
+                }
+              }}
               disabled={!contact.email}
             >
                 <Mail className="w-4 h-4 mr-2" /> Email
@@ -153,7 +184,12 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
             <Button 
               variant="outline" 
               className="w-full bg-[#f9fafb] dark:bg-[#2c3039] border-[#e5e7eb] dark:border-[#3a3f4b] text-[#4b5563] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#343942] h-auto py-3.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => contact.phone && window.open(`sms:${contact.phone}`)}
+              onClick={() => {
+                if (contact.phone) {
+                  window.open(`sms:${contact.phone}`);
+                  onContactAction?.('text');
+                }
+              }}
               disabled={!contact.phone}
             >
                 <MessageSquare className="w-4 h-4 mr-2" /> Text
@@ -238,5 +274,73 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange 
       </div>
 
     </aside>
+  );
+}
+
+// Inline Last Contact Editor Component
+function LastContactEditor({ 
+  currentDate, 
+  currentMethod, 
+  displayText,
+  onSave 
+}: { 
+  currentDate?: string;
+  currentMethod?: string;
+  displayText: string;
+  onSave?: (date: string, method: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [date, setDate] = useState(currentDate?.split('T')[0] || '');
+  const [method, setMethod] = useState(currentMethod || '');
+
+  const handleSave = () => {
+    onSave?.(date, method);
+    setIsOpen(false);
+  };
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group">
+          <Clock className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 shrink-0 transition-colors" />
+          <span>Last contact: {displayText}</span>
+          <Edit2 className="w-3 h-3 opacity-0 group-hover:opacity-100 text-indigo-500 transition-opacity" />
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-[#334155] shadow-xl rounded-xl z-[9999]">
+        <h4 className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Log Contact</h4>
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Method</label>
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">Select method...</option>
+              <option value="call">Call</option>
+              <option value="email">Email</option>
+              <option value="text">Text</option>
+              <option value="meeting">Meeting</option>
+            </select>
+          </div>
+          <Button 
+            onClick={handleSave}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg"
+          >
+            Save
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
