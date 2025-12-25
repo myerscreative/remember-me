@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Leaf from '@/components/relationship-garden/Leaf';
+import Seed, { getRelationshipLevel } from '@/components/relationship-garden/Seed';
 
 // Constants for Fibonacci positioning
 const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
@@ -20,6 +20,13 @@ interface ContactData {
   lastContact?: string | null;
   tags?: string[];
   importance?: 'high' | 'medium' | 'low';
+}
+
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  contact: { name: string; days: number } | null;
 }
 
 // Transform dashboard contacts to garden format
@@ -58,6 +65,8 @@ function getColorForDays(days: number): string {
 
 export default function GardenLeafWidget({ contacts = [], className = '' }: GardenLeafWidgetProps) {
   const transformedContacts = useMemo(() => transformContacts(contacts), [contacts]);
+  const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, contact: null });
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   
   // Calculate stats
   const stats = useMemo(() => {
@@ -71,7 +80,7 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
     
     transformedContacts.forEach(c => {
       if (c.days <= 14) s.healthy++;
-      else if (c.days <= 45) s.warning++; // "Good" in garden but mapping to widget slots
+      else if (c.days <= 45) s.warning++;
       else if (c.days <= 120) s.dying++;
       else s.dormant++;
     });
@@ -85,78 +94,98 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
 
   const needingAttention = stats.dying + stats.dormant;
 
-  // Mini-garden positioning logic
-  const leafPositions = useMemo(() => {
-    // Increase limit to 250 for the widget to handle larger networks
+  // Seed positioning logic with dynamic sizing
+  const seedPositions = useMemo(() => {
     const displayContacts = [...transformedContacts]
       .sort((a, b) => a.days - b.days)
-      .slice(0, 250);
+      .slice(0, 300); // Higher limit for seeds since they're smaller
 
     const count = displayContacts.length;
     
-    // Dynamic scaling factors
-    // Base scale reduces as count increases to avoid overcrowding
-    const baseScaleFactor = Math.max(0.12, 0.35 * Math.pow(20 / Math.max(20, count), 0.5));
+    // Dynamic seed size based on contact count
+    const seedSize = count > 100 ? 4 : count > 50 ? 5 : 6;
     
-    // Spiral density - adjust the 'c' constant in Vogel's algorithm
-    // We want it to stay compact even with many items
-    const spiralConstant = Math.max(3.2, 5.5 * Math.pow(20 / Math.max(20, count), 0.2));
+    // Spiral packing - tighter constant for small dots
+    const spiralConstant = Math.max(2.5, 4.0 * Math.pow(30 / Math.max(30, count), 0.3));
 
     return displayContacts.map((contact, i) => {
-      // Vogel's spiral algorithm: r = c * sqrt(i), theta = i * golden_angle
       const radius = spiralConstant * Math.sqrt(i + 1); 
       const angle = i * GOLDEN_ANGLE;
       
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
       
-      // Rotation: leaf points outward
-      const rotation = (Math.atan2(y, x) * 180 / Math.PI); 
       const color = getColorForDays(contact.days);
-      
-      // Scale based on importance and total count
-      let scale = baseScaleFactor;
-      if (contact.importance === 'high') scale *= 1.3;
-      else if (contact.importance === 'low') scale *= 0.85;
 
-      return { contact, x, y, rotation, color, scale };
+      return { contact, x, y, color, seedSize };
     });
   }, [transformedContacts]);
 
+  const handleMouseEnter = (e: React.MouseEvent, contact: { name: string; days: number }) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8,
+      contact
+    });
+    setHoveredId(contact.name);
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip({ visible: false, x: 0, y: 0, contact: null });
+    setHoveredId(null);
+  };
+
   return (
-    <Link 
-      href="/garden"
-      className={`block bg-linear-to-br from-emerald-50/50 to-teal-100/30 dark:from-emerald-950/20 dark:to-teal-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01] overflow-hidden ${className}`}
-    >
-      <div className="p-5">
+    <div className={`block bg-linear-to-br from-emerald-50/50 to-teal-100/30 dark:from-[#0B1120] dark:to-[#0F172A] rounded-2xl border border-emerald-100 dark:border-emerald-800/30 shadow-sm overflow-hidden ${className}`}>
+      <Link href="/garden" className="block p-5 hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🍃</span>
+            <span className="text-xl">🌱</span>
             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Relationship Garden</h3>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
         
-        {/* Mini Garden Visualization */}
-        <div className="relative h-48 mb-4 flex items-center justify-center bg-white/40 dark:bg-black/20 rounded-xl overflow-hidden">
+        {/* Mini Garden Visualization - Seeds */}
+        <div className="relative h-48 mb-4 flex items-center justify-center bg-[#0B1120] rounded-xl overflow-hidden">
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {leafPositions.map(({ contact, x, y, rotation, color, scale }) => (
+            {seedPositions.map(({ contact, x, y, color, seedSize }) => (
               <motion.div
                 key={contact.id}
                 initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1, x, y, rotate: rotation }}
-                transition={{ delay: 0.01 * leafPositions.indexOf({ contact, x, y, rotation, color, scale }) }}
+                animate={{ opacity: 1, scale: 1, x, y }}
+                transition={{ delay: 0.005 * seedPositions.indexOf({ contact, x, y, color, seedSize }) }}
                 className="absolute"
+                style={{ marginLeft: -seedSize / 2, marginTop: -seedSize / 2 }}
               >
-                <Leaf 
+                <Seed 
                   color={color} 
-                  scale={scale} 
-                  initials={leafPositions.length < 15 ? contact.initials : undefined}
+                  size={seedSize}
+                  isHighlighted={hoveredId === contact.name}
+                  onMouseEnter={(e) => handleMouseEnter(e, contact)}
+                  onMouseLeave={handleMouseLeave}
                 />
               </motion.div>
             ))}
           </div>
+
+          {/* Micro-tooltip */}
+          {tooltip.visible && tooltip.contact && (
+            <div 
+              className="fixed z-50 bg-slate-900/95 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none whitespace-nowrap"
+              style={{ 
+                left: tooltip.x, 
+                top: tooltip.y,
+                transform: 'translate(-50%, -100%)'
+              }}
+            >
+              <div className="font-medium">{tooltip.contact.name}</div>
+              <div className="text-[10px] opacity-75">{getRelationshipLevel(tooltip.contact.days)}</div>
+            </div>
+          )}
         </div>
         
         {/* Health Score & Stats */}
@@ -184,8 +213,8 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
             </div>
           )}
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 

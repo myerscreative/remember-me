@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Leaf from './Leaf';
+import Seed, { getRelationshipLevel } from './Seed';
 import { FilterType } from './CategoryFilters';
 
 // GOLDEN ANGLE - Nature's perfect packing angle (137.5°)
@@ -15,7 +15,7 @@ export interface Contact {
   days: number;
   category: FilterType;
   lastContactDate?: string;
-  targetFrequencyDays?: number;  // For cadence-based health
+  targetFrequencyDays?: number;
   importance?: 'high' | 'medium' | 'low';
 }
 
@@ -81,10 +81,8 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Load default zoom - now handled in useState initializer
-
   // Zoom handlers
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 120));
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 150));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(defaultZoom);
   
@@ -192,8 +190,16 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       : contacts.filter(c => c.category === filter);
   }, [contacts, filter]);
 
-  // Calculate Ring-Based positions
-  const leafPositions = useMemo(() => {
+  // Calculate seed size based on total contact count
+  const seedSize = useMemo(() => {
+    const count = filteredContacts.length;
+    if (count > 200) return 4;
+    if (count > 100) return 5;
+    return 6;
+  }, [filteredContacts.length]);
+
+  // Calculate Ring-Based positions for seeds
+  const seedPositions = useMemo(() => {
     // 1. Bucket contacts by health status
     const buckets = {
       healthy: [] as Contact[],
@@ -217,83 +223,47 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       maxRadius: number, 
       startAngleOffset: number
     ) => {
-      // Deterministic pseudo-random jitter helper
-      const getJitter = (id: string | number) => {
-        const str = id.toString();
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-          hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        // Map hash to range [-5, 5]
-        return (hash % 11) - 5;
-      };
-
       const count = items.length;
       return items.map((contact, i) => {
-        // Pure spiral logic `r = c * sqrt(i)` is best for area filling.
-        // To fill a RING (annulus) from R_inner to R_outer:
-        // Area_inner = pi * R_inner^2
-        // Area_target = Area_inner + (Area_outer - Area_inner) * (i/N)
-        // R_target = sqrt(Area_target / pi)
-        
+        // Area-based spiral for even distribution across ring
         const areaInner = Math.PI * minRadius * minRadius;
         const areaOuter = Math.PI * maxRadius * maxRadius;
-        const areaTarget = areaInner + (areaOuter - areaInner) * (i + 1) / (count + 1); // +1 to avoid edge crowding
+        const areaTarget = areaInner + (areaOuter - areaInner) * (i + 1) / (count + 1);
         const radius = Math.sqrt(areaTarget / Math.PI);
         
         const angle = i * GOLDEN_ANGLE + startAngleOffset;
         
-        
-        // Base coordinates
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
-        
-        // Removed Position Jitter to restore Fibonacci pattern visibility
-        // const jitterX = getJitter(contact.id + 'x');
-        // const jitterY = getJitter(contact.id + 'y');
-        // x += jitterX;
-        // y += jitterY;
-
-        // Rotation: leaf points outward
-        const rotation = (Math.atan2(y, x) * 180 / Math.PI); 
 
         const color = getColorForDays(contact.days);
-        
-        // Scale based on importance
-        let scale = 1.3; // Default medium
-        if (contact.importance === 'high') scale = 1.8;
-        else if (contact.importance === 'low') scale = 0.9;
-        
-        // Add random slight rotation jitter (+- 15deg) for more natural look
-        // Uses same hash seed to be stable
-        const rotJitter = getJitter(contact.id + 'r') * 2; 
 
-        return { contact, x, y, rotation: rotation + rotJitter, color, scale };
+        return { contact, x, y, color };
       });
     };
 
-    // 3. Define Rings (radii in pixels) with dynamic sizing
-    // If Blooming ring is sparse (<10), pull it in tighter to 120px
+    // 3. Define Rings with tighter spacing for seeds
     const bloomingCount = buckets.healthy.length;
-    const r1Max = bloomingCount < 10 ? 120 : 180;
+    const r1Max = bloomingCount < 10 ? 80 : 120;
     
-    // Sort buckets by days so inner-most in each ring are the "healthiest" of that ring
+    // Sort buckets by days
     buckets.healthy.sort((a,b) => a.days - b.days);
     buckets.good.sort((a,b) => a.days - b.days);
     buckets.warning.sort((a,b) => a.days - b.days);
     buckets.needsLove.sort((a,b) => a.days - b.days);
 
-    const p1 = calculateRingPositions(buckets.healthy, 50, r1Max, 0);
-    const p2 = calculateRingPositions(buckets.good, r1Max + 1, 300, p1.length * GOLDEN_ANGLE);
-    const p3 = calculateRingPositions(buckets.warning, 301, 450, (p1.length + p2.length) * GOLDEN_ANGLE);
-    const p4 = calculateRingPositions(buckets.needsLove, 451, 700, (p1.length + p2.length + p3.length) * GOLDEN_ANGLE);
+    // Tighter ring spacing for seeds (was 180, 300, 450, 700 for leaves)
+    const p1 = calculateRingPositions(buckets.healthy, 30, r1Max, 0);
+    const p2 = calculateRingPositions(buckets.good, r1Max + 10, 200, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRingPositions(buckets.warning, 210, 350, (p1.length + p2.length) * GOLDEN_ANGLE);
+    const p4 = calculateRingPositions(buckets.needsLove, 360, 550, (p1.length + p2.length + p3.length) * GOLDEN_ANGLE);
 
     return [...p1, ...p2, ...p3, ...p4];
 
   }, [filteredContacts]);
 
   // Tooltip handlers
-  const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
+  const handleSeedEnter = (e: React.MouseEvent, contact: Contact) => {
     setTooltip({
       visible: true,
       x: e.clientX + 15,
@@ -302,7 +272,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     });
   };
 
-  const handleLeafMove = (e: React.MouseEvent) => {
+  const handleSeedMove = (e: React.MouseEvent) => {
     setTooltip(prev => ({
       ...prev,
       x: e.clientX + 15,
@@ -310,7 +280,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     }));
   };
 
-  const handleLeafLeave = () => {
+  const handleSeedLeave = () => {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
@@ -347,14 +317,14 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         <input
           type="range"
           min="50"
-          max="120"
+          max="150"
           step="10"
           value={zoom}
           onChange={(e) => setZoom(parseInt(e.target.value))}
           className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb:hover]:bg-slate-700 dark:[&::-webkit-slider-thumb:hover]:bg-indigo-400 [&::-webkit-slider-thumb:hover]:scale-110"
         />
         
-        <div className="text-sm font-semibold text-slate-900 min-w-[50px] text-right">
+        <div className="text-sm font-semibold text-slate-900 dark:text-white min-w-[50px] text-right">
           {zoom}%
         </div>
         
@@ -363,16 +333,16 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           className={`px-3 h-9 border rounded-lg text-xs font-semibold transition-all active:scale-95 ${
             saved 
               ? 'bg-green-500 text-white border-green-500' 
-              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300'
           }`}
         >
           {saved ? '✓ Saved!' : 'Set Default'}
         </button>
       </div>
 
-      {/* Garden Canvas */}
+      {/* Garden Canvas - Deep Navy Background */}
       <div 
-        className="relative w-full h-[90vh] bg-gradient-to-b from-white to-slate-50 dark:from-[#111827] dark:to-[#0f172a] rounded-xl overflow-hidden shadow-inner border border-slate-100 dark:border-gray-800" 
+        className="relative w-full h-[90vh] bg-[#0B1120] rounded-xl overflow-hidden shadow-inner border border-slate-800" 
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -381,14 +351,14 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         {/* Center label */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-600 text-sm font-semibold pointer-events-none select-none z-0">
           Most Recent
         </div>
 
         {/* Info Badge */}
-        <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-sm border border-slate-200 p-4 rounded-xl shadow-sm text-right z-10">
+        <div className="absolute top-5 right-5 bg-slate-900/90 backdrop-blur-sm border border-slate-700 p-4 rounded-xl shadow-sm text-right z-10">
           <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-1">Showing</div>
-          <div className="text-lg font-bold text-slate-800">
+          <div className="text-lg font-bold text-white">
             {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
           </div>
           <div className="text-xs text-slate-400 mt-1">
@@ -400,20 +370,19 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         <div 
           className="absolute inset-0 transition-transform duration-75"
           style={{ 
-            // Apply Zoom here on the container instead of recalculating positions
-            // This is much more performant and correct for "Zooming into a canvas"
             transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom / 100})`,
             transformOrigin: 'center',
           }}
         >
-          {/* Leaves Container (Centered) */}
+          {/* Seeds Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {/* Render Rings Guidelines (Optional, helpful for debugging/visual structure) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-green-500/10 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-lime-500/10 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-amber-500/10 pointer-events-none" />
+            {/* Ring Guidelines */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] rounded-full border border-green-500/10 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-lime-500/10 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-amber-500/10 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] rounded-full border border-orange-500/10 pointer-events-none" />
             
-            {leafPositions.map(({ contact, x, y, rotation, color, scale }) => {
+            {seedPositions.map(({ contact, x, y, color }) => {
               const isHovered = hoveredContactId === contact.id.toString();
               
               return (
@@ -424,28 +393,28 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                 animate={{
                   x,
                   y,
-                  rotate: rotation,
-                  scale: isHovered ? 1.1 : 1,
-                  filter: isHovered ? `drop-shadow(0 0 15px ${color})` : 'none',
+                  scale: isHovered ? 1.5 : 1,
                 }}
                 transition={{
                   type: "spring",
-                  stiffness: 70,
+                  stiffness: 100,
                   damping: 20,
-                  mass: 1
+                  mass: 0.5
                 }}
                 className="absolute"
                 style={{
+                  marginLeft: -seedSize / 2,
+                  marginTop: -seedSize / 2,
                   zIndex: isHovered ? 50 : 1,
                 }}
               >
-                <Leaf 
+                <Seed 
                   color={color} 
-                  initials={contact.initials}
-                  scale={isHovered ? scale * 1.3 : scale} 
-                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
-                  onMouseMove={handleLeafMove}
-                  onMouseLeave={handleLeafLeave}
+                  size={seedSize}
+                  isHighlighted={isHovered}
+                  onMouseEnter={(e) => handleSeedEnter(e, contact)}
+                  onMouseMove={handleSeedMove}
+                  onMouseLeave={handleSeedLeave}
                   onClick={() => onContactClick?.(contact)}
                 />
               </motion.div>
@@ -456,7 +425,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div 
-            className="fixed z-1000 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto"
+            className="fixed z-[1000] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-none"
             style={{ 
               left: tooltip.x, 
               top: tooltip.y,
@@ -467,9 +436,13 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
               <span>Last contact:</span>
               <span className="font-bold">{tooltip.contact.days === 999 ? 'Never' : `${tooltip.contact.days} days ago`}</span>
             </div>
-            <div className="flex justify-between text-xs opacity-90 mb-2">
+            <div className="flex justify-between text-xs opacity-90 mb-1">
               <span>Status:</span>
               <span className="font-bold">{getStatusLabel(tooltip.contact.days)}</span>
+            </div>
+            <div className="flex justify-between text-xs opacity-90 mb-2">
+              <span>Relationship Level:</span>
+              <span className="font-bold text-indigo-300">{getRelationshipLevel(tooltip.contact.days)}</span>
             </div>
             
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
@@ -479,12 +452,6 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
               {/* Quick Log for High Importance */}
               {tooltip.contact.importance === 'high' && onQuickLog && (
                 <button
-                  onClick={() => {
-                    // Prevent click from passing to leaf click
-                    // Use ref or just rely on parent handling if this was real DOM, but tooltip is pointer-events-none
-                    // WAit, tooltip is pointer-events-none, so I can't click the button!
-                    // I must enable pointer-events for the tooltip container.
-                  }}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm transition-colors pointer-events-auto"
                   onMouseDown={(e) => {
                      e.stopPropagation();
@@ -498,9 +465,6 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           </div>
         )}
       </div>
-
-
     </div>
   );
 }
-
