@@ -32,14 +32,17 @@ export async function getDailyBriefing(): Promise<{ data: DailyBriefing | null; 
     const oneHundredTwentyDaysAgo = new Date();
     oneHundredTwentyDaysAgo.setDate(oneHundredTwentyDaysAgo.getDate() - 120);
 
-    const { data: fadingContacts, error: fadingError } = await supabase
+    const fadingResult = await supabase
       .from('persons')
       .select('*')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false')
       .lt('last_interaction_date', oneHundredTwentyDaysAgo.toISOString())
-      .order('importance', { ascending: false }) // High > Medium > Low (note: Postgres sorts text differently, but importance is often mapped)
-      .limit(10); // Get a batch to sort further
+      .order('importance', { ascending: false })
+      .limit(10);
+    
+    const fadingContacts = fadingResult.data as Person[] | null;
+    const fadingError = fadingResult.error;
 
     if (fadingError) throw fadingError;
 

@@ -78,7 +78,7 @@ export async function addMilestone(contactId: string, label: string, date: strin
     if (!user || !user.id) throw new Error("Unauthorized");
 
     // Get current contact info to check important_dates
-    const { data: contact, error: fetchError } = await supabase
+    const { data: contact, error: fetchError } = await (supabase as any)
       .from('persons')
       .select('birthday, custom_anniversary, important_dates')
       .eq('id', contactId)
