@@ -27,9 +27,9 @@ import {
   batchContacts,
   type ImportedContact,
 } from "@/lib/contacts/importUtils";
-import { syncAvatarsFromVCF } from "@/lib/contacts/avatarSyncUtils";
+import { syncAvatarsFromVCF, previewAvatarSync, type AvatarSyncPreview } from "@/lib/contacts/avatarSyncUtils";
 
-type ImportStage = 'idle' | 'parsing' | 'importing' | 'syncing' | 'complete' | 'error';
+type ImportStage = 'idle' | 'parsing' | 'importing' | 'syncing' | 'preview' | 'complete' | 'error';
 type ImportMode = 'full' | 'avatars';
 
 export default function ImportContactsPage() {
@@ -46,6 +46,7 @@ export default function ImportContactsPage() {
   const [avatarsSkipped, setAvatarsSkipped] = useState(0);
   const [currentContact, setCurrentContact] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [dryRunPreview, setDryRunPreview] = useState<AvatarSyncPreview | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -286,6 +287,33 @@ export default function ImportContactsPage() {
     }
   };
 
+  // Handle Dry Run preview
+  const handleDryRun = async () => {
+    if (parsedContacts.length === 0) return;
+
+    setStage('preview');
+    setErrorMessage('');
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const preview = await previewAvatarSync(parsedContacts, user.id);
+      setDryRunPreview(preview);
+
+    } catch (error) {
+      console.error('Dry run error:', error);
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Failed to preview sync'
+      );
+      setStage('error');
+    }
+  };
+
   const handleReset = () => {
     setStage('idle');
     setImportMode('full');
@@ -300,6 +328,7 @@ export default function ImportContactsPage() {
     setAvatarsSkipped(0);
     setCurrentContact('');
     setErrorMessage('');
+    setDryRunPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -580,16 +609,97 @@ export default function ImportContactsPage() {
                     </Button>
                   </div>
                   
-                  {/* Avatar Sync Button */}
-                  <Button
-                    onClick={handleAvatarSync}
-                    variant="outline"
-                    className="w-full border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20"
-                  >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Sync Avatars Only (Safe Re-import)
-                  </Button>
+                  {/* Avatar Sync Buttons */}
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleDryRun}
+                      variant="outline"
+                      className="flex-1 border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                    >
+                      <Search className="mr-2 h-4 w-4" />
+                      Preview Dry Run
+                    </Button>
+                    <Button
+                      onClick={handleAvatarSync}
+                      variant="outline"
+                      className="flex-1 border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20"
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Sync Avatars
+                    </Button>
+                  </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Dry Run Preview Panel */}
+          {stage === 'preview' && dryRunPreview && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                🔍 Dry Run Preview
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Found {dryRunPreview.totalWithPhotos} contacts with photos. Here&apos;s what will happen:
+              </p>
+
+              <div className="space-y-4">
+                {/* Will Update */}
+                {dryRunPreview.willUpdate.length > 0 && (
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                    <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
+                      ✅ Will Update ({dryRunPreview.willUpdate.length})
+                    </h4>
+                    <ul className="text-sm text-green-700 dark:text-green-300 space-y-1 max-h-32 overflow-y-auto">
+                      {dryRunPreview.willUpdate.map((c, i) => (
+                        <li key={i}>{c.name} {c.email && `(${c.email})`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Will Skip */}
+                {dryRunPreview.willSkip.length > 0 && (
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+                    <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+                      ⏭️ Will Skip ({dryRunPreview.willSkip.length})
+                    </h4>
+                    <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 max-h-32 overflow-y-auto">
+                      {dryRunPreview.willSkip.map((c, i) => (
+                        <li key={i}>{c.name}: {c.reason}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* No Match */}
+                {dryRunPreview.noMatch.length > 0 && (
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      ❓ No Match ({dryRunPreview.noMatch.length})
+                    </h4>
+                    <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 max-h-32 overflow-y-auto">
+                      {dryRunPreview.noMatch.map((c, i) => (
+                        <li key={i}>{c.name} {c.email && `(${c.email})`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button variant="outline" onClick={handleReset} className="flex-1">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAvatarSync}
+                  disabled={dryRunPreview.willUpdate.length === 0}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Confirm Sync ({dryRunPreview.willUpdate.length})
+                </Button>
               </div>
             </div>
           )}

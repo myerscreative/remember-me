@@ -9,6 +9,13 @@ export interface AvatarSyncResult {
   errors: string[];
 }
 
+export interface AvatarSyncPreview {
+  willUpdate: { name: string; email: string | null }[];
+  willSkip: { name: string; reason: string }[];
+  noMatch: { name: string; email: string | null }[];
+  totalWithPhotos: number;
+}
+
 /**
  * Sync avatars from imported contacts without duplicating or overwriting data
  * Only updates photo_url for matching contacts
@@ -159,8 +166,82 @@ async function uploadAvatarToStorage(
       .getPublicUrl(data.path);
 
     return urlData.publicUrl;
-  } catch (err) {
-    console.error('Avatar upload failed:', err);
+  } catch {
+    console.error('Avatar upload failed');
     return null;
   }
+}
+
+/**
+ * Preview avatar sync without making changes (Dry Run)
+ */
+export async function previewAvatarSync(
+  contacts: ImportedContact[],
+  userId: string
+): Promise<AvatarSyncPreview> {
+  const supabase = createClient();
+  const preview: AvatarSyncPreview = {
+    willUpdate: [],
+    willSkip: [],
+    noMatch: [],
+    totalWithPhotos: 0,
+  };
+
+  // Filter to only contacts with photos
+  const contactsWithPhotos = contacts.filter(c => c.photo);
+  preview.totalWithPhotos = contactsWithPhotos.length;
+
+  if (contactsWithPhotos.length === 0) {
+    return preview;
+  }
+
+  // Get all existing contacts for this user
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existingContacts, error: fetchError } = await (supabase as any)
+    .from('persons')
+    .select('id, name, email, photo_url')
+    .eq('user_id', userId);
+
+  if (fetchError) {
+    return preview;
+  }
+
+  // Create lookup maps for matching
+  const emailMap = new Map<string, { id: string; name: string; email: string | null; photo_url: string | null }>();
+  const nameMap = new Map<string, { id: string; name: string; email: string | null; photo_url: string | null }>();
+
+  for (const contact of existingContacts || []) {
+    if (contact.email) {
+      emailMap.set(contact.email.toLowerCase(), contact);
+    }
+    if (contact.name) {
+      nameMap.set(contact.name.toLowerCase(), contact);
+    }
+  }
+
+  // Preview each contact
+  for (const contact of contactsWithPhotos) {
+    let matchedContact: { id: string; name: string; email: string | null; photo_url: string | null } | undefined;
+
+    if (contact.email) {
+      matchedContact = emailMap.get(contact.email.toLowerCase());
+    }
+
+    if (!matchedContact && contact.name) {
+      matchedContact = nameMap.get(contact.name.toLowerCase());
+    }
+
+    if (!matchedContact) {
+      preview.noMatch.push({ name: contact.name, email: contact.email });
+      continue;
+    }
+
+    if (matchedContact.photo_url) {
+      preview.willSkip.push({ name: matchedContact.name, reason: 'Already has photo' });
+    } else {
+      preview.willUpdate.push({ name: matchedContact.name, email: matchedContact.email });
+    }
+  }
+
+  return preview;
 }
