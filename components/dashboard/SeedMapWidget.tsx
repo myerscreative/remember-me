@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sprout } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Seed, { getRelationshipLevel } from '@/components/relationship-garden/Seed';
 
