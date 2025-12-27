@@ -1,10 +1,9 @@
+'use client';
 
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Check, X, ArrowRight, Merge, AlertTriangle } from 'lucide-react';
+import { Check, ArrowRight, Merge, AlertTriangle, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'react-hot-toast';
 import { type Database } from '@/types/database.types';
@@ -15,41 +14,40 @@ interface MergeWizardProps {
   isOpen: boolean;
   onClose: () => void;
   keeper: Person;
-  duplicate: Person;
+  duplicates: Person[]; // Now accepts ALL duplicates
   onSuccess: () => void;
 }
 
-export function MergeWizard({ isOpen, onClose, keeper, duplicate, onSuccess }: MergeWizardProps) {
+export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: MergeWizardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedDirection, setSelectedDirection] = useState<'forward' | 'backward'>('forward'); // forward = merge dup INTO keeper
+  const [selectedKeeperId, setSelectedKeeperId] = useState<string>(keeper.id);
 
-  // Which ID is the final "Master"?
-  // If forward: keeper is Master.
-  // If backward: duplicate is Master (swap roles).
-  const finalMaster = selectedDirection === 'forward' ? keeper : duplicate;
-  const finalVictim = selectedDirection === 'forward' ? duplicate : keeper;
-
-  // We only allow choosing who is the MASTER record. 
-  // The merge logic in PostgreSQL will non-destructively fill in blanks and append notes.
-  // It effectively PRESERVES the Master's core identity (name, etc) unless fields are missing.
-  // So "swap" is the primary way to choose "which name/job title do I want?" -> Choose the record that has it correct.
+  // All contacts in this group
+  const allContacts = [keeper, ...duplicates];
+  
+  // The selected keeper
+  const finalMaster = allContacts.find(c => c.id === selectedKeeperId) || keeper;
+  // All others will be merged into the master and deleted
+  const finalVictims = allContacts.filter(c => c.id !== selectedKeeperId);
 
   const handleMerge = async () => {
-    if (!confirm(`Are you sure you want to merge these contacts? matches will be combined and ${finalVictim.name} will be deleted.`)) return;
+    if (!confirm(`Are you sure you want to merge ${allContacts.length} contacts? All data will be combined into "${finalMaster.name}" and the other ${finalVictims.length} record(s) will be deleted.`)) return;
 
     setIsProcessing(true);
     const supabase = createClient();
 
     try {
-      // Logic: keeper_id is the one that STAYS. duplicate_id is the one that GOES.
-      const { error } = await (supabase as any).rpc('merge_contacts', {
-        keeper_id: finalMaster.id,
-        duplicate_id: finalVictim.id
-      });
+      // Merge each victim into the master, one at a time
+      for (const victim of finalVictims) {
+        const { error } = await (supabase as any).rpc('merge_contacts', {
+          keeper_id: finalMaster.id,
+          duplicate_id: victim.id
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
-      toast.success("Contacts merged successfully");
+      toast.success(`Successfully merged ${allContacts.length} contacts into "${finalMaster.name}"`);
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -66,61 +64,53 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicate, onSuccess }: M
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Merge className="w-5 h-5 text-indigo-600" />
-            Merge Contacts
+            Merge {allContacts.length} Contacts
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-6">
-          <div className="bg-amber-50 text-amber-800 p-4 rounded-lg mb-6 flex items-start gap-3 text-sm">
+          <div className="bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 p-4 rounded-lg mb-6 flex items-start gap-3 text-sm">
              <AlertTriangle className="w-5 h-5 shrink-0" />
              <p>
                Select the <strong>Primary Record</strong> you want to keep. 
-               The other record will be deleted, but its notes, interactions, and missing info will be moved to the Primary record first.
+               All other records will be merged into it - their notes, interactions, and any missing info will be copied first, then they will be deleted.
              </p>
           </div>
 
-          <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-stretch">
-            {/* Left Option (Keeper) */}
-            <div 
-              className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${selectedDirection === 'forward' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-200 hover:border-gray-300'}`}
-              onClick={() => setSelectedDirection('forward')}
-            >
-              <div className="flex justify-between items-start mb-4">
-                 <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${selectedDirection === 'forward' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                    {selectedDirection === 'forward' ? 'Primary (Keep)' : 'Duplicate (Merge From)'}
-                 </span>
-                 {selectedDirection === 'forward' && <Check className="w-5 h-5 text-indigo-600" />}
+          {/* All contacts grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {allContacts.map((contact) => (
+              <div 
+                key={contact.id}
+                onClick={() => setSelectedKeeperId(contact.id)}
+                className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                  selectedKeeperId === contact.id 
+                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30' 
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-3">
+                   <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
+                     selectedKeeperId === contact.id 
+                       ? 'bg-indigo-600 text-white' 
+                       : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                   }`}>
+                      {selectedKeeperId === contact.id ? 'PRIMARY (Keep)' : 'Will Merge'}
+                   </span>
+                   {selectedKeeperId === contact.id && <Check className="w-5 h-5 text-indigo-600" />}
+                </div>
+                <ContactCard contact={contact} />
               </div>
-              <ContactCard contact={keeper} />
-            </div>
+            ))}
+          </div>
 
-            {/* Center / Action */}
-            <div className="flex flex-col items-center justify-center text-gray-400">
-               {selectedDirection === 'forward' ? (
-                 <div className="flex flex-col items-center gap-2">
-                   <span className="text-xs font-medium text-indigo-600">Merging Into</span>
-                   <ArrowRight className="w-8 h-8 text-indigo-600" />
-                 </div>
-               ) : (
-                 <div className="flex flex-col items-center gap-2">
-                   <ArrowRight className="w-8 h-8 text-indigo-600 rotate-180" />
-                   <span className="text-xs font-medium text-indigo-600">Merging Into</span>
-                 </div>
-               )}
+          {/* Summary */}
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Merging <strong className="text-gray-900 dark:text-white">{finalVictims.length}</strong> contact(s) into
             </div>
-
-            {/* Right Option (Duplicate) */}
-            <div 
-              className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${selectedDirection === 'backward' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-200 hover:border-gray-300'}`}
-              onClick={() => setSelectedDirection('backward')}
-            >
-              <div className="flex justify-between items-start mb-4">
-                 <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${selectedDirection === 'backward' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                    {selectedDirection === 'backward' ? 'Primary (Keep)' : 'Duplicate (Merge From)'}
-                 </span>
-                 {selectedDirection === 'backward' && <Check className="w-5 h-5 text-indigo-600" />}
-              </div>
-              <ContactCard contact={duplicate} />
+            <div className="text-lg font-bold text-indigo-600 mt-1">
+              {finalMaster.name}
             </div>
           </div>
         </div>
@@ -130,7 +120,14 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicate, onSuccess }: M
             Cancel
           </Button>
           <Button onClick={handleMerge} disabled={isProcessing} className="bg-indigo-600 hover:bg-indigo-700">
-            {isProcessing ? 'Merging...' : 'Confirm Merge'}
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Merging...
+              </>
+            ) : (
+              `Merge ${allContacts.length} Contacts`
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -140,43 +137,48 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicate, onSuccess }: M
 
 function ContactCard({ contact }: { contact: Person }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
        <div className="flex items-center gap-3">
           {contact.photo_url ? (
-            <img src={contact.photo_url} alt={contact.name} className="w-12 h-12 rounded-full object-cover bg-gray-200" />
+            <img src={contact.photo_url} alt={contact.name} className="w-10 h-10 rounded-full object-cover bg-gray-200" />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
+            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-sm">
                {contact.name.slice(0, 2).toUpperCase()}
             </div>
           )}
-          <div>
-            <div className="font-bold text-gray-900">{contact.name}</div>
-            <div className="text-xs text-gray-500">{contact.job_title || 'No Job Title'}</div>
+          <div className="min-w-0">
+            <div className="font-bold text-gray-900 dark:text-white truncate">{contact.name}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{contact.job_title || 'No Job Title'}</div>
           </div>
        </div>
        
-       <div className="space-y-2 text-sm">
+       <div className="space-y-1 text-xs">
          <InfoRow label="Email" value={contact.email} />
          <InfoRow label="Phone" value={contact.phone} />
+         <InfoRow label="Company" value={contact.company} />
          <InfoRow label="Last Contact" value={contact.last_contact ? new Date(contact.last_contact).toLocaleDateString() : null} />
          <InfoRow label="Interactions" value={contact.interaction_count?.toString()} />
-         <div className="pt-2">
-            <span className="text-xs text-gray-500 block mb-1">Preview Notes:</span>
-            <div className="bg-white p-2 rounded border border-gray-100 text-xs text-gray-600 line-clamp-3">
-              {contact.notes || "No notes"}
+       </div>
+       
+       {contact.notes && (
+         <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+            <div className="text-[10px] text-gray-400 mb-1">Notes Preview:</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+              {contact.notes}
             </div>
          </div>
-       </div>
+       )}
     </div>
   );
 }
 
 function InfoRow({ label, value }: { label: string, value?: string | null }) {
+  if (!value) return null; // Don't show empty rows - cleaner UI
   return (
-     <div className="flex justify-between py-1 border-b border-gray-100/50 last:border-0">
-        <span className="text-gray-500">{label}</span>
-        <span className="font-medium text-gray-900 text-right truncate max-w-[150px]" title={value || ''}>
-          {value || <span className="text-gray-300 italic">Empty</span>}
+     <div className="flex justify-between py-0.5">
+        <span className="text-gray-500 dark:text-gray-400">{label}</span>
+        <span className="font-medium text-gray-900 dark:text-white text-right truncate max-w-[120px]" title={value}>
+          {value}
         </span>
      </div>
   );

@@ -167,7 +167,7 @@ export default function DeduplicatePage() {
              isOpen={wizardOpen}
              onClose={() => setWizardOpen(false)}
              keeper={selectedGroup.keeper}
-             duplicate={selectedGroup.duplicates[0]} // Currently only supporting 1-on-1 merge in wizard for simplicity
+             duplicates={selectedGroup.duplicates} // Pass ALL duplicates, not just [0]
              onSuccess={handleMergeSuccess}
            />
         )}
