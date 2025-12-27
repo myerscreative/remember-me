@@ -45,6 +45,7 @@ import {
   getTribeHealth,
   getRelationshipHealth,
   getTopContacts,
+  getAllMapContacts,
   type DashboardStats,
   type TribeHealth,
   type RelationshipHealth,
@@ -86,7 +87,8 @@ export default function DashboardPage() {
         tribesResult,
         healthResult,
         topResult,
-        briefingResult
+        briefingResult,
+        mapResult
       ] = await Promise.all([
         getDashboardStats(),
         getContactsNeedingAttention(30),
@@ -94,27 +96,12 @@ export default function DashboardPage() {
         getRelationshipHealth(),
         getTopContacts(5),
         getDailyBriefing(),
+        getAllMapContacts() // Server-side Force Sync
       ]);
 
-      // Fetch all contacts for the SeedMap
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: contacts } = await (supabase as any)
-          .from('persons')
-          .select('id, name, last_interaction_date, importance, relationship_value, person_tags(tags(name))')
-          .eq('user_id', user.id);
-        
-        if (contacts) {
-          setAllContacts(contacts.map((c: any) => ({
-            id: c.id,
-            name: c.name,
-            lastContact: c.last_interaction_date,
-            // Fix: Ensure contacts with history but no importance are still considered 'active' (truthy)
-            intensity: c.relationship_value || c.importance || (c.last_interaction_date ? 'medium' : null), 
-            tags: c.person_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || []
-          })));
-        }
+      // Set Map Data directly from server results
+      if (mapResult.data) {
+         setAllContacts(mapResult.data);
       }
 
       // Check for critical errors

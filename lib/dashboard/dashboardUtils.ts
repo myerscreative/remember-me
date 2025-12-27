@@ -669,4 +669,41 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
     console.error('Error fetching milestones:', error);
     return { data: [], error: error instanceof Error ? error : new Error(error.message) };
   }
+/**
+ * Get all contacts for Map Visualization (Server-Side Force Sync)
+ */
+export async function getAllMapContacts(): Promise<{ data: any[]; error: Error | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { data: [], error: new Error("User not authenticated") };
+  }
+
+  try {
+    const { data: contacts, error } = await (supabase as any)
+      .from('persons')
+      .select('id, name, last_interaction_date, importance, relationship_value')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error fetching map contacts:', error);
+      return { data: [], error: new Error(error.message) };
+    }
+    
+    // Server-side Intensity Mapping to guarantee 'Active' status
+    const mappedContacts = (contacts || []).map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        lastContact: c.last_interaction_date,
+        // FORCE SYNC LOGIC: If date exists, it IS active.
+        intensity: c.relationship_value || c.importance || (c.last_interaction_date ? 'medium' : null), 
+    }));
+
+    return { data: mappedContacts, error: null };
+  } catch (error) {
+    console.error('Error fetching map contacts:', error);
+    return { data: [], error: error instanceof Error ? error : new Error('Unknown error') };
+  }
 }
+
