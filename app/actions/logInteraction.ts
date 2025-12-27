@@ -35,7 +35,7 @@ export async function logInteraction({ personId, type, note }: LogInteractionInp
       (supabase as any).from('persons').update({
         last_interaction_date: now,
         last_contact: now.split('T')[0], // Also update last_contact for backwards compatibility
-      }).eq('id', personId),
+      }).eq('id', personId).eq('user_id', user.id),
     ]);
 
     if (interactionResult.error) {
