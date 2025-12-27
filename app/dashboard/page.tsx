@@ -110,7 +110,8 @@ export default function DashboardPage() {
             id: c.id,
             name: c.name,
             lastContact: c.last_interaction_date,
-            intensity: c.relationship_value || c.importance, // Used for filtering active/categorized
+            // Fix: Ensure contacts with history but no importance are still considered 'active' (truthy)
+            intensity: c.relationship_value || c.importance || (c.last_interaction_date ? 'medium' : null), 
             tags: c.person_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || []
           })));
         }
