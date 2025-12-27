@@ -6,17 +6,17 @@ import { createClient } from "@/lib/supabase/server";
  * Get all contacts for Map Visualization (Server-Side Force Sync)
  */
 export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: number; activeCount: number; error: Error | null }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  console.log("Server Sync User:", user?.id);
-
-  if (!user) {
-    console.log("Server Sync: No User");
-    return { data: [], totalCount: 0, activeCount: 0, error: new Error("User not authenticated") };
-  }
-
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    console.log("Server Sync User:", user?.id);
+
+    if (!user) {
+      console.log("Server Sync: No User");
+      return { data: [], totalCount: 0, activeCount: 0, error: new Error("User not authenticated") };
+    }
+
     const { data: contacts, error, count: totalCount } = await (supabase as any)
       .from('persons')
       .select('id, name, last_interaction_date, importance, relationship_value, person_tags(tags(name))', { count: 'exact' })
@@ -45,7 +45,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
 
     return { data: mappedContacts, totalCount: totalCount || 0, activeCount, error: null };
   } catch (error) {
-    console.error('Error fetching map contacts:', error);
-    return { data: [], totalCount: 0, activeCount: 0, error: error instanceof Error ? error : new Error('Unknown error') };
+    console.error('Critical Error in getAllMapContacts:', error);
+    return { data: [], totalCount: 0, activeCount: 0, error: error instanceof Error ? error : new Error('Unknown server error') };
   }
 }

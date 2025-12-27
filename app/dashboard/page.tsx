@@ -107,6 +107,16 @@ export default function DashboardPage() {
          setMapTotalCount(mapResult.totalCount || 0);
          setMapActiveCount(mapResult.activeCount || 0);
       }
+      
+      if (mapResult.error) {
+          console.error("Map Sync Error:", mapResult.error);
+          toast.error(`Map Sync Failed: ${mapResult.error.message}`);
+      }
+      
+      if (mapResult.error) {
+          console.error("Map Sync Error:", mapResult.error);
+          toast.error(`Map Sync Failed: ${mapResult.error.message}`);
+      }
 
       // Check for critical errors
       if (statsResult.error) throw statsResult.error;
