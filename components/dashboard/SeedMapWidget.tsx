@@ -12,6 +12,8 @@ const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
 interface SeedMapWidgetProps {
   contacts?: any[];
   className?: string;
+  totalCount?: number;
+  activeCount?: number;
 }
 
 interface TooltipState {
@@ -28,12 +30,12 @@ function getColorForDays(days: number): string {
   return '#F97316';                   // Orange-500 (Alert / No History / Edge)
 }
 
-export default function SeedMapWidget({ contacts = [], className = '' }: SeedMapWidgetProps) {
+export default function SeedMapWidget({ contacts = [], className = '', totalCount, activeCount: propActiveCount }: SeedMapWidgetProps) {
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, contact: null });
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Seed positioning logic with dynamic sizing
-  const { seedPositions, activeCount } = useMemo(() => {
+  const { seedPositions, calculatedActiveCount } = useMemo(() => {
     // 1. Filter active contacts (having intensity/importance)
     // Upstream fix ensures 'intensity' is set for anyone with history
     const activeContacts = contacts.filter((c: any) => c.intensity);
@@ -77,8 +79,11 @@ export default function SeedMapWidget({ contacts = [], className = '' }: SeedMap
       return { ...contact, x, y, size: seedSize, color: getColorForDays(contact.days) };
     });
 
-    return { seedPositions: positions, activeCount: count };
+    return { seedPositions: positions, calculatedActiveCount: count };
   }, [contacts]);
+
+  const displayActiveCount = propActiveCount ?? calculatedActiveCount;
+  const displayTotalCount = totalCount ?? contacts.length;
 
   return (
     <div className={`relative flex flex-col items-center justify-center p-4 bg-card rounded-xl border border-border/50 h-[380px] w-full ${className}`}>
@@ -90,7 +95,7 @@ export default function SeedMapWidget({ contacts = [], className = '' }: SeedMap
 
       {/* SVG Map */}
       <div className="relative w-[300px] h-[300px] flex items-center justify-center">
-         {activeCount > 0 ? (
+         {displayActiveCount > 0 ? (
             <svg width="300" height="300" viewBox="0 0 300 300" className="overflow-visible">
               <defs>
                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -149,7 +154,7 @@ export default function SeedMapWidget({ contacts = [], className = '' }: SeedMap
       {/* Footer Stats - DYNAMIC & SYNCHRONIZED */}
       <div className="absolute bottom-4 right-4 flex items-center gap-3">
          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded-md">
-            {contacts.length} TOTAL / <span className="text-emerald-500">{activeCount} ACTIVE</span>
+            {displayTotalCount} TOTAL / <span className="text-emerald-500">{displayActiveCount} ACTIVE</span>
          </div>
       </div>
     </div>

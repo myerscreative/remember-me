@@ -45,13 +45,13 @@ import {
   getTribeHealth,
   getRelationshipHealth,
   getTopContacts,
-  getAllMapContacts,
   type DashboardStats,
   type TribeHealth,
   type RelationshipHealth,
   type TopContact,
 } from "@/lib/dashboard/dashboardUtils";
 import { createClient } from "@/lib/supabase/client";
+import { getAllMapContacts } from "@/app/actions/dashboard-map";
 import { getInitials, getGradient } from "@/lib/utils/contact-helpers";
 
 export default function DashboardPage() {
@@ -64,6 +64,8 @@ export default function DashboardPage() {
   const [relationshipHealth, setRelationshipHealth] = useState<RelationshipHealth | null>(null);
   const [topContacts, setTopContacts] = useState<TopContact[]>([]);
   const [allContacts, setAllContacts] = useState<any[]>([]);
+  const [mapTotalCount, setMapTotalCount] = useState<number>(0);
+  const [mapActiveCount, setMapActiveCount] = useState<number>(0);
   const [briefing, setBriefing] = useState<DailyBriefing | null>(null);
   const [briefingNarrative, setBriefingNarrative] = useState<string | null>(null);
   
@@ -102,6 +104,8 @@ export default function DashboardPage() {
       // Set Map Data directly from server results
       if (mapResult.data) {
          setAllContacts(mapResult.data);
+         setMapTotalCount(mapResult.totalCount || 0);
+         setMapActiveCount(mapResult.activeCount || 0);
       }
 
       // Check for critical errors
@@ -297,7 +301,12 @@ export default function DashboardPage() {
                  {/* Relationship Health Card (Map + Stats) */}
                  <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                      {/* Map */}
-                     <SeedMapWidget contacts={allContacts} className="border-0 bg-transparent shadow-none rounded-none" />
+                     <SeedMapWidget 
+                        contacts={allContacts} 
+                        className="border-0 bg-transparent shadow-none rounded-none" 
+                        totalCount={mapTotalCount}
+                        activeCount={mapActiveCount}
+                     />
                      
                      {/* Stats Footer */}
                      {relationshipHealth && (
