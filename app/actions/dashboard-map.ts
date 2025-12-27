@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 /**
  * Get all contacts for Map Visualization (Server-Side Force Sync)
  */
-export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: number; activeCount: number; error: Error | null }> {
+export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: number; activeCount: number; error: string | null }> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -14,7 +14,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
 
     if (!user) {
       console.log("Server Sync: No User");
-      return { data: [], totalCount: 0, activeCount: 0, error: new Error("User not authenticated") };
+      return { data: [], totalCount: 0, activeCount: 0, error: "User not authenticated" };
     }
 
     const { data: contacts, error, count: totalCount } = await (supabase as any)
@@ -27,7 +27,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
 
     if (error) {
       console.error('Error fetching map contacts:', error);
-      return { data: [], totalCount: 0, activeCount: 0, error: new Error(error.message) };
+      return { data: [], totalCount: 0, activeCount: 0, error: error.message };
     }
     
     // Server-side Intensity Mapping to guarantee 'Active' status
@@ -44,8 +44,8 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
     console.log("Server Sync Active Count:", activeCount);
 
     return { data: mappedContacts, totalCount: totalCount || 0, activeCount, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Critical Error in getAllMapContacts:', error);
-    return { data: [], totalCount: 0, activeCount: 0, error: error instanceof Error ? error : new Error('Unknown server error') };
+    return { data: [], totalCount: 0, activeCount: 0, error: error.message || 'Unknown server error' };
   }
 }
