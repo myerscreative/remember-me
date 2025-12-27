@@ -46,30 +46,30 @@ export function MilestoneRadar() {
 
   return (
     <>
-      <Card className="bg-[#0F172A] border-[#1E293B] shadow-none rounded-none">
-        <CardHeader className="border-b border-[#1E293B] pb-4">
+      <Card className="bg-card border-border shadow-none rounded-none">
+        <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-slate-400 flex items-center gap-2 uppercase font-black tracking-tighter text-sm">
+            <CardTitle className="text-muted-foreground flex items-center gap-2 uppercase font-black tracking-tighter text-sm">
               <Radar className="h-4 w-4" />
               Milestone Radar
             </CardTitle>
-            <Badge variant="outline" className="border-slate-700 text-slate-500 font-black rounded-none">NEXT 30D</Badge>
+            <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500 font-black rounded-none">NEXT 30D</Badge>
           </div>
         </CardHeader>
         <CardContent className="pt-4 px-0">
-          <div className="divide-y divide-[#1E293B]">
+          <div className="divide-y divide-border">
             {milestones.length > 0 ? (
               milestones.map((milestone, idx) => {
                 const isToday = milestone.daysRemaining === 0;
                 return (
-                  <div key={`${milestone.contactId}-${idx}`} className="p-4 flex items-center justify-between group hover:bg-[#1E293B]/50 transition-colors">
+                  <div key={`${milestone.contactId}-${idx}`} className="p-4 flex items-center justify-between group hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col items-center justify-center">
                          {getIcon(milestone.type)}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <p className="text-slate-300 font-bold text-xs uppercase tracking-tight">{milestone.contactName}</p>
+                          <p className="text-foreground font-bold text-xs uppercase tracking-tight">{milestone.contactName}</p>
                           {milestone.isThirsty && (
                             <span title="This relationship needs attention! 🌱" className="text-amber-500 animate-pulse">
                               ⚠️
@@ -77,8 +77,8 @@ export function MilestoneRadar() {
                           )}
                         </div>
                         <p className="text-[10px] font-bold uppercase mt-0.5 flex items-center gap-1.5">
-                          <span className="text-slate-500">{milestone.label}</span>
-                          <span className="text-slate-600">•</span>
+                          <span className="text-muted-foreground">{milestone.label}</span>
+                          <span className="text-muted-foreground">•</span>
                           <span style={{ color: isToday ? '#FF4D4D' : '#38BDF8' }}>
                             {isToday ? 'TODAY' : `IN ${milestone.daysRemaining}D`}
                           </span>
@@ -90,7 +90,7 @@ export function MilestoneRadar() {
                         setSelectedMilestone(milestone);
                         setIsModalOpen(true);
                       }}
-                      className="h-8 w-20 bg-[#1E293B] hover:bg-emerald-500 hover:text-[#0F172A] flex items-center justify-center transition-all border border-[#334155] rounded-none text-[10px] font-black uppercase"
+                      className="h-8 w-20 bg-secondary hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all border border-border rounded-none text-[10px] font-black uppercase text-muted-foreground"
                     >
                       Nurture
                     </button>
@@ -98,7 +98,7 @@ export function MilestoneRadar() {
                 );
               })
             ) : (
-              <div className="p-8 text-center text-slate-500 text-xs font-bold uppercase tracking-widest leading-relaxed">
+              <div className="p-8 text-center text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">
                 {isLoading ? 'Scanning Radar...' : 'Any Important Date or Birthday that is attached to a contact shows here.'}
               </div>
             )}

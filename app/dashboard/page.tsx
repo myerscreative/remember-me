@@ -102,7 +102,7 @@ export default function DashboardPage() {
       if (user) {
         const { data: contacts } = await (supabase as any)
           .from('persons')
-          .select('id, name, last_interaction_date, person_tags(tags(name))')
+          .select('id, name, last_interaction_date, importance, relationship_value, person_tags(tags(name))')
           .eq('user_id', user.id);
         
         if (contacts) {
@@ -110,6 +110,7 @@ export default function DashboardPage() {
             id: c.id,
             name: c.name,
             lastContact: c.last_interaction_date,
+            intensity: c.relationship_value || c.importance, // Used for filtering active/categorized
             tags: c.person_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || []
           })));
         }
@@ -297,26 +298,7 @@ export default function DashboardPage() {
                   {/* Needs Nurture List (Redesigned & Compact with Filter) */}
                   <NeedsNurtureList contacts={needingAttention} />
 
-                  {/* Momentum Leaders (Compact) */}
-                  {topContacts.length > 0 && (
-                      <div className="space-y-2">
-                           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Momentum Leaders</h3>
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                               {topContacts.slice(0, 4).map(c => (
-                                   <div key={c.id} onClick={() => router.push(`/contacts/${c.id}`)} className="flex items-center gap-2 p-2 bg-white dark:bg-card border border-slate-100 dark:border-slate-800 rounded-lg cursor-pointer hover:border-purple-200 hover:shadow-sm transition-all">
-                                        <Avatar className="h-6 w-6">
-                                            <AvatarImage src={c.photoUrl || undefined} />
-                                            <AvatarFallback className={cn("text-[9px] text-white", getGradient(c.name))}>{getInitials(c.firstName, c.lastName)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="overflow-hidden min-w-0">
-                                            <p className="text-xs font-bold truncate">{c.name}</p>
-                                            <p className="text-[9px] text-slate-500 truncate">{c.interactionCount} interactions</p>
-                                        </div>
-                                   </div>
-                               ))}
-                           </div>
-                      </div>
-                  )}
+
 
               </div>
 
@@ -324,24 +306,25 @@ export default function DashboardPage() {
               <div className="space-y-4 lg:sticky lg:top-6">
                  
                  {/* Relationship Health Card (Map + Stats) */}
-                 <div className="bg-[#0B1120] rounded-xl border border-slate-800 shadow-sm overflow-hidden">
+                 {/* Relationship Health Card (Map + Stats) */}
+                 <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                      {/* Map */}
                      <SeedMapWidget contacts={allContacts} className="border-0 bg-transparent shadow-none rounded-none" />
                      
                      {/* Stats Footer */}
                      {relationshipHealth && (
-                         <div className="flex border-t border-slate-800 divide-x divide-slate-800 bg-[#0F172A]/50 backdrop-blur-sm">
+                         <div className="flex border-t border-border divide-x divide-border bg-muted/50 backdrop-blur-sm">
                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
                                  <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">Fresh</div>
-                                 <div className="text-lg font-black text-white">{relationshipHealth.healthy}</div>
+                                 <div className="text-lg font-black text-foreground">{relationshipHealth.healthy}</div>
                              </div>
                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
                                  <div className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-0.5">Warn</div>
-                                 <div className="text-lg font-black text-white">{relationshipHealth.warning}</div>
+                                 <div className="text-lg font-black text-foreground">{relationshipHealth.warning}</div>
                              </div>
                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
                                  <div className="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-0.5">Alert</div>
-                                 <div className="text-lg font-black text-white">{relationshipHealth.needsAttention}</div>
+                                 <div className="text-lg font-black text-foreground">{relationshipHealth.needsAttention}</div>
                              </div>
                          </div>
                      )}

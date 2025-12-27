@@ -36,24 +36,24 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
 
   return (
     <>
-      <Card className="border border-slate-800 bg-[#0B1120] shadow-xl relative overflow-hidden group">
+      <Card className="border border-border bg-card shadow-xl relative overflow-hidden group">
         {/* Glass Header */}
-        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#38BDF8]/10 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
         
         <CardHeader className="relative pb-2 z-10">
           <div className="flex items-center justify-between">
             <div>
-                 <h2 className="text-white font-bold text-lg mb-0.5">
+                 <h2 className="text-foreground font-bold text-lg mb-0.5">
                     Good Morning, Robert.
                  </h2>
-                 <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">
-                    You have <span className="text-[#38BDF8] font-bold">{totalActions} priority actions</span> today.
+                 <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                    You have <span className="text-primary font-bold">{totalActions} priority actions</span> today.
                  </p>
             </div>
             
-            <div className="flex items-center gap-2 bg-[#38BDF8]/10 backdrop-blur-sm border border-[#38BDF8]/20 px-3 py-1.5 rounded-full">
-                <Sparkles className="h-3.5 w-3.5 text-[#38BDF8]" />
-                <span className="text-[#38BDF8] text-[10px] font-black uppercase tracking-widest">{totalActions} Actions</span>
+            <div className="flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/20 px-3 py-1.5 rounded-full">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="text-primary text-[10px] font-black uppercase tracking-widest">{totalActions} Actions</span>
             </div>
           </div>
         </CardHeader>
@@ -92,17 +92,18 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                   {/* Thirst Ring (Dashed Orange) */}
                                   <div className="absolute -inset-1 rounded-full border-2 border-dashed border-orange-500/50 animate-[spin_10s_linear_infinite]" />
                                   
-                                  <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-[#0B1120] bg-slate-800">
+                                  
+                                  <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-background bg-muted shadow-md">
                                        <Avatar className="h-full w-full">
                                             <AvatarImage src={p.photo_url || undefined} />
-                                            <AvatarFallback className={cn("text-lg font-bold text-white", getGradient(p.name))}>
+                                            <AvatarFallback className="text-lg font-bold text-white bg-slate-400 dark:bg-slate-600">
                                                 {getInitials(p.first_name, p.last_name)}
                                             </AvatarFallback>
                                        </Avatar>
                                   </div>
                                   
-                                  <div className="absolute -bottom-1 -right-1 bg-[#0B1120] rounded-full p-1">
-                                      <div className="bg-orange-500 h-3 w-3 rounded-full animate-pulse" />
+                                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
+                                      <div className="bg-orange-500 h-3 w-3 rounded-full animate-pulse ring-1 ring-white dark:ring-transparent" />
                                   </div>
                               </div>
                           </LoreTooltip>
@@ -115,8 +116,8 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                 setIsDeepLoreOpen(true);
                             }}
                           >
-                              <h3 className="text-white font-bold text-sm truncate px-1">{p.name}</h3>
-                              <p className="text-slate-500 text-[10px] font-medium truncate px-1 leading-tight">
+                              <h3 className="text-foreground font-bold text-sm truncate px-1">{p.name}</h3>
+                              <p className="text-slate-600 dark:text-slate-400 text-[10px] font-medium truncate px-1 leading-tight">
                                   {p.deep_lore || p.relationship_summary || "Needs some love"}
                               </p>
                           </div>
@@ -126,7 +127,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Call with ${p.first_name}`)}
                                 >
                                    <Phone className="h-3.5 w-3.5" />
@@ -134,7 +135,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Email to ${p.first_name}`)}
                                >
                                    <Mail className="h-3.5 w-3.5" />
@@ -142,7 +143,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Message to ${p.first_name}`)}
                                >
                                    <MessageSquare className="h-3.5 w-3.5" />

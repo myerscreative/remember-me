@@ -292,6 +292,7 @@ export interface Database {
           interaction_date: string
           title: string | null
           notes: string | null
+          next_goal_note: string | null // Added
           location: string | null
           duration_minutes: number | null
           created_at: string
@@ -305,6 +306,7 @@ export interface Database {
           interaction_date?: string
           title?: string | null
           notes?: string | null
+          next_goal_note?: string | null // Added
           location?: string | null
           duration_minutes?: number | null
           created_at?: string
@@ -318,6 +320,7 @@ export interface Database {
           interaction_date?: string
           title?: string | null
           notes?: string | null
+          next_goal_note?: string | null // Added
           location?: string | null
           duration_minutes?: number | null
           created_at?: string

@@ -9,6 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
 import { FREQUENCY_PRESETS } from '@/lib/relationship-health';
+import { getRelationshipStatus } from '@/app/network/utils/relationshipStatus';
+import { cn } from '@/lib/utils';
 
 interface ProfileSidebarProps {
   contact: {
@@ -106,24 +108,38 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
         {/* 3. Status Badge */}
         <div className="mb-4 mt-2 flex items-center justify-center gap-2">
-             <Badge className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 px-3 py-1.5 rounded-xl font-normal text-xs uppercase tracking-wide">
-                Next: {contact.next_contact_date ? formatDate(contact.next_contact_date) : "NO RHYTHM SET"}
-             </Badge>
-             {!contact.next_contact_date && (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Info className="w-3.5 h-3.5 text-rose-500/70 hover:text-rose-600 cursor-pointer focus:outline-none transition-colors" aria-label="Status info" role="button" />
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]">
-                        <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
-                            <span className="text-slate-200 font-bold">Automatic contact reminders are not set.</span> Current setting is <span className="text-slate-200 font-bold">Manual Mode</span>, which means you will not be prompted to contact this person.
-                        </p>
-                        <p className="text-slate-400 text-[11px] leading-relaxed">
-                            To set intervals and receive automated reminders, use the <span className="text-slate-200 font-bold">Contact Cadence</span> selector below.
-                        </p>
-                    </PopoverContent>
-                </Popover>
-            )}
+             {(() => {
+                // Map local contact prop to expected Person shape for the utility
+                const status = getRelationshipStatus({
+                    ...contact,
+                    last_interaction_date: contact.last_contact_date || null,
+                    last_contact: contact.last_contact_date || null, // Fallback
+                    birthday: contact.birthday || null,
+                    // Cast as any since we are just passing partial data needed for status
+                } as any);
+
+                return (
+                    <Badge className={cn(
+                        "px-3 py-1.5 rounded-xl font-sans font-normal text-xs uppercase tracking-wide border",
+                        status.colorClass.replace("text-", "bg-").replace("600", "50").replace("400", "900/20").replace("500", "100") + " " + status.colorClass.replace("dark:text-", "dark:bg-").replace("dark:text-slate-400", "dark:bg-slate-800") + " border-transparent"
+                    )}>
+                        {/* 
+                           Note: The utility returns text classes (e.g. text-purple-600). 
+                           We want to style the Badge background based on that, or just use the text color with a subtle BG.
+                           Let's simplify: Use the text color class directly on the text, and a standard subtle background,
+                           OR map the colors manually for the Badge style to match the requested look.
+                           User asked for "Color States".
+                           Let's do manual mapping for the Badge based on the label content or reuse the utility style if possible?
+                           Actually, the utility returns "text-purple-600". I can just apply that to the text inside a standard badge,
+                           or conditionally style the badge.
+                           Let's attempt to use the returned class for text and a matching soft bg.
+                        */}
+                        <span className={status.colorClass}>{status.label}</span>
+                    </Badge>
+                );
+             })()}
+             
+             {/* Info Popover for Context (Optional, keeping it simple or verifying if user wants it removed? User said "Replace metaphor...". I'll keep the popover if it explains the *new* status, but the old one explained "Manual Mode". The new status is self-explanatory ("Overdue: 12 Days"). I will remove the old specific popover to avoid confusion.) */}
         </div>
 
       </div>

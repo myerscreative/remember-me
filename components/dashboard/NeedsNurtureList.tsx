@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { getGradient, getInitials } from "@/lib/utils/contact-helpers";
 import { getMethodIcon, getLastSeenText } from "@/lib/utils/interaction-utils";
 import { UnifiedActionHub } from "@/components/dashboard/UnifiedActionHub";
+import { getRelationshipStatus } from "@/app/network/utils/relationshipStatus";
 
 interface NeedsNurtureListProps {
   contacts: any[]; // Using any to accommodate the supabase join structure broadly for now
@@ -48,7 +49,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
     <div className="space-y-4">
       {/* Header & View All */}
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100 uppercase tracking-tight">
+        <h2 className="text-sm font-bold flex items-center gap-2 text-foreground uppercase tracking-tight">
           <AlertCircle className="h-4 w-4 text-orange-500" />
           Needs Nurture
         </h2>
@@ -57,7 +58,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
             variant="link" 
             size="sm" 
             className="text-[10px] h-6 text-orange-600" 
-            onClick={() => router.push('/contacts?filter=nurture')}
+            onClick={() => router.push('/?filter=nurture')}
           >
             View All
           </Button>
@@ -85,28 +86,28 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
       )}
 
       {/* List */}
-      <div className="bg-white dark:bg-card border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-in-out">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-in-out">
         {filteredContacts.length > 0 ? (
           <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
             {filteredContacts.map((contact) => (
               <div 
                 key={contact.id}
-                className="group flex items-center justify-between px-3 py-2 hover:bg-orange-50/50 dark:hover:bg-orange-900/10 transition-colors cursor-pointer"
+                className="group flex items-center justify-between px-3 py-2 hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => {
                     setSelectedContact(contact);
                     setIsLoreOpen(true);
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8 border-2 border-white dark:border-slate-800 shadow-sm">
+                  <Avatar className="h-8 w-8 border-2 border-background shadow-sm">
                     <AvatarImage src={contact.photo_url} />
                     <AvatarFallback className={cn("text-[10px] text-white", getGradient(contact.name || ""))}>
                       {getInitials(contact.first_name, contact.last_name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">{contact.name}</p>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 mt-0.5">
+                    <p className="font-bold text-xs text-foreground leading-tight">{contact.name}</p>
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1 opacity-75">
                         {getMethodIcon(contact.last_interaction_method)}
                         {contact.last_interaction_method || 'Contacted'}
@@ -118,20 +119,41 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className={cn(
-                    "text-[9px] font-bold px-1.5 h-4 min-w-[32px] justify-center",
-                    contact.days_since_contact > 90 ? "bg-red-50 text-red-700 border border-red-100" : "bg-orange-50 text-orange-700 border border-orange-100"
+                  <span className={cn(
+                    "text-xs font-sans",
+                     getRelationshipStatus(contact).colorClass
                   )}>
-                    {contact.days_since_contact}d
-                  </Badge>
+                    {/* Logic Update: Check for 'next_goal_note' on latest interaction first. */}
+                    {contact.latest_next_goal ? (
+                        <span className="text-indigo-400 font-semibold italic flex items-center gap-1.5">
+                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                           "{contact.latest_next_goal}"
+                        </span>
+                    ) : (
+                        getRelationshipStatus(contact).label
+                    )}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-6 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
-            <span className="text-2xl">🌱</span>
-            <p>No contacts in <span className="font-bold text-slate-500">{activeTribe}</span> need attention.</p>
+          <div className="p-8 text-center flex flex-col items-center justify-center gap-4 min-h-[200px]">
+             <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-2">
+                <span className="text-2xl">🌱</span>
+             </div>
+             <div className="space-y-1">
+                <p className="text-sm font-bold text-foreground">Your Garden is thriving!</p>
+                <p className="text-xs text-muted-foreground">Everyone in <span className="font-bold text-emerald-600 dark:text-emerald-400">{activeTribe}</span> is up to date.</p>
+             </div>
+             <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => router.push('/')}
+                className="mt-2 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/50 bg-transparent"
+             >
+                View All Contacts
+             </Button>
           </div>
         )}
       </div>

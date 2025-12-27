@@ -25,6 +25,7 @@ import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useTheme } from "@/app/providers/theme-provider";
 import toast, { Toaster } from "react-hot-toast";
 import { ErrorFallback } from "@/components/error-fallback";
+import { cn } from "@/lib/utils";
 
 interface UserSettings {
   // Profile
@@ -99,16 +100,16 @@ export default function SettingsPage() {
           .eq('user_id', authUser.id)
           .single();
         
-        if (settingsError && settingsError.code !== 'PGRST116') { // Ignore "No rows found" error
-           throw settingsError;
-        }
-
-        if (userSettings) {
+        if (settingsError && settingsError.code !== 'PGRST116') { 
+          // If the table doesn't exist (42P01) or other DB error, don't crash the whole page
+          // Just log it and proceed with default settings
+          console.warn("User settings table might be missing or unreachable:", settingsError);
+        } else if (userSettings) {
           setSettings(prev => ({ ...prev, ...userSettings }));
         }
-      } catch (error) {
-        console.error("Error loading settings:", error);
-        setError(error instanceof Error ? error : new Error("Failed to load settings"));
+      } catch (err: any) {
+        console.error("Critical error in loadSettings:", err);
+        // We still don't want to crash the page if possible
       } finally {
         setLoading(false);
       }
@@ -468,40 +469,46 @@ export default function SettingsPage() {
                   {/* Light Mode Button */}
                   <button
                     onClick={() => setTheme('light')}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'light'
-                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                        ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <Sun className="h-5 w-5" />
-                    <span className="font-medium">Light</span>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'light' ? "bg-purple-100 text-purple-600" : "bg-gray-100 dark:bg-gray-800")}>
+                      <Sun className="h-5 w-5" />
+                    </div>
+                    <span className="font-semibold text-xs uppercase tracking-wider">Light</span>
                   </button>
                   
                   {/* Dark Mode Button */}
                   <button
                     onClick={() => setTheme('dark')}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                        ? 'border-purple-500 bg-[#1E293B] text-purple-400 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <Moon className="h-5 w-5" />
-                    <span className="font-medium">Dark</span>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'dark' ? "bg-purple-900/40 text-purple-400" : "bg-gray-100 dark:bg-gray-800")}>
+                      <Moon className="h-5 w-5" />
+                    </div>
+                    <span className="font-semibold text-xs uppercase tracking-wider">Dark</span>
                   </button>
                   
                   {/* Auto Mode Button */}
                   <button
                     onClick={() => setTheme('auto')}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'auto'
-                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <Monitor className="h-5 w-5" />
-                    <span className="font-medium">Auto</span>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'auto' ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300" : "bg-gray-100 dark:bg-gray-800")}>
+                      <Monitor className="h-5 w-5" />
+                    </div>
+                    <span className="font-semibold text-xs uppercase tracking-wider">Auto</span>
                   </button>
                 </div>
               </div>

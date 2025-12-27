@@ -67,42 +67,42 @@ export function DecayAlertBanner() {
   };
 
   return (
-    <Card className="border border-indigo-500/30 bg-slate-800/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl mb-6 relative overflow-hidden">
+    <Card className="border border-[var(--nurture-banner-border,rgba(59,130,246,0.3))] bg-[var(--nurture-banner-bg,rgba(59,130,246,0.1))] dark:border-[var(--nurture-banner-border,rgba(59,130,246,0.3))] dark:bg-[var(--nurture-banner-bg,rgba(59,130,246,0.1))] backdrop-blur-sm shadow-xl mb-6 relative overflow-hidden">
         {/* Subtle decorative gradient */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
         
       <CardContent className="p-4 md:p-5 relative z-10">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+            <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
                {/* Leaf icon for "Garden/Growth" metaphor */}
-              <Users className="h-5 w-5 text-indigo-400" />
+              <Users className="h-5 w-5 text-[var(--nurture-banner-text)]" />
             </div>
           </div>
-
+ 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-base md:text-lg font-bold text-white">
+              <h3 className="text-base md:text-lg font-bold text-[var(--nurture-banner-text)]">
                 Time to Reconnect
               </h3>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setDismissed(true)}
-                className="h-6 w-6 text-slate-400 hover:text-white hover:bg-white/10"
+                className="h-6 w-6 text-[var(--nurture-banner-text)] opacity-50 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
-
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+ 
+            <p className="text-sm text-[var(--nurture-banner-text)] opacity-80 mb-4 leading-relaxed">
               {severeCount > 0 && (
-                <span className="font-medium text-slate-200">
+                <span className="font-medium">
                   {severeCount} relationship{severeCount > 1 ? "s" : ""} haven't been contacted in over a year.
                 </span>
               )}
               {severeCount === 0 && moderateCount > 0 && (
-                <span className="font-medium text-slate-200">
+                <span className="font-medium">
                   {moderateCount} relationship{moderateCount > 1 ? "s" : ""} haven't been contacted in 6+ months.
                 </span>
               )}

@@ -8,9 +8,10 @@ interface LogInteractionInput {
   personId: string;
   type: InteractionType;
   note?: string;
+  nextGoal?: string; // New field
 }
 
-export async function logInteraction({ personId, type, note }: LogInteractionInput) {
+export async function logInteraction({ personId, type, note, nextGoal }: LogInteractionInput) {
   const supabase = await createClient();
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -31,6 +32,7 @@ export async function logInteraction({ personId, type, note }: LogInteractionInp
         type,
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
+        next_goal_note: nextGoal || null, // Map nextGoal input
       }),
       (supabase as any).from('persons').update({
         last_interaction_date: now,

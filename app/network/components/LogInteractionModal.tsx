@@ -19,6 +19,7 @@ interface LogInteractionModalProps {
 
 export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionModalProps) {
   const [notes, setNotes] = useState('');
+  const [nextGoal, setNextGoal] = useState(''); // New state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -31,12 +32,14 @@ export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionMo
         contactIds: tribe.members.map(m => m.id),
         type: 'text', // Default to text/message for "Nurture"
         note: notes || `Nurtured tribe: ${tribe.name}`,
+        nextGoalNote: nextGoal.trim() || null, // Insert next goal
       });
 
       if (result.success) {
         toast.success(`Nurtured ${tribe.memberCount} people in ${tribe.name}!`);
         onClose();
         setNotes('');
+        setNextGoal(''); // Clear nextGoal after successful submission
       } else {
         toast.error('Failed to log interaction');
       }
@@ -63,15 +66,27 @@ export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionMo
         
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <label htmlFor="notes" className="text-sm font-medium">
+            <Label htmlFor="notes" className="text-sm font-medium">
               Notes / Message sent
-            </label>
+            </Label>
             <Textarea
               id="notes"
               placeholder="e.g. Sent group update about the summer trip..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
+          </div>
+
+          {/* Next Goal */}
+          <div className="grid gap-2">
+             <Label htmlFor="nextGoal" className="text-sm font-medium">Next Goal (Strategy)</Label>
+             <Textarea 
+               id="nextGoal"
+               value={nextGoal}
+               onChange={(e) => setNextGoal(e.target.value)}
+               placeholder="e.g. Follow up about the new role..."
+               className="min-h-[60px] border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/20 focus:ring-indigo-500/20"
+             />
           </div>
         </div>
 

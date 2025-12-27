@@ -17,6 +17,7 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
   const [type, setType] = useState(initialType);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
+  const [nextGoal, setNextGoal] = useState(''); // New state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -40,7 +41,8 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
           person_id: contactId,
           type,
           date: new Date(date).toISOString(),
-          notes: notes.trim() || null
+          notes: notes.trim() || null,
+          next_goal_note: nextGoal.trim() || null // Insert next goal
         });
 
       if (insertError) {
@@ -135,6 +137,16 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
              />
           </div>
 
+          {/* Next Goal */}
+          <div className="space-y-1.5">
+             <label className="text-xs font-medium text-gray-500">Next Goal (Strategy)</label>
+             <textarea 
+               value={nextGoal}
+               onChange={(e) => setNextGoal(e.target.value)}
+               placeholder="e.g. Follow up about the new role..."
+               className="w-full min-h-[60px] rounded-md border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/20 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+             />
+          </div>
         </div>
 
         {/* Footer */}

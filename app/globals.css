@@ -162,7 +162,7 @@
    ======================================== */
 :root[data-theme='light'],
 :root:not(.dark) {
-  /* Core Light Theme Colors */
+  /* Core Light Theme Colors - Requested */
   --bg-main: #F8FAFC;
   --bg-card: #FFFFFF;
   --text-primary: #0F172A;
@@ -171,40 +171,40 @@
   --accent-purple: #8B5CF6;
 
   /* Override CSS Variables for Light Mode */
-  --background: #F8FAFC;
-  --foreground: #0F172A;
+  --background: var(--bg-main);
+  --foreground: var(--text-primary);
   
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
+  --card: var(--bg-card);
+  --card-foreground: var(--text-primary);
   
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
+  --popover: var(--bg-card);
+  --popover-foreground: var(--text-primary);
   
-  --primary: #8B5CF6;
+  --primary: var(--accent-purple);
   --primary-foreground: #FFFFFF;
   
   --secondary: #F1F5F9;
-  --secondary-foreground: #0F172A;
+  --secondary-foreground: var(--text-primary);
   
   --muted: #F1F5F9;
-  --muted-foreground: #475569;
+  --muted-foreground: var(--text-secondary);
   
-  --accent: #F3E8FF;
-  --accent-foreground: #0F172A;
+  --accent: #F3E8FF; /* Light Purple for active items */
+  --accent-foreground: var(--text-primary);
   
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #8B5CF6;
+  --border: var(--border-subtle);
+  --input: var(--border-subtle);
+  --ring: var(--accent-purple);
   
   /* Sidebar Light Mode */
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #475569;
-  --sidebar-primary: #8B5CF6;
+  --sidebar-foreground: var(--text-secondary);
+  --sidebar-primary: var(--accent-purple);
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #F3E8FF;
-  --sidebar-accent-foreground: #0F172A;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #8B5CF6;
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border-subtle);
+  --sidebar-ring: var(--accent-purple);
   
   /* Component-Specific Light Mode Vars */
   --conversation-starter-bg: #F5F3FF;

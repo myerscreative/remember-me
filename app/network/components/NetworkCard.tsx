@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { CalendarDays, GitBranch } from 'lucide-react';
 import Link from 'next/link';
+import { getRelationshipStatus } from '../utils/relationshipStatus';
+import { cn } from '@/lib/utils';
 
 interface NetworkCardProps {
   contact: Person;
@@ -92,9 +94,11 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
           </div>
           
           {/* Connection Indicator (Visual only for now) */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-indigo-400">
-            <GitBranch className="h-3 w-3" />
-            <span>Map</span>
+             <div className={cn(
+              "text-xs font-sans",
+              getRelationshipStatus(contact).colorClass
+            )}>
+            {getRelationshipStatus(contact).label}
           </div>
         </div>
       </Card>

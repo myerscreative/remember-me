@@ -277,32 +277,50 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
   }
 
   try {
-    // Calculate cutoff date
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
-    const cutoffISO = cutoffDate.toISOString();
-
+    // Simplified query to ensure we catch ALL contacts needing attention (including NULL dates)
+    // The previous optimization was too aggressive and excluded 'New' (null date) contacts.
     const { data, error } = await (supabase as any)
       .from('persons')
-      .select('*')
+      .select('*, interactions(next_goal_note, interaction_date)')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false')
-      .not('last_interaction_date', 'is', null)
-      .lt('last_interaction_date', cutoffISO)
-      .order('last_interaction_date', { ascending: true }) // Oldest interactions first
-      .limit(20); // Reasonable limit
+      .order('last_interaction_date', { ascending: true, nullsFirst: true }); // Prioritize 'Never Contacted' then 'Oldest'
 
     if (error) {
       console.error('Error fetching contacts needing attention:', error);
       return { data: [], error: new Error(error.message) };
     }
 
-    // Add calculated "daysAgo" field to match expected output if needed, or just return contact data
-    // The previous RPC likely returned contact data + calculated days.
-    // We can just return the contacts; the UI likely calculates daysAgo or we can map it.
-    // Checking usage in other files would be good, but for now returning the contacts is the safest MVP fix.
+    const now = new Date();
+    const processedData = (data || [])
+        .filter((contact: any) => {
+            if (!contact.last_interaction_date) return true; // Should be handled by "New" logic, but safety first
+            
+            const lastDate = new Date(contact.last_interaction_date);
+            const diffTime = Math.abs(now.getTime() - lastDate.getTime());
+            const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            let threshold = 30; // Medium/Default
+            if (contact.importance === 'high') threshold = 14;
+            else if (contact.importance === 'low') threshold = 90;
+            
+            return daysAgo >= threshold;
+        })
+        .map((contact: any) => {
+            // Sort interactions by date desc to get the latest
+            const sortedInteractions = (contact.interactions || []).sort((a: any, b: any) => 
+                new Date(b.interaction_date).getTime() - new Date(a.interaction_date).getTime()
+            );
+            const latestGoal = sortedInteractions.length > 0 ? sortedInteractions[0].next_goal_note : null;
+            
+            return {
+                ...contact,
+                latest_next_goal: latestGoal
+            };
+        })
+        .slice(0, 20); // Apply limit after filtering
     
-    return { data: data || [], error: null };
+    return { data: processedData, error: null };
   } catch (error) {
     console.error('Error fetching contacts needing attention:', error);
     return { data: [], error: error instanceof Error ? error : new Error('Unknown error') };

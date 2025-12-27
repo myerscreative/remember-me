@@ -33,6 +33,7 @@ interface UnifiedActionHubProps {
 export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMethod }: UnifiedActionHubProps & { initialMethod?: InteractionType }) {
   const router = useRouter();
   const [note, setNote] = useState("");
+  const [nextGoal, setNextGoal] = useState(""); // New state for next goal
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   
@@ -46,6 +47,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const [aiStatus, setAiStatus] = useState<string | null>(null);
   const [isGeneratingStatus, setIsGeneratingStatus] = useState(false);
   const [generatedScript, setGeneratedScript] = useState<string>("");
+  const [goalUsed, setGoalUsed] = useState<string | null>(null); // Track if goal was used
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
   const [contextBrief, setContextBrief] = useState<string | null>(null);
   const [isGeneratingBrief, setIsGeneratingBrief] = useState(false);
@@ -117,6 +119,10 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 // 3. Generate Conversation Starter (Script)
                 // Only if not already generated, to save costs/time
                 if (!generatedScript) {
+                    // Extract latest Next Goal from history
+                    const sortedLogs = [...logs].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    const latestNextGoal = sortedLogs.length > 0 ? sortedLogs[0].next_goal_note : null;
+
                     setIsGeneratingScript(true);
                     try {
                         const scriptRes = await fetch('/api/generate-script', {
@@ -129,11 +135,16 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                                     type: l.type, 
                                     notes: l.notes 
                                 })).slice(0, 3), // Send last 3 for context
-                                mutualConnections: sortedMutuals.map(m => m.connected_person.name).slice(0, 3)
+                                mutualConnections: sortedMutuals.map(m => m.connected_person.name).slice(0, 3),
+                                nextGoal: latestNextGoal // Pass the goal
                             })
                         });
                         const scriptData = await scriptRes.json();
-                        if (scriptData.script) setGeneratedScript(scriptData.script);
+                        if (scriptData.script) {
+                             setGeneratedScript(scriptData.script);
+                             // Store effectively if we used a goal for UI labeling
+                             if (latestNextGoal) setGoalUsed(latestNextGoal); 
+                        }
                     } catch (e) {
                         console.error("Error generating script:", e);
                     } finally {
@@ -209,7 +220,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
           const interactionResult = await logInteraction({
               personId: person.id,
               type: selectedType,
-              note: note.trim() || undefined
+              note: note.trim() || undefined,
+              nextGoal: nextGoal.trim() || undefined // Pass next goal
           });
 
           // 3. Update 'The Story' if note exists (Per user request for unified persistence)
@@ -221,6 +233,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
               toast.success("Connection Logged & Status Updated! 🌱");
               onAction(selectedType, note);
               setNote("");
+              setNextGoal(""); // Clear next goal
               setContextBrief(null); // Invalidate brief to force refresh with new context
               onClose();
           } else {
@@ -253,8 +266,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      {/* High-Contrast Stage: Deep Navy + Blur XL */}
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-[#0F172A]/95 backdrop-blur-xl border border-indigo-500/30 shadow-[0_0_60px_-15px_rgba(99,102,241,0.3)] p-0 overflow-hidden gap-0 duration-300">
+      {/* High-Contrast Stage: Responsive */}
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl p-0 overflow-hidden gap-0 duration-300">
         <DialogTitle className="sr-only">Unified Action Hub for {person.name}</DialogTitle>
         
         {/* Header / Banner */}
@@ -295,26 +308,33 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
 
         {/* Actionable Script Box */}
         <div className="px-6 pb-2 relative z-20 -mt-2">
-             <div className="relative overflow-hidden bg-gradient-to-br from-[#1E1B4B]/80 to-[#0F172A] border border-indigo-500/40 rounded-xl p-3 shadow-lg shadow-indigo-900/10 group">
+             <div className="relative overflow-hidden bg-[var(--conversation-starter-bg,rgba(139,92,246,0.1))] border border-[var(--conversation-starter-border,rgba(139,92,246,0.3))] rounded-xl p-3 shadow-lg group">
                  <div className="absolute right-2 top-2">
                      <Button 
                         size="icon" 
                         variant="ghost" 
-                        className="h-6 w-6 text-indigo-300 hover:text-white hover:bg-indigo-500/20 rounded-lg transition-all"
+                        className="h-6 w-6 text-[var(--conversation-starter-text)] hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-all"
                         onClick={handleCopyScript}
                      >
                         {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                      </Button>
                  </div>
                  
-                 <div className="flex gap-2 mb-1.5">
-                     <Sparkles className="h-3.5 w-3.5 text-indigo-300 mt-0.5" />
-                     <p className="text-[10px] uppercase font-bold text-indigo-300 tracking-widest pt-0.5">Conversation Starter</p>
+                 <div className="flex gap-2 mb-1.5 justify-between items-start">
+                     <div className="flex gap-2">
+                        <Sparkles className="h-3.5 w-3.5 text-[var(--conversation-starter-text)] mt-0.5" />
+                        <p className="text-[10px] uppercase font-bold text-[var(--conversation-starter-text)] tracking-widest pt-0.5">Conversation Starter</p>
+                     </div>
+                     {goalUsed && !isGeneratingScript && (
+                         <span className="text-[9px] text-indigo-400 font-medium italic border border-indigo-400/20 bg-indigo-400/10 px-1.5 py-0.5 rounded-md">
+                             Drafted based on goal: "{goalUsed.length > 20 ? goalUsed.substring(0, 20) + '...' : goalUsed}"
+                         </span>
+                     )}
                  </div>
                  
-                 <p className="text-sm text-slate-200 font-medium leading-relaxed italic pr-6 text-opacity-90">
+                 <p className="text-sm text-[var(--conversation-starter-text)] font-medium leading-relaxed italic pr-6 text-opacity-90">
                      {isGeneratingScript ? (
-                         <span className="text-indigo-300/50 animate-pulse">Designing the perfect approach...</span>
+                         <span className="opacity-50 animate-pulse">Designing the perfect approach...</span>
                      ) : (
                          `"${generatedScript || "Hey, thinking of you! Hope all is well."}"`
                      )}
@@ -373,17 +393,17 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
         </ScrollArea>
 
         {/* UNIFIED ACTION GRID & MEMORY LOG */}
-        <div className="p-4 bg-[#0B1120] border-t border-slate-800 space-y-4 z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.5)] min-h-[340px]">
+        <div className="p-4 bg-muted/30 border-t border-border space-y-4 z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] min-h-[340px]">
              
              {/* Tab Switcher */}
-             <div className="flex p-1 bg-slate-900/50 rounded-xl mb-4 border border-slate-800">
+             <div className="flex p-1 bg-muted rounded-xl mb-4 border border-border">
                 <button
                     onClick={() => setActiveTab('log')}
                     className={cn(
                         "flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
                         activeTab === 'log' 
-                            ? "bg-slate-800 text-white shadow-sm ring-1 ring-white/10" 
-                            : "text-slate-500 hover:text-slate-300"
+                            ? "bg-background text-foreground shadow-sm ring-1 ring-border" 
+                            : "text-muted-foreground hover:text-foreground"
                     )}
                 >
                     Log Action
@@ -393,8 +413,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     className={cn(
                         "flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
                         activeTab === 'history' 
-                            ? "bg-slate-800 text-white shadow-sm ring-1 ring-white/10" 
-                            : "text-slate-500 hover:text-slate-300"
+                            ? "bg-background text-foreground shadow-sm ring-1 ring-border" 
+                            : "text-muted-foreground hover:text-foreground"
                     )}
                 >
                     History
@@ -422,7 +442,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             "p-2 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-1 h-16 relative group",
                             isActive 
                               ? "border-[#8B5CF6] bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.3)]" 
-                              : "border-slate-800 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-700"
+                              : "border-border bg-card hover:bg-accent hover:border-slate-400 dark:hover:border-slate-700"
                           )}
                         >
                           <span className="text-xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>
@@ -450,7 +470,23 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="What did you talk about? Add a specific detail..."
                             rows={2}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
+                            className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
+                        />
+                    </div>
+                 </div>
+
+                 {/* Next Goal Input (New) */}
+                 <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-100 mb-4">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
+                       Goal for Next Contact <span className="text-indigo-400 font-normal normal-case italic ml-1">(Column 3 Strategy)</span>
+                    </label>
+                    <div className="relative">
+                        <textarea
+                            value={nextGoal}
+                            onChange={(e) => setNextGoal(e.target.value)}
+                            placeholder="e.g., Ask about their new project..."
+                            rows={1}
+                            className="w-full px-4 py-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-foreground placeholder:text-indigo-400/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 resize-none transition-all text-sm"
                         />
                     </div>
                  </div>
@@ -480,7 +516,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 <div className="space-y-4 h-[340px] overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
                     
                     {/* Context Brief (AI Insight) */}
-                    <div className="bg-[#1E293B] border border-slate-700/50 rounded-xl p-3 shrink-0 relative overflow-hidden shadow-sm">
+                    <div className="bg-card border border-border rounded-xl p-3 shrink-0 relative overflow-hidden shadow-sm">
                         <div className="flex gap-3 items-start">
                              <div className="mt-0.5 bg-yellow-500/10 p-1 rounded-md">
                                 {isGeneratingBrief ? (
@@ -490,10 +526,10 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                                 )}
                              </div>
                              <div>
-                                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Context Brief</h4>
-                                 <p className="text-sm text-slate-200 font-medium leading-relaxed">
+                                 <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Context Brief</h4>
+                                 <p className="text-sm text-foreground font-medium leading-relaxed">
                                      {isGeneratingBrief ? (
-                                         <span className="text-slate-500 italic animate-pulse">Connecting the dots...</span>
+                                         <span className="text-muted-foreground italic animate-pulse">Connecting the dots...</span>
                                      ) : (
                                          contextBrief || "No sufficient context to generate brief."
                                      )}
@@ -515,9 +551,9 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                              </div>
                              <div>
                                  <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1">History Summary</h4>
-                                 <p className="text-sm text-slate-200 font-medium leading-relaxed">
+                                 <p className="text-sm text-foreground font-medium leading-relaxed">
                                      {isGeneratingStatus ? (
-                                         <span className="text-slate-500 italic animate-pulse">Analyzing recent history...</span>
+                                         <span className="text-muted-foreground italic animate-pulse">Analyzing recent history...</span>
                                      ) : (
                                          aiStatus || "No recent history to summarize."
                                      )}
