@@ -26,17 +26,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { personName, context, history } = await request.json();
+    const { personName, context, history, mutualConnections } = await request.json();
 
     const systemPrompt = `You are a helpful relationship assistant.
 Goal: Based on the provided Context and History for ${personName}, generate a natural reach-out script.
 Tone: Casual, warm, authentic. Not "salesy".
 Length: Short message (SMS/Email style), max 2 sentences.
+Special Instruction: If mutual connections are listed, you MUST start the message by mentioning one of them to create a warm intro. Example: "Hey ${personName}, I was just catching up with [Mutual Name] and your name came up!"
 Output: Just the script text. No quotes.`;
 
     const userContext = `
     Contact Name: ${personName}
     
+    Mutual Connections (Warm Intro Opportunities):
+    ${mutualConnections && mutualConnections.length > 0 ? mutualConnections.join(', ') : "None"}
+
     Context (Notes/Interests):
     ${context || "No specific context available."}
     

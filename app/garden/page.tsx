@@ -3,7 +3,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, List, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid, Share2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
@@ -12,6 +13,11 @@ import NurtureSidebar from '@/components/relationship-garden/NurtureSidebar';
 import GardenLegend from '@/components/relationship-garden/GardenLegend';
 import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
 import toast from 'react-hot-toast';
+
+const NetworkGraphView = dynamic(() => import('@/components/relationship-garden/NetworkGraphView'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="animate-spin h-8 w-8 text-slate-400" /></div>
+});
 
 // Health status types
 type HealthStatus = 'all' | 'blooming' | 'nourished' | 'thirsty' | 'fading';
@@ -89,13 +95,17 @@ function getInitials(firstName: string, lastName: string | null, name: string): 
 // Extended contact with db id
 interface ExtendedContact extends Contact {
   dbId: string;
+  company?: string | null;
+  interests?: string[] | null;
+  tags?: string[];
 }
 
 export default function GardenPage() {
   const [categoryFilter, setCategoryFilter] = useState<FilterType>('all');
   const [healthFilter, setHealthFilter] = useState<HealthStatus>('all');
-  const [viewMode, setViewMode] = useState<'garden' | 'list'>('garden');
+  const [viewMode, setViewMode] = useState<'garden' | 'list' | 'graph'>('garden');
   const [contacts, setContacts] = useState<ExtendedContact[]>([]);
+  const [relationships, setRelationships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -120,14 +130,14 @@ export default function GardenPage() {
         return;
       }
 
-      // Fetch persons
+      // Fetch persons and relationships
       const { data: persons, error: fetchError } = await (supabase as any)
         .from('persons')
-        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance')
+        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance, company, interests')
         .eq('user_id', user.id)
         .eq('archived', false)
         .order('name');
-
+        
       if (fetchError) {
         console.error('Error fetching persons:', fetchError);
         setError('Failed to load contacts');
@@ -135,27 +145,17 @@ export default function GardenPage() {
         return;
       }
 
-      // Fetch person_tags
-      const personIds = persons?.map((p: any) => p.id) || [];
-      const { data: personTags } = await (supabase as any)
-        .from('person_tags')
-        .select('person_id, tags(name)')
-        .in('person_id', personIds);
-
-      const tagsMap = new Map<string, string[]>();
-      personTags?.forEach((pt: any) => {
-        const personId = pt.person_id;
-        const tagName = pt.tags?.name;
-        if (tagName) {
-          if (!tagsMap.has(personId)) {
-            tagsMap.set(personId, []);
-          }
-          tagsMap.get(personId)?.push(tagName);
-        }
-      });
+      // Fetch relationships for graph
+      const { data: allRelationships } = await (supabase as any)
+        .from('inter_contact_relationships')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      setRelationships(allRelationships || []);
 
       const gardenContacts: ExtendedContact[] = (persons || []).map((person: any) => {
-        const tagNames = tagsMap.get(person.id) || [];
+        // Use interests as a proxy for tags to determine category
+        const interestsList = person.interests || [];
         return {
           id: person.id,
           dbId: person.id,
@@ -163,7 +163,10 @@ export default function GardenPage() {
           initials: getInitials(person.first_name, person.last_name, person.name),
           days: calculateDaysSinceContact(person.last_contact, person.last_interaction_date),
           importance: person.importance || 'medium',
-          category: mapTagsToCategory(tagNames),
+          category: mapTagsToCategory(interestsList), // Using interests for categorization
+          company: person.company,
+          interests: person.interests,
+          tags: interestsList // Using interests as fallback for tags
         };
       });
 
@@ -432,6 +435,17 @@ export default function GardenPage() {
                 title="List View"
               >
                 <List className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode('graph')}
+                className={`p-2 rounded-lg border transition-colors ${
+                  viewMode === 'graph' 
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+                title="Network Graph"
+              >
+                <Share2 className="w-5 h-5" />
               </button>
             </div>
           </div>

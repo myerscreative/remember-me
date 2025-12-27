@@ -18,7 +18,9 @@ import { updatePersonMemory } from "@/app/actions/update-person-memory";
 import { logInteraction } from "@/app/actions/logInteraction";
 import { getRecentInteractions, type InteractionHistoryItem } from "@/app/actions/get-interactions";
 import { type InteractionType } from "@/lib/relationship-health";
+import { getConnections, type ConnectionWithDetails } from "@/app/actions/get-connections";
 import { HistoryTimeline } from "./HistoryTimeline";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 interface UnifiedActionHubProps {
@@ -29,6 +31,7 @@ interface UnifiedActionHubProps {
 }
 
 export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMethod }: UnifiedActionHubProps & { initialMethod?: InteractionType }) {
+  const router = useRouter();
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -46,6 +49,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
   const [contextBrief, setContextBrief] = useState<string | null>(null);
   const [isGeneratingBrief, setIsGeneratingBrief] = useState(false);
+  const [mutuals, setMutuals] = useState<ConnectionWithDetails[]>([]);
+  const [isLoadingMutuals, setIsLoadingMutuals] = useState(false);
   
   const noteInputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -71,7 +76,20 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 const logs = res.data;
                 setHistory(logs);
                 
-                // 1. Generate History Summary (Status)
+                // 1. Fetch Mutuals (Parallel)
+                setIsLoadingMutuals(true);
+                const mutualsRes = await getConnections(person.id);
+                setMutuals(mutualsRes);
+                setIsLoadingMutuals(false);
+
+                // Sort mutuals by health (recency)
+                const sortedMutuals = [...mutualsRes].sort((a, b) => {
+                    const dateA = a.connected_person.last_interaction_date ? new Date(a.connected_person.last_interaction_date).getTime() : 0;
+                    const dateB = b.connected_person.last_interaction_date ? new Date(b.connected_person.last_interaction_date).getTime() : 0;
+                    return dateB - dateA;
+                });
+
+                // 2. Generate History Summary (Status)
                 if (activeTab === 'history' && logs.length > 0 && !aiStatus) {
                     setIsGeneratingStatus(true);
                     try {
@@ -95,7 +113,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     }
                 }
 
-                // 2. Generate Conversation Starter (Script)
+                // 3. Generate Conversation Starter (Script)
                 // Only if not already generated, to save costs/time
                 if (!generatedScript) {
                     setIsGeneratingScript(true);
@@ -109,7 +127,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                                     date: new Date(l.created_at).toLocaleDateString(), 
                                     type: l.type, 
                                     notes: l.notes 
-                                })).slice(0, 3) // Send last 3 for context
+                                })).slice(0, 3), // Send last 3 for context
+                                mutualConnections: sortedMutuals.map(m => m.connected_person.name).slice(0, 3)
                             })
                         });
                         const scriptData = await scriptRes.json();
@@ -318,6 +337,37 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                         {interests.length === 0 && <span className="text-[10px] text-slate-600 italic">No interests yet.</span>}
                     </div>
                 </div>
+
+                {/* Shared Connections */}
+                {mutuals.length > 0 && (
+                    <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">
+                        <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                           Shared Connections
+                        </h3>
+                        <div className="flex items-center gap-1">
+                             <div className="flex -space-x-2">
+                                {mutuals.slice(0, 3).map((mutual) => (
+                                    <Avatar 
+                                      key={mutual.id} 
+                                      className="h-6 w-6 border border-[#0F172A] cursor-pointer hover:z-10 hover:scale-110 transition-transform"
+                                      onClick={() => {
+                                         onClose();
+                                         router.push(`/contacts/${mutual.connected_person.id}`);
+                                      }}
+                                    >
+                                        <AvatarImage src={mutual.connected_person.photo_url || undefined} />
+                                        <AvatarFallback className="text-[8px] bg-slate-700 text-slate-300">
+                                            {getInitials(mutual.connected_person.first_name, mutual.connected_person.last_name)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                ))}
+                             </div>
+                             <span className="text-[10px] text-slate-400 ml-2">
+                                You both know {mutuals[0].connected_person.first_name} {mutuals.length > 1 && `+ ${mutuals.length - 1} others`}
+                             </span>
+                        </div>
+                    </div>
+                )}
             </div>
         </ScrollArea>
 
