@@ -9,7 +9,10 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  console.log("Server Sync User:", user?.id);
+
   if (!user) {
+    console.log("Server Sync: No User");
     return { data: [], totalCount: 0, activeCount: 0, error: new Error("User not authenticated") };
   }
 
@@ -18,6 +21,9 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
       .from('persons')
       .select('id, name, last_interaction_date, importance, relationship_value, person_tags(tags(name))', { count: 'exact' })
       .eq('user_id', user.id);
+
+    console.log("Server Sync Raw Count:", totalCount);
+    console.log("Server Sync Raw Data Length:", contacts?.length);
 
     if (error) {
       console.error('Error fetching map contacts:', error);
@@ -35,6 +41,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
     }));
 
     const activeCount = mappedContacts.filter((c: any) => c.intensity).length;
+    console.log("Server Sync Active Count:", activeCount);
 
     return { data: mappedContacts, totalCount: totalCount || 0, activeCount, error: null };
   } catch (error) {
