@@ -669,8 +669,7 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
     console.error('Error fetching milestones:', error);
     return { data: [], error: error instanceof Error ? error : new Error(error.message) };
   }
-/**
- * Get all contacts for Map Visualization (Server-Side Force Sync)
- */
+}
+
 
 
