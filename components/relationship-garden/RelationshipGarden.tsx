@@ -58,6 +58,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     y: 0,
     contact: null,
   });
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Zoom state with localStorage persistence
   const [zoom, setZoom] = useState(() => {
@@ -292,8 +293,12 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
   }, [filteredContacts]);
 
-  // Tooltip handlers
   const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
+    // Clear any pending hide timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
     setTooltip({
       visible: true,
       x: e.clientX + 15,
@@ -311,6 +316,22 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   };
 
   const handleLeafLeave = () => {
+    // Delay hiding to allow user to move mouse to tooltip
+    hideTimeoutRef.current = setTimeout(() => {
+      setTooltip(prev => ({ ...prev, visible: false }));
+    }, 200); // 200ms delay
+  };
+
+  const handleTooltipEnter = () => {
+    // Cancel hide when mouse enters tooltip
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleTooltipLeave = () => {
+    // Hide tooltip when mouse leaves it
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
@@ -456,11 +477,13 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div 
-            className="fixed z-1000 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto"
+            className="fixed z-1000 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-default"
             style={{ 
               left: tooltip.x, 
               top: tooltip.y,
             }}
+            onMouseEnter={handleTooltipEnter}
+            onMouseLeave={handleTooltipLeave}
           >
             <div className="font-semibold text-[15px] mb-2">{tooltip.contact.name}</div>
             <div className="flex justify-between text-xs opacity-90 mb-1">
@@ -476,20 +499,17 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                <div className="inline-block px-2 py-1 bg-white/15 rounded text-[11px] capitalize">
                 {tooltip.contact.category}
               </div>
-              {/* Quick Log for High Importance */}
-              {tooltip.contact.importance === 'high' && onQuickLog && (
+              {/* Quick Log Button - shown for ALL contacts */}
+              {onQuickLog && (
                 <button
-                  onClick={() => {
-                    // Prevent click from passing to leaf click
-                    // Use ref or just rely on parent handling if this was real DOM, but tooltip is pointer-events-none
-                    // WAit, tooltip is pointer-events-none, so I can't click the button!
-                    // I must enable pointer-events for the tooltip container.
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (tooltip.contact && onQuickLog) {
+                      onQuickLog(tooltip.contact);
+                      setTooltip(prev => ({ ...prev, visible: false }));
+                    }
                   }}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm transition-colors pointer-events-auto"
-                  onMouseDown={(e) => {
-                     e.stopPropagation();
-                     if (tooltip.contact && onQuickLog) onQuickLog(tooltip.contact);
-                  }}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm transition-colors"
                 >
                   ⚡ Quick Log
                 </button>
