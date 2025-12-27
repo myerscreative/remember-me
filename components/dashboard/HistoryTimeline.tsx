@@ -80,7 +80,7 @@ export function HistoryTimeline({ history, onCopy, isLoading }: HistoryTimelineP
                                         </div>
                                         
                                         {/* Next Goal Note Display */}
-                                        {item.next_goal_note && (
+                                        {item.next_goal_note && item.next_goal_note.trim() !== "" && (
                                             <div className="mb-2 flex items-start gap-1.5">
                                                 <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider shrink-0 mt-0.5">Strategy:</span>
                                                 <span className="text-xs text-purple-400 font-medium italic">{item.next_goal_note}</span>

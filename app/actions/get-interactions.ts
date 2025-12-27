@@ -8,6 +8,7 @@ export interface InteractionHistoryItem {
   created_at: string;
   type: InteractionType;
   notes: string | null;
+  next_goal_note?: string | null;
 }
 
 export async function getRecentInteractions(personId: string, limit: number = 5) {
@@ -21,7 +22,7 @@ export async function getRecentInteractions(personId: string, limit: number = 5)
   try {
     const { data: interactions, error } = await supabase
       .from('interactions')
-      .select('id, created_at, type, notes')
+      .select('id, created_at, type, notes, next_goal_note')
       .eq('person_id', personId)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
