@@ -226,21 +226,59 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
             </div>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-              Cancel
+
+      <div className="flex justify-between w-full">
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={async () => {
+                if (!confirm("Are you sure you want to delete this contact? This action cannot be undone.")) return;
+                
+                setIsSaving(true);
+                try {
+                  const supabase = createClient();
+                  const { error } = await (supabase as any)
+                    .from("persons")
+                    .delete()
+                    .eq("id", contact.id);
+
+                  if (error) throw error;
+
+                  toast.success("Contact deleted");
+                  onSuccess(); // Triggers refresh
+                  onClose();
+                  // redirect performed by parent or purely refresh? 
+                  // If on a contact page, we should probably redirect. 
+                  // But checking the props, onSuccess is passed. 
+                  // Let's assume parent handles nav or refresh.
+                  // Actually, if we are on /contacts/[id], we need to go home.
+                   window.location.href = '/contacts'; 
+                } catch (err: any) {
+                  console.error("Delete error:", err);
+                   toast.error("Failed to delete contact");
+                   setIsSaving(false);
+                }
+              }} 
+              disabled={isSaving}
+            >
+              Delete Contact
             </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </DialogFooter>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

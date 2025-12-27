@@ -3,132 +3,64 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Merge, User, Check, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Merge, User, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { findPotentialDuplicates, PotentialDuplicateGroup } from '@/lib/contacts/merge-utils';
+import { MergeWizard } from './components/MergeWizard';
+import { type Database } from '@/types/database.types';
 
-interface Contact {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  photo_url?: string;
-  interaction_count?: number;
-  last_contact?: string;
-}
-
-interface DuplicateGroup {
-  name: string;
-  contacts: Contact[];
-}
+type Person = Database['public']['Tables']['persons']['Row'];
 
 export default function DeduplicatePage() {
-  const [groups, setGroups] = useState<DuplicateGroup[]>([]);
+  const [duplicateGroups, setDuplicateGroups] = useState<PotentialDuplicateGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
+  
+  // Wizard State
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<PotentialDuplicateGroup | null>(null);
+
   const router = useRouter();
   const supabase = createClient();
 
+  const fetchContactsAndFindDuplicates = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: persons, error } = await supabase
+        .from('persons')
+        .select('*') // Get all fields for better fuzzy matching
+        .eq('user_id', user.id)
+        .eq('archived', false);
+
+      if (error) throw error;
+
+      // Use potentially heavy fuzzy logic
+      // Note: For 200 contacts this is instant. For 2000 it might take 100ms.
+      const groups = findPotentialDuplicates(persons as Person[]);
+      setDuplicateGroups(groups);
+
+    } catch (err) {
+      console.error('Error fetching/processing contacts:', err);
+      toast.error('Failed to analyze contacts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+    fetchContactsAndFindDuplicates();
+  }, []);
 
-        const { data: persons, error } = await supabase
-          .from('persons')
-          .select('id, name, email, phone, photo_url, interaction_count, last_contact')
-          .eq('user_id', user.id)
-          .eq('archived', false); // Only check active contacts
+  const handleOpenMergeWizard = (group: PotentialDuplicateGroup) => {
+    setSelectedGroup(group);
+    setWizardOpen(true);
+  };
 
-        if (error) throw error;
-
-        // Group by name
-        const grouped = new Map<string, Contact[]>();
-        persons?.forEach((p: any) => {
-          const normalizedName = p.name?.trim().toLowerCase();
-          if (!normalizedName) return;
-          
-          if (!grouped.has(normalizedName)) {
-            grouped.set(normalizedName, []);
-          }
-          grouped.get(normalizedName)?.push(p);
-        });
-
-        // Filter for duplicates
-        const duplicates: DuplicateGroup[] = [];
-        grouped.forEach((contacts) => {
-          if (contacts.length > 1) {
-            // Sort by interaction count or something responsible?
-            // Let's sort by ID to be stable, or interaction count descending (keep most active by default visually)
-            contacts.sort((a, b) => (b.interaction_count || 0) - (a.interaction_count || 0));
-            duplicates.push({ name: contacts[0].name, contacts });
-          }
-        });
-
-        setGroups(duplicates);
-      } catch (err) {
-        console.error('Error fetching contacts:', err);
-        toast.error('Failed to load contacts');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContacts();
-  }, [supabase]);
-
-  // handleMerge removed (unused)
-
-  const handleMergeGroup = async (groupIndex: number, keeperId: string) => {
-    const group = groups[groupIndex];
-    const duplicates = group.contacts.filter(c => c.id !== keeperId);
-    
-    // We strictly merge one by one for safety/feedback, although loop is fine
-    // Or we could create a bulk merge RPC, but single is safer to debug.
-    
-    setProcessing(true);
-    let successCount = 0;
-
-    for (const dup of duplicates) {
-      try {
-         // Cast to any to avoid type errors since migration is fresh and types aren't regenerated
-         const { error } = await (supabase as any).rpc('merge_contacts', {
-            keeper_id: keeperId,
-            duplicate_id: dup.id
-         });
-         if (error) throw error;
-         successCount++;
-      } catch (e: any) {
-        console.error(`Failed to merge ${dup.id} into ${keeperId}`, e);
-        // Log detailed error for debugging
-        if (typeof e === 'object' && e !== null) {
-            console.error('Error details:', {
-                message: e.message,
-                code: e.code,
-                details: e.details,
-                hint: e.hint
-            });
-        }
-        toast.error(`Failed: ${e.message || 'Unknown error'}`);
-      }
-    }
-
-    if (successCount === duplicates.length) {
-      toast.success(`Successfully merged ${group.name}`);
-      // Refresh by re-fetching. We need to define fetchContacts outside or duplicate logic?
-      // Since it's inside useEffect now, we can't call it. 
-      // ACTUALLY, better to keep it outside and wrap in useCallback.
-      // Let me revert to useCallback strategy in this ReplacementContent or just trigger a reload or state update.
-      // Easiest is to window.location.reload() or just update local state.
-      // Updating local state is better.
-      const newGroups = [...groups];
-      newGroups.splice(groupIndex, 1);
-      setGroups(newGroups);
-      setProcessing(false);
-    } else {
-      setProcessing(false); 
-      // Partial success - ideally we re-fetch but for now just stop.
-    }
+  const handleMergeSuccess = () => {
+    // Refresh list
+    fetchContactsAndFindDuplicates();
   };
 
   if (loading) {
@@ -150,116 +82,98 @@ export default function DeduplicatePage() {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Network
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Duplicate Cleanup</h1>
+          <div className="text-right">
+             <h1 className="text-2xl font-bold text-gray-900">Network Cleanup</h1>
+             <p className="text-xs text-gray-500">AI-Powered Duplicate Detection</p>
+          </div>
         </header>
 
-        {groups.length === 0 ? (
+        {duplicateGroups.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="w-8 h-8" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No Duplicates Found</h2>
-            <p className="text-gray-500">Your network looks clean! No contacts with identical names found.</p>
+            <p className="text-gray-500">Your network looks clean! We checked names, emails, and phone numbers.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+            <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-lg flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-indigo-600 mt-0.5 shrink-0" />
               <div>
-                <h3 className="font-medium text-blue-900">How merging works</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  Select the &quot;primary&quot; contact you want to keep. All interactions, meetings, and interests 
-                  from the other duplicates will be moved to the primary contact. The duplicates will then be removed.
+                <h3 className="font-medium text-indigo-900">Potential Duplicates Found</h3>
+                <p className="text-sm text-indigo-700 mt-1">
+                  We found <strong>{duplicateGroups.length}</strong> groups of potential duplicates using smart matching (Name similarity, Email, Phone).
+                  Review each group to merge them.
                 </p>
               </div>
             </div>
 
-            {groups.map((group, idx) => (
-              <MergeGroupCard 
-                key={idx} 
-                group={group} 
-                onMerge={(keeperId) => handleMergeGroup(idx, keeperId)}
-                processing={processing}
-              />
+            {duplicateGroups.map((group) => (
+              <div key={group.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                       {group.keeper.name}
+                       {group.score >= 1.0 && (
+                         <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Exact Match</span>
+                       )}
+                       {group.score < 1.0 && (
+                         <span className="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">{(group.score * 100).toFixed(0)}% Similar</span>
+                       )}
+                    </h3>
+                    <div className="text-xs text-gray-500 mt-1 flex gap-2">
+                      {group.reason.map((r, i) => (
+                        <span key={i} className="bg-gray-200 px-1.5 py-0.5 rounded">{r}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => handleOpenMergeWizard(group)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                  >
+                    <Merge className="w-4 h-4" />
+                    Review & Merge
+                  </button>
+                </div>
+                
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Only show up to 3 for preview */}
+                    {[group.keeper, ...group.duplicates].slice(0, 3).map(person => (
+                       <div key={person.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-100">
+                           <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600 overflow-hidden">
+                              {person.photo_url ? <img src={person.photo_url} className="w-full h-full object-cover" /> : person.name.slice(0,1)}
+                           </div>
+                           <div className="overflow-hidden">
+                              <div className="font-medium text-sm truncate">{person.name}</div>
+                              <div className="text-xs text-gray-500 truncate">{person.email || person.phone || 'No info'}</div>
+                           </div>
+                       </div>
+                    ))}
+                    {group.duplicates.length + 1 > 3 && (
+                       <div className="flex items-center justify-center text-xs text-gray-500 italic">
+                         + {(group.duplicates.length + 1) - 3} more
+                       </div>
+                    )}
+                </div>
+              </div>
             ))}
           </div>
         )}
+        
+        {selectedGroup && (
+           <MergeWizard 
+             isOpen={wizardOpen}
+             onClose={() => setWizardOpen(false)}
+             keeper={selectedGroup.keeper}
+             duplicate={selectedGroup.duplicates[0]} // Currently only supporting 1-on-1 merge in wizard for simplicity
+             onSuccess={handleMergeSuccess}
+           />
+        )}
+        
       </div>
     </div>
   );
 }
 
-function MergeGroupCard({ group, onMerge, processing }: { group: DuplicateGroup, onMerge: (id: string) => void, processing: boolean }) {
-  const [selectedKeeper, setSelectedKeeper] = useState<string>(group.contacts[0].id);
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <User className="w-4 h-4 text-gray-500" />
-          {group.name}
-          <span className="text-xs font-normal text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
-            {group.contacts.length} copies
-          </span>
-        </h3>
-        <button
-          onClick={() => onMerge(selectedKeeper)}
-          disabled={processing}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-        >
-          <Merge className="w-4 h-4" />
-          Merge into Selected
-        </button>
-      </div>
-      
-      <div className="divide-y divide-gray-100">
-        {group.contacts.map((contact) => (
-          <div 
-            key={contact.id} 
-            className={`p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer ${selectedKeeper === contact.id ? 'bg-indigo-50 hover:bg-indigo-50' : ''}`}
-            onClick={() => setSelectedKeeper(contact.id)}
-          >
-            <div className="flex items-center gap-4">
-              <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedKeeper === contact.id ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'}`}>
-                {selectedKeeper === contact.id && <Check className="w-3 h-3 text-white" />}
-              </div>
-              
-              <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden shrink-0">
-                {contact.photo_url ? (
-                  <img src={contact.photo_url} alt={contact.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs font-bold">
-                    {contact.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <div className="text-sm font-medium text-gray-900">
-                  {contact.id === selectedKeeper ? 'Primary Contact (Keeper)' : 'Duplicate (Will be deleted)'}
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                  <span>ID: ...{contact.id.slice(-4)}</span>
-                  <span>•</span>
-                  <span>{contact.interaction_count || 0} interactions</span>
-                  {contact.email && (
-                    <>
-                      <span>•</span>
-                      <span>{contact.email}</span>
-                    </>
-                  )}
-                  {contact.phone && (
-                    <>
-                      <span>•</span>
-                      <span>{contact.phone}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

@@ -24,7 +24,6 @@ import {
   parseCSV,
   deduplicateContacts,
   validateContact,
-  batchContacts,
   type ImportedContact,
 } from "@/lib/contacts/importUtils";
 import { syncAvatarsFromVCF, previewAvatarSync, type AvatarSyncPreview } from "@/lib/contacts/avatarSyncUtils";
@@ -183,59 +182,16 @@ export default function ImportContactsPage() {
     setErrorMessage('');
 
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      // Use Server Action for secure and selective import
+      const { importVCard } = await import('@/app/actions/import-vcard');
+      const result = await importVCard(contactsToImport);
 
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
+      setImportedCount(result.created + result.updated);
+      setFailedCount(result.failed);
 
-      // Batch selected contacts for efficient insertion
-      const batches = batchContacts(contactsToImport, 100);
-      let totalImported = 0;
-      let totalFailed = 0;
-
-      for (const batch of batches) {
-        // Prepare data for insertion
-        const contactsToInsert = batch.map(contact => ({
-          user_id: user.id,
-          name: contact.name,
-          first_name: contact.first_name,
-          last_name: contact.last_name,
-          email: contact.email,
-          phone: contact.phone,
-          birthday: contact.birthday,
-          notes: contact.notes,
-          imported: true,
-          has_context: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }));
-
-        // Update current contact display
-        if (batch.length > 0) {
-          setCurrentContact(batch[0].name);
-        }
-
-        // Insert batch
-        const { data, error } = await (supabase as any)
-          .from('persons')
-          .insert(contactsToInsert)
-          .select();
-
-        if (error) {
-          console.error('Batch insert error:', error);
-          totalFailed += batch.length;
-        } else {
-          totalImported += data?.length || 0;
-        }
-
-        // Update progress
-        setImportedCount(totalImported);
-        setFailedCount(totalFailed);
-
-        // Small delay to show progress (optional, can remove for production)
-        await new Promise(resolve => setTimeout(resolve, 100));
+      if (result.errors.length > 0) {
+        // Show first few errors if any
+        setErrorMessage(`Import completed with errors: ${result.errors.slice(0, 3).join(', ')}`);
       }
 
       setStage('complete');
@@ -766,6 +722,30 @@ export default function ImportContactsPage() {
               )}
             </div>
           )}
+
+          {/* Dev Tools Section */}
+          <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              Developer Tools
+            </h3>
+            <div className="flex gap-4">
+               <Button 
+                variant="destructive" 
+                onClick={async () => {
+                  if (!confirm('Are you sure you want to purge mock data (John Smith, etc)?')) return;
+                  const { purgeMockData } = await import('@/app/actions/purge-mock-data');
+                  const result = await purgeMockData();
+                  if (result.success) {
+                    alert(`Purged ${result.count} mock contacts.`);
+                  } else {
+                    alert('Purge failed: ' + result.error);
+                  }
+                }}
+              >
+                Purge Mock Data
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

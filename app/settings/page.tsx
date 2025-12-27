@@ -13,8 +13,11 @@ import {
   Shield,
   ChevronRight,
   Save,
-  Loader2
+  Loader2,
+  Database,
+  Calendar
 } from "lucide-react";
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useTheme } from "@/app/providers/theme-provider";
 import toast, { Toaster } from "react-hot-toast";
 import { ErrorFallback } from "@/components/error-fallback";
@@ -503,6 +506,44 @@ export default function SettingsPage() {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
+            </div>
+          </section>
+
+          {/* Setup & Imports */}
+          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                <Database className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Setup & Imports</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                    <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white">Calendar Sync</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Connect Google Calendar to track interactions</p>
+                  </div>
+                </div>
+                <GoogleSignInButton />
+              </div>
+
+              <Link href="/import" className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                    <Database className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white">Import Data</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Import contacts from CSV or vCard</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+              </Link>
             </div>
           </section>
 

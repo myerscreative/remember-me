@@ -57,90 +57,90 @@ export function DecayAlertBanner() {
     }
   };
 
-  const getSeverityText = (days: number) => {
+  const getSeverityText = (days: number | undefined | null) => {
+    // Handle undefined/null specifically as "Not yet contacted" or "Long time"
+    if (days === undefined || days === null) return "Ready for a first hello"; 
+    
     if (days > 365) return "Over a year";
     if (days > 180) return `${Math.floor(days / 30)} months`;
     return `${days} days`;
   };
 
   return (
-    <Card className="border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950 dark:to-yellow-950 mb-6">
-      <CardContent className="p-4 md:p-5">
-        <div className="flex items-start gap-3">
+    <Card className="border border-indigo-500/30 bg-slate-800/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl mb-6 relative overflow-hidden">
+        {/* Subtle decorative gradient */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+        
+      <CardContent className="p-4 md:p-5 relative z-10">
+        <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <div className="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+               {/* Leaf icon for "Garden/Growth" metaphor */}
+              <Users className="h-5 w-5 text-indigo-400" />
             </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base md:text-lg font-bold text-orange-900 dark:text-orange-100">
-                Relationships Needing Attention
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-base md:text-lg font-bold text-white">
+                Time to Reconnect
               </h3>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setDismissed(true)}
-                className="h-7 w-7 text-orange-600 hover:text-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900"
+                className="h-6 w-6 text-slate-400 hover:text-white hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
-            <p className="text-sm text-orange-800 dark:text-orange-200 mb-3">
+            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
               {severeCount > 0 && (
-                <span className="font-medium">
+                <span className="font-medium text-slate-200">
                   {severeCount} relationship{severeCount > 1 ? "s" : ""} haven't been contacted in over a year.
                 </span>
               )}
               {severeCount === 0 && moderateCount > 0 && (
-                <span className="font-medium">
+                <span className="font-medium text-slate-200">
                   {moderateCount} relationship{moderateCount > 1 ? "s" : ""} haven't been contacted in 6+ months.
                 </span>
               )}
-              {" "}Consider reconnecting or archiving to keep your list focused.
+              {" "}Nurture your network to keep it healthy. 🌱
             </p>
 
             {/* Show top decaying relationships */}
             <div className="space-y-2 mb-4">
               {decayingRelationships.slice(0, 3).map((relationship) => (
                 <Link key={relationship.person_id} href={`/contacts/${relationship.person_id}`}>
-                  <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors cursor-pointer border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center justify-between p-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg hover:border-indigo-500/50 hover:bg-slate-800 transition-all cursor-pointer group">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <Users className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <div className="h-2 w-2 rounded-full bg-indigo-500 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.6)] transition-shadow" />
+                      <span className="text-sm font-medium text-slate-200 group-hover:text-white truncate">
                         {relationship.name}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Badge className={cn("text-xs", getSeverityColor(relationship.decay_severity))}>
-                        {getSeverityText(relationship.last_contact_days)} ago
+                      <Badge className={cn("text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/20")}>
+                        {getSeverityText(relationship.last_contact_days)} {relationship.last_contact_days ? 'ago' : ''}
                       </Badge>
-                      <Calendar className="h-3 w-3 text-gray-400" />
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
 
-            {decayingRelationships.length > 3 && (
-              <p className="text-xs text-orange-700 dark:text-orange-300 mb-3">
-                + {decayingRelationships.length - 3} more relationship{decayingRelationships.length - 3 > 1 ? "s" : ""}
-              </p>
-            )}
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 pt-1">
               <Link href="/insights">
-                <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+                <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
                   View All
                 </Button>
               </Link>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setDismissed(true)}
-                className="border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-300"
+                className="text-slate-400 hover:text-white hover:bg-white/5"
               >
                 Dismiss
               </Button>

@@ -63,7 +63,7 @@ export function GoogleSignInButton() {
     <button
       onClick={handleSignIn}
       disabled={isLoading}
-      className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition disabled:opacity-50 text-sm font-medium"
+      className="flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50 text-sm font-medium text-gray-700 dark:text-gray-300"
     >
       <svg className="w-4 h-4" viewBox="0 0 24 24">
         <path

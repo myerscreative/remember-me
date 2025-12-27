@@ -64,40 +64,45 @@ export function DailyPracticeWidget() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white shadow-lg relative overflow-hidden group">
+    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-4 text-white shadow-lg relative overflow-hidden group">
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-700">
-        <Brain size={120} />
+      <div className="absolute -top-4 -right-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-700 pointer-events-none">
+        <Brain size={80} />
       </div>
 
-      <div className="relative z-10">
-        <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                <Star size={12} className="fill-yellow-300 text-yellow-300" /> Daily Challenge
-            </div>
-            {stats.currentStreak > 0 && (
-                <div className="flex items-center gap-1 text-orange-300 font-bold bg-black/20 px-2 py-1 rounded-lg text-xs">
-                    <Flame size={12} className="fill-orange-500 text-orange-500" /> 
-                    {stats.currentStreak} Day Streak
+      <div className="relative z-10 flex items-center justify-between">
+        <div className="flex-1">
+             <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    <Star size={10} className="fill-yellow-300 text-yellow-300" /> Daily Challenge
                 </div>
-            )}
+                {stats.currentStreak > 0 && (
+                    <div className="flex items-center gap-1 text-orange-200 font-bold text-[10px]">
+                        <Flame size={10} className="fill-orange-400 text-orange-400" /> 
+                        {stats.currentStreak} Day Streak
+                    </div>
+                )}
+             </div>
+
+            <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold">Master Your Network</h3>
+                <p className="text-indigo-100 text-xs hidden md:block">
+                Keep the streak alive!
+                </p>
+            </div>
         </div>
 
-        <h3 className="text-xl font-bold mb-2">Master Your Network</h3>
-        <p className="text-indigo-100 text-sm mb-6 max-w-[280px]">
-           Complete a quick 60-second Face Match session to keep your streak!
-        </p>
-
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+             <div className="hidden md:block bg-black/20 rounded-lg px-2 py-1.5 text-[10px] font-medium text-indigo-200">
+                 +100 XP
+             </div>
              <Button 
                 onClick={() => router.push('/practice')}
-                className="bg-white text-indigo-600 hover:bg-indigo-50 font-bold border-0 shadow-xl"
+                size="sm"
+                className="bg-white text-indigo-600 hover:bg-indigo-50 font-bold border-0 shadow-md h-8 text-xs px-3"
              >
-                Start Practice <ArrowRight size={16} className="ml-2" />
+                Start <ArrowRight size={14} className="ml-1.5" />
              </Button>
-             <div className="bg-black/20 rounded-lg px-3 py-2 text-xs font-medium text-indigo-200">
-                 +100 XP Reward
-             </div>
         </div>
       </div>
     </div>

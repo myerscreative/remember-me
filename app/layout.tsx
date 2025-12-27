@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
-import { FABWrapper } from "@/components/FABWrapper";
 import { ThemeProvider } from "./providers/theme-provider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { Toaster } from "react-hot-toast";
@@ -65,7 +64,6 @@ export default function RootLayout({
                   {children}
                 </main>
                 <BottomNav />
-                <FABWrapper />
               </div>
             </div>
             <Toaster position="bottom-center" />

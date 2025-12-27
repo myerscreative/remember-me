@@ -24,6 +24,10 @@ import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
 import { InterestsTab } from "@/app/contacts/[id]/components/tabs/InterestsTab";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
+import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
+import { InteractionType } from "@/lib/relationship-health";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getInitials } from "@/lib/utils/contact-helpers";
 
 const tabs = ["Overview", "Details", "Story", "Family", "Interests"];
 
@@ -45,6 +49,36 @@ export default function ContactDetailPage({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Log Interaction Modal State
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [logInitialMethod, setLogInitialMethod] = useState<InteractionType | undefined>(undefined);
+
+  // Check searchParams for action trigger
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action) {
+       let method: InteractionType = 'in-person';
+       if (action === 'call') method = 'call';
+       else if (action === 'email') method = 'email';
+       else if (action === 'message' || action === 'text') method = 'text';
+       else if (action === 'social') method = 'social';
+       else if (action === 'in-person') method = 'in-person';
+       
+       setLogInitialMethod(method);
+       setIsLogModalOpen(true);
+    }
+  }, [searchParams]);
+
+  const closeLogModal = () => {
+      setIsLogModalOpen(false);
+      // Clean URL without refresh using router.replace
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('action');
+      router.replace(`/contacts/${id}?${params.toString()}`, { scroll: false });
+  };
 
   const handleRefresh = async () => {
     window.location.reload();
@@ -385,6 +419,21 @@ export default function ContactDetailPage({
         contact={contact}
         onSuccess={handleRefresh}
       />
+      
+      {contact && (
+          <LogInteractionModal 
+            isOpen={isLogModalOpen}
+            onClose={closeLogModal}
+            contact={{
+                id: contact.id,
+                name: contact.name,
+                initials: getInitials(contact.first_name, contact.last_name),
+                importance: contact.importance
+            }}
+            initialMethod={logInitialMethod}
+            onSuccess={handleRefresh}
+          />
+      )}
     </div>
   );
 }

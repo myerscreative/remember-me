@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { INTERACTION_TYPES, type InteractionType } from '@/lib/relationship-health';
 import { logInteraction } from '@/app/actions/logInteraction';
 import toast from 'react-hot-toast';
+import { cn } from "@/lib/utils";
 
 interface LogInteractionModalProps {
   contact: {
@@ -18,7 +19,19 @@ interface LogInteractionModalProps {
   onSuccess?: () => void;
   onUpdateImportance?: (newImportance: 'high' | 'medium' | 'low') => Promise<void>;
   initialNote?: string;
+  initialMethod?: InteractionType; 
 }
+
+const SUCCESS_SEEDS = [
+  "Relationship successfully watered! 🌱",
+  "You just planted a seed of connection. ✨",
+  "Relationship Nourished! Moved to the inner circle. 🌸",
+  "Intentionality pays off. Your garden is growing. 🌿",
+  "Connection refreshed. That large leaf is blooming again! 🍃"
+];
+
+// Reordered for UI: Call, Email, Text (Row 1) - In Person, Social, Other (Row 2)
+const ORDERED_TYPES: InteractionType[] = ['call', 'email', 'text', 'in-person', 'social', 'other'];
 
 export default function LogInteractionModal({ 
   contact, 
@@ -26,11 +39,24 @@ export default function LogInteractionModal({
   onClose,
   onSuccess,
   onUpdateImportance,
-  initialNote = ''
+  initialNote = '',
+  initialMethod
 }: LogInteractionModalProps) {
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
   const [note, setNote] = useState(initialNote);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const noteInputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Sync initialMethod when modal opens
+  useEffect(() => {
+    if (isOpen && initialMethod) {
+      setSelectedType(initialMethod);
+      // Auto-focus note input if coming from a specific action
+      setTimeout(() => {
+        noteInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen, initialMethod]);
 
   if (!isOpen) return null;
 
@@ -44,16 +70,6 @@ export default function LogInteractionModal({
         type: selectedType,
         note: note.trim() || undefined,
       });
-
-const SUCCESS_SEEDS = [
-  "Relationship successfully watered! 🌱",
-  "You just planted a seed of connection. ✨",
-  "Relationship Nourished! Moved to the inner circle. 🌸",
-  "Intentionality pays off. Your garden is growing. 🌿",
-  "Connection refreshed. That large leaf is blooming again! 🍃"
-];
-
-// ... inside handleSubmit ...
 
       if (result.success) {
         const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
@@ -72,34 +88,35 @@ const SUCCESS_SEEDS = [
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop with Blur XL */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl transition-all duration-300"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      {/* Modal Container - Matches Lore Card */}
+      <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-semibold">
+        <div className="flex items-center justify-between p-6 border-b border-slate-800">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold ring-2 ring-slate-700 shadow-inner">
               {contact.initials}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                 Log Connection
               </h2>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm text-slate-400 font-medium">
                   with {contact.name}
                 </p>
                 {onUpdateImportance && (
                   <select
                     value={contact.importance || 'medium'}
                     onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
-                    className="ml-2 text-xs py-0.5 px-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    className="ml-1 text-[10px] py-0.5 px-2 rounded-full border border-slate-700 bg-slate-800 text-slate-400 focus:outline-none focus:border-indigo-500 cursor-pointer uppercase font-bold tracking-wider"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <option value="high">⭐ High</option>
@@ -112,55 +129,61 @@ const SUCCESS_SEEDS = [
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-full text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
           >
-            <X className="w-5 h-5 text-slate-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Interaction Type */}
+          {/* Interaction Type Grid */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
               How did you connect?
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {INTERACTION_TYPES.map(({ value, label, emoji }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setSelectedType(value)}
-                  className={`p-3 rounded-xl border-2 transition-all text-center ${
-                    selectedType === value
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{emoji}</div>
-                  <div className={`text-xs font-medium ${
-                    selectedType === value 
-                      ? 'text-emerald-700 dark:text-emerald-400' 
-                      : 'text-slate-600 dark:text-slate-400'
-                  }`}>
-                    {label}
-                  </div>
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-3">
+              {ORDERED_TYPES.map((typeValue) => {
+                const typeInfo = INTERACTION_TYPES.find(t => t.value === typeValue) || { value: typeValue, label: typeValue, emoji: '✨' };
+                const isActive = selectedType === typeValue;
+                
+                return (
+                  <button
+                    key={typeValue}
+                    type="button"
+                    onClick={() => setSelectedType(typeValue)}
+                    className={cn(
+                      "p-3 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-2 h-20 relative group",
+                      isActive 
+                        ? "border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.25)]" 
+                        : "border-slate-800 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-700"
+                    )}
+                  >
+                    <span className="text-2xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>
+                    <span className={cn(
+                      "text-[10px] font-bold uppercase tracking-tight",
+                      isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"
+                    )}>
+                      {typeInfo.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Note */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Story / Notes <span className="text-slate-400">(optional)</span>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              Story / Notes <span className="text-slate-600 font-normal normal-case italic ml-1">(optional)</span>
             </label>
             <textarea
+              ref={noteInputRef}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="What did you talk about? Any memorable moments?"
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all"
             />
           </div>
 
@@ -168,16 +191,19 @@ const SUCCESS_SEEDS = [
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 px-4 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold tracking-wide rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Logging...
+                <Loader2 className="w-5 h-5 animate-spin text-white/80" />
+                <span className="text-white/90">Logging...</span>
               </>
             ) : (
               <>
-                🌱 Log Connection
+                <span className="relative z-10 flex items-center gap-2">
+                   🌱 Log Connection
+                </span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               </>
             )}
           </button>

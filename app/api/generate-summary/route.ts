@@ -3,10 +3,15 @@ import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
 
 // Lazy initialization to prevent build-time errors
+// Lazy initialization to prevent build-time errors
 let openaiInstance: OpenAI | null = null;
 function getOpenAI(): OpenAI {
   if (!openaiInstance) {
-    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Missing OPENAI_API_KEY environment variable");
+    }
+    openaiInstance = new OpenAI({ apiKey });
   }
   return openaiInstance;
 }

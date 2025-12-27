@@ -4,16 +4,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap, List, Rows, Brain } from "lucide-react";
+import { Search, Settings, ChevronRight, Plus, Users, Star, Archive, Zap, List, Rows, Brain, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
 import { DecayAlertBanner } from "@/components/decay-alert-banner";
 import { getInitialsFromFullName, getGradient, formatBirthday } from "@/lib/utils/contact-helpers";
+import { ExploreFilter } from "@/components/dashboard/ExploreFilter";
 
 import { ErrorFallback } from "@/components/error-fallback";
-import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 const filterOptions = ["All", "Favorites", "Investor", "Startup", "Friend"];
 
@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 export default function HomePage() {
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Person[]>([]);
   const [contactTags, setContactTags] = useState<Map<string, string[]>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -219,6 +220,13 @@ export default function HomePage() {
         }
       }
 
+      // Apply Interest filter
+      if (selectedInterest) {
+        if (!contact.interests || !contact.interests.includes(selectedInterest)) {
+          return false;
+        }
+      }
+
       // Apply search filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -252,149 +260,148 @@ export default function HomePage() {
       {/* Main Container - Centered on Desktop */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[950px] mx-auto w-full px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="flex items-center justify-between pt-6 pb-4 md:pt-8 md:pb-6">
+          {/* Header & Banner Section */}
+          <div className="pt-6 pb-2 md:pt-8 md:pb-4 space-y-4">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
               {showArchived ? "Archived Contacts" : "Contacts"}
             </h1>
-            <div className="flex items-center gap-2">
-              <GoogleSignInButton />
-              {/* Desktop: Add Contact Button */}
-              <Link href="/contacts/new" className="hidden lg:block">
-                <Button className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Contact
-                </Button>
-              </Link>
-              
-              {/* Desktop: Quick Capture Button */}
-              <Link href="/quick-capture" className="hidden lg:block">
-                <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 text-white">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Quick Capture
-                </Button>
-              </Link>
 
-                <Button 
-                   variant="ghost" 
-                   size="icon" 
-                   onClick={() => router.push('/practice')}
-                   className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40 transition-colors mr-2"
-                   title="Daily Practice"
-                >
-                   <Brain size={20} />
-                </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleViewMode}
-                className={cn(
-                  "h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
-                  isCompactView
-                    ? "bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800"
-                    : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                )}
-                title={isCompactView ? "Switch to normal view" : "Switch to compact view"}
-              >
-                {isCompactView ? (
-                  <List className="h-5 w-5 text-blue-700 dark:text-blue-300" />
-                ) : (
-                  <Rows className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowArchived(!showArchived)}
-                className={cn(
-                  "h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
-                  showArchived
-                    ? "bg-orange-100 hover:bg-orange-200 dark:bg-orange-900 dark:hover:bg-orange-800"
-                    : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                )}
-                title={showArchived ? "Show active contacts" : "Show archived contacts"}
-              >
-                <Archive className={cn(
-                  "h-5 w-5",
-                  showArchived ? "text-orange-700 dark:text-orange-300" : "text-gray-700 dark:text-gray-300"
-                )} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                <Search className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-              </Button>
-              <Link href="/settings">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  <Settings className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          
-          {/* Search Bar */}
-          <div className="pb-6 md:pb-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400 dark:text-gray-500" />
+            {/* Decay Alert Banner - Moved to Top */}
+            {!showArchived && <div className="-mt-1"><DecayAlertBanner /></div>}
+            
+            {/* Search Bar - Kept accessible */}
+            <div className="relative w-full max-w-2xl">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
-                placeholder="Who are you trying to remember?"
+                placeholder="Search your network..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 md:pl-10 h-11 md:h-12 rounded-xl bg-muted dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm md:text-base focus:border-gray-300 dark:focus:border-gray-600 focus:bg-card dark:focus:bg-gray-700 transition-colors"
+                className="w-full pl-9 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:border-blue-500 transition-all font-medium"
               />
             </div>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="pb-6 md:pb-8">
-            <div className="flex justify-center gap-2 md:gap-3 overflow-x-auto scrollbar-hide md:overflow-x-visible">
-              {filterOptions.map((filter) => {
-                const isSelected = selectedFilter === filter;
-                const isPrimary = isSelected && filter !== "All" && filter !== "Favorites";
-                const isAllSelected = filter === "All" && selectedFilter === "All";
-                const isFavoritesSelected = filter === "Favorites" && selectedFilter === "Favorites";
+          {/* Sticky Toolbar */}
+          <div className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 border-b border-gray-100 dark:border-gray-800 mb-6 transition-all hover:bg-white/95 dark:hover:bg-gray-900/95">
+            <div className="max-w-[950px] mx-auto flex items-center justify-between gap-4">
+              {/* LEFT: Tribe Filters & Explore */}
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mask-fade-right">
+                <ExploreFilter
+                  tags={Array.from(new Set(Array.from(contactTags.values()).flat())).sort()}
+                  interests={Array.from(new Set(contacts.flatMap(c => c.interests || []))).sort()}
+                  selectedTag={selectedFilter}
+                  selectedInterest={selectedInterest}
+                  onSelectTag={setSelectedFilter}
+                  onSelectInterest={setSelectedInterest}
+                />
                 
-                return (
-                  <button
-                    key={filter}
-                    onClick={() => setSelectedFilter(filter)}
-                    className={cn(
-                      "px-4 py-2 md:px-5 md:py-2.5 rounded-full text-sm md:text-base font-medium whitespace-nowrap transition-all duration-200",
-                      isPrimary
-                        ? "bg-blue-600 dark:bg-blue-500 text-white shadow-sm"
-                        : isAllSelected
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50"
-                        : isFavoritesSelected
-                        ? "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                        : isSelected
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50"
-                        : filter === "Favorites"
-                        ? "bg-card dark:bg-gray-800 text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-700 dark:hover:border-amber-400"
-                        : "bg-card dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-700 dark:hover:border-blue-400"
-                    )}
-                  >
-                    {filter}
-                  </button>
-                );
-              })}
+                <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+                <button
+                  onClick={() => { setSelectedFilter("All"); setSelectedInterest(null); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 border border-transparent",
+                    selectedFilter === "All" && !selectedInterest
+                      ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                  )}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setSelectedFilter("Favorites")}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 border border-transparent",
+                    selectedFilter === "Favorites"
+                      ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                  )}
+                >
+                  Favorites
+                </button>
+                
+                {/* Active Tribe Chip (if not All/Fav) */}
+                {selectedFilter !== "All" && selectedFilter !== "Favorites" && (
+                  <div className="flex items-center animate-in fade-in slide-in-from-left-2 duration-200">
+                    <span className="px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm flex items-center gap-1 border border-blue-200 dark:border-blue-800">
+                      {selectedFilter}
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setSelectedFilter("All"); }}
+                        className="hover:text-blue-900 dark:hover:text-blue-100 ml-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  </div>
+                )}
+
+                {/* Active Interest Chip */}
+                {selectedInterest && (
+                  <div className="flex items-center animate-in fade-in slide-in-from-left-2 duration-200">
+                    <span className="px-3 py-1.5 rounded-full text-sm font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 shadow-sm flex items-center gap-1 border border-indigo-200 dark:border-indigo-800">
+                      <span className="opacity-70 text-xs uppercase tracking-wider">Interest:</span> {selectedInterest}
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setSelectedInterest(null); }}
+                        className="hover:text-indigo-900 dark:hover:text-indigo-100 ml-1 rounded-full hover:bg-indigo-200 dark:hover:bg-indigo-800 p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT: Actions */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Desktop: Add Contact Button (Purple Gradient) */}
+                <Link href="/contacts/new" className="hidden lg:block">
+                  <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Contact
+                  </Button>
+                </Link>
+                
+                {/* Desktop: Quick Capture */}
+                <Link href="/quick-capture" className="hidden lg:block">
+                  <Button variant="ghost" size="icon" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" title="Quick Capture">
+                    <Zap className="h-4 w-4" />
+                  </Button>
+                </Link>
+
+                <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1 hidden lg:block" />
+
+                {/* View Toggles & Tools */}
+                <Button 
+                   variant="ghost" 
+                   size="icon" 
+                   onClick={() => router.push('/practice')}
+                   className="h-9 w-9 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                   title="Daily Practice"
+                >
+                   <Brain size={18} />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleViewMode}
+                  className={cn(
+                    "h-9 w-9 transition-colors",
+                    isCompactView ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                  )}
+                  title="Toggle View"
+                >
+                  {isCompactView ? <List size={18} /> : <Rows size={18} />}
+                </Button>
+
+                <Link href="/settings">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-700 dark:text-gray-400">
+                    <Settings size={18} />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-
-
-
-
-
-
-          {/* Decay Alert Banner - Only show for active contacts */}
-          {!showArchived && <DecayAlertBanner />}
 
           {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">

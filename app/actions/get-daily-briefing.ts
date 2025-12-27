@@ -10,8 +10,9 @@ export interface DailyBriefing {
   priorityNurtures: Person[];
 }
 
-export async function getDailyBriefing(): Promise<{ data: DailyBriefing | null; error: string | null }> {
+export async function getDailyBriefing(options: { expanded?: boolean } = {}): Promise<{ data: DailyBriefing | null; error: string | null }> {
   try {
+    const { expanded = false } = options;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -19,15 +20,28 @@ export async function getDailyBriefing(): Promise<{ data: DailyBriefing | null; 
       return { data: null, error: "Unauthorized" };
     }
 
-    // 1. Get Milestones and filter for TODAY
+    // 1. Get Milestones
     const milestonesResult = await getMilestones();
-    const todayMilestones = (milestonesResult.data || []).filter(m => m.daysRemaining === 0);
+    let finalMilestones = milestonesResult.data || [];
+    
+    if (!expanded) {
+       // Just today
+       finalMilestones = finalMilestones.filter(m => m.daysRemaining === 0);
+    } else {
+       // Today + Next 7 Days
+       finalMilestones = finalMilestones.filter(m => m.daysRemaining >= 0 && m.daysRemaining <= 7);
+    }
 
     // 2. Get Tribe Health and filter for THIRSTY
     const tribesResult = await getTribeHealth();
+    // In expanded mode, show ALL tribes, otherwise only thirsty ones? 
+    // Actually, "Briefing" usually implies "Actionable". 
+    // For now, let's keep it to Thirsty for both, maybe sort by urgency.
+    // If expanded, maybe we show ALL tribes but highlight thirsty ones? 
+    // Let's stick to Thirsty for now to keep it actionable.
     const thirstyTribes = (tribesResult.data || []).filter(t => t.isThirsty);
 
-    // 3. Identify Top 3 Fading Contacts
+    // 3. Identify Fading Contacts
     // "Fading" = last interaction > 120 days ago
     const oneHundredTwentyDaysAgo = new Date();
     oneHundredTwentyDaysAgo.setDate(oneHundredTwentyDaysAgo.getDate() - 120);
@@ -39,7 +53,7 @@ export async function getDailyBriefing(): Promise<{ data: DailyBriefing | null; 
       .or('archive_status.is.null,archive_status.eq.false')
       .lt('last_interaction_date', oneHundredTwentyDaysAgo.toISOString())
       .order('importance', { ascending: false })
-      .limit(10);
+      .limit(20); // Fetch more than needed to sort
     
     const fadingContacts = fadingResult.data as Person[] | null;
     const fadingError = fadingResult.error;
@@ -58,13 +72,16 @@ export async function getDailyBriefing(): Promise<{ data: DailyBriefing | null; 
       const dateA = a.last_interaction_date ? new Date(a.last_interaction_date).getTime() : 0;
       const dateB = b.last_interaction_date ? new Date(b.last_interaction_date).getTime() : 0;
       return dateA - dateB;
-    }).slice(0, 3);
+    });
+
+    const limitFading = expanded ? 10 : 3;
+    const finalFading = sortedFading.slice(0, limitFading);
 
     return {
       data: {
-        milestones: todayMilestones,
+        milestones: finalMilestones,
         thirstyTribes,
-        priorityNurtures: sortedFading as Person[]
+        priorityNurtures: finalFading as Person[]
       },
       error: null
     };

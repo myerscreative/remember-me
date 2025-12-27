@@ -4,10 +4,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Coffee, Cake, Droplets, Heart, Sparkles, Star } from 'lucide-react';
+import { Coffee, Cake, Droplets, Heart, Sparkles, Star, Phone, Mail, MessageSquare, Flower2 } from 'lucide-react';
 import { DailyBriefing } from '@/app/actions/get-daily-briefing';
 import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
-import { getInitials } from '@/lib/utils/contact-helpers';
+import { getInitials, getGradient } from '@/lib/utils/contact-helpers';
+import { LoreTooltip } from '@/components/dashboard/LoreTooltip';
+import { UnifiedActionHub } from '@/components/dashboard/UnifiedActionHub';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface DailyBriefingCardProps {
   briefing: DailyBriefing;
@@ -15,8 +19,9 @@ interface DailyBriefingCardProps {
 }
 
 export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingCardProps) {
-  const [selectedContact, setSelectedContact] = useState<{ id: string, name: string, template: string } | null>(null);
+  const [selectedContact, setSelectedContact] = useState<{ id: string, name: string, template: string, [key: string]: any } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeepLoreOpen, setIsDeepLoreOpen] = useState(false);
 
   const { milestones, thirstyTribes, priorityNurtures } = briefing;
   
@@ -31,113 +36,137 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
 
   return (
     <>
-      <Card className="border-2 border-[#38BDF8] bg-[#0F172A] shadow-[0_0_20px_rgba(56,189,248,0.1)] relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-           <Coffee className="h-24 w-24 text-[#38BDF8]" />
-        </div>
+      <Card className="border border-slate-800 bg-[#0B1120] shadow-xl relative overflow-hidden group">
+        {/* Glass Header */}
+        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#38BDF8]/10 to-transparent pointer-events-none" />
         
-        <CardHeader className="pb-2">
+        <CardHeader className="relative pb-2 z-10">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-[#38BDF8] flex items-center gap-2 font-black uppercase text-lg tracking-tighter">
-              <Sparkles className="h-5 w-5" />
-              Morning Briefing
-            </CardTitle>
-            <Badge className="bg-[#38BDF8] text-[#0F172A] font-black rounded-none">
-              {totalActions} ACTIONS
-            </Badge>
+            <div>
+                 <h2 className="text-white font-bold text-lg mb-0.5">
+                    Good Morning, Robert.
+                 </h2>
+                 <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">
+                    You have <span className="text-[#38BDF8] font-bold">{totalActions} priority actions</span> today.
+                 </p>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-[#38BDF8]/10 backdrop-blur-sm border border-[#38BDF8]/20 px-3 py-1.5 rounded-full">
+                <Sparkles className="h-3.5 w-3.5 text-[#38BDF8]" />
+                <span className="text-[#38BDF8] text-[10px] font-black uppercase tracking-widest">{totalActions} Actions</span>
+            </div>
           </div>
-          <p className="text-slate-400 text-sm font-bold uppercase tracking-tight mt-1">
-            Good morning! You have {milestones.length} milestones today and {thirstyTribes.length} tribes that need water.
-          </p>
         </CardHeader>
         
-        <CardContent className="space-y-4 pt-2">
-          {/* Milestones Sections */}
-          {milestones.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <Cake className="h-3 w-3" /> Today&apos;s Milestones
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {milestones.map((m) => (
-                  <div key={m.contactId} className="flex items-center justify-between p-2 bg-[#1E293B] border border-slate-800">
-                    <div className="flex flex-col">
-                      <span className="text-white text-xs font-bold uppercase">{m.contactName}</span>
-                      <span className="text-[#FF4D4D] text-[10px] font-black">{m.label.toUpperCase()}</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="h-7 text-[10px] font-black uppercase border-[#38BDF8] text-[#38BDF8] hover:bg-[#38BDF8] hover:text-[#0F172A] rounded-none"
-                      onClick={() => handleNurture(m.contactId, m.contactName, `Happy ${m.label}, ${m.contactName.split(' ')[0]}! Hope you have a wonderful day! 🎂`)}
-                    >
-                      Celebrate
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <CardContent className="space-y-6 pt-4 pb-6 overflow-x-auto">
+          
+          {/* Action Carousel */}
+          {priorityNurtures.length > 0 ? (
+              <div className="flex gap-4 pb-2 px-1">
+                  {priorityNurtures.map((p, idx) => (
+                      <div 
+                        key={p.id} 
+                        className={`
+                            flex-shrink-0 w-40 flex flex-col items-center group relative
+                            ${idx === 0 ? 'opacity-100' : 'opacity-90'}
+                        `}
+                      >
+                          {/* Avatar ORB with Thirst Ring + Lore Tooltip */}
+                          <LoreTooltip 
+                             lastContactDate={p.last_interaction_date} 
+                             lastContactMethod={p.last_contact_method} // Assuming this field exists or needs mapping
+                             isFading={true} // Priority nurtures are by definition fading or thirsty
+                          >
+                              <div 
+                                className="relative mb-3 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                                onClick={() => {
+                                    setSelectedContact(p as any); // Cast for now given type overlaps
+                                    setIsDeepLoreOpen(true);
+                                }}
+                              >
+                                  {/* Glowing background for top priority */}
+                                  {idx === 0 && (
+                                      <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full" />
+                                  )}
+                                  
+                                  {/* Thirst Ring (Dashed Orange) */}
+                                  <div className="absolute -inset-1 rounded-full border-2 border-dashed border-orange-500/50 animate-[spin_10s_linear_infinite]" />
+                                  
+                                  <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-[#0B1120] bg-slate-800">
+                                       <Avatar className="h-full w-full">
+                                            <AvatarImage src={p.photo_url || undefined} />
+                                            <AvatarFallback className={cn("text-lg font-bold text-white", getGradient(p.name))}>
+                                                {getInitials(p.first_name, p.last_name)}
+                                            </AvatarFallback>
+                                       </Avatar>
+                                  </div>
+                                  
+                                  <div className="absolute -bottom-1 -right-1 bg-[#0B1120] rounded-full p-1">
+                                      <div className="bg-orange-500 h-3 w-3 rounded-full animate-pulse" />
+                                  </div>
+                              </div>
+                          </LoreTooltip>
 
-          {/* Tribes Sections */}
-          {thirstyTribes.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <Droplets className="h-3 w-3" /> Thirsty Tribes
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {thirstyTribes.map((t) => (
-                  <div key={t.name} className="flex items-center justify-between p-2 bg-[#1E293B] border border-slate-800">
-                    <div className="flex flex-col">
-                      <span className="text-white text-xs font-bold uppercase">{t.name}</span>
-                      <span className="text-[#38BDF8] text-[10px] font-black">{t.maxDaysSince}D OVERDUE</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="h-7 text-[10px] font-black uppercase border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black rounded-none"
-                      onClick={() => handleNurture('tribe', t.name, `Checking in with the ${t.name} crew! 🌱 Hope everyone is doing well.`)}
-                    >
-                      Water
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                          {/* Name & Deep Lore */}
+                          <div 
+                            className="text-center w-full mb-3 cursor-pointer hover:opacity-80"
+                            onClick={() => {
+                                setSelectedContact(p as any);
+                                setIsDeepLoreOpen(true);
+                            }}
+                          >
+                              <h3 className="text-white font-bold text-sm truncate px-1">{p.name}</h3>
+                              <p className="text-slate-500 text-[10px] font-medium truncate px-1 leading-tight">
+                                  {p.deep_lore || p.relationship_summary || "Needs some love"}
+                              </p>
+                          </div>
 
-          {/* Priority Nurtures Section */}
-          {priorityNurtures.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <Heart className="h-3 w-3" /> Priority Nurtures
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {priorityNurtures.map((p) => (
-                  <div key={p.id} className="flex flex-col gap-2 p-2 bg-[#1E293B] border border-slate-800">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-white text-xs font-bold uppercase truncate">{p.name}</span>
-                        {p.importance === 'high' && <Star className="h-2 w-2 text-red-500" fill="currentColor" />}
+                          {/* One-Tap Actions */}
+                          <div className="flex items-center gap-2 justify-center w-full">
+                               <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    onClick={() => handleNurture(p.id, p.name, `Call with ${p.first_name}`)}
+                                >
+                                   <Phone className="h-3.5 w-3.5" />
+                               </Button>
+                               <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    onClick={() => handleNurture(p.id, p.name, `Email to ${p.first_name}`)}
+                               >
+                                   <Mail className="h-3.5 w-3.5" />
+                               </Button>
+                               <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 rounded-full bg-slate-800/50 text-slate-400 hover:bg-[#38BDF8] hover:text-white transition-all"
+                                    onClick={() => handleNurture(p.id, p.name, `Message to ${p.first_name}`)}
+                               >
+                                   <MessageSquare className="h-3.5 w-3.5" />
+                               </Button>
+                          </div>
                       </div>
-                      <span className="text-rose-400 text-[10px] font-black truncate">FADING FROM GARDEN</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="h-7 text-[10px] font-black uppercase border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white rounded-none w-full"
-                      onClick={() => handleNurture(p.id, p.name, `Thinking of you, ${p.first_name}! It's been a while since we caught up. Hope you're doing well! ✨`)}
-                    >
-                      Reconnect
-                    </Button>
-                  </div>
-                ))}
+                  ))}
+                  
+                  {/* Milestones & Tribes mixed in? Or separate? 
+                      Plan said remove boxes. Let's append Milestones to the end of carousel if needed 
+                      or keep them subtle. For 'Action Carousel', let's focus on People for now.
+                  */}
               </div>
-            </div>
+          ) : (
+             <div className="flex flex-col items-center justify-center py-6 opacity-50">
+                 <Flower2 className="h-12 w-12 text-emerald-500 mb-2" />
+                 <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Garden is Blooming</p>
+             </div>
           )}
+          
         </CardContent>
       </Card>
 
+      {/* Log Interaction Modal (For direct action buttons) */}
       {selectedContact && (
         <LogInteractionModal
           isOpen={isModalOpen}
@@ -151,6 +180,23 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
           onSuccess={() => {
             onActionComplete?.();
           }}
+        />
+      )}
+
+      {/* Deep Lore Modal (For clicking the person) */}
+      {selectedContact && (
+        <UnifiedActionHub 
+            isOpen={isDeepLoreOpen}
+            onClose={() => setIsDeepLoreOpen(false)}
+            person={selectedContact as any}
+            onAction={(type, note) => {
+                setIsDeepLoreOpen(false);
+                // Open Action Modal logic
+                const template = type === 'call' ? `Call with ${selectedContact.first_name}` :
+                                 type === 'email' ? `Email to ${selectedContact.first_name}` :
+                                 `Message to ${selectedContact.first_name}`;
+                handleNurture(selectedContact.id, selectedContact.name, template);
+            }}
         />
       )}
     </>
