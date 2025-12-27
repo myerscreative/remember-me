@@ -8,13 +8,14 @@ interface LogGroupInteractionInput {
   contactIds: string[];
   type: InteractionType;
   note?: string;
+  nextGoalNote?: string | null;
 }
 
 /**
  * Log an interaction for multiple contacts at once (e.g., family dinner)
  * Updates last_interaction_date and creates interaction records for all contacts
  */
-export async function logGroupInteraction({ contactIds, type, note }: LogGroupInteractionInput): Promise<{
+export async function logGroupInteraction({ contactIds, type, note, nextGoalNote }: LogGroupInteractionInput): Promise<{
   success: boolean;
   updatedCount?: number;
   error?: string;
@@ -56,6 +57,7 @@ export async function logGroupInteraction({ contactIds, type, note }: LogGroupIn
       // If table created by 2025 migration, it needs 'notes'.
       // If we use 'notes', we cover the likely case that 2025 migration ran first.
       notes: note || `Group interaction with ${contactIds.length} contacts`,
+      next_goal_note: nextGoalNote || null,
     }));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
