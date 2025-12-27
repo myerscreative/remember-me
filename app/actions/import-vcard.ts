@@ -50,7 +50,7 @@ export async function importVCard(contacts: ImportedContact[]): Promise<ImportRe
     for (const contact of contacts) {
       try {
         // MATCHING LOGIC
-        let match = null;
+        let match: any = null;
         if (contact.email) {
           match = emailMap.get(contact.email.toLowerCase());
         }

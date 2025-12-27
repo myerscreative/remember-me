@@ -79,11 +79,12 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 // 1. Fetch Mutuals (Parallel)
                 setIsLoadingMutuals(true);
                 const mutualsRes = await getConnections(person.id);
-                setMutuals(mutualsRes);
+                const mutualsData = mutualsRes.success && mutualsRes.data ? mutualsRes.data : [];
+                setMutuals(mutualsData);
                 setIsLoadingMutuals(false);
 
                 // Sort mutuals by health (recency)
-                const sortedMutuals = [...mutualsRes].sort((a, b) => {
+                const sortedMutuals = [...mutualsData].sort((a, b) => {
                     const dateA = a.connected_person.last_interaction_date ? new Date(a.connected_person.last_interaction_date).getTime() : 0;
                     const dateB = b.connected_person.last_interaction_date ? new Date(b.connected_person.last_interaction_date).getTime() : 0;
                     return dateB - dateA;

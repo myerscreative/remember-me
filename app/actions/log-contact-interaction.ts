@@ -17,7 +17,7 @@ export async function logContactInteraction(
 
   try {
     // 1. Insert Interaction Record
-    const { error: maxInteractionError } = await supabase
+    const { error: maxInteractionError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
@@ -34,7 +34,7 @@ export async function logContactInteraction(
     // We could also set a 'status' field if it existed (e.g. 'Blooming'), 
     // but the schema uses `relationship_value` or similar. 
     // For now, we update the core timestamp fields.
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({
         last_interaction_date: new Date().toISOString(),

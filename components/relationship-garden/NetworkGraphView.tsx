@@ -24,7 +24,7 @@ interface NetworkGraphProps {
 
 export default function NetworkGraphView({ contacts, relationships, onNodeClick }: NetworkGraphProps) {
   const { resolvedTheme } = useTheme();
-  const fgRef = useRef<any>();
+  const fgRef = useRef<any>(null);
   const [dimensions, setDimensions] = useState({ w: 800, h: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -122,7 +122,6 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
             return '#cbd5e1';
         }}
         linkWidth={(link: any) => link.type === 'manual' ? 2 : 1}
-        linkOpacity={0.2}
         onNodeClick={(node: any) => {
             onNodeClick(node.id);
             // Center view?

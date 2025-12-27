@@ -16,7 +16,7 @@ function levenshteinDistance(a: string, b: string): number {
   if (a.length === 0) return b.length;
   if (b.length === 0) return a.length;
 
-  const matrix = [];
+  const matrix: number[][] = [];
 
   // increment along the first column of each row
   for (let i = 0; i <= b.length; i++) {
@@ -81,7 +81,7 @@ export function findPotentialDuplicates(contacts: Person[]): PotentialDuplicateG
       if (processedOrGrouped.has(other.id)) continue;
 
       let score = 0;
-      const currentReasons = [];
+      const currentReasons: string[] = [];
 
       // Email Match (Strongest)
       if (current.email && other.email && current.email.toLowerCase() === other.email.toLowerCase()) {

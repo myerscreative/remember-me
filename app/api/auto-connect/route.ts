@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   try {
     // 1. Fetch all contacts with company and id
-    const { data: contacts, error: contactsError } = await supabase
+    const { data: contacts, error: contactsError } = await (supabase as any)
       .from("persons")
       .select("id, name, company, user_id")
       .eq("user_id", user.id);
@@ -20,10 +20,10 @@ export async function POST(req: Request) {
     if (!contacts) return NextResponse.json({ message: "No contacts found" });
 
     // 2. Fetch all tags for these contacts
-    const { data: personTags, error: tagsError } = await supabase
+    const { data: personTags, error: tagsError } = await (supabase as any)
       .from("person_tags")
       .select("person_id, tag_id, tags(name)")
-      .in("person_id", contacts.map(c => c.id));
+      .in("person_id", contacts.map((c: any) => c.id));
 
     if (tagsError) throw tagsError;
 
@@ -120,9 +120,9 @@ export async function POST(req: Request) {
         const chunkSize = 100;
         for (let i = 0; i < relationshipsToInsert.length; i += chunkSize) {
             const chunk = relationshipsToInsert.slice(i, i + chunkSize);
-            const { error: insertError } = await supabase
+            const { error: insertError } = await (supabase as any)
                 .from('inter_contact_relationships')
-                .upsert(chunk, { onConflict: 'contact_id_a,contact_id_b,relationship_type' as any, ignoreDuplicates: true });
+                .upsert(chunk, { onConflict: 'contact_id_a,contact_id_b,relationship_type', ignoreDuplicates: true });
             
             if (insertError) console.error("Error inserting connections:", insertError);
         }

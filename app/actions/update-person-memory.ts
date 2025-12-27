@@ -17,7 +17,7 @@ export async function updatePersonMemory(personId: string, memoryText: string) {
 
   try {
     // 1. Fetch current notes
-    const { data: person, error: fetchError } = await supabase
+    const { data: person, error: fetchError } = await (supabase as any)
         .from('persons')
         .select('notes')
         .eq('id', personId)
@@ -29,10 +29,10 @@ export async function updatePersonMemory(personId: string, memoryText: string) {
     // 2. Append new memory with timestamp
     const timestamp = new Date().toLocaleDateString();
     const newEntry = `[${timestamp}] ${memoryText.trim()}`;
-    const updatedNotes = person.notes ? `${person.notes}\n\n${newEntry}` : newEntry;
+    const updatedNotes = person?.notes ? `${person.notes}\n\n${newEntry}` : newEntry;
 
     // 3. Update person
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({ 
             notes: updatedNotes,
