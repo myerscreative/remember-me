@@ -48,6 +48,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     
     root.classList.add(effectiveTheme);
+    root.setAttribute('data-theme', effectiveTheme); // Set data-theme attribute
     setResolvedTheme(effectiveTheme);
     
     // Save to localStorage
@@ -64,6 +65,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.remove('light', 'dark');
       const newTheme = mediaQuery.matches ? 'dark' : 'light';
       root.classList.add(newTheme);
+      root.setAttribute('data-theme', newTheme); // Set data-theme attribute
       setResolvedTheme(newTheme);
     };
     

@@ -16,7 +16,10 @@ import {
   Loader2,
   Database,
   Calendar,
-  Users
+  Users,
+  Sun,
+  Moon,
+  Monitor
 } from "lucide-react";
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useTheme } from "@/app/providers/theme-provider";
@@ -458,18 +461,49 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   Theme
                 </label>
-                <select
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value as 'light' | 'dark' | 'auto')}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                  <option value="auto">Auto (System)</option>
-                </select>
+                <div className="flex gap-2">
+                  {/* Light Mode Button */}
+                  <button
+                    onClick={() => setTheme('light')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      theme === 'light'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    <Sun className="h-5 w-5" />
+                    <span className="font-medium">Light</span>
+                  </button>
+                  
+                  {/* Dark Mode Button */}
+                  <button
+                    onClick={() => setTheme('dark')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      theme === 'dark'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    <Moon className="h-5 w-5" />
+                    <span className="font-medium">Dark</span>
+                  </button>
+                  
+                  {/* Auto Mode Button */}
+                  <button
+                    onClick={() => setTheme('auto')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      theme === 'auto'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    <Monitor className="h-5 w-5" />
+                    <span className="font-medium">Auto</span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between">

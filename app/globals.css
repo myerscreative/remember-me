@@ -146,6 +146,74 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #1E293B; /* Subtle border */
   --sidebar-ring: #3B82F6;
+  
+  /* Component-Specific Dark Mode Vars */
+  --conversation-starter-bg: rgba(139, 92, 246, 0.1);
+  --conversation-starter-border: rgba(139, 92, 246, 0.3);
+  --conversation-starter-text: #C4B5FD;
+  
+  --nurture-banner-bg: rgba(59, 130, 246, 0.1);
+  --nurture-banner-border: rgba(59, 130, 246, 0.3);
+  --nurture-banner-text: #93C5FD;
+}
+
+/* ========================================
+   HIGH-CONTRAST LIGHT MODE
+   ======================================== */
+:root[data-theme='light'],
+:root:not(.dark) {
+  /* Core Light Theme Colors */
+  --bg-main: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-subtle: #E2E8F0;
+  --accent-purple: #8B5CF6;
+
+  /* Override CSS Variables for Light Mode */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  
+  --primary: #8B5CF6;
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  
+  --muted: #F1F5F9;
+  --muted-foreground: #475569;
+  
+  --accent: #F3E8FF;
+  --accent-foreground: #0F172A;
+  
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #8B5CF6;
+  
+  /* Sidebar Light Mode */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #475569;
+  --sidebar-primary: #8B5CF6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F3E8FF;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #8B5CF6;
+  
+  /* Component-Specific Light Mode Vars */
+  --conversation-starter-bg: #F5F3FF;
+  --conversation-starter-border: #DDD6FE;
+  --conversation-starter-text: #4C1D95;
+  
+  --nurture-banner-bg: #EFF6FF;
+  --nurture-banner-border: #BFDBFE;
+  --nurture-banner-text: #1E3A8A;
 }
 
 @layer base {
