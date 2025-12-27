@@ -18,10 +18,11 @@ interface TooltipState {
   visible: boolean;
   x: number;
   y: number;
-  contact: { name: string; days: number } | null;
+  contact: { name: string; days: number; id: string } | null; // Added id to contact
 }
 
 function getColorForDays(days: number): string {
+  // STRICT VISUAL LOGIC: Map Fresh (Green), Warn (Yellow), Alert (Orange)
   if (days <= 30) return '#10B981';   // Emerald-500 (Fresh / Center)
   if (days <= 90) return '#EAB308';   // Yellow-500 (Warn / Mid)
   return '#F97316';                   // Orange-500 (Alert / No History / Edge)
@@ -34,6 +35,7 @@ export default function SeedMapWidget({ contacts = [], className = '' }: SeedMap
   // Seed positioning logic with dynamic sizing
   const { seedPositions, activeCount } = useMemo(() => {
     // 1. Filter active contacts (having intensity/importance)
+    // Upstream fix ensures 'intensity' is set for anyone with history
     const activeContacts = contacts.filter((c: any) => c.intensity);
     
     // Transform and sort active ones
@@ -45,117 +47,111 @@ export default function SeedMapWidget({ contacts = [], className = '' }: SeedMap
           : 999; // Treat no-history as "Oldest" (Outer Edge)
         return { ...c, days };
     })
-    .sort((a, b) => a.days - b.days)
-    .slice(0, 400); // Limit rendered seeds if needed
+    .sort((a, b) => a.days - b.days) // Sort by recency (Green center -> Orange edge)
+    .slice(0, 400); 
 
     const count = displayContacts.length;
-    
-    // 2. Dynamic Scaling
-    const seedSize = count < 50 ? 8 : 4;
-    const spiralConstant = count < 50 ? 6 : 3.5; // Spread out more if few seeds
- 
-    const positions = displayContacts.map((contact, i) => {
-      const radius = spiralConstant * Math.sqrt(i + 1); 
-      const angle = i * GOLDEN_ANGLE;
-      
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-      
-      const color = getColorForDays(contact.days);
+    // Dynamic scaling based on count
+    // If few active contacts, spread them out more. If many, pack them tighter.
+    const spacing = 16; 
+    let spiralConstant = 5; 
+    let seedSize = 5;
 
-      return { contact, x, y, color, seedSize };
+    if (count < 50) {
+        seedSize = 8;
+        spiralConstant = 7;
+    } else if (count < 100) {
+        seedSize = 6;
+        spiralConstant = 6;
+    }
+
+    const positions = displayContacts.map((contact, i) => {
+      // Fibonacci Spiral: r = c * sqrt(n), theta = n * 137.5 deg
+      const n = i; // Ensure center start
+      const radius = spiralConstant * Math.sqrt(n);
+      const angle = n * 137.508 * (Math.PI / 180);
+      
+      const x = 150 + radius * Math.cos(angle);
+      const y = 150 + radius * Math.sin(angle);
+      
+      return { ...contact, x, y, size: seedSize, color: getColorForDays(contact.days) };
     });
 
     return { seedPositions: positions, activeCount: count };
   }, [contacts]);
 
-  const handleMouseEnter = (e: React.MouseEvent, contact: { name: string; days: number }) => {
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    setTooltip({
-      visible: true,
-      x: rect.left + rect.width / 2,
-      y: rect.top - 8,
-      contact
-    });
-    setHoveredId(contact.name);
-  };
-
-  const handleMouseLeave = () => {
-    setTooltip({ visible: false, x: 0, y: 0, contact: null });
-    setHoveredId(null);
-  };
-
   return (
-    <div className={`block bg-card rounded-xl border border-border shadow-sm overflow-hidden ${className}`}>
-      <Link href="/garden" className="block p-4 hover:bg-muted/5 transition-colors relative group">
-        
-        {/* Title Overlay */}
-        <div className="absolute top-4 left-4 z-10 pointer-events-none">
-             <div className="flex items-center gap-2">
-                <span className="text-lg">🌱</span>
-                <h3 className="text-sm font-bold text-foreground tracking-tight uppercase opacity-80 group-hover:opacity-100 transition-opacity">Garden Map</h3>
-             </div>
-        </div>
+    <div className={`relative flex flex-col items-center justify-center p-4 bg-card rounded-xl border border-border/50 h-[380px] w-full ${className}`}>
+      {/* Title */}
+      <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
+        <Sprout className="h-5 w-5 text-lime-500" />
+        <span className="font-bold text-sm tracking-wide text-foreground/80 uppercase">Garden Map</span>
+      </div>
 
-        {/* Mini Garden Visualization - Seeds */}
-        <div className="relative h-48 flex items-center justify-center">
-            {/* Center glow */}
-            <div className={`absolute top-1/2 left-1/2 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ${activeCount > 0 ? 'w-24 h-24 bg-emerald-500/10 blur-xl' : ''}`} />
+      {/* SVG Map */}
+      <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+         {activeCount > 0 ? (
+            <svg width="300" height="300" viewBox="0 0 300 300" className="overflow-visible">
+              <defs>
+                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                 </filter>
+              </defs>
+              
+              {/* Center Marker */}
+              <circle cx="150" cy="150" r="2" fill="currentColor" className="text-muted-foreground/20" />
 
-          <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {activeCount > 0 ? (
-                seedPositions.map(({ contact, x, y, color, seedSize }) => (
-                  <motion.div
-                    key={contact.id}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1, x, y }}
-                    transition={{ delay: 0.002 * seedPositions.indexOf({ contact, x, y, color, seedSize }) }}
-                    className="absolute rounded-full"
-                    style={{ 
-                        marginLeft: -seedSize / 2, 
-                        marginTop: -seedSize / 2,
-                        width: seedSize,
-                        height: seedSize,
-                        backgroundColor: color,
-                        boxShadow: hoveredId === contact.name ? `0 0 8px ${color}` : 'none',
-                        zIndex: hoveredId === contact.name ? 50 : 1
-                    }}
-                    onMouseEnter={(e) => handleMouseEnter(e, contact.contact)}
-                    onMouseLeave={handleMouseLeave}
-                  />
-                ))
-            ) : (
-                // 3. Empty State
-                <div className="flex flex-col items-center justify-center text-center w-48 -mt-4">
-                    <div className="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-full mb-3 animate-pulse">
-                         <span className="text-2xl">🌱</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-medium">Start <span className="text-emerald-500 font-bold">Quick Sort</span> to see your garden grow</p>
-                </div>
-            )}
-          </div>
-
-          {/* Micro-tooltip */}
-          {tooltip.visible && tooltip.contact && (
-            <div 
-              className="fixed z-50 bg-slate-900/95 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none whitespace-nowrap border border-slate-700"
-              style={{ 
-                left: tooltip.x, 
-                top: tooltip.y,
-                transform: 'translate(-50%, -100%)'
-              }}
-            >
-              <div className="font-bold text-emerald-400">{tooltip.contact.name}</div>
-              <div className="text-[10px] text-slate-300">{getRelationshipLevel(tooltip.contact.days)}</div>
+              {/* Seeds */}
+              {seedPositions.map((seed) => (
+                <circle
+                  key={seed.id}
+                  cx={seed.x}
+                  cy={seed.y}
+                  r={hoveredId === seed.id ? seed.size * 1.5 : seed.size}
+                  fill={seed.color}
+                  className={`transition-all duration-300 ease-out cursor-pointer ${hoveredId === seed.id ? 'stroke-white dark:stroke-slate-900 stroke-2 z-50' : 'hover:opacity-80'}`}
+                  onMouseEnter={(e) => {
+                     setHoveredId(seed.id);
+                     setTooltip({ visible: true, x: e.clientX, y: e.clientY, contact: seed });
+                  }}
+                  onMouseLeave={() => {
+                     setHoveredId(null);
+                     setTooltip({ ...tooltip, visible: false });
+                  }}
+                />
+              ))}
+            </svg>
+         ) : (
+            // EMPTY STATE FAILSAFE: Only show if activeCount === 0
+            <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500">
+               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                  <Sprout className="h-8 w-8 text-emerald-600" />
+               </div>
+               <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                   Start <span className="font-bold text-emerald-500">Quick Sort</span> to see your<br/>garden grow
+               </p>
             </div>
-          )}
-        </div>
-        
-        {/* 4. Total Count Sync */}
-        <div className="absolute bottom-2 right-4 text-[10px] text-muted-foreground font-mono">
-            {contacts.length} TOTAL / <span className="text-emerald-500 font-bold">{activeCount} ACTIVE</span>
-        </div>
-      </Link>
+         )}
+
+         {/* Tooltip */}
+         {tooltip.visible && tooltip.contact && (
+            <div 
+              className="fixed z-50 px-3 py-2 bg-slate-900/95 text-white text-xs rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-[140%] backdrop-blur-sm border border-slate-700"
+              style={{ left: tooltip.x, top: tooltip.y }}
+            >
+              <div className="font-bold">{tooltip.contact.name}</div>
+              <div className="text-slate-400 text-[10px] uppercase tracking-wider">{tooltip.contact.days === 999 ? 'New / No History' : `${tooltip.contact.days} Days Ago`}</div>
+            </div>
+         )}
+      </div>
+
+      {/* Footer Stats - DYNAMIC & SYNCHRONIZED */}
+      <div className="absolute bottom-4 right-4 flex items-center gap-3">
+         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded-md">
+            {contacts.length} TOTAL / <span className="text-emerald-500">{activeCount} ACTIVE</span>
+         </div>
+      </div>
     </div>
   );
 }
