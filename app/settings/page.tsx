@@ -15,7 +15,8 @@ import {
   Save,
   Loader2,
   Database,
-  Calendar
+  Calendar,
+  Users
 } from "lucide-react";
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useTheme } from "@/app/providers/theme-provider";
@@ -540,6 +541,19 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-medium text-gray-900 dark:text-white">Import Data</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Import contacts from CSV or vCard</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+              </Link>
+
+              <Link href="/network/deduplicate" className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                    <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white">Merge Duplicates</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Find and merge duplicate contacts</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
