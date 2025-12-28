@@ -681,4 +681,10 @@ export interface Person {
   company: string | null;
   deep_lore: string | null; // This is our 'Shared Memory' source
   job_title: string | null;
+  relationship_value: string | null;
+  what_i_offered: string | null;
+  what_they_offered: string | null;
+  first_impression: string | null;
+  memorable_moment: string | null;
+  story_completeness: number | null;
 }
