@@ -59,11 +59,11 @@ export async function POST(_request: NextRequest) {
         .sort((a, b) => b.count - a.count)
         .slice(0, 3);
 
-    // 4. Fetch Upcoming Milestones (Birthdays/Anniversaries)
+    // 4. Fetch Upcoming Milestones (Birthdays only - custom_anniversary may not exist)
     const { data: persons, error: personsError } = await supabase
         .from('persons')
-        .select('name, birthday, custom_anniversary')
-        .eq('archived', false);
+        .select('name, birthday')
+        .eq('user_id', user.id);
 
     if (personsError) throw personsError;
 
@@ -95,7 +95,6 @@ export async function POST(_request: NextRequest) {
         };
 
         checkDate(p.birthday, 'Birthday');
-        checkDate(p.custom_anniversary, 'Anniversary');
     });
 
     // 5. AI Summary for "New Intelligence"
