@@ -88,10 +88,10 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     };
 
     const cardStyles = {
-      whereWeMet: 'bg-white dark:bg-[#1f2937]/60 border-indigo-100 dark:border-indigo-500/20 hover:border-indigo-200 dark:hover:border-indigo-500/40',
-      whyStayInContact: 'bg-white dark:bg-[#1f2937]/60 border-rose-100 dark:border-rose-500/20 hover:border-rose-200 dark:hover:border-rose-500/40',
-      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-amber-100 dark:border-amber-500/20 hover:border-amber-200 dark:hover:border-amber-500/40',
-      whatFoundInteresting: 'bg-white dark:bg-[#1f2937]/60 border-emerald-100 dark:border-emerald-500/20 hover:border-emerald-200 dark:hover:border-emerald-500/40'
+      whereWeMet: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/40',
+      whyStayInContact: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-500/40',
+      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-amber-200 dark:hover:border-amber-500/40',
+      whatFoundInteresting: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-500/40'
     };
 
     const activeStyle = cardStyles[field as keyof typeof cardStyles];

@@ -17,6 +17,8 @@ import {
   Search,
   X
 } from "lucide-react";
+import { format } from "date-fns";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface Reminder {
   id: string;
@@ -73,35 +75,24 @@ export default function RemindersPage() {
       // Fetch reminders with person information
       const { data: remindersData, error } = await (supabase as any)
         .from('reminders')
-        .select(`
-          *,
-          persons (
-            id,
-            name,
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('due_date', { ascending: true })
         .order('due_time', { ascending: true });
 
       if (error) throw error;
 
-      // Transform data to include person_name
-      const transformedReminders = remindersData?.map((reminder: any) => ({
-        ...reminder,
-        person_name: reminder.persons 
-          ? (reminder.persons.first_name 
-              ? `${reminder.persons.first_name} ${reminder.persons.last_name || ''}`
-              : reminder.persons.name)
-          : undefined
-      })) || [];
+      // No person join; use reminders data directly
+      const transformedReminders = remindersData || [];
 
       setReminders(transformedReminders);
     } catch (error) {
       console.error('Error loading reminders:', error);
-      setError(error instanceof Error ? error : new Error('Failed to load reminders'));
+      if ((error as any)?.message) console.error('Error message:', (error as any).message);
+      if ((error as any)?.details) console.error('Error details:', (error as any).details);
+      if ((error as any)?.hint) console.error('Error hint:', (error as any).hint);
+
+      // No fallback needed as we are already fetching simple reminders.
     } finally {
       setLoading(false);
     }
@@ -316,31 +307,37 @@ export default function RemindersPage() {
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'all'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={
+                  `px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    filter === 'all'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`
+                }
               >
                 All
               </button>
               <button
                 onClick={() => setFilter('pending')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'pending'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={
+                  `px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    filter === 'pending'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`
+                }
               >
                 Pending
               </button>
               <button
                 onClick={() => setFilter('completed')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'completed'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={
+                  `px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    filter === 'completed'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`
+                }
               >
                 Completed
               </button>
@@ -536,13 +533,21 @@ export default function RemindersPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Due Date *
                   </label>
-                  <input
-                    type="date"
-                    value={editForm.due_date}
-                    onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  <DatePicker
+                    date={
+                      editForm.due_date
+                        ? (() => {
+                            const [y, m, d] = editForm.due_date.split('-').map(Number);
+                            return new Date(y, m - 1, d);
+                          })()
+                        : undefined
+                    }
+                    setDate={(date) =>
+                      setEditForm({
+                        ...editForm,
+                        due_date: date ? format(date, "yyyy-MM-dd") : "",
+                      })
+                    }
                   />
                 </div>
                 <div>

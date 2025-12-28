@@ -21,7 +21,6 @@ import { ProfileHeader } from "./components/ProfileHeader";
 import { OverviewTab } from "./components/tabs/OverviewTab";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
-import { InterestsTab } from "@/app/contacts/[id]/components/tabs/InterestsTab";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
@@ -29,7 +28,7 @@ import { InteractionType } from "@/lib/relationship-health";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getInitials } from "@/lib/utils/contact-helpers";
 
-const tabs = ["Overview", "Details", "Story", "Family", "Interests"];
+const tabs = ["Overview", "Story", "Family"];
 
 export default function ContactDetailPage({
   params,
@@ -375,24 +374,6 @@ export default function ContactDetailPage({
                     <OverviewTab contact={contact} />
                 )}
                 
-                {activeTab === "Details" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                        <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Contact Info</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <Phone className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-foreground">{contact.phone || "No phone"}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Mail className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-foreground">{contact.email || "No email"}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                
                 {activeTab === "Story" && (
                     <StoryTab contact={contact} />
                 )}
@@ -403,10 +384,6 @@ export default function ContactDetailPage({
                       contactName={contact.name} 
                       familyMembers={contact.family_members} 
                     />
-                )}
-                
-                {activeTab === "Interests" && (
-                    <InterestsTab contactId={id} />
                 )}
             </div>
 

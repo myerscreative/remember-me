@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import { format } from "date-fns";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function NewReminderPage() {
   const router = useRouter();
@@ -137,14 +139,21 @@ export default function NewReminderPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Date *
                 </label>
-                <input
-                  type="date"
-                  required
-                  value={formData.due_date}
-                  onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                <DatePicker
+                  date={
+                    formData.due_date
+                      ? (() => {
+                          const [y, m, d] = formData.due_date.split('-').map(Number);
+                          return new Date(y, m - 1, d);
+                        })()
+                      : undefined
+                  }
+                  setDate={(date) =>
+                    setFormData({
+                      ...formData,
+                      due_date: date ? format(date, "yyyy-MM-dd") : "",
+                    })
+                  }
                 />
               </div>
               <div>
