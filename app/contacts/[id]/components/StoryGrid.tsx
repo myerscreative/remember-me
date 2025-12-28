@@ -97,7 +97,7 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     const activeStyle = cardStyles[field as keyof typeof cardStyles];
 
     return (
-      <div className={`group relative flex flex-col h-full ${activeStyle} border rounded-[0.875rem] shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
+      <div className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${

@@ -451,8 +451,43 @@ export interface Database {
           created_at?: string
         }
       }
+      shared_memories: {
+        Row: {
+          id: string
+          user_id: string
+          person_id: string
+          content: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          person_id: string
+          content: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          person_id?: string
+          content?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
+      person_health_status: {
+        Row: {
+          id: string
+          name: string
+          target_frequency_days: number | null
+          last_contact: string | null
+          current_health: 'nurtured' | 'drifting' | 'neglected'
+        }
+      }
       persons_with_tags: {
         Row: {
           id: string

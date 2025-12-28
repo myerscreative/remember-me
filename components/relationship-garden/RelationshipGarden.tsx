@@ -375,7 +375,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb:hover]:bg-slate-700 dark:[&::-webkit-slider-thumb:hover]:bg-indigo-400 [&::-webkit-slider-thumb:hover]:scale-110"
         />
         
-        <div className="text-sm font-semibold text-slate-900 min-w-[50px] text-right">
+        <div className="text-sm font-semibold text-slate-900 dark:text-white min-w-[50px] text-right">
           {zoom}%
         </div>
         
@@ -406,8 +406,8 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           Most Recent
         </div>
 
-        {/* Info Badge */}
-        <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-sm border border-slate-200 p-4 rounded-xl shadow-sm text-right z-10">
+        {/* Info Badge - Desktop Only */}
+        <div className="hidden md:block absolute top-5 right-5 bg-white/95 backdrop-blur-sm border border-slate-200 p-4 rounded-xl shadow-sm text-right z-10">
           <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-1">Showing</div>
           <div className="text-lg font-bold text-slate-800">
             {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}

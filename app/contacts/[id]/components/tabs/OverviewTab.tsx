@@ -11,6 +11,7 @@ import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { ReachOutPanel } from '@/components/contacts/ReachOutPanel';
 
 // Minimal Contact type for typing
 interface Contact {
@@ -36,6 +37,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
   const [isInterestsOpen, setIsInterestsOpen] = useState(false);
   const [submittingTag, setSubmittingTag] = useState(false);
   const [submittingInterest, setSubmittingInterest] = useState(false);
+  const [isReachOutOpen, setIsReachOutOpen] = useState(false);
 
   // Handlers
   const handleAddTag = async () => {
@@ -124,7 +126,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
         
         {/* AI Synopsis */}
         {contact.aiSummary && (
-            <section className="bg-gradient-to-br from-indigo-50 to-white dark:from-[#1E293B] dark:to-[#0F172A] border border-indigo-100 dark:border-[#334155] rounded-2xl p-6 shadow-sm">
+            <section className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-[#1E293B] dark:to-[#0F172A] border border-slate-200 dark:border-[#334155] rounded-2xl p-6 shadow-sm">
                 <h2 className="text-indigo-900 dark:text-indigo-200 font-semibold mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-indigo-500" />
                     AI Synopsis
@@ -284,9 +286,22 @@ export function OverviewTab({ contact }: OverviewTabProps) {
 
       {/* RIGHT SIDEBAR */}
       <div className="w-full xl:w-80 space-y-6">
-          
-          {/* Contact Info Card */}
-          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+           
+           {/* Reach Out Action */}
+           <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-5 shadow-sm">
+               <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider mb-2">Ready to connect?</h3>
+               <p className="text-xs text-indigo-700/70 dark:text-indigo-300/60 mb-4">Generate a personalized script based on your memories.</p>
+               <Button 
+                onClick={() => setIsReachOutOpen(true)}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9"
+               >
+                  <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                  Reach Out
+               </Button>
+           </div>
+
+           {/* Contact Info Card */}
+          <div className="bg-card border border-slate-200 dark:border-border rounded-xl p-5 shadow-sm">
              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 border-b border-border pb-2">Contact Info</h3>
              <div className="space-y-4 text-sm">
                  <div className="flex items-center gap-3">
@@ -336,6 +351,12 @@ export function OverviewTab({ contact }: OverviewTabProps) {
           )}
 
       </div>
+
+       <ReachOutPanel 
+         isOpen={isReachOutOpen} 
+         onClose={() => setIsReachOutOpen(false)} 
+         contact={contact} 
+       />
     </div>
   );
 }

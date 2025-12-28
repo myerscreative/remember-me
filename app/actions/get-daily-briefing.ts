@@ -46,14 +46,14 @@ export async function getDailyBriefing(options: { expanded?: boolean } = {}): Pr
     const oneHundredTwentyDaysAgo = new Date();
     oneHundredTwentyDaysAgo.setDate(oneHundredTwentyDaysAgo.getDate() - 120);
 
-    const fadingResult = await supabase
+    const fadingResult = await (supabase as any)
       .from('persons')
-      .select('*')
+      .select('id, name, first_name, last_name, importance, last_interaction_date, last_contact_method, shared_memories(content)')
       .eq('user_id', user.id)
-      .or('archive_status.is.null,archive_status.eq.false')
+      .eq('archived', false)
       .lt('last_interaction_date', oneHundredTwentyDaysAgo.toISOString())
       .order('importance', { ascending: false })
-      .limit(20); // Fetch more than needed to sort
+      .limit(20);
     
     const fadingContacts = fadingResult.data as Person[] | null;
     const fadingError = fadingResult.error;

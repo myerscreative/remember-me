@@ -21,7 +21,7 @@ interface DailyBriefingCardProps {
 export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingCardProps) {
   const [selectedContact, setSelectedContact] = useState<{ id: string, name: string, template: string, [key: string]: any } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeepLoreOpen, setIsDeepLoreOpen] = useState(false);
+  const [isSharedMemoryOpen, setIsSharedMemoryOpen] = useState(false);
 
   const { milestones, thirstyTribes, priorityNurtures } = briefing;
   
@@ -80,8 +80,8 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                               <div 
                                 className="relative mb-3 cursor-pointer transition-transform hover:scale-105 active:scale-95"
                                 onClick={() => {
-                                    setSelectedContact(p as any); // Cast for now given type overlaps
-                                    setIsDeepLoreOpen(true);
+                                    setSelectedContact(p as any); 
+                                    setIsSharedMemoryOpen(true);
                                 }}
                               >
                                   {/* Glowing background for top priority */}
@@ -108,17 +108,17 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                               </div>
                           </LoreTooltip>
 
-                          {/* Name & Deep Lore */}
+                          {/* Name & Shared Memories */}
                           <div 
                             className="text-center w-full mb-3 cursor-pointer hover:opacity-80"
                             onClick={() => {
                                 setSelectedContact(p as any);
-                                setIsDeepLoreOpen(true);
+                                setIsSharedMemoryOpen(true);
                             }}
                           >
                               <h3 className="text-foreground font-bold text-sm truncate px-1">{p.name}</h3>
                               <p className="text-slate-600 dark:text-slate-400 text-[10px] font-medium truncate px-1 leading-tight">
-                                  {p.deep_lore || p.relationship_summary || "Needs some love"}
+                                  {p.shared_memories?.[0]?.content || p.relationship_summary || "Needs some love"}
                               </p>
                           </div>
 
@@ -184,14 +184,14 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
         />
       )}
 
-      {/* Deep Lore Modal (For clicking the person) */}
+      {/* Shared Memory Modal (For clicking the person) */}
       {selectedContact && (
         <UnifiedActionHub 
-            isOpen={isDeepLoreOpen}
-            onClose={() => setIsDeepLoreOpen(false)}
+            isOpen={isSharedMemoryOpen}
+            onClose={() => setIsSharedMemoryOpen(false)}
             person={selectedContact as any}
             onAction={(type, note) => {
-                setIsDeepLoreOpen(false);
+                setIsSharedMemoryOpen(false);
                 // Open Action Modal logic
                 const template = type === 'call' ? `Call with ${selectedContact.first_name}` :
                                  type === 'email' ? `Email to ${selectedContact.first_name}` :

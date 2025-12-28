@@ -27,7 +27,24 @@ export function DecayAlertBanner() {
         const response = await fetch("/api/decay-alerts?days=180");
         if (response.ok) {
           const data = await response.json();
-          setDecayingRelationships(data.relationships || []);
+          // The API returns raw person records. Map them to the required format.
+          const processed = (data.relationships || []).map((p: any) => {
+            const lastDate = p.last_interaction_date || p.created_at;
+            const days = Math.floor((new Date().getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24));
+            
+            let severity: "mild" | "moderate" | "severe" = "mild";
+            if (days > 365) severity = "severe";
+            else if (days > 180) severity = "moderate";
+
+            return {
+              person_id: p.id,
+              name: p.name,
+              last_contact_days: days,
+              interaction_count: p.interaction_count || 0,
+              decay_severity: severity
+            };
+          });
+          setDecayingRelationships(processed);
         }
       } catch (error) {
         console.error("Error fetching decaying relationships:", error);
@@ -58,7 +75,6 @@ export function DecayAlertBanner() {
   };
 
   const getSeverityText = (days: number | undefined | null) => {
-    // Handle undefined/null specifically as "Not yet contacted" or "Long time"
     if (days === undefined || days === null) return "Ready for a first hello"; 
     
     if (days > 365) return "Over a year";

@@ -15,7 +15,7 @@ import {
   Save,
   Loader2
 } from "lucide-react";
-import { updateDeepLore, addMilestone, deleteMilestone } from "@/app/actions/story-actions";
+import { updateDeepLore, addMilestone, deleteMilestone, upsertSharedMemory } from "@/app/actions/story-actions";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 
@@ -35,12 +35,14 @@ interface StoryTabProps {
     deep_lore?: string | null;
     story?: any;
     whatFoundInteresting?: string;
+    shared_memories?: { content: string }[];
   };
 }
 
 export function StoryTab({ contact }: StoryTabProps) {
+  const initialMemory = contact.shared_memories?.[0]?.content || "";
   const [isSavingLore, setIsSavingLore] = useState(false);
-  const [deepLore, setDeepLore] = useState(contact.deep_lore || "");
+  const [sharedMemory, setSharedMemory] = useState(initialMemory);
   const [isAddingMilestone, setIsAddingMilestone] = useState(false);
   const [newMilestone, setNewMilestone] = useState({ label: "", date: "" });
   const [isSubmittingMilestone, setIsSubmittingMilestone] = useState(false);
@@ -53,12 +55,12 @@ export function StoryTab({ contact }: StoryTabProps) {
   const customDates = Array.isArray(contact.important_dates) ? contact.important_dates : [];
   milestones.push(...customDates);
 
-  const handleSaveLore = async () => {
+  const handleSaveMemory = async () => {
     setIsSavingLore(true);
-    const res = await updateDeepLore(contact.id, deepLore);
+    const res = await upsertSharedMemory(contact.id, sharedMemory);
     setIsSavingLore(false);
     if (res.success) {
-      toast.success("Shared Memories updated! 📚");
+      toast.success("Shared Memory saved! 📚");
     } else {
       toast.error(res.error || "Failed to save");
     }
@@ -198,23 +200,28 @@ export function StoryTab({ contact }: StoryTabProps) {
           </div>
         </div>
 
-        {/* Column 2: Shared Memories (formerly Deep Lore) */}
+        {/* Column 2: Shared Memory */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between mb-2">
-             <h3 className="text-sm font-black uppercase tracking-tighter text-indigo-500 flex items-center gap-2">
-               <BookOpen className="h-4 w-4" />
-               Shared Memories & Context
-             </h3>
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                 <BookOpen className="w-5 h-5 text-indigo-500" />
+               </div>
+               <div>
+                 <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Shared Memories & Context</h2>
+                 <p className="text-xs text-slate-500 dark:text-slate-400">The deep history of your relationship</p>
+               </div>
+             </div>
+          <div className="flex items-center justify-end mb-2">
              <div className="flex items-center gap-2">
                <span className="text-[10px] font-bold text-slate-600 uppercase">Markdown Supported</span>
                <Button 
                  size="sm" 
-                 onClick={handleSaveLore}
-                 disabled={isSavingLore || deepLore === contact.deep_lore}
+                 onClick={handleSaveMemory}
+                 disabled={isSavingLore || sharedMemory === initialMemory}
                  className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] rounded-none px-4"
                >
                  {isSavingLore ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Save className="h-3 w-3 mr-1" />}
-                 Save Context
+                 Save Memory
                </Button>
              </div>
           </div>
@@ -228,8 +235,8 @@ export function StoryTab({ contact }: StoryTabProps) {
             </CardHeader>
             <CardContent className="flex-1 p-0 flex flex-col">
               <textarea
-                value={deepLore}
-                onChange={(e) => setDeepLore(e.target.value)}
+                value={sharedMemory}
+                onChange={(e) => setSharedMemory(e.target.value)}
                 placeholder="What makes this relationship special? Family notes, shared interests, career goals, or recurring inside jokes..."
                 className="flex-1 w-full bg-transparent p-6 text-slate-300 text-sm leading-relaxed focus:outline-none resize-none min-h-[350px] font-medium"
               />

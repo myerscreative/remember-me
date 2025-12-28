@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Check, Repeat } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star } from "lucide-react";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
@@ -109,12 +109,26 @@ export default function ContactDetailPage({
         
         const tags = tagData?.map((t: any) => t.tags.name) || [];
 
-        // 3. Assemble complete object
+        // 3. Fetch Shared Memories
+        const { data: sharedMemories } = await (supabase as any)
+          .from("shared_memories")
+          .select("content")
+          .eq("person_id", id)
+          .order('created_at', { ascending: false });
+
+        // 4. Assemble complete object
+        const latestMemory = sharedMemories?.[0]?.content;
+        const baseAiSummary = person.ai_summary || "";
+        const enhancedAiSummary = latestMemory 
+            ? `Most Recent Memory: ${latestMemory}\n\n${baseAiSummary}`
+            : baseAiSummary;
+
         const fullContact = {
             ...person,
             firstName: person.first_name || person.name?.split(" ")[0] || "",
             lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
             tags: tags,
+            shared_memories: sharedMemories || [],
             story: {
                 whereWeMet: person.where_met,
                 whyStayInContact: person.why_stay_in_contact,
@@ -128,7 +142,7 @@ export default function ContactDetailPage({
             photo_url: person.photo_url || person.avatar_url, 
             familyMembers: person.family_members || [],
             interests: person.interests || [],
-            aiSummary: person.ai_summary,
+            aiSummary: enhancedAiSummary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
             whatFoundInteresting: person.what_found_interesting,
@@ -234,6 +248,11 @@ export default function ContactDetailPage({
     }
   };
 
+  const handleToggleFavorite = async () => {
+    const newImportance = contact.importance === 'high' ? 'medium' : 'high';
+    await handleImportanceChange(newImportance as ContactImportance);
+  };
+
 
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Loading profile...</div></div>;
@@ -265,7 +284,11 @@ export default function ContactDetailPage({
       <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
          
          {/* DESKTOP HEADER (Hidden on Mobile) */}
-         <ProfileHeader onEdit={() => setIsEditModalOpen(true)} />
+         <ProfileHeader 
+            onEdit={() => setIsEditModalOpen(true)} 
+            importance={contact.importance}
+            onToggleFavorite={handleToggleFavorite}
+         />
 
          {/* MOBILE HEADER (Visible < 768px) */}
          <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white min-h-[300px] rounded-b-[2.5rem] p-6 shadow-xl relative overflow-hidden">
@@ -278,7 +301,18 @@ export default function ContactDetailPage({
                         <ArrowLeft className="h-6 w-6" />
                     </Button>
                 </Link>
-                <div className="flex gap-2">
+                <div className="flex gap-2 relative z-10">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={cn(
+                          "hover:bg-white/10 rounded-full transition-all duration-200",
+                          contact.importance === 'high' ? "text-amber-400" : "text-white"
+                        )}
+                        onClick={handleToggleFavorite}
+                    >
+                        <Star className={cn("h-5 w-5", contact.importance === 'high' && "fill-amber-400")} />
+                    </Button>
                     <Button 
                         variant="ghost" 
                         size="icon" 

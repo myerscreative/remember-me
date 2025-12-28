@@ -161,4 +161,30 @@ export async function deleteMilestone(contactId: string, label: string, date: st
       console.error("Error deleting milestone:", error);
       return { success: false, error: message };
     }
+}
+
+export async function upsertSharedMemory(person_id: string, content: string) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) throw new Error("Unauthorized");
+
+    const { error } = await (supabase as any)
+      .from('shared_memories')
+      .upsert({ 
+        person_id, 
+        user_id: user.id, 
+        content 
+      }, { onConflict: 'person_id, user_id' }); // Assuming we want one main memory context per person/user
+
+    if (error) throw error;
+
+    revalidatePath(`/contacts/${person_id}`);
+    return { success: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error upserting shared memory:", error);
+    return { success: false, error: message };
   }
+}

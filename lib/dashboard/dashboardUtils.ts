@@ -80,17 +80,18 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
       totalContacts: contacts.length,
       withContext: contacts.filter(c => c.has_context).length,
       withoutContext: contacts.filter(c => !c.has_context).length,
-      highPriority: contacts.filter(c => c.contact_importance === 'high').length,
-      mediumPriority: contacts.filter(c => c.contact_importance === 'medium').length,
-      lowPriority: contacts.filter(c => c.contact_importance === 'low').length,
+      highPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'high').length,
+      mediumPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'medium').length,
+      lowPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'low').length,
       needingAttention: contacts.filter(c => {
-        if (!c.last_interaction_date) return false;
-        const lastInteraction = new Date(c.last_interaction_date);
+        const lastInteractionDate = c.last_interaction_date; // We keep this for now but should ideally fetch from 'interactions' table separately if needed
+        if (!lastInteractionDate) return true;
+        
+        const lastInteraction = new Date(lastInteractionDate);
         const daysSince = Math.floor((Date.now() - lastInteraction.getTime()) / (1000 * 60 * 60 * 24));
         
-        let threshold = 30;
-        if (c.contact_importance === 'high') threshold = 14;
-        else if (c.contact_importance === 'low') threshold = 90;
+        const importance = c.importance || c.contact_importance;
+        const threshold = c.target_frequency_days || (importance === 'high' ? 14 : importance === 'low' ? 90 : 30);
         
         return daysSince >= threshold;
       }).length,
@@ -99,7 +100,7 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
         return created >= thirtyDaysAgo;
       }).length,
       imported: contacts.filter(c => c.imported).length,
-      archived: contacts.filter(c => c.archive_status).length,
+      archived: contacts.filter(c => c.archived).length,
     };
 
     return { data: stats, error: null };
@@ -182,9 +183,9 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
   try {
     const { data: contacts, error } = await (supabase as any)
       .from('persons')
-      .select('last_interaction_date')
+      .select('*')
       .eq('user_id', user.id)
-      .or('archive_status.is.null,archive_status.eq.false');
+      .or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null');
 
     if (error) {
       console.error('Error fetching contacts:', error);
@@ -209,10 +210,12 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
 
       const lastInteraction = new Date(contact.last_interaction_date).getTime();
       const daysSince = Math.floor((now - lastInteraction) / (1000 * 60 * 60 * 24));
+      const importanceValue = contact.importance || contact.contact_importance;
+      const threshold = contact.target_frequency_days || (importanceValue === 'high' ? 14 : importanceValue === 'low' ? 90 : 30);
 
-      if (daysSince <= 30) {
+      if (daysSince <= threshold) {
         health.healthy++;
-      } else if (daysSince <= 60) {
+      } else if (daysSince <= threshold * 1.5) {
         health.warning++;
       } else {
         health.needsAttention++;
@@ -240,9 +243,9 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
   try {
     const { data, error } = await (supabase as any)
       .from('persons')
-      .select('id, name, first_name, last_name, photo_url, interaction_count, last_interaction_date, importance, relationship_summary')
+      .select('*')
       .eq('user_id', user.id)
-      .or('archive_status.is.null,archive_status.eq.false')
+      .or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null')
       .order('interaction_count', { ascending: false, nullsFirst: false })
       .limit(limit);
 
@@ -259,7 +262,7 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
       photoUrl: c.photo_url,
       interactionCount: c.interaction_count || 0,
       lastInteractionDate: c.last_interaction_date,
-      contactImportance: c.importance,
+      contactImportance: c.importance || c.contact_importance,
       relationshipSummary: c.relationship_summary,
     }));
 
@@ -306,9 +309,10 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
             const diffTime = Math.abs(now.getTime() - lastDate.getTime());
             const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+            const importance = contact.importance || contact.contact_importance;
             let threshold = 30; // Medium/Default
-            if (contact.importance === 'high') threshold = 14;
-            else if (contact.importance === 'low') threshold = 90;
+            if (importance === 'high') threshold = 14;
+            else if (importance === 'low') threshold = 90;
 
             return daysAgo >= threshold;
         })
@@ -411,9 +415,10 @@ export function calculateRelationshipScore(contact: Person): number {
 
   // Importance (0-20 points)
   // Importance (0-20 points)
-  if (contact.importance === 'high') score += 20;
-  else if (contact.importance === 'medium') score += 10;
-  else if (contact.importance === 'low') score += 5;
+  const importance = contact.importance || contact.contact_importance;
+  if (importance === 'high') score += 20;
+  else if (importance === 'medium') score += 10;
+  else if (importance === 'low') score += 5;
 
   // Context (0-10 points)
   if (contact.has_context) score += 10;

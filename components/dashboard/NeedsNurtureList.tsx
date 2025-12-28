@@ -20,7 +20,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
   const router = useRouter();
   const [activeTribe, setActiveTribe] = useState("All");
   const [selectedContact, setSelectedContact] = useState<any | null>(null);
-  const [isLoreOpen, setIsLoreOpen] = useState(false);
+  const [isSharedMemoryOpen, setIsSharedMemoryOpen] = useState(false);
 
   // Extract unique tribes from contacts
   const tribes = useMemo(() => {
@@ -95,7 +95,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 className="group flex items-center justify-between px-3 py-2 hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => {
                     setSelectedContact(contact);
-                    setIsLoreOpen(true);
+                    setIsSharedMemoryOpen(true);
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -158,11 +158,11 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
         )}
       </div>
 
-      {/* Deep Lore Modal */}
+      {/* Shared Memories Modal */}
       {selectedContact && (
         <UnifiedActionHub 
-            isOpen={isLoreOpen}
-            onClose={() => setIsLoreOpen(false)}
+            isOpen={isSharedMemoryOpen}
+            onClose={() => setIsSharedMemoryOpen(false)}
             person={selectedContact}
             onAction={(type, note) => {
                 // Determine template based on action type
@@ -173,7 +173,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 // OR we can implement a quick log.
                 // For this step, simply navigating to their page is a safe fallback
                 // if we don't have the log modal here.
-                setIsLoreOpen(false);
+                setIsSharedMemoryOpen(false);
                 router.push(`/contacts/${selectedContact.id}?action=${type}`);
             }}
         />

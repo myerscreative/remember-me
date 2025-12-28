@@ -176,10 +176,10 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
          )}
       </div>
 
-      {/* Footer: Stats + Legend - Below map on mobile, absolute on desktop if desired, but request says "move below" */}
-      <div className="mt-4 pt-3 border-t border-border/30 w-full flex flex-col sm:flex-row items-center justify-between gap-3 md:absolute md:bottom-4 md:right-4 md:mt-0 md:pt-0 md:border-t-0 md:w-auto">
-         {/* Legend */}
-         <div className="flex items-center gap-3 text-[10px] font-bold order-2 sm:order-1">
+      {/* Footer: Stats + Legend - Below map on mobile, absolute on desktop */}
+      <div className="mt-4 pt-4 border-t border-border/30 w-full flex flex-col md:flex-row items-center justify-between gap-4 md:absolute md:bottom-4 md:right-4 md:mt-0 md:pt-0 md:border-t-0 md:w-auto">
+         {/* Legend - Stays as a row or wraps naturally */}
+         <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-bold order-2 md:order-1">
             <div className="flex items-center gap-1.5">
                <span className="w-2.5 h-2.5 rounded-full bg-[#059669]"></span>
                <span className="text-foreground/80 dark:text-emerald-400 whitespace-nowrap">Nurtured</span>
@@ -194,8 +194,8 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
             </div>
          </div>
 
-         {/* Stats */}
-         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded-md order-1 sm:order-2">
+         {/* Stats - Centered on mobile */}
+         <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest bg-muted/50 px-3 py-1.5 rounded-md order-1 md:order-2 w-full md:w-auto text-center">
             {displayTotalCount} TOTAL / <span className="text-emerald-500">{displayActiveCount} ACTIVE</span>
          </div>
       </div>

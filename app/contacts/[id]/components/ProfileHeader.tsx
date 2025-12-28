@@ -2,13 +2,19 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Edit, Settings } from 'lucide-react';
+import { ChevronLeft, Edit, Settings, Star } from 'lucide-react';
+import { ContactImportance } from '@/types/database.types';
+import { cn } from '@/lib/utils';
 
 interface ProfileHeaderProps {
   onEdit?: () => void;
+  importance?: ContactImportance;
+  onToggleFavorite?: () => void;
 }
 
-export function ProfileHeader({ onEdit }: ProfileHeaderProps) {
+export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileHeaderProps) {
+  const isFavorite = importance === 'high';
+
   return (
     <header className="h-[65px] flex items-center justify-between px-8 bg-sidebar border-b border-sidebar-border sticky top-0 z-10 hidden md:flex">
       {/* Left: Back Button */}
@@ -28,6 +34,19 @@ export function ProfileHeader({ onEdit }: ProfileHeaderProps) {
 
       {/* Right: Actions */}
       <div className="flex-1 flex justify-end gap-2">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onToggleFavorite}
+          className={cn(
+            "h-9 w-9 rounded-full transition-all duration-200",
+            isFavorite 
+              ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+              : "text-gray-400 hover:text-amber-500 hover:bg-gray-50 dark:hover:bg-[#2c3039]"
+          )}
+        >
+          <Star className={cn("h-4 w-4", isFavorite && "fill-amber-500")} />
+        </Button>
         <Button 
           variant="ghost" 
           size="icon" 

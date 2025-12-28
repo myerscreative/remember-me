@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, List, LayoutGrid, Share2 } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
@@ -113,6 +113,7 @@ export default function GardenPage() {
   // Modal state for logging interactions
   const [selectedContactForModal, setSelectedContactForModal] = useState<ExtendedContact | null>(null);
   const [hoveredContactId, setHoveredContactId] = useState<string | null>(null);
+  const [uncategorizedCount, setUncategorizedCount] = useState(0);
 
   // Fetch contacts from Supabase
   useEffect(() => {
@@ -129,6 +130,16 @@ export default function GardenPage() {
         setLoading(false);
         return;
       }
+
+      // Check for contacts without target frequency
+      const { count: uCount, error: countError } = await (supabase as any)
+        .from('persons')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .is('target_frequency_days', null)
+        .eq('archived', false);
+      
+      if (!countError) setUncategorizedCount(uCount || 0);
 
       // Fetch persons and relationships
       const { data: persons, error: fetchError } = await (supabase as any)
@@ -392,7 +403,7 @@ export default function GardenPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto px-4 py-8">
         
         {/* Header */}
@@ -401,12 +412,21 @@ export default function GardenPage() {
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
           </Link>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">🍃 Relationship Garden</h1>
               <p className="text-slate-500 dark:text-slate-400">Click a health status to see contacts in that group</p>
             </div>
-            <div className="flex items-center gap-2">
+            
+            {/* Mobile Controls Position (Visible only on mobile) */}
+            <div className="md:hidden w-full flex flex-col items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+               <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Currently Showing</div>
+               <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                 {categoryFilter === 'all' ? 'All Contacts' : categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
+               </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end md:self-start">
               <Link
                 href="/triage"
                 className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"

@@ -19,6 +19,7 @@ interface EditContactModalProps {
 
 export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditContactModalProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Form State - only fields that exist in the database
   const [formData, setFormData] = useState({
@@ -227,58 +228,88 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
           </div>
 
 
-      <div className="flex justify-between w-full">
-            <Button 
-              type="button" 
-              variant="destructive" 
-              onClick={async () => {
-                if (!confirm("Are you sure you want to delete this contact? This action cannot be undone.")) return;
-                
-                setIsSaving(true);
-                try {
-                  const supabase = createClient();
-                  const { error } = await (supabase as any)
-                    .from("persons")
-                    .delete()
-                    .eq("id", contact.id);
-
-                  if (error) throw error;
-
-                  toast.success("Contact deleted");
-                  onSuccess(); // Triggers refresh
-                  onClose();
-                  // redirect performed by parent or purely refresh? 
-                  // If on a contact page, we should probably redirect. 
-                  // But checking the props, onSuccess is passed. 
-                  // Let's assume parent handles nav or refresh.
-                  // Actually, if we are on /contacts/[id], we need to go home.
-                   window.location.href = '/contacts'; 
-                } catch (err: any) {
-                  console.error("Delete error:", err);
-                   toast.error("Failed to delete contact");
-                   setIsSaving(false);
-                }
-              }} 
-              disabled={isSaving}
-            >
-              Delete Contact
-            </Button>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-                Cancel
+      <div className="flex flex-col gap-4 w-full pt-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex justify-between items-center w-full">
+            {!showDeleteConfirm ? (
+              <Button 
+                type="button" 
+                variant="destructive" 
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSaving}
+              >
+                Delete Contact
               </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
-              </Button>
-            </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3 items-center bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30 w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="flex-1">
+                  <p className="text-red-800 dark:text-red-400 text-xs font-bold uppercase tracking-tight mb-1">Warning: Irreversible Action</p>
+                  <p className="text-red-600 dark:text-red-500 text-[11px] leading-tight">Delete everything for this contact?</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white h-9 px-4"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    disabled={isSaving}
+                  >
+                    Keep
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="destructive" 
+                    size="sm"
+                    className="h-9 px-4 shadow-lg shadow-red-500/20"
+                    onClick={async () => {
+                      setIsSaving(true);
+                      try {
+                        const supabase = createClient();
+                        const { error } = await (supabase as any)
+                          .from("persons")
+                          .delete()
+                          .eq("id", contact.id);
+
+                        if (error) throw error;
+
+                        toast.success("Contact deleted");
+                        onSuccess();
+                        onClose();
+                        window.location.href = '/'; 
+                      } catch (err: any) {
+                        console.error("Delete error:", err);
+                        toast.error("Failed to delete contact");
+                        setIsSaving(false);
+                        setShowDeleteConfirm(false);
+                      }
+                    }} 
+                    disabled={isSaving}
+                  >
+                    Confirm Delete
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {!showDeleteConfirm && (
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
         </form>
       </DialogContent>
     </Dialog>
