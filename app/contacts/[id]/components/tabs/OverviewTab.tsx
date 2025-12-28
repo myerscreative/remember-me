@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sparkles, Plus, Tag, X, Loader2, Info, Mail, MapPin, Users, Phone } from 'lucide-react';
+import { Sparkles, Plus, Tag, X, Loader2, Info, Mail, MapPin, Users, Phone, MessageSquare } from 'lucide-react';
 import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
