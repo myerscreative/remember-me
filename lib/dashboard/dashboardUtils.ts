@@ -284,9 +284,10 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
   try {
     // Simplified query to ensure we catch ALL contacts needing attention (including NULL dates)
     // The previous optimization was too aggressive and excluded 'New' (null date) contacts.
+    // Note: next_goal_note column may not exist in production, so we don't query it
     const { data, error } = await (supabase as any)
       .from('persons')
-      .select('*, interactions(next_goal_note, date)')
+      .select('*')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false')
       .order('last_interaction_date', { ascending: true, nullsFirst: true }); // Prioritize 'Never Contacted' then 'Oldest'
@@ -312,15 +313,9 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
             return daysAgo >= threshold;
         })
         .map((contact: any) => {
-            // Sort interactions by date desc to get the latest
-            const sortedInteractions = (contact.interactions || []).sort((a: any, b: any) =>
-                new Date(b.date).getTime() - new Date(a.date).getTime()
-            );
-            const latestGoal = sortedInteractions.length > 0 ? sortedInteractions[0].next_goal_note : null;
-            
             return {
                 ...contact,
-                latest_next_goal: latestGoal
+                latest_next_goal: null // next_goal_note column may not exist in production
             };
         })
         .slice(0, 20); // Apply limit after filtering
