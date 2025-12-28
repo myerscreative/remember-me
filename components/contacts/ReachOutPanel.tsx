@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Copy, Check, MessageSquare } from 'lucide-react';
 import { generateReconnectionScript } from '@/lib/ai/scriptGenerator';
 import toast from 'react-hot-toast';
+import { cn } from "@/lib/utils";
 
 interface ReachOutPanelProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface ReachOutPanelProps {
     shared_memories?: Array<{ content: string }> | null;
     relationship_summary?: string | null;
     ai_summary?: string | null;
+    where_met?: string | null;
     story?: {
         whyStayInContact?: string | null;
     };
@@ -53,7 +55,8 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
         contact.name, 
         latestMemory, 
         purpose,
-        contact.relationship_summary || contact.ai_summary
+        contact.relationship_summary || contact.ai_summary,
+        contact.where_met
       );
       setScript(generated);
       setCopied(false);
@@ -80,7 +83,7 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
            <SheetHeader className="p-6 border-b border-slate-200 dark:border-slate-800">
              <SheetTitle className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 text-left">
                <Sparkles className="w-5 h-5 text-indigo-500" />
-               Drafting a Reconnection based on Shared Memories
+               Shared Memory Reach-Out
              </SheetTitle>
              <SheetDescription className="text-slate-500 dark:text-slate-400 text-left">
                 Using your deepest lore with {contact.name.split(' ')[0]}.
@@ -118,7 +121,7 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
            </div>
 
            <div className="p-6 border-t border-slate-200 dark:border-slate-800 mt-auto bg-slate-50/50 dark:bg-slate-900/30">
-              <Button 
+              <Button
                 onClick={handleCopy}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 h-12 rounded-xl text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
               >

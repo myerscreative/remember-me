@@ -25,6 +25,7 @@ interface Contact {
   shared_memories?: Array<{ content: string }> | null;
   relationship_summary?: string | null;
   ai_summary?: string | null;
+  where_met?: string | null;
   [key: string]: any;
 }
 

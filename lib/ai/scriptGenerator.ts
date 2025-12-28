@@ -7,11 +7,12 @@ export function generateReconnectionScript(
     name: string, 
     deepLore: string | null, 
     whyStayInContact: string | null,
-    relationshipSummary?: string | null
+    relationshipSummary?: string | null,
+    whereMet?: string | null
 ): string {
   const firstName = name.split(' ')[0];
   
-  // Sentence 1: The Memory or Relationship Summary
+  // Sentence 1: The Memory, Summary, or Where Met
   let sentence1 = `Hey ${firstName}, I was just thinking about you and the time we spent talking about ${deepLore || 'our shared experiences'}!`;
   
   if (deepLore) {
@@ -20,6 +21,8 @@ export function generateReconnectionScript(
   } else if (relationshipSummary) {
       const summaryPreview = relationshipSummary.length > 60 ? relationshipSummary.substring(0, 60) + '...' : relationshipSummary;
       sentence1 = `Hey ${firstName}, I was just thinking about our connection and how ${summaryPreview}.`;
+  } else if (whereMet) {
+      sentence1 = `Hey ${firstName}, I was just reflecting on when we first met at ${whereMet}!`;
   }
 
   // Sentence 2: The Reconnect
