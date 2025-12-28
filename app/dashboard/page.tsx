@@ -252,9 +252,9 @@ export default function DashboardPage() {
                                 <span className="text-sm font-medium text-slate-500">Context</span>
                                 <span className="text-lg font-bold text-slate-700 dark:text-slate-300">{stats?.withContext || 0}</span>
                             </div>
-                            <div className="flex justify-between items-center text-orange-600">
-                                <span className="text-sm font-bold">Nurture</span>
-                                <span className="text-lg font-black">{needingAttention.length}</span>
+                            <div className="flex justify-between items-center text-red-600">
+                                <span className="text-sm font-bold">Neglected</span>
+                                <span className="text-lg font-black">{stats?.needingAttention || 0}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -316,20 +316,20 @@ export default function DashboardPage() {
                      
                      {/* Stats Footer */}
                      {relationshipHealth && (
-                         <div className="flex border-t border-border divide-x divide-border bg-muted/50 backdrop-blur-sm">
-                             <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                 <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">Fresh</div>
-                                 <div className="text-lg font-black text-foreground">{relationshipHealth.healthy}</div>
-                             </div>
-                             <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                 <div className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-0.5">Warn</div>
-                                 <div className="text-lg font-black text-foreground">{relationshipHealth.warning}</div>
-                             </div>
-                             <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                 <div className="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-0.5">Alert</div>
-                                 <div className="text-lg font-black text-foreground">{relationshipHealth.needsAttention}</div>
-                             </div>
-                         </div>
+                          <div className="flex border-t border-border divide-x divide-border bg-muted/50 backdrop-blur-sm">
+                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
+                                  <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">Nurtured</div>
+                                  <div className="text-lg font-black text-foreground">{relationshipHealth.healthy}</div>
+                              </div>
+                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
+                                  <div className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-0.5">Drifting</div>
+                                  <div className="text-lg font-black text-foreground">{relationshipHealth.warning}</div>
+                              </div>
+                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
+                                  <div className="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-0.5">Neglected</div>
+                                  <div className="text-lg font-black text-foreground">{relationshipHealth.needsAttention}</div>
+                              </div>
+                          </div>
                      )}
                  </div>
 

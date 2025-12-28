@@ -87,7 +87,12 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
         if (!c.last_interaction_date) return false;
         const lastInteraction = new Date(c.last_interaction_date);
         const daysSince = Math.floor((Date.now() - lastInteraction.getTime()) / (1000 * 60 * 60 * 24));
-        return daysSince >= 30;
+        
+        let threshold = 30;
+        if (c.contact_importance === 'high') threshold = 14;
+        else if (c.contact_importance === 'low') threshold = 90;
+        
+        return daysSince >= threshold;
       }).length,
       recentlyAdded: contacts.filter(c => {
         const created = new Date(c.created_at);

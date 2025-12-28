@@ -51,17 +51,13 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
   else if (contact.importance === 'low') threshold = 90;
 
   if (daysAgo >= threshold) {
-     // Proactive Phrase Logic based on Importance
-     const importance = contact.importance || 'medium';
-     let phrase = "Send a thoughtful follow-up message"; // Default/Medium
-     
-     if (importance === 'high') {
-         phrase = "Time to schedule a deep-dive call";
-     } else if (importance === 'low') {
-         phrase = "Drop a quick hello or shared link";
+     // Check Severity for Drifting vs Neglected
+     // Buffer of 30 days past threshold = Neglected
+     if (daysAgo >= threshold + 30) {
+        return { label: "Rescue this neglected connection", colorClass: "text-red-500 dark:text-red-400 font-semibold text-[12px] font-sans" };
+     } else {
+        return { label: "Reconnect with this drifting contact", colorClass: "text-amber-500 dark:text-amber-400 font-semibold text-[12px] font-sans" };
      }
-     
-     return { label: phrase, colorClass: "text-indigo-500 dark:text-indigo-400 font-semibold text-[12px] font-sans" };
   }
 
   // 4. Up to Date (Slate - No suggested action)

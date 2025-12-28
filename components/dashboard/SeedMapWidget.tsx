@@ -20,14 +20,25 @@ interface TooltipState {
   visible: boolean;
   x: number;
   y: number;
-  contact: { name: string; days: number; id: string } | null; // Added id to contact
+  contact: { name: string; days: number; id: string; status: 'nurtured' | 'drifting' | 'neglected'; } | null;
 }
 
-function getColorForDays(days: number): string {
-  // STRICT VISUAL LOGIC: Map Fresh (Green), Warn (Yellow), Alert (Orange)
-  if (days <= 30) return '#10B981';   // Emerald-500 (Fresh / Center)
-  if (days <= 90) return '#EAB308';   // Yellow-500 (Warn / Mid)
-  return '#F97316';                   // Orange-500 (Alert / No History / Edge)
+function getContactStatus(days: number, importance: string = 'medium'): 'nurtured' | 'drifting' | 'neglected' {
+  let threshold = 30;
+  if (importance === 'high') threshold = 14;
+  else if (importance === 'low') threshold = 90;
+
+  if (days <= threshold) return 'nurtured';
+  if (days <= threshold + 30) return 'drifting'; // Buffer for drifting
+  return 'neglected';
+}
+
+function getColorForStatus(status: 'nurtured' | 'drifting' | 'neglected'): string {
+  switch (status) {
+    case 'nurtured': return '#10B981'; // Emerald-500
+    case 'drifting': return '#F59E0B'; // Amber-500
+    case 'neglected': return '#EF4444'; // Red-500
+  }
 }
 
 export default function SeedMapWidget({ contacts = [], className = '', totalCount, activeCount: propActiveCount }: SeedMapWidgetProps) {
@@ -37,7 +48,6 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
   // Seed positioning logic with dynamic sizing
   const { seedPositions, calculatedActiveCount } = useMemo(() => {
     // 1. Filter active contacts (having intensity/importance)
-    // Upstream fix ensures 'intensity' is set for anyone with history
     const activeContacts = contacts.filter((c: any) => c.intensity);
     
     // Transform and sort active ones
@@ -47,14 +57,16 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
         const days = lastDate 
           ? Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
           : 999; // Treat no-history as "Oldest" (Outer Edge)
-        return { ...c, days };
+        
+        const status = getContactStatus(days, c.importance);
+        
+        return { ...c, days, status };
     })
     .sort((a, b) => a.days - b.days) // Sort by recency (Green center -> Orange edge)
     .slice(0, 400); 
 
     const count = displayContacts.length;
     // Dynamic scaling based on count
-    // If few active contacts, spread them out more. If many, pack them tighter.
     const spacing = 16; 
     let spiralConstant = 5; 
     let seedSize = 5;
@@ -76,7 +88,7 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
       const x = 150 + radius * Math.cos(angle);
       const y = 150 + radius * Math.sin(angle);
       
-      return { ...contact, x, y, size: seedSize, color: getColorForDays(contact.days) };
+      return { ...contact, x, y, size: seedSize, color: getColorForStatus(contact.status) };
     });
 
     return { seedPositions: positions, calculatedActiveCount: count };
@@ -85,11 +97,20 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
   const displayActiveCount = propActiveCount ?? calculatedActiveCount;
   const displayTotalCount = totalCount ?? contacts.length;
 
+  const getTooltipText = (contact: NonNullable<TooltipState['contact']>) => {
+      if (contact.days === 999) return "Ready for first hello.";
+      switch (contact.status) {
+          case 'nurtured': return `${contact.name} is Nurtured. Connection is solid.`;
+          case 'drifting': return `${contact.name} is Drifting. Reach out to pull them back.`;
+          case 'neglected': return `${contact.name} is Neglected. This connection needs a rescue.`;
+      }
+  };
+
   return (
     <div className={`relative flex flex-col items-center justify-center p-4 bg-card rounded-xl border border-border/50 h-[380px] w-full ${className}`}>
       {/* Title */}
       <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-        <Sprout className="h-5 w-5 text-lime-500" />
+        <Sprout className="h-5 w-5 text-emerald-500" />
         <span className="font-bold text-sm tracking-wide text-foreground/80 uppercase">Garden Map</span>
       </div>
 
@@ -142,11 +163,13 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
          {/* Tooltip */}
          {tooltip.visible && tooltip.contact && (
             <div 
-              className="fixed z-50 px-3 py-2 bg-slate-900/95 text-white text-xs rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-[140%] backdrop-blur-sm border border-slate-700"
+              className="fixed z-50 px-3 py-2 bg-slate-900/95 text-white text-xs rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-[140%] backdrop-blur-sm border border-slate-700 min-w-[200px] text-center"
               style={{ left: tooltip.x, top: tooltip.y }}
             >
-              <div className="font-bold">{tooltip.contact.name}</div>
-              <div className="text-slate-400 text-[10px] uppercase tracking-wider">{tooltip.contact.days === 999 ? 'New / No History' : `${tooltip.contact.days} Days Ago`}</div>
+              <div className="font-bold text-sm mb-0.5">{tooltip.contact.name}</div>
+              <div className="text-slate-300 text-[11px] leading-tight">
+                {getTooltipText(tooltip.contact)}
+              </div>
             </div>
          )}
       </div>
