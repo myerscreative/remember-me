@@ -56,7 +56,8 @@ export interface Database {
           last_interaction_date: string | null
           last_contact_method: string | null
           interaction_count: number
-          importance: 'high' | 'medium' | 'low' | null
+          importance: 'high' | 'medium' | 'low' | string | null
+          target_frequency_days: number | null
           archive_status: boolean
           has_context: boolean
           imported: boolean
@@ -556,7 +557,7 @@ export interface Database {
 }
 
 // Helper types for easier usage
-export type Person = Database['public']['Tables']['persons']['Row']
+export type BasePerson = Database['public']['Tables']['persons']['Row']
 export type PersonInsert = Database['public']['Tables']['persons']['Insert']
 export type PersonUpdate = Database['public']['Tables']['persons']['Update']
 
