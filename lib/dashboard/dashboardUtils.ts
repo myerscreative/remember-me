@@ -80,9 +80,9 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
       totalContacts: contacts.length,
       withContext: contacts.filter(c => c.has_context).length,
       withoutContext: contacts.filter(c => !c.has_context).length,
-      highPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'high').length,
-      mediumPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'medium').length,
-      lowPriority: contacts.filter(c => (c.importance || c.contact_importance) === 'low').length,
+      highPriority: contacts.filter(c => c.importance === 'high').length,
+      mediumPriority: contacts.filter(c => c.importance === 'medium').length,
+      lowPriority: contacts.filter(c => c.importance === 'low').length,
       needingAttention: contacts.filter(c => {
         const lastInteractionDate = c.last_interaction_date; // We keep this for now but should ideally fetch from 'interactions' table separately if needed
         if (!lastInteractionDate) return true;
@@ -90,7 +90,7 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
         const lastInteraction = new Date(lastInteractionDate);
         const daysSince = Math.floor((Date.now() - lastInteraction.getTime()) / (1000 * 60 * 60 * 24));
         
-        const importance = c.importance || c.contact_importance;
+        const importance = c.importance;
         const threshold = c.target_frequency_days || (importance === 'high' ? 14 : importance === 'low' ? 90 : 30);
         
         return daysSince >= threshold;
@@ -210,7 +210,7 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
 
       const lastInteraction = new Date(contact.last_interaction_date).getTime();
       const daysSince = Math.floor((now - lastInteraction) / (1000 * 60 * 60 * 24));
-      const importanceValue = contact.importance || contact.contact_importance;
+      const importanceValue = contact.importance;
       const threshold = contact.target_frequency_days || (importanceValue === 'high' ? 14 : importanceValue === 'low' ? 90 : 30);
 
       if (daysSince <= threshold) {
@@ -262,7 +262,7 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
       photoUrl: c.photo_url,
       interactionCount: c.interaction_count || 0,
       lastInteractionDate: c.last_interaction_date,
-      contactImportance: c.importance || c.contact_importance,
+      contactImportance: c.importance,
       relationshipSummary: c.relationship_summary,
     }));
 
@@ -309,7 +309,7 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
             const diffTime = Math.abs(now.getTime() - lastDate.getTime());
             const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            const importance = contact.importance || contact.contact_importance;
+            const importance = contact.importance;
             let threshold = 30; // Medium/Default
             if (importance === 'high') threshold = 14;
             else if (importance === 'low') threshold = 90;

@@ -130,7 +130,7 @@ export function StoryTab({ contact }: StoryTabProps) {
           </div>
 
           {isAddingMilestone && (
-            <Card className="bg-[#0F172A] border-[#1E293B] border-t-2 border-t-[#38BDF8] rounded-none mb-6 slide-in-from-top-2 animate-in duration-300">
+            <Card className="bg-[#0F172A] border-slate-200 dark:border-slate-800 border-t-2 border-t-[#38BDF8] rounded-none mb-6 slide-in-from-top-2 animate-in duration-300">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
@@ -139,7 +139,7 @@ export function StoryTab({ contact }: StoryTabProps) {
                       placeholder="e.g. Work Anniversary" 
                       value={newMilestone.label}
                       onChange={(e) => setNewMilestone({...newMilestone, label: e.target.value})}
-                      className="h-9 bg-[#1E293B] border-slate-800 text-white text-xs rounded-none focus-visible:ring-[#38BDF8]"
+                      className="h-9 bg-[#1E293B] border-slate-200 dark:border-slate-800 text-white text-xs rounded-none focus-visible:ring-[#38BDF8]"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -148,7 +148,7 @@ export function StoryTab({ contact }: StoryTabProps) {
                       type="date"
                       value={newMilestone.date}
                       onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
-                      className="h-9 bg-[#1E293B] border-slate-800 text-white text-xs rounded-none focus-visible:ring-[#38BDF8]"
+                      className="h-9 bg-[#1E293B] border-slate-200 dark:border-slate-800 text-white text-xs rounded-none focus-visible:ring-[#38BDF8]"
                     />
                   </div>
                 </div>
@@ -168,10 +168,10 @@ export function StoryTab({ contact }: StoryTabProps) {
               milestones.map((m, idx) => (
                 <div 
                   key={`${m.label}-${idx}`} 
-                  className="group flex items-center justify-between p-4 bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8]/50 transition-all"
+                  className="group flex items-center justify-between p-4 bg-[#0F172A] border border-slate-200 dark:border-slate-800 hover:border-[#38BDF8]/50 transition-all"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 bg-[#1E293B] flex items-center justify-center border border-slate-800">
+                    <div className="h-10 w-10 bg-[#1E293B] flex items-center justify-center border border-slate-200 dark:border-slate-800">
                       <Cake className={cn("h-5 w-5", m.label.toLowerCase().includes('birthday') ? "text-rose-500" : "text-[#38BDF8]")} />
                     </div>
                     <div>
@@ -192,7 +192,7 @@ export function StoryTab({ contact }: StoryTabProps) {
                 </div>
               ))
             ) : (
-              <div className="p-12 text-center border-2 border-dashed border-[#1E293B] bg-[#0F172A]/30">
+              <div className="p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 bg-[#0F172A]/30">
                  <Calendar className="h-8 w-8 text-slate-800 mx-auto mb-3" />
                  <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No milestones recorded yet</p>
               </div>
@@ -218,7 +218,7 @@ export function StoryTab({ contact }: StoryTabProps) {
                  size="sm" 
                  onClick={handleSaveMemory}
                  disabled={isSavingLore || sharedMemory === initialMemory}
-                 className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] rounded-none px-4"
+                 className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] rounded-none px-4 shadow-sm"
                >
                  {isSavingLore ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Save className="h-3 w-3 mr-1" />}
                  Save Memory
@@ -226,8 +226,8 @@ export function StoryTab({ contact }: StoryTabProps) {
              </div>
           </div>
 
-          <Card className="bg-[#0F172A] border-[#1E293B] shadow-2xl rounded-none flex flex-col min-h-[400px]">
-            <CardHeader className="p-4 border-b border-[#1E293B] bg-[#1E293B]/30">
+          <Card className="bg-[#0F172A] border-slate-200 dark:border-slate-800 shadow-2xl rounded-none flex flex-col min-h-[400px]">
+            <CardHeader className="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#1E293B]/30">
               <div className="flex items-center gap-2">
                  <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shared Memories & Important Context</span>

@@ -154,7 +154,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
               setSelectedMemberIndex(null);
               setShowEditMemberModal(true);
             }}
-            className="flex items-center gap-2 border-purple-200 text-purple-700 hover:bg-purple-50"
+            className="flex items-center gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Family Detail</span>
@@ -164,7 +164,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
 
       {/* Empty state */}
       {relationships.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 dark:bg-[#252931] rounded-2xl border border-dashed border-gray-200 dark:border-[#3a3f4b]">
+        <div className="text-center py-16 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
           <Users className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No connections yet
@@ -193,7 +193,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
             {localFamilyMembers.map((member, idx) => (
               <div 
                 key={idx} 
-                className="group relative flex flex-col bg-white dark:bg-[#1a1d24]/60 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm hover:shadow-xl hover:border-purple-200/50 dark:hover:border-purple-500/30 transition-all duration-300 overflow-hidden"
+                className="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-xl hover:border-indigo-200/50 dark:hover:border-indigo-500/30 transition-all duration-300 overflow-hidden"
               >
                 {/* Accent Top Border */}
                 <div className="h-1.5 w-full bg-linear-to-r from-purple-500 to-indigo-500 opacity-70" />
@@ -202,12 +202,12 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <Avatar className="h-12 w-12 border-2 border-white dark:border-[#2d333b] shadow-sm">
-                          <AvatarFallback className="bg-linear-to-br from-purple-100 to-indigo-100 text-purple-700 font-semibold">
+                        <Avatar className="h-12 w-12 border-2 border-white dark:border-slate-800 shadow-sm">
+                          <AvatarFallback className="bg-linear-to-br from-indigo-100 to-indigo-100 text-indigo-700 font-semibold">
                             {member.name?.[0] || '?'}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="absolute -bottom-1 -right-1 bg-white dark:bg-[#1a1d24] rounded-full p-0.5 shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm border border-slate-200 dark:border-slate-800">
                           <div className={`w-2.5 h-2.5 rounded-full ${member.birthday ? 'bg-blue-500' : 'bg-gray-300'}`} />
                         </div>
                       </div>
@@ -255,7 +255,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
                   </div>
 
                   {/* Details Section */}
-                  <div className="space-y-3 mt-1 py-3 border-t border-gray-50 dark:border-gray-800/50 flex-1">
+                  <div className="space-y-3 mt-1 py-3 border-t border-slate-100 dark:border-slate-800 flex-1">
                     {member.birthday ? (
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/10">
@@ -334,7 +334,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
                   return (
                     <div
                       key={contact.relationship_id}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#252931] rounded-xl hover:bg-gray-100 dark:hover:bg-[#2d333b] transition-colors group"
+                      className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group border border-slate-200 dark:border-slate-800"
                     >
                       <Link 
                         href={`/contacts/${contact.id}`}

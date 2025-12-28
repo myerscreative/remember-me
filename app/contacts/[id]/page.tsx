@@ -250,7 +250,7 @@ export default function ContactDetailPage({
 
   const handleToggleFavorite = async () => {
     const newImportance = contact.importance === 'high' ? 'medium' : 'high';
-    await handleImportanceChange(newImportance as ContactImportance);
+    await handleImportanceChange(newImportance as any);
   };
 
 

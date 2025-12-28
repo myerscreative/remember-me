@@ -172,7 +172,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen bg-background pb-16 md:pb-0 overflow-x-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[1600px] mx-auto w-full px-4 py-6 space-y-6">
           
@@ -242,7 +242,7 @@ export default function DashboardPage() {
                  {/* Stats Summary */}
                  <div className="space-y-2">
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Overview</h3>
-                    <Card className="bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 shadow-none">
+                    <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-none">
                         <CardContent className="p-4 space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-slate-500">Total</span>
@@ -334,17 +334,17 @@ export default function DashboardPage() {
                  </div>
 
                  {/* Milestone Radar (Conditional) */}
-                 <div className="bg-white dark:bg-card rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                 <div className="bg-white dark:bg-card rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                     <MilestoneRadar />
                  </div>
 
                  {/* Tribe Health (Conditional) */}
                  {tribeHealth.length > 0 && (
-                     <div className="bg-white dark:bg-card rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                     <div className="bg-white dark:bg-card rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tribes</h3>
                         </div>
-                        <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
                              {tribeHealth.slice(0, 5).map(t => (
                                  <div key={t.name} className="px-3 py-2 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer" onClick={() => { setSelectedTribe(t); setIsModalOpen(true); }}>
                                      <div className="flex items-center gap-2">

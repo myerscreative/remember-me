@@ -133,7 +133,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
         
         {/* AI Synopsis */}
         {contact.aiSummary && (
-            <section className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-[#1E293B] dark:to-[#0F172A] border border-slate-200 dark:border-[#334155] rounded-2xl p-6 shadow-sm">
+            <section className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-[#1E293B] dark:to-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
                 <h2 className="text-indigo-900 dark:text-indigo-200 font-semibold mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-indigo-500" />
                     AI Synopsis
@@ -152,7 +152,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
         {/* Tags & Interests Grid */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Tags Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Tag className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" /> Tags
@@ -160,7 +160,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                     <PopoverTrigger asChild>
                       <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Tags info" role="button" />
                     </PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] shadow-xl rounded-xl z-[9999]" align="start">
+                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-[9999]" align="start">
                       <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed mb-3">
                         <span className="text-slate-900 dark:text-white font-bold">Organize your Tribes.</span> Group contacts by commonalities (e.g., &apos;NASA&apos;, &apos;Japan&apos;, &apos;Family&apos;).
                       </p>
@@ -185,7 +185,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                   tags.map((tag: string, i: number) => (
                     <Badge 
                         key={i} 
-                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#334155] text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-teal-500/50 hover:text-teal-600 dark:hover:text-teal-400 transition-all cursor-default pr-2"
+                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-teal-500/50 hover:text-teal-600 dark:hover:text-teal-400 transition-all cursor-default pr-2"
                     >
                         {tag}
                         <button 
@@ -221,7 +221,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
             </div>
 
             {/* Interests Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Interests
@@ -229,7 +229,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                     <PopoverTrigger asChild>
                       <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Interests info" role="button" />
                     </PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border-slate-200 dark:border-[#334155] shadow-xl rounded-xl z-[9999]" align="start">
+                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-[9999]" align="start">
                       <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed mb-3">
                         <span className="text-slate-900 dark:text-white font-bold">Personalize your Touch.</span> Log specific likes or hobbies here.
                       </p>
@@ -254,7 +254,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                   interests.map((interest: string, i: number) => (
                     <Badge 
                         key={i} 
-                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#334155] text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-purple-500/50 hover:text-purple-600 dark:hover:text-purple-400 transition-all cursor-default pr-2"
+                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-purple-500/50 hover:text-purple-600 dark:hover:text-purple-400 transition-all cursor-default pr-2"
                     >
                         {interest}
                         <button 
@@ -300,7 +300,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                <p className="text-xs text-indigo-700/70 dark:text-indigo-300/60 mb-4">Generate a personalized script based on your memories.</p>
                <Button 
                 onClick={() => setIsReachOutOpen(true)}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9 font-semibold"
                >
                   <MessageSquare className="w-3.5 h-3.5 mr-2" />
                   Reach Out
@@ -308,8 +308,8 @@ export function OverviewTab({ contact }: OverviewTabProps) {
            </div>
 
            {/* Contact Info Card */}
-          <div className="bg-card border border-slate-200 dark:border-border rounded-xl p-5 shadow-sm">
-             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 border-b border-border pb-2">Contact Info</h3>
+          <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">Contact Info</h3>
              <div className="space-y-4 text-sm">
                  <div className="flex items-center gap-3">
                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
