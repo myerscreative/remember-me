@@ -14,7 +14,8 @@ import {
   User,
   Trash2,
   Edit,
-  Search
+  Search,
+  X
 } from "lucide-react";
 
 interface Reminder {
@@ -39,6 +40,17 @@ export default function RemindersPage() {
   const [error, setError] = useState<Error | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Edit modal state
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    due_date: '',
+    due_time: '',
+    priority: 'medium' as 'low' | 'medium' | 'high'
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadReminders();
@@ -132,6 +144,59 @@ export default function RemindersPage() {
     setReminders((reminders as any[]).filter((r: any) => r.id !== reminderId));
   }
 
+  function openEditModal(reminder: Reminder) {
+    setEditingReminder(reminder);
+    setEditForm({
+      title: reminder.title,
+      description: reminder.description || '',
+      due_date: reminder.due_date,
+      due_time: reminder.due_time || '',
+      priority: reminder.priority
+    });
+  }
+
+  async function updateReminder() {
+    if (!editingReminder || !editForm.title.trim() || !editForm.due_date) return;
+    
+    setSaving(true);
+    const supabase = createClient();
+    
+    const { error } = await (supabase as any)
+      .from('reminders')
+      .update({
+        title: editForm.title.trim(),
+        description: editForm.description.trim() || null,
+        due_date: editForm.due_date,
+        due_time: editForm.due_time || null,
+        priority: editForm.priority
+      })
+      .eq('id', editingReminder.id);
+
+    setSaving(false);
+
+    if (error) {
+      console.error('Error updating reminder:', error);
+      alert('Failed to update reminder');
+      return;
+    }
+
+    // Update local state
+    setReminders((reminders as any[]).map((r: any) => 
+      r.id === editingReminder.id 
+        ? { 
+            ...r, 
+            title: editForm.title.trim(),
+            description: editForm.description.trim() || null,
+            due_date: editForm.due_date,
+            due_time: editForm.due_time || null,
+            priority: editForm.priority
+          } 
+        : r
+    ));
+    
+    setEditingReminder(null);
+  }
+
   // Filter reminders
   const filteredReminders = reminders.filter(reminder => {
     // Filter by status
@@ -213,6 +278,7 @@ export default function RemindersPage() {
   }
 
   return (
+    <>
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -390,11 +456,12 @@ export default function RemindersPage() {
 
                               {/* Actions */}
                               <div className="flex items-center gap-2">
-                                <Link href={`/reminders/${reminder.id}/edit`}>
-                                  <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors">
-                                    <Edit className="h-4 w-4" />
-                                  </button>
-                                </Link>
+                                <button
+                                  onClick={() => openEditModal(reminder)}
+                                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </button>
                                 <button
                                   onClick={() => deleteReminder(reminder.id)}
                                   className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
@@ -415,6 +482,129 @@ export default function RemindersPage() {
         )}
       </div>
     </div>
+
+      {/* Edit Modal */}
+      {editingReminder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Edit Reminder</h2>
+              <button
+                onClick={() => setEditingReminder(null)}
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Reminder title"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Optional description"
+                />
+              </div>
+
+              {/* Date and Time */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Due Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.due_date}
+                    onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    value={editForm.due_time}
+                    onChange={(e) => setEditForm({ ...editForm, due_time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Priority
+                </label>
+                <div className="flex gap-2">
+                  {(['low', 'medium', 'high'] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, priority: p })}
+                      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                        editForm.priority === p
+                          ? p === 'high' ? 'bg-red-100 border-red-300 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-400'
+                          : p === 'medium' ? 'bg-orange-100 border-orange-300 text-orange-700 dark:bg-orange-900/30 dark:border-orange-700 dark:text-orange-400'
+                          : 'bg-green-100 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-400'
+                          : 'bg-gray-50 border-gray-200 text-gray-600 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setEditingReminder(null)}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={updateReminder}
+                disabled={saving || !editForm.title.trim() || !editForm.due_date}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
