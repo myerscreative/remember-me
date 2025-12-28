@@ -97,12 +97,12 @@ export function DecayAlertBanner() {
  
             <p className="text-sm text-[var(--nurture-banner-text)] opacity-80 mb-4 leading-relaxed">
               {severeCount > 0 && (
-                <span className="font-medium">
+                <span key="severe-count" className="font-medium">
                   {severeCount} relationship{severeCount > 1 ? "s" : ""} haven't been contacted in over a year.
                 </span>
               )}
               {severeCount === 0 && moderateCount > 0 && (
-                <span className="font-medium">
+                <span key="moderate-count" className="font-medium">
                   {moderateCount} relationship{moderateCount > 1 ? "s" : ""} haven't been contacted in 6+ months.
                 </span>
               )}

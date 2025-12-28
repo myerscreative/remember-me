@@ -286,7 +286,7 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
     // The previous optimization was too aggressive and excluded 'New' (null date) contacts.
     const { data, error } = await (supabase as any)
       .from('persons')
-      .select('*, interactions(next_goal_note, interaction_date)')
+      .select('*, interactions(next_goal_note, date)')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false')
       .order('last_interaction_date', { ascending: true, nullsFirst: true }); // Prioritize 'Never Contacted' then 'Oldest'
@@ -300,21 +300,21 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
     const processedData = (data || [])
         .filter((contact: any) => {
             if (!contact.last_interaction_date) return true; // Should be handled by "New" logic, but safety first
-            
+
             const lastDate = new Date(contact.last_interaction_date);
             const diffTime = Math.abs(now.getTime() - lastDate.getTime());
             const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
             let threshold = 30; // Medium/Default
             if (contact.importance === 'high') threshold = 14;
             else if (contact.importance === 'low') threshold = 90;
-            
+
             return daysAgo >= threshold;
         })
         .map((contact: any) => {
             // Sort interactions by date desc to get the latest
-            const sortedInteractions = (contact.interactions || []).sort((a: any, b: any) => 
-                new Date(b.interaction_date).getTime() - new Date(a.interaction_date).getTime()
+            const sortedInteractions = (contact.interactions || []).sort((a: any, b: any) =>
+                new Date(b.date).getTime() - new Date(a.date).getTime()
             );
             const latestGoal = sortedInteractions.length > 0 ? sortedInteractions[0].next_goal_note : null;
             
