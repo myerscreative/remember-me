@@ -131,15 +131,15 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       {/* MAIN CONTENT COLUMN */}
       <div className="flex-1 space-y-8 min-w-0">
         
-        {/* AI Synopsis */}
-        {contact.aiSummary && (
+        {/* Shared Memories ( Deep Lore ) */}
+        {contact.deep_lore && (
             <section className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-[#1E293B] dark:to-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
                 <h2 className="text-indigo-900 dark:text-indigo-200 font-semibold mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-indigo-500" />
-                    AI Synopsis
+                    Shared Memories
                 </h2>
                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[15px]">
-                    {contact.aiSummary}
+                    {contact.deep_lore}
                 </p>
             </section>
         )}
@@ -303,7 +303,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9 font-semibold"
                >
                   <MessageSquare className="w-3.5 h-3.5 mr-2" />
-                  Reach Out
+                   Draft Reconnection
                </Button>
            </div>
 

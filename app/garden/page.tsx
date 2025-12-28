@@ -419,14 +419,14 @@ export default function GardenPage() {
             </div>
             
             {/* Mobile Controls Position (Visible only on mobile) */}
-            <div className="md:hidden w-full flex flex-col items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-               <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Currently Showing</div>
-               <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
+            <div className="md:hidden w-full flex flex-col items-center gap-1 bg-white/50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-2">
+               <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Showing</div>
+               <div className="text-lg font-black text-slate-800 dark:text-slate-200">
                  {categoryFilter === 'all' ? 'All Contacts' : categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
                </div>
             </div>
 
-            <div className="flex items-center gap-2 self-end md:self-start">
+            <div className="flex items-center gap-2 self-end md:self-start w-full md:w-auto justify-end">
               <Link
                 href="/triage"
                 className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"

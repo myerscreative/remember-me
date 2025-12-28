@@ -338,7 +338,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   return (
     <div className="space-y-6">
       {/* Zoom Controls Bar */}
-      <div className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 transition-colors">
+      <div className="flex flex-col md:flex-row items-center gap-4 px-5 py-4 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 transition-colors">
         <div className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
           🔍 Zoom
         </div>
@@ -372,7 +372,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           step="10"
           value={zoom}
           onChange={(e) => setZoom(parseInt(e.target.value))}
-          className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb:hover]:bg-slate-700 dark:[&::-webkit-slider-thumb:hover]:bg-indigo-400 [&::-webkit-slider-thumb:hover]:scale-110"
+          className="w-full md:flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb:hover]:bg-slate-700 dark:[&::-webkit-slider-thumb:hover]:bg-indigo-400 [&::-webkit-slider-thumb:hover]:scale-110"
         />
         
         <div className="text-sm font-semibold text-slate-900 dark:text-white min-w-[50px] text-right">
