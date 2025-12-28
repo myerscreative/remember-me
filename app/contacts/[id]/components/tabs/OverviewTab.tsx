@@ -16,9 +16,13 @@ import { ReachOutPanel } from '@/components/contacts/ReachOutPanel';
 // Minimal Contact type for typing
 interface Contact {
   id: string;
+  name: string;
   story: any;
   tags?: string[];
   interests?: string[];
+  deep_lore?: string | null;
+  why_stay_in_contact?: string | null;
+  shared_memories?: Array<{ content: string }> | null;
   [key: string]: any;
 }
 
