@@ -577,11 +577,11 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
   }
 
   try {
+    // Simplified query - only select columns that definitely exist
     const { data: contacts, error } = await (supabase as any)
       .from('persons')
-      .select('id, name, birthday, important_dates, last_interaction_date')
-      .eq('user_id', user.id)
-      .or('archive_status.is.null,archive_status.eq.false');
+      .select('id, name, birthday, last_interaction_date')
+      .eq('user_id', user.id);
 
     if (error) throw error;
 
@@ -629,21 +629,8 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
         }
       };
 
-      // 1. Check Birthday
+      // Check Birthday (only field guaranteed to exist)
       processDate(contact.birthday, 'Birthday', 'birthday');
-
-      // 2. Check Important Dates (JSONB array - may contain anniversaries)
-      const importantDates = Array.isArray(contact.important_dates) ? contact.important_dates : [];
-      importantDates.forEach((idate: any) => {
-        if (idate.date) {
-          let type: Milestone['type'] = 'other';
-          const labelLower = (idate.label || '').toLowerCase();
-          if (labelLower.includes('anniversary')) type = 'anniversary';
-          else if (labelLower.includes('work') || labelLower.includes('professional') || labelLower.includes('start')) type = 'professional';
-          
-          processDate(idate.date, idate.label || 'Important Date', type);
-        }
-      });
     });
 
     // Sort by days remaining
