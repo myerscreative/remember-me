@@ -584,7 +584,7 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
   try {
     const { data: contacts, error } = await (supabase as any)
       .from('persons')
-      .select('id, name, birthday, custom_anniversary, important_dates, last_interaction_date')
+      .select('id, name, birthday, important_dates, last_interaction_date')
       .eq('user_id', user.id)
       .or('archive_status.is.null,archive_status.eq.false');
 
@@ -637,10 +637,7 @@ export async function getMilestones(): Promise<{ data: Milestone[]; error: Error
       // 1. Check Birthday
       processDate(contact.birthday, 'Birthday', 'birthday');
 
-      // 2. Check Custom Anniversary
-      processDate(contact.custom_anniversary, 'Anniversary', 'anniversary');
-
-      // 3. Check Important Dates (JSONB array)
+      // 2. Check Important Dates (JSONB array - may contain anniversaries)
       const importantDates = Array.isArray(contact.important_dates) ? contact.important_dates : [];
       importantDates.forEach((idate: any) => {
         if (idate.date) {
