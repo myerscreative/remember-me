@@ -2,20 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
 
-export const runtime = 'edge';
 
-// Lazy initialization
-let openaiInstance: OpenAI | null = null;
-function getOpenAI(): OpenAI {
-  if (!openaiInstance) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("Missing OPENAI_API_KEY environment variable");
-    }
-    openaiInstance = new OpenAI({ apiKey });
-  }
-  return openaiInstance;
-}
+// Remove edge runtime to ensure broad compatibility
+// export const runtime = 'edge';
 
 export async function POST(_request: NextRequest) {
   try {
@@ -110,43 +99,43 @@ export async function POST(_request: NextRequest) {
     });
 
     // 5. AI Summary for "New Intelligence"
-    let newIntelligence = [];
-    if (contextNotes.length > 0) {
-        const systemPrompt = `You are an intelligence analyst for a relationship CRM.
+    let newIntelligence: string[] = [];
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (contextNotes.length > 0 && apiKey) {
+        try {
+            const openai = new OpenAI({ apiKey });
+            const systemPrompt = `You are an intelligence analyst for a relationship CRM.
 Goal: Identify the 3 most significant 'Context' updates from this week's logs.
 Input: A list of raw notes from interactions.
 Output: A JSON array of 3 strings. Each string should be: "Name: [Summary of update]".
 Criteria: Focus on life events, projects, career changes, or strong personal details. Ignore generic "caught up" notes.`;
 
-        const completion = await getOpenAI().chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: contextNotes.join('\n') }
-            ],
-            response_format: { type: "json_object" },
-            temperature: 0.5,
-        });
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: contextNotes.join('\n') }
+                ],
+                response_format: { type: "json_object" },
+                temperature: 0.5,
+            });
 
-        const content = completion.choices[0]?.message?.content;
-        if (content) {
-            try {
-                // Expecting JSON { "updates": [...] } or similar based on loose instruction, 
-                // but "json_object" requires the prompt to say "JSON".
-                // Let's parse whatever valid JSON it returns.
+            const content = completion.choices[0]?.message?.content;
+            if (content) {
                 const parsed = JSON.parse(content);
-                // Handle various likely key names
-                newIntelligence = parsed.updates || parsed.intelligence || parsed.summary || [];
-                // If it's an object with keys, extract values
-                if (!Array.isArray(newIntelligence)) {
-                    newIntelligence = Object.values(newIntelligence);
+                let updates = parsed.updates || parsed.intelligence || parsed.summary || [];
+                if (!Array.isArray(updates)) {
+                    updates = Object.values(updates);
                 }
-            } catch (e) {
-                console.error("Failed to parse AI response", e);
-                // Fallback: just take the top 3 raw notes if parsing fails? 
-                // Or return empty.
+                newIntelligence = updates;
             }
+        } catch (e) {
+            console.error("AI Generation Failed (Non-fatal warning):", e);
+            // Non-fatal, just fallback to empty text
         }
+    } else if (!apiKey) {
+        console.warn("Skipping AI Recap: Missing OPENAI_API_KEY");
     }
 
     return NextResponse.json({
