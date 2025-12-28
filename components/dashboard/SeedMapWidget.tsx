@@ -35,9 +35,9 @@ function getContactStatus(days: number, importance: string = 'medium'): 'nurture
 
 function getColorForStatus(status: 'nurtured' | 'drifting' | 'neglected'): string {
   switch (status) {
-    case 'nurtured': return '#10B981'; // Emerald-500
-    case 'drifting': return '#F59E0B'; // Amber-500
-    case 'neglected': return '#EF4444'; // Red-500
+    case 'nurtured': return '#059669'; // Emerald-600
+    case 'drifting': return '#B45309'; // Amber-700 for high contrast
+    case 'neglected': return '#DC2626'; // Red-600
   }
 }
 
@@ -107,47 +107,49 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
   };
 
   return (
-    <div className={`relative flex flex-col items-center justify-center p-4 bg-card rounded-xl border border-border/50 h-[380px] w-full ${className}`}>
+    <div className={`relative flex flex-col p-4 bg-card rounded-xl border border-border/50 min-h-[380px] w-full max-w-full overflow-hidden ${className}`}>
       {/* Title */}
-      <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-        <Sprout className="h-5 w-5 text-emerald-500" />
+      <div className="flex items-center gap-2 mb-4 md:absolute md:top-4 md:left-4 md:mb-0 z-10">
+        <Sprout className="h-5 w-5 text-emerald-500 shrink-0" />
         <span className="font-bold text-sm tracking-wide text-foreground/80 uppercase">Garden Map</span>
       </div>
 
-      {/* SVG Map */}
-      <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+      {/* SVG Map - Centered */}
+      <div className="flex-1 flex items-center justify-center w-full min-h-[300px]">
          {displayActiveCount > 0 ? (
-            <svg width="300" height="300" viewBox="0 0 300 300" className="overflow-visible">
-              <defs>
-                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                 </filter>
-              </defs>
-              
-              {/* Center Marker */}
-              <circle cx="150" cy="150" r="2" fill="currentColor" className="text-muted-foreground/20" />
+            <div className="relative flex items-center justify-center w-full h-full">
+              <svg width="300" height="300" viewBox="0 0 300 300" className="overflow-visible max-w-full h-auto">
+                <defs>
+                   <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="2" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                   </filter>
+                </defs>
+                
+                {/* Center Marker */}
+                <circle cx="150" cy="150" r="2" fill="currentColor" className="text-muted-foreground/20" />
 
-              {/* Seeds */}
-              {seedPositions.map((seed) => (
-                <circle
-                  key={seed.id}
-                  cx={seed.x}
-                  cy={seed.y}
-                  r={hoveredId === seed.id ? seed.size * 1.5 : seed.size}
-                  fill={seed.color}
-                  className={`transition-all duration-300 ease-out cursor-pointer ${hoveredId === seed.id ? 'stroke-white dark:stroke-slate-900 stroke-2 z-50' : 'hover:opacity-80'}`}
-                  onMouseEnter={(e) => {
-                     setHoveredId(seed.id);
-                     setTooltip({ visible: true, x: e.clientX, y: e.clientY, contact: seed });
-                  }}
-                  onMouseLeave={() => {
-                     setHoveredId(null);
-                     setTooltip({ ...tooltip, visible: false });
-                  }}
-                />
-              ))}
-            </svg>
+                {/* Seeds */}
+                {seedPositions.map((seed) => (
+                  <circle
+                    key={seed.id}
+                    cx={seed.x}
+                    cy={seed.y}
+                    r={hoveredId === seed.id ? seed.size * 1.5 : seed.size}
+                    fill={seed.color}
+                    className={`transition-all duration-300 ease-out cursor-pointer ${hoveredId === seed.id ? 'stroke-white dark:stroke-slate-900 stroke-2 z-50' : 'hover:opacity-80'}`}
+                    onMouseEnter={(e) => {
+                       setHoveredId(seed.id);
+                       setTooltip({ visible: true, x: e.clientX, y: e.clientY, contact: seed });
+                    }}
+                    onMouseLeave={() => {
+                       setHoveredId(null);
+                       setTooltip({ ...tooltip, visible: false });
+                    }}
+                  />
+                ))}
+              </svg>
+           </div>
          ) : (
             // EMPTY STATE FAILSAFE: Only show if activeCount === 0
             <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500">
@@ -174,9 +176,26 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
          )}
       </div>
 
-      {/* Footer Stats - DYNAMIC & SYNCHRONIZED */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-3">
-         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded-md">
+      {/* Footer: Stats + Legend - Below map on mobile, absolute on desktop if desired, but request says "move below" */}
+      <div className="mt-4 pt-3 border-t border-border/30 w-full flex flex-col sm:flex-row items-center justify-between gap-3 md:absolute md:bottom-4 md:right-4 md:mt-0 md:pt-0 md:border-t-0 md:w-auto">
+         {/* Legend */}
+         <div className="flex items-center gap-3 text-[10px] font-bold order-2 sm:order-1">
+            <div className="flex items-center gap-1.5">
+               <span className="w-2.5 h-2.5 rounded-full bg-[#059669]"></span>
+               <span className="text-foreground/80 dark:text-emerald-400 whitespace-nowrap">Nurtured</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+               <span className="w-2.5 h-2.5 rounded-full bg-[#B45309]"></span>
+               <span className="text-foreground/80 dark:text-amber-400 whitespace-nowrap">Drifting</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+               <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]"></span>
+               <span className="text-foreground/80 dark:text-rose-400 whitespace-nowrap">Neglected</span>
+            </div>
+         </div>
+
+         {/* Stats */}
+         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded-md order-1 sm:order-2">
             {displayTotalCount} TOTAL / <span className="text-emerald-500">{displayActiveCount} ACTIVE</span>
          </div>
       </div>

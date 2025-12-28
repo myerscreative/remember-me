@@ -117,7 +117,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
   };
 
   return (
-    <div className="flex flex-col xl:flex-row gap-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="flex flex-col xl:flex-row gap-4 md:gap-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
       
       {/* MAIN CONTENT COLUMN */}
       <div className="flex-1 space-y-8 min-w-0">

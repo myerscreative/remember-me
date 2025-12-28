@@ -86,7 +86,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
   // Zoom handlers
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 120));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 25));
   const handleResetZoom = () => setZoom(defaultZoom);
   
   const handleSetDefaultZoom = () => {
@@ -144,7 +144,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           e.touches[0].pageY - e.touches[1].pageY
         );
         const ratio = dist / touchStartRef.current.dist;
-        const newZoom = Math.min(Math.max(touchStartRef.current.zoom * ratio, 50), 150);
+        const newZoom = Math.min(Math.max(touchStartRef.current.zoom * ratio, 25), 150);
         setZoom(newZoom);
       } else if (e.touches.length === 1 && isDragging) {
           setPanOffset({
@@ -167,7 +167,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         setZoom(prev => {
           const direction = delta > 0 ? -1 : 1; 
           const newZoom = prev + (direction * 5);
-          return Math.min(Math.max(newZoom, 50), 150);
+          return Math.min(Math.max(newZoom, 25), 150);
         });
       }
     };
@@ -367,7 +367,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         
         <input
           type="range"
-          min="50"
+          min="25"
           max="120"
           step="10"
           value={zoom}

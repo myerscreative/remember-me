@@ -262,7 +262,7 @@ export default function ContactDetailPage({
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
          
          {/* DESKTOP HEADER (Hidden on Mobile) */}
          <ProfileHeader onEdit={() => setIsEditModalOpen(true)} />
@@ -345,7 +345,7 @@ export default function ContactDetailPage({
 
 
          {/* SCROLLABLE CONTENT */}
-         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar">
+         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar overflow-x-hidden">
 
             {/* TAB NAVIGATION */}
             <div className="flex items-center gap-8 border-b border-border/50 mb-8 overflow-x-auto scrollbar-hide">
