@@ -72,9 +72,9 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                         `}
                       >
                           {/* Avatar ORB with Thirst Ring + Lore Tooltip */}
-                          <LoreTooltip 
-                             lastContactDate={p.last_interaction_date} 
-                             lastContactMethod={p.last_contact_method} // Assuming this field exists or needs mapping
+                          <LoreTooltip
+                             lastContactDate={p.last_interaction_date}
+                             lastContactMethod={(p as any).last_contact_method}
                              isFading={true} // Priority nurtures are by definition fading or thirsty
                           >
                               <div 
