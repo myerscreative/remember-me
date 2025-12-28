@@ -118,7 +118,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                           >
                               <h3 className="text-foreground font-bold text-sm truncate px-1">{p.name}</h3>
                               <p className="text-slate-600 dark:text-slate-400 text-[10px] font-medium truncate px-1 leading-tight">
-                                  {p.shared_memories?.[0]?.content || p.relationship_summary || "Needs some love"}
+                                  {p.deep_lore || p.relationship_summary || "Needs some love"}
                               </p>
                           </div>
 

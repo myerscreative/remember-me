@@ -23,6 +23,8 @@ interface Contact {
   deep_lore?: string | null;
   why_stay_in_contact?: string | null;
   shared_memories?: Array<{ content: string }> | null;
+  relationship_summary?: string | null;
+  ai_summary?: string | null;
   [key: string]: any;
 }
 

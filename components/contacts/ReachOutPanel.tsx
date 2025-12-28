@@ -21,6 +21,8 @@ interface ReachOutPanelProps {
     deep_lore?: string | null;
     why_stay_in_contact?: string | null;
     shared_memories?: Array<{ content: string }> | null;
+    relationship_summary?: string | null;
+    ai_summary?: string | null;
     story?: {
         whyStayInContact?: string | null;
     };
@@ -50,7 +52,8 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
       const generated = generateReconnectionScript(
         contact.name, 
         latestMemory, 
-        purpose
+        purpose,
+        contact.relationship_summary || contact.ai_summary
       );
       setScript(generated);
       setCopied(false);
