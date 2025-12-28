@@ -33,6 +33,7 @@ export function Calendar({
 }: CalendarProps) {
   // Use a state for "today" to avoid hydration mismatches between server and client time
   const [today, setToday] = React.useState<Date | null>(null)
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(selected || new Date())
 
   React.useEffect(() => {
     const now = new Date();
