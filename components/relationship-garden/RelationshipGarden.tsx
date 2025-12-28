@@ -369,7 +369,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
           type="range"
           min="25"
           max="120"
-          step="10"
+          step="5"
           value={zoom}
           onChange={(e) => setZoom(parseInt(e.target.value))}
           className="w-full md:flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb:hover]:bg-slate-700 dark:[&::-webkit-slider-thumb:hover]:bg-indigo-400 [&::-webkit-slider-thumb:hover]:scale-110"
