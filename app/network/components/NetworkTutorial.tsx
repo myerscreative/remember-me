@@ -58,7 +58,7 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-2xl max-h-[85vh] flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden animate-in zoom-in-95 duration-300">
         
         {/* Close Button */}
         <button 
@@ -68,7 +68,7 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-8 space-y-8">
+        <div className="p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto">
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-2">

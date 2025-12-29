@@ -37,7 +37,8 @@ import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
 import { cn } from "@/lib/utils";
 import { autoMapTribes } from "@/app/actions/auto-map-tribes";
 import { MilestoneRadar } from "@/components/MilestoneRadar";
-import { WeeklyDigestCard } from "@/components/dashboard/WeeklyDigestCard";
+import { CriticalNudges } from "@/components/dashboard/CriticalNudges";
+import { WeeklyBriefing } from "@/components/dashboard/WeeklyBriefing";
 import { TriageMode } from "@/components/dashboard/TriageMode";
 import {
   getDashboardStats,
@@ -215,7 +216,7 @@ export default function DashboardPage() {
           ) : (
             
             // MAIN 3-COLUMN GRID
-            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr_350px] gap-6 items-start">
+            <div className="flex flex-col lg:grid lg:grid-cols-[250px_1fr_350px] gap-6 items-start">
             
               {/* COLUMN 1: SIDEBAR RAIL (250px) */}
               <div className="space-y-6 lg:sticky lg:top-6">
@@ -284,11 +285,14 @@ export default function DashboardPage() {
               {/* COLUMN 2: MAIN CENTER (Auto) */}
               <div className="space-y-6 min-w-0">
                   
+                  {/* Critical Drifters (Urgent) */}
+                  <CriticalNudges />
+
                   {/* Daily Practice */}
                   <DailyPracticeWidget />
                   
-                  {/* Weekly Digest (Friday Report) */}
-                  <WeeklyDigestCard />
+                  {/* Weekly Briefing (Automated Context Summary) */}
+                  <WeeklyBriefing />
 
                   {/* Daily Briefing Card (Collapsible/Dynamic) */}
                   {briefing && <DailyBriefingCard briefing={briefing} onActionComplete={loadDashboardData} />}
