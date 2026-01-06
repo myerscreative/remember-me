@@ -88,14 +88,14 @@ export default function EditContactPage({
           email: person.email || "",
           phone: person.phone || "",
           birthday: person.birthday || "",
-          whereMet: person.where_we_met || "",
-          introducedBy: person.introduced_by || "",
+          whereMet: person.where_met || "", // Note: where_met in DB, whereWeMet in form
+          introducedBy: person.who_introduced || "",
           whyStayInContact: person.why_stay_in_contact || "",
-          whatInteresting: person.what_interesting || "",
-          whatsImportant: person.whats_important || "",
-          profession: person.profession || "",
+          whatInteresting: person.what_found_interesting || "",
+          whatsImportant: person.most_important_to_them || "",
+          profession: person.job_title || "", // Map job_title to profession
           familyNotes: person.family_notes || "",
-          hobbies: person.hobbies || "",
+          hobbies: person.interests ? person.interests.join(", ") : "", // Map interests array to hobbies string
           tags: tagNames.join(", "),
         });
 
@@ -137,11 +137,11 @@ export default function EditContactPage({
           where_we_met: formData.whereMet.trim() || null,
           introduced_by: formData.introducedBy.trim() || null,
           why_stay_in_contact: formData.whyStayInContact.trim() || null,
-          what_interesting: formData.whatInteresting.trim() || null,
-          whats_important: formData.whatsImportant.trim() || null,
-          profession: formData.profession.trim() || null,
+          what_found_interesting: formData.whatInteresting.trim() || null,
+          most_important_to_them: formData.whatsImportant.trim() || null,
+          job_title: formData.profession.trim() || null,
           family_notes: formData.familyNotes.trim() || null,
-          hobbies: formData.hobbies.trim() || null,
+          interests: formData.hobbies.split(",").map(s => s.trim()).filter(Boolean),
           updated_at: new Date().toISOString(),
         })
         .eq("id", id)

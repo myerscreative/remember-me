@@ -133,6 +133,7 @@ export default function NewContactPage() {
         email: formData.email.trim() || null,
         phone: formData.phone.trim() || null,
         linkedin: formData.linkedin.trim() || null,
+        interests: formData.interests.split(',').map(s => s.trim()).filter(Boolean),
       };
 
       // Insert person
