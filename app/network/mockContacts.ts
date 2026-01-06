@@ -16,6 +16,7 @@ export interface Contact {
   email?: string;
   phone?: string;
   notes?: string;
+  birthday?: string; // ISO date string YYYY-MM-DD
 }
 
 export const mockContacts: Contact[] = [
@@ -34,7 +35,8 @@ export const mockContacts: Contact[] = [
     },
     email: "sarah.chen@email.com",
     phone: "(555) 123-4567",
-    notes: "Met at tech conference. Great collaborator on side projects."
+    notes: "Met at tech conference. Great collaborator on side projects.",
+    birthday: "1990-05-15"
   },
   {
     id: 2,
@@ -51,7 +53,8 @@ export const mockContacts: Contact[] = [
     },
     email: "mike.j@email.com",
     phone: "(555) 234-5678",
-    notes: "Former coworker. Should catch up soon!"
+    notes: "Former coworker. Should catch up soon!",
+    birthday: "1988-11-20"
   },
   {
     id: 3,

@@ -41,9 +41,17 @@ function getColorForStatus(status: 'nurtured' | 'drifting' | 'neglected'): strin
   }
 }
 
+import { toast } from 'react-hot-toast';
+
+// ... existing imports
+
 export default function SeedMapWidget({ contacts = [], className = '', totalCount, activeCount: propActiveCount }: SeedMapWidgetProps) {
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, contact: null });
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [celebratingId, setCelebratingId] = useState<string | null>(null);
+  
+  // Track previous statuses to detect improvements
+  const prevStatusesRef = React.useRef<Record<string, 'nurtured' | 'drifting' | 'neglected'>>({});
 
   // Seed positioning logic with dynamic sizing
   const { seedPositions, calculatedActiveCount } = useMemo(() => {
@@ -94,6 +102,53 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
     return { seedPositions: positions, calculatedActiveCount: count };
   }, [contacts]);
 
+  // Effect to detect status improvements
+  React.useEffect(() => {
+    const currentStatuses: Record<string, 'nurtured' | 'drifting' | 'neglected'> = {};
+    
+    seedPositions.forEach(seed => {
+      currentStatuses[seed.id] = seed.status;
+      
+      const prevStatus = prevStatusesRef.current[seed.id];
+      // Check for Transition: Drifting/Neglected -> Nurtured
+      if (prevStatus && (prevStatus === 'drifting' || prevStatus === 'neglected') && seed.status === 'nurtured') {
+         // Trigger Celebration
+         setCelebratingId(seed.id);
+         
+         // Toast Notification
+         toast.custom((t) => (
+            <div
+              className={`${
+                t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-emerald-50 border-2 border-emerald-200 shadow-lg rounded-xl pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 pt-0.5">
+                    <Sprout className="h-10 w-10 text-emerald-500" />
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <p className="text-sm font-bold text-emerald-900">
+                      Connection Restored!
+                    </p>
+                    <p className="mt-1 text-sm text-emerald-700">
+                      You've nurtured your bond with <span className="font-bold">{seed.name}</span>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+         ), { duration: 4000, position: 'bottom-center' });
+
+         // Clear celebration animation after 2s
+         setTimeout(() => setCelebratingId(null), 2500);
+      }
+    });
+
+    // Update ref
+    prevStatusesRef.current = currentStatuses;
+  }, [seedPositions]);
+
   const displayActiveCount = propActiveCount ?? calculatedActiveCount;
   const displayTotalCount = totalCount ?? contacts.length;
 
@@ -131,14 +186,29 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
 
                 {/* Seeds */}
                 {seedPositions.map((seed) => (
-                  <circle
+                  <motion.circle
                     key={seed.id}
                     cx={seed.x}
                     cy={seed.y}
-                    r={hoveredId === seed.id ? seed.size * 1.5 : seed.size}
+                    r={seed.size}
                     fill={seed.color}
-                    className={`transition-all duration-300 ease-out cursor-pointer ${hoveredId === seed.id ? 'stroke-white dark:stroke-slate-900 stroke-2 z-50' : 'hover:opacity-80'}`}
-                    onMouseEnter={(e) => {
+                    initial={false}
+                    animate={{
+                        r: celebratingId === seed.id ? seed.size * 2.5 : (hoveredId === seed.id ? seed.size * 1.5 : seed.size),
+                        opacity: 1,
+                        scale: celebratingId === seed.id ? [1, 1.5, 1] : 1,
+                    }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15,
+                        scale: {
+                            repeat: celebratingId === seed.id ? 3 : 0, 
+                            duration: 0.6
+                        }
+                    }}
+                    className={`cursor-pointer ${hoveredId === seed.id ? 'stroke-white dark:stroke-slate-900 stroke-2 z-50' : 'hover:opacity-80'}`}
+                    onMouseEnter={(e: any) => {
                        setHoveredId(seed.id);
                        setTooltip({ visible: true, x: e.clientX, y: e.clientY, contact: seed });
                     }}

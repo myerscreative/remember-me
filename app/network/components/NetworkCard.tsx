@@ -4,10 +4,11 @@ import { Person } from '@/types/database.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { CalendarDays, GitBranch } from 'lucide-react';
+import { CalendarDays, Cake } from 'lucide-react';
 import Link from 'next/link';
 import { getRelationshipStatus } from '../utils/relationshipStatus';
 import { cn } from '@/lib/utils';
+import { format, parseISO } from 'date-fns';
 
 interface NetworkCardProps {
   contact: Person;
@@ -37,69 +38,67 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
 
   const initials = contact.first_name?.[0] + (contact.last_name?.[0] || '');
 
+  // Format dates helper
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return null;
+    try {
+      return format(parseISO(dateString), 'MMM d, yyyy');
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const birthday = formatDate(contact.birthday);
+  const lastContact = formatDate(contact.last_interaction_date);
+
   return (
     <Link href={`/contacts/${contact.id}`}>
-      <Card className="group relative overflow-hidden p-4 hover:shadow-lg transition-all duration-300 border-white/20 bg-white/40 dark:bg-black/20 hover:bg-white/60 dark:hover:bg-black/40 backdrop-blur-md">
-        <div className="flex items-start gap-4">
-          <Avatar className="h-12 w-12 border-2 border-white/20">
+      <Card className="group relative overflow-hidden p-3 hover:shadow-md transition-all duration-300 border-white/20 bg-white/40 dark:bg-black/20 hover:bg-white/60 dark:hover:bg-black/40 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border-2 border-white/20">
             <AvatarImage src={contact.photo_url || undefined} />
-            <AvatarFallback className="bg-indigo-100 text-indigo-600">
+            <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white truncate">
-              <HighlightText text={contact.name} />
-            </h4>
+            <div className="flex justify-between items-start">
+               <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                <HighlightText text={contact.name} />
+              </h4>
+            </div>
             
-            {/* Context / Where met */}
-            {(contact.where_met || contact.relationship_summary) && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
+            {/* Context - Only show if very relevant or searching, otherwise keep it clean */}
+            {(contact.where_met || contact.relationship_summary) && highlight && (
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1">
                 <HighlightText text={contact.where_met || contact.relationship_summary || ''} />
               </p>
             )}
+            
+            <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+               {/* Last Contact */}
+               <div className="flex items-center gap-1">
+                 <CalendarDays className="h-3 w-3 opacity-70" />
+                 <span>{lastContact || 'No contact'}</span>
+               </div>
+               
+               {/* Birthday */}
+               {birthday && (
+                 <div className="flex items-center gap-1 text-pink-500/80">
+                   <Cake className="h-3 w-3 opacity-70" />
+                   <span>{birthday}</span>
+                 </div>
+               )}
+            </div>
 
-            {/* Interests Badges */}
-            {contact.interests && contact.interests.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {contact.interests.slice(0, 2).map((interest, i) => (
-                  <Badge 
-                    key={i} 
-                    variant="secondary" 
-                    className="text-[10px] px-1.5 h-5 bg-white/50 dark:bg-white/10"
-                  >
-                    <HighlightText text={interest} />
-                  </Badge>
-                ))}
-                {contact.interests.length > 2 && (
-                  <span className="text-[10px] text-gray-400 flex items-center">
-                    +{contact.interests.length - 2}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between text-xs text-gray-400">
-          <div className="flex items-center gap-1.5">
-             <CalendarDays className="h-3 w-3" />
-             <span>
-               {contact.last_interaction_date 
-                 ? new Date(contact.last_interaction_date).toLocaleDateString()
-                 : 'No recent contact'}
-             </span>
           </div>
           
-          {/* Connection Indicator (Visual only for now) */}
-             <div className={cn(
-              "text-xs font-sans",
-              getRelationshipStatus(contact).colorClass
-            )}>
-            {getRelationshipStatus(contact).label}
-          </div>
+           {/* Connection Indicator (Mini Dot) */}
+           <div className={cn(
+              "h-2 w-2 rounded-full",
+              getRelationshipStatus(contact).colorClass.split(' ')[1]?.replace('text-', 'bg-') || 'bg-gray-300'
+            )} title={getRelationshipStatus(contact).label} />
         </div>
       </Card>
     </Link>
