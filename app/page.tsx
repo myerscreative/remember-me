@@ -495,6 +495,7 @@ export default function HomePage() {
             )}
           </div>
         </div>
+      </div>
         
         {/* Seed Data Button - Dev Only */}
         {process.env.NODE_ENV === "development" && contacts.length === 0 && !loading && (
