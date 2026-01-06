@@ -457,11 +457,42 @@ export default function HomePage() {
           {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">
              {loading ? (
-                     </p>
-                  </div>
-               )}
-             </div>
-             )}
+               <div className="flex flex-col items-center justify-center py-20">
+                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                 <p className="mt-4 text-slate-500 text-sm">Loading your network...</p>
+               </div>
+            ) : sortedContacts.length === 0 ? (
+              <div className="text-center py-16 px-4">
+                <div className="bg-slate-50 dark:bg-slate-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">No contacts found</h3>
+                <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                  Try adjusting your filters or search query, or add a new person to your network.
+                </p>
+                {sortedContacts.length === 0 && contacts.length > 0 && searchQuery && (
+                   <Button variant="outline" onClick={() => setSearchQuery("")}>Clear Search</Button>
+                )}
+              </div>
+            ) : (
+              <div className={cn(
+                "grid gap-3 pb-20",
+                viewMode === "grid" 
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+                  : "grid-cols-1"
+              )}>
+                {sortedContacts.map((contact) => (
+                  <SearchResultCard
+                    key={contact.id}
+                    contact={contact}
+                    isCompactView={isCompactView}
+                    onToggleFavorite={toggleFavorite}
+                    tags={contactTags.get(contact.id) || []}
+                    mutualCount={mutualCounts.get(contact.id) || 0}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
         
