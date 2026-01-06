@@ -454,7 +454,6 @@ export default function HomePage() {
              </div>
            </div>
          </div>
-         </div>
 
            {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">
@@ -479,7 +478,7 @@ export default function HomePage() {
             ) : (
               <div className={cn(
                 "grid gap-3 pb-20",
-                viewMode === "grid" 
+                !isCompactView 
                   ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
                   : "grid-cols-1"
               )}>
@@ -488,7 +487,7 @@ export default function HomePage() {
                     key={contact.id}
                     contact={contact}
                     isCompactView={isCompactView}
-                    onToggleFavorite={toggleFavorite}
+                    onToggleFavorite={handleToggleFavorite}
                     tags={contactTags.get(contact.id) || []}
                     mutualCount={mutualCounts.get(contact.id) || 0}
                   />
@@ -499,52 +498,6 @@ export default function HomePage() {
         </div>
       </div>
         
-        {/* Seed Data Button - Dev Only */}
-        {process.env.NODE_ENV === "development" && contacts.length === 0 && !loading && (
-           <div className="absolute inset-x-0 bottom-32 flex justify-center z-50 pointer-events-none">
-             <Button 
-               onClick={async () => {
-                 setLoading(true);
-                 const supabase = createClient();
-                 const { data: { user } } = await supabase.auth.getUser();
-                 
-                 if (!user) return;
-
-                 const contactsToInsert = mockContacts.map(c => {
-                    const [firstName, ...lastNameParts] = c.name.split(" ");
-                    const lastName = lastNameParts.join(" ");
-                    
-                    // Explicitly cast to any first to avoid partial type issues during creation
-                    // but structure it to match PersonInsert
-                    return {
-                       user_id: user.id,
-                       name: c.name,
-                       first_name: firstName,
-                       last_name: lastName || null,
-                       job_title: c.role,
-                       company: null,
-                       interests: c.interests,
-                       notes: c.notes,
-                       email: c.email,
-                       phone: c.phone
-                    };
-                 });
-
-                 for (const contact of contactsToInsert) {
-                    await supabase.from("persons").insert(contact as any);
-                 }
-                 
-                 // Artificial delay and reload
-                 setTimeout(() => {
-                    window.location.reload();
-                 }, 500);
-               }}
-               className="pointer-events-auto bg-green-600 hover:bg-green-700 text-white shadow-lg"
-             >
-               🌱 Seed Mock Data
-             </Button>
-           </div>
-        )}
       {/* Floating Action Buttons - Mobile & Tablet Only */}
       <div className="lg:hidden fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-3">
         {/* Quick Capture FAB */}
