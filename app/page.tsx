@@ -455,14 +455,15 @@ export default function HomePage() {
                     const [firstName, ...lastNameParts] = c.name.split(" ");
                     const lastName = lastNameParts.join(" ");
                     
+                    // Explicitly cast to any first to avoid partial type issues during creation
+                    // but structure it to match PersonInsert
                     return {
                        user_id: user.id,
                        name: c.name,
                        first_name: firstName,
-                       last_name: lastName || "",
+                       last_name: lastName || null,
                        job_title: c.role,
                        company: null,
-                       location: c.location,
                        interests: c.interests,
                        notes: c.notes,
                        email: c.email,
@@ -471,7 +472,7 @@ export default function HomePage() {
                  });
 
                  for (const contact of contactsToInsert) {
-                    await supabase.from("persons").insert(contact);
+                    await supabase.from("persons").insert(contact as any);
                  }
                  
                  // Artificial delay and reload
