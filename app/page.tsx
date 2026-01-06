@@ -452,9 +452,11 @@ export default function HomePage() {
                   </Link>
                </div>
              </div>
-          </div>
+           </div>
+         </div>
+         </div>
 
-          {/* Contact List */}
+           {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">
              {loading ? (
                <div className="flex flex-col items-center justify-center py-20">
