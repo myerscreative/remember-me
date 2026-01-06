@@ -27,7 +27,22 @@ export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tag
     }
   };
 
-  const birthday = contact.birthday ? formatBirthday(contact.birthday) : null;
+  const birthday = useMemo(() => {
+    if (!contact.birthday) return null;
+    try {
+      // Append time to force local parsing or split and create date manually to avoid timezone shift
+      // YYYY-MM-DD -> [YYYY, MM, DD]
+      // Note: new Date("YYYY-MM-DD") is UTC, new Date(Y, M, D) is local
+      const parts = contact.birthday.split('-');
+      if (parts.length === 3) {
+        const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+      }
+      return new Date(contact.birthday).toLocaleDateString("en-US", { month: "long", day: "numeric" });
+    } catch (e) {
+      return contact.birthday;
+    }
+  }, [contact.birthday]);
   const lastContact = formatDate(contact.last_interaction_date);
 
   return (

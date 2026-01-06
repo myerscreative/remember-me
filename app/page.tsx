@@ -3,17 +3,27 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Search, Settings, Plus, Users, Zap, List, Rows, Brain, X } from "lucide-react";
+import { useRef, useCallback } from "react";
+import { Search, Settings, Plus, Users, Zap, List, Rows, Brain, X, ArrowUpDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Person } from "@/types/database.types";
 import { DecayAlertBanner } from "@/components/decay-alert-banner";
 import { ExploreFilter } from "@/components/dashboard/ExploreFilter";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { SearchResultCard } from "@/app/contacts/components/SearchResultCard";
 import { ErrorFallback } from "@/components/error-fallback";
-import { mockContacts } from "@/app/network/mockContacts"; // Add mock data import
+import { mockContacts } from "@/app/network/mockContacts"; 
+import { sortContacts, SortOption, SortDirection } from "@/lib/utils/contact-sorting";
 
 import { useRouter } from "next/navigation";
 // Remove unused imports if necessary, or keep them. keeping imports safe.
@@ -35,6 +45,10 @@ export default function HomePage() {
   const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCompactView, setIsCompactView] = useState(false);
+  
+  // Sorting State
+  const [sortOption, setSortOption] = useState<SortOption>("first_name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [migrating, setMigrating] = useState(false);
 
 
@@ -224,6 +238,9 @@ export default function HomePage() {
       return true;
     });
 
+  // Apply sorting
+  const sortedContacts = sortContacts(filteredContacts, sortOption, sortDirection);
+
   if (error) {
      // ... (Error UI)
       return (
@@ -385,7 +402,41 @@ export default function HomePage() {
                   >
                      <Brain size={18} />
                   </Button>
-                  <Button
+
+                   <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+                   {/* Sort Menu */}
+                   <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-9 gap-2 px-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                        <ArrowUpDown className="h-4 w-4" />
+                        <span className="text-xs font-medium hidden sm:inline-block">
+                          {sortOption === "first_name" ? "First Name" : 
+                           sortOption === "last_name" ? "Last Name" : 
+                           sortOption === "birthday" ? "Birthday" : "Last Contact"}
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                      <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => { setSortOption("first_name"); setSortDirection("asc"); }}>
+                        <span className={cn("flex-1", sortOption === "first_name" && "font-bold")}>First Name</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setSortOption("last_name"); setSortDirection("asc"); }}>
+                         <span className={cn("flex-1", sortOption === "last_name" && "font-bold")}>Last Name</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setSortOption("birthday"); setSortDirection("asc"); }}>
+                         <span className={cn("flex-1", sortOption === "birthday" && "font-bold")}>Birthday</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setSortOption("last_contact"); setSortDirection("desc"); }}>
+                         <span className={cn("flex-1", sortOption === "last_contact" && "font-bold")}>Last Contact</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                   <div className="hidden sm:flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 gap-1"> 
+                    <Button
                     variant="ghost" 
                     size="icon" 
                     onClick={toggleViewMode}
@@ -406,30 +457,6 @@ export default function HomePage() {
           {/* Contact List */}
           <div className="pb-6 md:pb-8 lg:pb-12">
              {loading ? (
-               <div className="flex items-center justify-center py-16">
-                 <p className="text-gray-500 dark:text-gray-400">Loading contacts...</p>
-               </div>
-             ) : (
-             <div className={cn("space-y-2", !isCompactView && "md:space-y-4 lg:space-y-5")}>
-               {filteredContacts.length > 0 ? (
-                 filteredContacts.map((contact) => (
-                   <SearchResultCard
-                     key={contact.id}
-                     contact={contact}
-                     isCompactView={isCompactView}
-                     onToggleFavorite={handleToggleFavorite}
-                     tags={contactTags.get(contact.id) || []}
-                     mutualCount={mutualCounts.get(contact.id) || 0}
-                   />
-                 ))
-               ) : (
-                  <div className="flex flex-col items-center justify-center py-16 md:py-20 px-4">
-                     <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4 mb-4">
-                       <Users className="h-8 w-8 md:h-10 md:w-10 text-gray-400 dark:text-gray-500" />
-                     </div>
-                     <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2">No contacts found</h3>
-                     <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 text-center max-w-md mb-2">
-                        {searchQuery.trim() ? `No contacts match "${searchQuery}"` : "Try adjusting filters or adding new contacts."}
                      </p>
                   </div>
                )}
