@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +79,6 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       job_title: formData.jobTitle.trim() || null,
       birthday: formData.birthday || null,
       last_interaction_date: formData.lastContactDate || null,
-      last_contact_method: formData.lastContactMethod || null,
     };
 
     try {
@@ -109,6 +108,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Contact Info</DialogTitle>
+          <DialogDescription>
+            Update the details for this contact.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
