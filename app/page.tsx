@@ -13,6 +13,7 @@ import { ExploreFilter } from "@/components/dashboard/ExploreFilter";
 
 import { SearchResultCard } from "@/app/contacts/components/SearchResultCard";
 import { ErrorFallback } from "@/components/error-fallback";
+import { mockContacts } from "@/app/network/mockContacts"; // Add mock data import
 
 import { useRouter } from "next/navigation";
 // Remove unused imports if necessary, or keep them. keeping imports safe.
@@ -436,7 +437,54 @@ export default function HomePage() {
              )}
           </div>
         </div>
-      </div>
+        
+        </div>
+        
+        {/* Seed Data Button - Dev Only */}
+        {process.env.NODE_ENV === "development" && contacts.length === 0 && !loading && (
+           <div className="absolute inset-x-0 bottom-32 flex justify-center z-50 pointer-events-none">
+             <Button 
+               onClick={async () => {
+                 setLoading(true);
+                 const supabase = createClient();
+                 const { data: { user } } = await supabase.auth.getUser();
+                 
+                 if (!user) return;
+
+                 const contactsToInsert = mockContacts.map(c => {
+                    const [firstName, ...lastNameParts] = c.name.split(" ");
+                    const lastName = lastNameParts.join(" ");
+                    
+                    return {
+                       user_id: user.id,
+                       name: c.name,
+                       first_name: firstName,
+                       last_name: lastName || "",
+                       job_title: c.role,
+                       company: null,
+                       location: c.location,
+                       interests: c.interests,
+                       notes: c.notes,
+                       email: c.email,
+                       phone: c.phone
+                    };
+                 });
+
+                 for (const contact of contactsToInsert) {
+                    await supabase.from("persons").insert(contact);
+                 }
+                 
+                 // Artificial delay and reload
+                 setTimeout(() => {
+                    window.location.reload();
+                 }, 500);
+               }}
+               className="pointer-events-auto bg-green-600 hover:bg-green-700 text-white shadow-lg"
+             >
+               🌱 Seed Mock Data
+             </Button>
+           </div>
+        )}
       {/* Floating Action Buttons - Mobile & Tablet Only */}
       <div className="lg:hidden fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-3">
         {/* Quick Capture FAB */}

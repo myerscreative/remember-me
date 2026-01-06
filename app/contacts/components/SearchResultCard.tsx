@@ -1,10 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatBirthday, getGradient, getInitialsFromFullName } from "@/lib/utils/contact-helpers";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Star, Link as LinkIcon, Users } from "lucide-react";
+import { ChevronRight, Star, Link as LinkIcon, CalendarDays, Cake } from "lucide-react";
 import Link from "next/link";
 import { Person } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
+import { format, parseISO } from "date-fns";
 
 interface SearchResultCardProps {
   contact: Person;
@@ -15,6 +16,20 @@ interface SearchResultCardProps {
 }
 
 export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tags = [], mutualCount = 0 }: SearchResultCardProps) {
+  
+  // Format info helper
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return null;
+    try {
+      return format(parseISO(dateString), 'MMM d, yyyy');
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const birthday = contact.birthday ? formatBirthday(contact.birthday) : null;
+  const lastContact = formatDate(contact.last_interaction_date);
+
   return (
     <Link
       href={`/contacts/${contact.id}`}
@@ -29,7 +44,7 @@ export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tag
       <Avatar className={cn(
         "shrink-0",
         isCompactView 
-          ? "h-8 w-8 md:h-9 md:w-9" 
+          ? "h-10 w-10" 
           : "h-12 w-12 md:h-14 md:w-14"
       )}>
         <AvatarImage src={contact.photo_url || ""} />
@@ -52,7 +67,7 @@ export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tag
           <h3 className={cn(
             "font-bold text-slate-900 dark:text-white leading-tight truncate",
             isCompactView 
-              ? "text-sm md:text-base" 
+              ? "text-sm" 
               : "text-base md:text-lg"
           )}>
             {contact.name}
@@ -67,7 +82,7 @@ export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tag
           >
             <Star
               className={cn(
-                isCompactView ? "h-3.5 w-3.5 md:h-4 md:w-4" : "h-4 w-4 md:h-5 md:w-5",
+                isCompactView ? "h-3.5 w-3.5" : "h-4 w-4 md:h-5 md:w-5",
                 (contact as any).is_favorite && "fill-current"
               )}
             />
@@ -82,40 +97,44 @@ export function SearchResultCard({ contact, isCompactView, onToggleFavorite, tag
            )}
         </div>
         
-        {/* Subtitle / Details */}
-        {!isCompactView && (
-          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-0.5">
-            {contact.birthday && (
-                <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-tight">
-                  {formatBirthday(contact.birthday)}
-                </p>
-            )}
-            {contact.company && (
-                 <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-tight truncate max-w-[150px]">
-                  {contact.company}
-                </p>
-            )}
-          </div>
-        )}
-        
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
-           {tags.slice(0, 3).map(tag => (
-             <span key={tag} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-sm border border-slate-200 dark:border-slate-700">
-                {tag}
-             </span>
-           ))}
-           {tags.length > 3 && (
-             <span className="text-[10px] text-slate-400 px-1">+ {tags.length - 3}</span>
-           )}
+        {/* Info Row: Birthday & Last Contact */}
+        <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+             {/* Birthday */}
+             {birthday && (
+                 <div className="flex items-center gap-1 text-pink-500/90 dark:text-pink-400/90 font-medium">
+                   <Cake className="h-3 w-3" />
+                   <span>{birthday}</span>
+                 </div>
+             )}
+             
+             {/* Last Contact */}
+             <div className="flex items-center gap-1">
+               <CalendarDays className="h-3 w-3 opacity-70" />
+               <span>{lastContact || 'No recent contact'}</span>
+             </div>
         </div>
+
+        {/* Tags - Only show in expanded view or if very few? 
+            User wanted "Standard View" to have tags, Compact to have Birthday/Last Contact replacing tags?
+            Let's keep tags but limit them strictly in Compact. Or hide them if Birthday is present?
+            Let's show 1 tag max in compact if space permits, or move to next line.
+        */}
+        {!isCompactView && (
+             <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2">
+                {tags.slice(0, 3).map(tag => (
+                  <span key={tag} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-sm border border-slate-200 dark:border-slate-700">
+                     {tag}
+                  </span>
+                ))}
+            </div>
+        )}
       </div>
 
       {/* Chevron */}
       <ChevronRight className={cn(
         "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0 transition-all duration-200 group-hover:translate-x-1",
         isCompactView 
-          ? "h-4 w-4 md:h-5 md:w-5" 
+          ? "h-4 w-4" 
           : "h-5 w-5 md:h-6 md:w-6",
         !isCompactView && "mt-1"
       )} />

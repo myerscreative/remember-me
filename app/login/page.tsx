@@ -303,6 +303,60 @@ function LoginForm() {
             ← Back to app
           </Link>
         </div>
+
+        {/* Dev Login Button - ONLY VISIBLE IN DEVELOPMENT */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide font-semibold">Development Only</p>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+              onClick={async () => {
+                 try {
+                  setIsLoading(true);
+                  const supabase = createClient();
+                  const devEmail = "dev@example.com";
+                  const devPassword = "password123";
+
+                  // Attempt sign in
+                  const { data, error: signInError } = await supabase.auth.signInWithPassword({
+                    email: devEmail,
+                    password: devPassword,
+                  });
+
+                  if (signInError) {
+                    // If sign in fails, try sign up
+                    console.log("Dev sign in failed, attempting sign up...", signInError);
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                      email: devEmail,
+                      password: devPassword,
+                    });
+                    
+                    if (signUpError) {
+                       throw signUpError;
+                    }
+                    
+                    if (signUpData.user) {
+                       // Login after sign up
+                       router.push(redirect);
+                       router.refresh();
+                    }
+                  } else if (data.user) {
+                    router.push(redirect);
+                    router.refresh();
+                  }
+                 } catch (err) {
+                   setError(err instanceof Error ? err.message : "Dev login failed");
+                   setIsLoading(false);
+                 }
+              }}
+              disabled={isLoading}
+            >
+              🚀 Quick Dev Login
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
