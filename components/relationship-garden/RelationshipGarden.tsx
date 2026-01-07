@@ -55,11 +55,40 @@ import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles, Search, X } fro
 // ... existing imports ...
 
 export default function RelationshipGarden({ contacts, filter, onContactClick, onQuickLog, hoveredContactId }: RelationshipGardenProps) {
-  // ... existing refs and state ...
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    contact: null,
+  });
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedContactId, setHighlightedContactId] = useState<string | null>(null);
+
+  // Zoom state with localStorage persistence
+  const [zoom, setZoom] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gardenDefaultZoom');
+      return saved ? parseInt(saved) : 100;
+    }
+    return 100;
+  });
+  const [defaultZoom, setDefaultZoom] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gardenDefaultZoom');
+      return saved ? parseInt(saved) : 100;
+    }
+    return 100;
+  });
+  const [saved, setSaved] = useState(false);
+  
+  // Pan state
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Search logic
   useEffect(() => {
@@ -82,8 +111,250 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     setSearchQuery('');
     setHighlightedContactId(null);
   };
+
+  // Zoom handlers
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 120));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 25));
+  const handleResetZoom = () => setZoom(defaultZoom);
   
-  // ... existing zoom/pan logic ...
+  const handleSetDefaultZoom = () => {
+    setDefaultZoom(zoom);
+    localStorage.setItem('gardenDefaultZoom', zoom.toString());
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  // Pan handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, input')) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      setPanOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Touch Zoom & Pan logic
+  const touchStartRef = useRef<{ dist: number, zoom: number } | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        touchStartRef.current = { dist, zoom };
+      } else if (e.touches.length === 1) {
+          setIsDragging(true);
+          setDragStart({ x: e.touches[0].clientX - panOffset.x, y: e.touches[0].clientY - panOffset.y });
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchStartRef.current) {
+        e.preventDefault();
+        const dist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        const ratio = dist / touchStartRef.current.dist;
+        const newZoom = Math.min(Math.max(touchStartRef.current.zoom * ratio, 25), 150);
+        setZoom(newZoom);
+      } else if (e.touches.length === 1 && isDragging) {
+          e.preventDefault(); // Prevent page scroll while dragging garden
+          setPanOffset({
+            x: e.touches[0].clientX - dragStart.x,
+            y: e.touches[0].clientY - dragStart.y
+          });
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchStartRef.current = null;
+      setIsDragging(false);
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        const delta = e.deltaY;
+        setZoom(prev => {
+          const direction = delta > 0 ? -1 : 1; 
+          const newZoom = prev + (direction * 5);
+          return Math.min(Math.max(newZoom, 25), 150);
+        });
+      }
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: false });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('wheel', onWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('wheel', onWheel);
+    };
+  }, [zoom, isDragging, dragStart, panOffset]);
+
+  // Filter contacts
+  const filteredContacts = useMemo(() => {
+    return filter === 'all' 
+      ? contacts 
+      : contacts.filter(c => c.category === filter);
+  }, [contacts, filter]);
+
+  // Calculate Ring-Based positions
+  const leafPositions = useMemo(() => {
+    // 1. Bucket contacts by health status
+    const buckets = {
+      healthy: [] as Contact[],
+      good: [] as Contact[],
+      warning: [] as Contact[],
+      needsLove: [] as Contact[],
+    };
+
+    filteredContacts.forEach(contact => {
+      const days = contact.days;
+      if (days <= 14) buckets.healthy.push(contact);
+      else if (days <= 45) buckets.good.push(contact);
+      else if (days <= 120) buckets.warning.push(contact);
+      else buckets.needsLove.push(contact);
+    });
+
+    // 2. Helper to distribute points in a ring using Golden Angle
+    const calculateRingPositions = (
+      items: Contact[], 
+      minRadius: number, 
+      maxRadius: number, 
+      startAngleOffset: number
+    ) => {
+      // Deterministic pseudo-random jitter helper
+      const getJitter = (id: string | number) => {
+        const str = id.toString();
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        // Map hash to range [-5, 5]
+        return (hash % 11) - 5;
+      };
+
+      const count = items.length;
+      return items.map((contact, i) => {
+        // Pure spiral logic `r = c * sqrt(i)` is best for area filling.
+        // To fill a RING (annulus) from R_inner to R_outer:
+        // Area_inner = pi * R_inner^2
+        // Area_target = Area_inner + (Area_outer - Area_inner) * (i/N)
+        // R_target = sqrt(Area_target / pi)
+        
+        const areaInner = Math.PI * minRadius * minRadius;
+        const areaOuter = Math.PI * maxRadius * maxRadius;
+        const areaTarget = areaInner + (areaOuter - areaInner) * (i + 1) / (count + 1); // +1 to avoid edge crowding
+        const radius = Math.sqrt(areaTarget / Math.PI);
+        
+        const angle = i * GOLDEN_ANGLE + startAngleOffset;
+        
+        // Base coordinates
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        
+        // Rotation: leaf points outward
+        const rotation = (Math.atan2(y, x) * 180 / Math.PI); 
+
+        const color = getColorForDays(contact.days);
+        
+        // Scale based on importance
+        let scale = 1.3; // Default medium
+        if (contact.importance === 'high') scale = 1.8;
+        else if (contact.importance === 'low') scale = 0.9;
+        
+        // Add random slight rotation jitter (+- 15deg) for more natural look
+        // Uses same hash seed to be stable
+        const rotJitter = getJitter(contact.id + 'r') * 2; 
+
+        return { contact, x, y, rotation: rotation + rotJitter, color, scale };
+      });
+    };
+
+    // 3. Define Rings (radii in pixels) with dynamic sizing
+    // If Blooming ring is sparse (<10), pull it in tighter to 120px
+    const bloomingCount = buckets.healthy.length;
+    const r1Max = bloomingCount < 10 ? 120 : 180;
+    
+    // Sort buckets by days so inner-most in each ring are the "healthiest" of that ring
+    buckets.healthy.sort((a,b) => a.days - b.days);
+    buckets.good.sort((a,b) => a.days - b.days);
+    buckets.warning.sort((a,b) => a.days - b.days);
+    buckets.needsLove.sort((a,b) => a.days - b.days);
+
+    const p1 = calculateRingPositions(buckets.healthy, 50, r1Max, 0);
+    const p2 = calculateRingPositions(buckets.good, r1Max + 1, 300, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRingPositions(buckets.warning, 301, 450, (p1.length + p2.length) * GOLDEN_ANGLE);
+    const p4 = calculateRingPositions(buckets.needsLove, 451, 700, (p1.length + p2.length + p3.length) * GOLDEN_ANGLE);
+
+    return [...p1, ...p2, ...p3, ...p4];
+
+  }, [filteredContacts]);
+
+  const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
+    // Clear any pending hide timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setTooltip({
+      visible: true,
+      x: e.clientX + 15,
+      y: e.clientY - 50,
+      contact
+    });
+  };
+
+  const handleLeafMove = (e: React.MouseEvent) => {
+    setTooltip(prev => ({
+      ...prev,
+      x: e.clientX + 15,
+      y: e.clientY - 50
+    }));
+  };
+
+  const handleLeafLeave = () => {
+    // Delay hiding to allow user to move mouse to tooltip
+    hideTimeoutRef.current = setTimeout(() => {
+      setTooltip(prev => ({ ...prev, visible: false }));
+    }, 200); // 200ms delay
+  };
+
+  const handleTooltipEnter = () => {
+    // Cancel hide when mouse enters tooltip
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleTooltipLeave = () => {
+    // Hide tooltip when mouse leaves it
+    setTooltip(prev => ({ ...prev, visible: false }));
+  };
 
   return (
     <div className="space-y-4">
