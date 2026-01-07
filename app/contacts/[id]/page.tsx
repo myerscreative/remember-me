@@ -367,14 +367,18 @@ export default function ContactDetailPage({
                    </div>
                 </div>
 
-                {/* Mobile Actions */}
-                <div className="flex items-center gap-2 w-full max-w-xs mx-auto">
-                    <Button className="flex-1 bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg font-semibold rounded-lg h-9 text-sm">
-                        <Phone className="h-3.5 w-3.5 mr-1.5" /> Call
-                    </Button>
-                    <Button className="flex-1 bg-indigo-700/50 text-white hover:bg-indigo-700/70 border-0 shadow-lg backdrop-blur-sm rounded-lg h-9 text-sm">
-                        <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
-                    </Button>
+                {/* Contact Details (Phone & Email) */}
+                <div className="flex flex-col gap-1.5 items-center justify-center mb-4 min-h-[1.5rem]">
+                   {contact.phone && (
+                        <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-indigo-100 hover:text-white transition-colors text-sm font-medium bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                            <Phone className="h-3.5 w-3.5 opacity-70" /> {contact.phone}
+                        </a>
+                   )}
+                   {contact.email && (
+                        <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-indigo-100 hover:text-white transition-colors text-sm font-medium bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                            <Mail className="h-3.5 w-3.5 opacity-70" /> {contact.email}
+                        </a>
+                   )}
                 </div>
             </div>
          </div>
