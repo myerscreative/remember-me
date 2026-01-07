@@ -105,79 +105,98 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
   };
 
   return (
-    <div className="relative group">
-       <div className={cn(
-           "relative flex items-center gap-2 bg-white dark:bg-[#252931]/50 border-2 border-dashed border-[#d1d5db] dark:border-[#374151] rounded-2xl transition-all duration-300 focus-within:border-indigo-500/50 focus-within:bg-indigo-50/5 px-4 py-2",
-           isProcessing ? "opacity-70 pointer-events-none" : "hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-50/5"
-       )}>
-           {/* Sparkle Icon */}
-           <Sparkles className={cn("w-5 h-5 shrink-0 transition-colors", input ? "text-indigo-400" : "text-[#9ca3af] group-hover:text-indigo-500 dark:group-hover:text-indigo-400")} />
+    <div className="relative">
+      {/* Centered AI Button */}
+      <div className="flex flex-col items-center gap-4">
+        {/* AI Button */}
+        <Button
+          size="lg"
+          onClick={toggleListening}
+          disabled={isProcessing}
+          className={cn(
+            "rounded-full w-16 h-16 transition-all shadow-lg hover:scale-105 active:scale-95",
+            isListening 
+              ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
+              : isProcessing
+              ? "bg-indigo-400 text-white cursor-not-allowed"
+              : "bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+          )}
+        >
+          {isProcessing ? (
+            <Loader2 className="w-7 h-7 animate-spin" />
+          ) : (
+            <Sparkles className="w-7 h-7" />
+          )}
+        </Button>
 
-           {/* Input Field */}
-           <textarea
+        {/* Label */}
+        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+          {isListening ? "Listening..." : isProcessing ? "Processing..." : "Add important info"}
+        </p>
+
+        {/* Text Display Area - Shows when there's input or listening */}
+        {(input || isListening) && (
+          <div className="w-full animate-in fade-in slide-in-from-top-2 duration-300">
+            <textarea
               ref={inputRef as any}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Add important info to your memory..."
-              rows={1}
-              className="flex-1 border-0 bg-transparent shadow-none focus:ring-0 text-base placeholder:text-[#9ca3af] dark:placeholder:text-gray-500 min-h-[40px] px-2 resize-none py-2 leading-6"
-              disabled={isProcessing}
-              style={{ overflow: 'hidden' }}
-              onInput={(e) => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = target.scrollHeight + 'px';
-              }}
-           />
+              placeholder={isListening ? "Listening..." : "Type or edit..."}
+              rows={3}
+              className="w-full px-4 py-3 rounded-xl border-2 border-indigo-200 dark:border-indigo-900/50 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all text-sm leading-relaxed"
+              disabled={isProcessing || isListening}
+              style={{ minHeight: '80px' }}
+            />
+            
+            {/* Action Buttons */}
+            {input && !isListening && !isProcessing && (
+              <div className="flex justify-end gap-2 mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setInput('')}
+                  className="text-slate-600 dark:text-slate-400"
+                >
+                  Clear
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Submit
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
-           {/* Info Popover */}
-           <Popover>
-             <PopoverTrigger asChild>
-               <Info className="w-4 h-4 shrink-0 text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Memory info" role="button" />
-             </PopoverTrigger>
-             <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" align="end">
-                 <h3 className="text-slate-200 font-bold text-xs uppercase tracking-wider border-b border-slate-700/50 pb-2 mb-2">Relationship Memory Capture</h3>
-                 <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
-                     <span className="text-white font-bold">Type or speak</span> anything you want to remember about this contact.
-                 </p>
-                 <p className="text-slate-400 text-[11px] leading-relaxed">
-                     Our AI will automatically categorize the details into <span className="text-white font-bold">The Story</span>, <span className="text-white font-bold">Tags</span>, or <span className="text-white font-bold">Interests</span> so you don&apos;t have to.
-                 </p>
-             </PopoverContent>
-           </Popover>
-
-           {/* Action Buttons */}
-           {isProcessing ? (
-               <div className="flex items-center gap-2 shrink-0">
-                   <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
-                   <span className="text-xs font-medium text-indigo-500">Processing...</span>
-               </div>
-           ) : (
-               <>
-                   <Button 
-                       variant="ghost" 
-                       size="icon" 
-                       onClick={handleSubmit}
-                       className={cn("shrink-0 text-gray-400 hover:text-indigo-500 transition-colors h-9 w-9", !input.trim() && "opacity-0 pointer-events-none")}
-                   >
-                       <Send className="w-4 h-4" />
-                   </Button>
-                   <Button 
-                       size="icon"
-                       onClick={toggleListening}
-                       className={cn(
-                           "shrink-0 rounded-full w-9 h-9 transition-all shadow-md hover:scale-105 active:scale-95",
-                           isListening 
-                               ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
-                               : "bg-[#a855f7] hover:bg-[#9333ea] text-white"
-                       )}
-                   >
-                       <Mic className="w-4 h-4" />
-                   </Button>
-               </>
-           )}
-       </div>
+        {/* Info Popover - Bottom right when no input */}
+        {!input && !isListening && (
+          <div className="absolute top-0 right-0">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="p-2 text-slate-400 hover:text-indigo-500 transition-colors">
+                  <Info className="w-4 h-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" align="end">
+                <h3 className="text-slate-200 font-bold text-xs uppercase tracking-wider border-b border-slate-700/50 pb-2 mb-2">
+                  AI Memory Capture
+                </h3>
+                <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
+                  <span className="text-white font-bold">Click the AI button</span> to speak or type anything you want to remember.
+                </p>
+                <p className="text-slate-400 text-[11px] leading-relaxed">
+                  Our AI will automatically organize details into <span className="text-white font-bold">Story</span>, <span className="text-white font-bold">Family</span>, <span className="text-white font-bold">Interests</span>, and more.
+                </p>
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
