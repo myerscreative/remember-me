@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star, Camera } from "lucide-react";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
@@ -352,13 +352,67 @@ export default function ContactDetailPage({
 
             {/* Mobile Profile Info */}
             <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="mb-3 relative">
-                    <Avatar className="h-24 w-24 border-4 border-white/30 shadow-2xl">
+                <div className="mb-3 relative group cursor-pointer" onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.capture = 'environment' as any; // Suggests camera but still allows library
+                    input.onchange = async (e: any) => {
+                        const file = e.target?.files?.[0];
+                        if (!file) return;
+
+                        if (!file.type.startsWith('image/')) {
+                            toast.error('Please upload an image file');
+                            return;
+                        }
+
+                        if (file.size > 5 * 1024 * 1024) {
+                            toast.error('Image must be less than 5MB');
+                            return;
+                        }
+
+                        const supabase = createClient();
+                        try {
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${contact.id}-${Math.random()}.${fileExt}`;
+                            const filePath = `${fileName}`;
+
+                            const { error: uploadError } = await supabase.storage
+                                .from('avatars')
+                                .upload(filePath, file);
+
+                            if (uploadError) throw uploadError;
+
+                            const { data: { publicUrl } } = supabase.storage
+                                .from('avatars')
+                                .getPublicUrl(filePath);
+
+                            const { error: dbError } = await (supabase as any)
+                                .from('persons')
+                                .update({ photo_url: publicUrl })
+                                .eq('id', contact.id);
+
+                            if (dbError) throw dbError;
+
+                            toast.success("Profile photo updated");
+                            setContact({ ...contact, photo_url: publicUrl });
+                        } catch (error) {
+                            console.error('Error uploading avatar:', error);
+                            toast.error('Failed to update photo');
+                        }
+                    };
+                    input.click();
+                }}>
+                    <Avatar className="h-24 w-24 border-4 border-white/30 shadow-2xl transition-all duration-300 hover:scale-105">
                         <AvatarImage src={contact.photo_url} className="object-cover" />
                         <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
                             {(contact.firstName?.[0] || "")}
                         </AvatarFallback>
                     </Avatar>
+                    {/* Camera overlay hint */}
+                    <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Camera className="w-6 h-6 text-white drop-shadow-md" />
+                    </div>
                 </div>
 
                 {isEditMode ? (
