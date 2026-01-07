@@ -113,7 +113,7 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     // 4. Update Person
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('persons')
         .update({
             family_members: currentFamily,
