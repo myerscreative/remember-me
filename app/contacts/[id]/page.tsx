@@ -356,7 +356,6 @@ export default function ContactDetailPage({
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
-                    input.capture = 'environment' as any; // Suggests camera but still allows library
                     input.onchange = async (e: any) => {
                         const file = e.target?.files?.[0];
                         if (!file) return;
