@@ -14,14 +14,21 @@ interface SearchResultCardProps {
   onToggleFavorite: (id: string, e: React.MouseEvent) => void;
   tags?: string[];
   mutualCount?: number;
+  onConnect?: (contact: Person) => void;
 }
+
+import { getRelationshipHealth } from "@/lib/conversation-helpers";
+import { ArrowRight } from "lucide-react";
+
+// ... existing imports ...
 
 export function SearchResultCard({ 
   contact, 
   isCompactView, 
   onToggleFavorite,
   tags = [],
-  mutualCount = 0
+  mutualCount = 0,
+  onConnect
 }: SearchResultCardProps) {
   
   const birthday = useMemo(() => {
@@ -42,29 +49,38 @@ export function SearchResultCard({
      }
   }, [contact.last_interaction_date]);
 
+  const health = getRelationshipHealth(contact);
+
+  // Stop propagation for connect button to prevent navigation
+  const handleConnectClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onConnect?.(contact);
+  };
+
   return (
     <Link href={`/contacts/${contact.id}`}>
       <div 
         className={cn(
-          "group relative bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-blue-500/30 dark:hover:border-blue-400/30 w-full p-4",
+          "group relative bg-white dark:bg-[#1e1e2dCC] border border-gray-200 dark:border-gray-700/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 w-full p-5 backdrop-blur-sm",
           isCompactView && "flex items-center p-3 gap-3"
         )}
       >
-        {/* Selection/Hover Overlay */}
-        <div className="absolute inset-0 bg-blue-50/0 dark:bg-blue-900/0 group-hover:bg-blue-50/30 dark:group-hover:bg-blue-900/10 transition-colors pointer-events-none" />
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-indigo-50/0 dark:bg-indigo-900/0 group-hover:bg-indigo-50/10 dark:group-hover:bg-indigo-900/5 transition-colors pointer-events-none" />
 
         <div className="flex gap-4 items-start relative z-10">
             {/* Avatar Column */}
-            <div className={cn("relative shrink-0", isCompactView ? "h-10 w-10" : "h-14 w-14 sm:h-16 sm:w-16")}>
+            <div className={cn("relative shrink-0", isCompactView ? "h-10 w-10" : "h-[56px] w-[56px]")}>
               <Avatar className="h-full w-full ring-2 ring-white dark:ring-gray-800 shadow-sm transition-transform group-hover:scale-105 duration-300">
                 <AvatarImage src={contact.photo_url || undefined} alt={contact.name} className="object-cover" />
-                <AvatarFallback className={cn("text-white font-medium text-lg", getGradient(contact.name))}>
+                <AvatarFallback className={cn("text-white font-semibold text-lg", getGradient(contact.name))}>
                   {getInitialsFromFullName(contact.name)}
                 </AvatarFallback>
               </Avatar>
               <button
                 onClick={(e) => onToggleFavorite(contact.id, e)}
-                className="absolute -bottom-1 -right-1 p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:scale-110 transition-transform z-20"
+                className="absolute -bottom-1 -right-1 p-1 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:scale-110 transition-transform z-20 border border-gray-100 dark:border-gray-700"
                 title={contact.is_favorite ? "Remove from favorites" : "Add to favorites"}
               >
                 <Star 
@@ -78,77 +94,77 @@ export function SearchResultCard({
             </div>
 
             {/* Info Column */}
-            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                 <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0">
-                        <h3 className="font-semibold text-gray-900 dark:text-white truncate text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {contact.name}
-                        </h3>
-                        {contact.job_title && !isCompactView && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                            {contact.job_title}
-                            {contact.company && <span className="text-gray-400"> at {contact.company}</span>}
-                        </p>
-                        )}
-                    </div>
+            <div className="flex-1 min-w-0 flex flex-col">
+                 <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-semibold text-[18px] text-gray-900 dark:text-white truncate group-hover:text-indigo-400 transition-colors">
+                      {contact.name}
+                    </h3>
                  </div>
 
                  {!isCompactView && (
-                    <div className="mt-2 space-y-2">
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
-                             <div className="flex items-center gap-1.5" title="Last Contact">
-                                <CalendarDays size={13} className="text-gray-400 shrink-0" />
-                                <span className={cn(!lastContact && "opacity-70 italic")}>{lastContact || "No contact yet"}</span>
-                            </div>
-                            {birthday && (
-                                <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400" title="Birthday">
-                                    <Cake size={13} className="text-pink-400 shrink-0" />
-                                    <span>{birthday}</span>
-                                </div>
-                            )}
+                    <div className="space-y-1.5">
+                        {/* Last Contacted Row */}
+                        <div className={cn(
+                            "flex items-center gap-2 text-sm font-medium",
+                            health === 'overdue' ? "text-amber-500" : 
+                            health === 'healthy' ? "text-emerald-500" : "text-gray-400"
+                        )}>
+                             <CalendarDays size={14} className={cn("shrink-0", !lastContact && "opacity-70")} />
+                             <span>{lastContact ? `Last contacted: ${lastContact}` : "No contact yet"}</span>
                         </div>
 
+                        {/* Birthday Row */}
+                        {birthday && (
+                            <div className="flex items-center gap-2 text-sm text-purple-500 font-medium">
+                                <Cake size={14} className="shrink-0" />
+                                <span>Birthday: {birthday}</span>
+                            </div>
+                        )}
+
+                        {/* Tags */}
                         {tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-2">
+                            <div className="flex flex-wrap gap-2 mt-3 mb-1">
                                 {tags.slice(0, 3).map(tag => (
-                                <Badge key={tag} variant="secondary" className="bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-[10px] h-5 px-1.5 border-0 font-normal">
+                                <Badge key={tag} variant="secondary" className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
                                     {tag}
                                 </Badge>
                                 ))}
                                 {tags.length > 3 && (
-                                <Badge variant="secondary" className="bg-gray-50 dark:bg-gray-800 text-gray-500 text-[10px] h-5 px-1.5 border-0 font-normal">
+                                <Badge variant="secondary" className="bg-gray-500/10 text-gray-400 border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
                                     +{tags.length - 3}
                                 </Badge>
                                 )}
                             </div>
                         )}
-                        
-                         {mutualCount > 0 && (
-                            <div className="flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium pt-1">
-                                <LinkIcon size={11} />
-                                {mutualCount} mutual connection{mutualCount !== 1 ? 's' : ''}
-                            </div>
-                        )}
                     </div>
                  )}
             </div>
-
-            {/* Compact View Right Side */}
+            
+            {/* Compact View End */}
             {isCompactView && (
-                <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-auto items-end sm:items-center shrink-0 self-center">
-                    {birthday && (
-                        <div className="flex items-center gap-1" title="Birthday">
-                            <Cake size={12} className="text-pink-400 shrink-0" />
-                            <span className="whitespace-nowrap">{birthday}</span>
-                        </div>
-                    )}
-                    <div className="flex items-center gap-1" title="Last Contact">
-                        <CalendarDays size={12} className="text-gray-400 shrink-0" />
-                        <span className="whitespace-nowrap">{lastContact || "No contact yet"}</span>
-                    </div>
+                <div className="ml-auto flex flex-col items-end gap-1">
+                     <span className={cn(
+                            "text-xs font-medium",
+                            health === 'overdue' ? "text-amber-500" : 
+                            health === 'healthy' ? "text-emerald-500" : "text-gray-400"
+                        )}>
+                        {lastContact || "No contact"}
+                     </span>
                 </div>
             )}
         </div>
+
+        {/* Connect Button (Full Width) */}
+        {!isCompactView && onConnect && (
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/50">
+                <button
+                    onClick={handleConnectClick}
+                    className="w-full bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-[15px] font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 relative z-20"
+                >
+                    Connect Now <ArrowRight className="w-4 h-4" />
+                </button>
+            </div>
+        )}
       </div>
     </Link>
   );

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SearchResultCard } from "@/app/contacts/components/SearchResultCard";
+import { ConnectNowModal } from "@/components/contacts/ConnectNowModal";
 import { ErrorFallback } from "@/components/error-fallback";
 import { mockContacts } from "@/app/network/mockContacts"; 
 import { sortContacts, SortOption, SortDirection } from "@/lib/utils/contact-sorting";
@@ -254,6 +255,12 @@ export default function HomePage() {
       </div>
     );
   }
+
+  const [selectedContactForConnect, setSelectedContactForConnect] = useState<Person | null>(null);
+
+  const handleConnect = (contact: Person) => {
+      setSelectedContactForConnect(contact);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
@@ -490,6 +497,7 @@ export default function HomePage() {
                     onToggleFavorite={handleToggleFavorite}
                     tags={contactTags.get(contact.id) || []}
                     mutualCount={mutualCounts.get(contact.id) || 0}
+                    onConnect={handleConnect}
                   />
                 ))}
               </div>
@@ -534,6 +542,15 @@ export default function HomePage() {
           </div>
         </Link>
       </div>
+      
+      {/* Connect Now Modal */}
+      {selectedContactForConnect && (
+          <ConnectNowModal 
+            person={selectedContactForConnect} 
+            isOpen={!!selectedContactForConnect} 
+            onOpenChange={(open) => !open && setSelectedContactForConnect(null)} 
+          />
+      )}
     </div>
   );
 }
