@@ -345,7 +345,9 @@ export default function ContactDetailPage({
                     <h1 className="text-xl font-bold mb-1">{contact.firstName} {contact.lastName}</h1>
                 )}
 
-                <p className="text-indigo-100 text-xs mb-3">{contact.linkedin || "Contact"}</p>
+                {contact.job_title && (
+                    <p className="text-indigo-100 text-xs mb-3">{contact.job_title}</p>
+                )}
 
                 {/* Mobile Frequency Selector */}
                 <div className="mb-3 flex justify-center w-full">

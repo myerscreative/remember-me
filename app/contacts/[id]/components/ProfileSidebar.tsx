@@ -77,30 +77,43 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
         {/* 2. Name & Title */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-1">{fullName}</h1>
-        
+
         {/* Job Title & Company */}
         {(contact.job_title || contact.company) && (
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center mb-2">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center mb-4">
                 {contact.job_title || contact.jobTitle}
                 {contact.job_title && contact.company && " at "}
                 {contact.company}
             </p>
         )}
 
-        {contact.linkedin && (
-             <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4 flex items-center gap-1.5 justify-center">
-                <Briefcase className="w-3.5 h-3.5" />
-                <a href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                    LinkedIn
-                </a>
-             </p>
-        )}
+        {/* Contact Info - Moved to top for easier access */}
+        <div className="space-y-2 mb-6 w-full px-2">
+          {contact.email && (
+            <a href={`mailto:${contact.email}`} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
+              <Mail className="w-4 h-4 shrink-0" />
+              <span className="truncate">{contact.email}</span>
+            </a>
+          )}
+          {contact.phone && (
+            <a href={`tel:${contact.phone}`} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
+              <Phone className="w-4 h-4 shrink-0" />
+              <span>{contact.phone}</span>
+            </a>
+          )}
+          {contact.linkedin && (
+            <a href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
+              <Briefcase className="w-4 h-4 shrink-0" />
+              <span>LinkedIn Profile</span>
+            </a>
+          )}
+        </div>
 
         {/* Birthday Display - Always visible */}
         <div className="flex items-center justify-center gap-2 mb-6">
             <Badge variant="outline" className="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800 rounded-full font-medium">
                 <Cake className="w-3.5 h-3.5 mr-1.5 inline-block -mt-0.5" />
-                {contact.birthday 
+                {contact.birthday
                   ? new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
                   : "Birthday: Not set"}
             </Badge>
@@ -144,23 +157,9 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
       </div>
 
-      {/* 5. Contact Details List */}
-      <div className="space-y-4 py-8 border-t border-b border-gray-100 dark:border-[#3a3f4b] mb-8">
-        {contact.phone && (
-          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-            <Phone className="w-4 h-4 text-gray-400 shrink-0" />
-            <span>{contact.phone}</span>
-          </div>
-        )}
-        {contact.email && (
-          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-            <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-            <a href={`mailto:${contact.email}`} className="hover:text-indigo-600 transition-colors truncate">
-              {contact.email}
-            </a>
-          </div>
-        )}
-        <LastContactEditor 
+      {/* Last Contact Editor */}
+      <div className="mb-8 pb-8 border-b border-gray-100 dark:border-[#3a3f4b]">
+        <LastContactEditor
           currentDate={contact.last_contact_date}
           currentMethod={contact.last_contact_method}
           displayText={lastContactDisplay()}
@@ -168,53 +167,8 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
         />
       </div>
 
-      {/* 5. Primary Actions */}
-      <div className="space-y-3">
-        <Button 
-          className="w-full bg-[#6366f1] hover:bg-[#5558dd] text-white shadow-sm h-auto py-3.5 text-sm font-medium rounded-xl transition-all hover:-translate-y-0.5 border-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-          onClick={() => {
-            if (contact.phone) {
-              window.open(`tel:${contact.phone}`);
-              onContactAction?.('call');
-            }
-          }}
-          disabled={!contact.phone}
-        >
-          <Phone className="w-4 h-4 mr-2" />
-          Call
-        </Button>
-        <div className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="outline" 
-              className="w-full bg-[#f9fafb] dark:bg-[#2c3039] border-[#e5e7eb] dark:border-[#3a3f4b] text-[#4b5563] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#343942] h-auto py-3.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => {
-                if (contact.email) {
-                  window.open(`mailto:${contact.email}`);
-                  onContactAction?.('email');
-                }
-              }}
-              disabled={!contact.email}
-            >
-                <Mail className="w-4 h-4 mr-2" /> Email
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full bg-[#f9fafb] dark:bg-[#2c3039] border-[#e5e7eb] dark:border-[#3a3f4b] text-[#4b5563] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#343942] h-auto py-3.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => {
-                if (contact.phone) {
-                  window.open(`sms:${contact.phone}`);
-                  onContactAction?.('text');
-                }
-              }}
-              disabled={!contact.phone}
-            >
-                <MessageSquare className="w-4 h-4 mr-2" /> Text
-            </Button>
-        </div>
-      </div>
-
-      {/* 6. Importance & Frequency (Moved to Bottom) */}
-      <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#3a3f4b] w-full space-y-4">
+      {/* Importance & Frequency */}
+      <div className="space-y-4">
          {/* Importance Selector */}
          <div>
            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">

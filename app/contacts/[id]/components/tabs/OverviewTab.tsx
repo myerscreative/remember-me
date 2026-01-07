@@ -152,7 +152,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
         {/* Tags & Interests Grid */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Tags Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col shadow-sm transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Tag className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" /> Tags
@@ -221,7 +221,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
             </div>
 
             {/* Interests Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 min-h-[200px] flex flex-col shadow-sm transition-colors">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col shadow-sm transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Interests
