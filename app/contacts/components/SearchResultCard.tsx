@@ -104,7 +104,7 @@ export function SearchResultCard({
                     {!isCompactView && onConnect && (
                         <button
                             onClick={handleConnectClick}
-                            className="shrink-0 bg-indigo-500/15 border border-indigo-500/25 text-indigo-200 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold flex items-center gap-1.5 hover:bg-indigo-500/25 hover:border-indigo-500/40 hover:text-indigo-100 transition-all z-20"
+                            className="shrink-0 bg-indigo-500/15 border border-indigo-500/25 text-indigo-600 dark:text-indigo-200 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold flex items-center gap-1.5 hover:bg-indigo-500/25 hover:border-indigo-500/40 hover:text-indigo-700 dark:hover:text-indigo-100 transition-all z-20"
                         >
                             Connect <ArrowRight className="w-3 h-3 opacity-70" />
                         </button>
@@ -116,8 +116,8 @@ export function SearchResultCard({
                         {/* Last Contacted Row */}
                         <div className={cn(
                             "flex items-center gap-2 text-sm font-medium",
-                            health === 'overdue' ? "text-amber-500" : 
-                            health === 'healthy' ? "text-emerald-500" : "text-gray-400"
+                            health === 'overdue' ? "text-amber-600 dark:text-amber-500" : 
+                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-gray-500 dark:text-gray-400"
                         )}>
                              <CalendarDays size={14} className={cn("shrink-0", !lastContact && "opacity-70")} />
                              <span>{lastContact ? `Last contacted: ${lastContact}` : "No contact yet"}</span>
@@ -125,7 +125,7 @@ export function SearchResultCard({
 
                         {/* Birthday Row */}
                         {birthday && (
-                            <div className="flex items-center gap-2 text-sm text-purple-500 font-medium">
+                            <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 font-medium">
                                 <Cake size={14} className="shrink-0" />
                                 <span>Birthday: {birthday}</span>
                             </div>
@@ -135,12 +135,12 @@ export function SearchResultCard({
                         {tags.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3 mb-1">
                                 {tags.slice(0, 3).map(tag => (
-                                <Badge key={tag} variant="secondary" className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
+                                <Badge key={tag} variant="secondary" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
                                     {tag}
                                 </Badge>
                                 ))}
                                 {tags.length > 3 && (
-                                <Badge variant="secondary" className="bg-gray-500/10 text-gray-400 border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
+                                <Badge variant="secondary" className="bg-gray-500/10 text-gray-600 dark:text-gray-400 border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
                                     +{tags.length - 3}
                                 </Badge>
                                 )}
@@ -155,8 +155,8 @@ export function SearchResultCard({
                 <div className="ml-auto flex flex-col items-end gap-1">
                      <span className={cn(
                             "text-xs font-medium",
-                            health === 'overdue' ? "text-amber-500" : 
-                            health === 'healthy' ? "text-emerald-500" : "text-gray-400"
+                            health === 'overdue' ? "text-amber-600 dark:text-amber-500" : 
+                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-gray-500 dark:text-gray-400"
                         )}>
                         {lastContact || "No contact"}
                      </span>

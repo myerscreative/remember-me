@@ -274,7 +274,7 @@ export default function HomePage() {
              </h1>
              {!showArchived && <div className="-mt-1"><DecayAlertBanner /></div>}
              <div className="relative w-full max-w-2xl">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-500" />
                <Input
                  placeholder="Search your network..."
                  value={searchQuery}
@@ -415,7 +415,7 @@ export default function HomePage() {
                    {/* Sort Menu */}
                    <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-9 gap-2 px-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                      <Button variant="ghost" size="sm" className="h-9 gap-2 px-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                         <ArrowUpDown className="h-4 w-4" />
                         <span className="text-xs font-medium hidden sm:inline-block">
                           {sortOption === "first_name" ? "First Name" : 
