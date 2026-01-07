@@ -95,10 +95,20 @@ export function SearchResultCard({
 
             {/* Info Column */}
             <div className="flex-1 min-w-0 flex flex-col">
-                 <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold text-[18px] text-gray-900 dark:text-white truncate group-hover:text-indigo-400 transition-colors">
+                 <div className="flex justify-between items-center gap-3 mb-2">
+                    <h3 className="font-semibold text-[18px] text-gray-900 dark:text-white truncate group-hover:text-indigo-400 transition-colors flex-1 min-w-0">
                       {contact.name}
                     </h3>
+
+                    {/* Inline Connect Button */}
+                    {!isCompactView && onConnect && (
+                        <button
+                            onClick={handleConnectClick}
+                            className="shrink-0 bg-indigo-500/15 border border-indigo-500/25 text-indigo-200 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold flex items-center gap-1.5 hover:bg-indigo-500/25 hover:border-indigo-500/40 hover:text-indigo-100 transition-all z-20"
+                        >
+                            Connect <ArrowRight className="w-3 h-3 opacity-70" />
+                        </button>
+                    )}
                  </div>
 
                  {!isCompactView && (
@@ -153,18 +163,6 @@ export function SearchResultCard({
                 </div>
             )}
         </div>
-
-        {/* Connect Button (Full Width) */}
-        {!isCompactView && onConnect && (
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/50">
-                <button
-                    onClick={handleConnectClick}
-                    className="w-full bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-[15px] font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 relative z-20"
-                >
-                    Connect Now <ArrowRight className="w-4 h-4" />
-                </button>
-            </div>
-        )}
       </div>
     </Link>
   );
