@@ -144,42 +144,19 @@ export function OverviewTab({ contact }: OverviewTabProps) {
           {contact.deep_lore || contact.where_met || contact.ai_summary ? (
             <>
               <div className="space-y-4 mb-6">
-                {/* Where We Met */}
-                {contact.where_met && (
-                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3" />
-                      Where We Met
+                 {/* Unified Synopsis Display */}
+                 <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-5 border border-indigo-100 dark:border-indigo-900/30">
+                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                        {contact.deep_lore || contact.ai_summary || "No synopsis available."}
                     </p>
-                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-                      {contact.where_met}
-                    </p>
-                  </div>
-                )}
-                
-                {/* Deep Lore / Shared Memories */}
-                {contact.deep_lore && (
-                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                      Shared Memories
-                    </p>
-                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
-                      {contact.deep_lore}
-                    </p>
-                  </div>
-                )}
-                
-                {/* AI Summary (if different from deep_lore) */}
-                {contact.ai_summary && contact.ai_summary !== contact.deep_lore && (
-                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                      Quick Summary
-                    </p>
-                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-                      {contact.ai_summary}
-                    </p>
-                  </div>
-                )}
+                    
+                    {/* Append Where Met if not included in deep_lore (simple check) */}
+                    {contact.where_met && (!contact.deep_lore || !contact.deep_lore.includes(contact.where_met)) && (
+                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mt-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/10">
+                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">Where we met:</span> {contact.where_met}
+                        </p>
+                    )}
+                 </div>
               </div>
               
               {/* Memory Capture - Below content */}

@@ -23,21 +23,19 @@ export async function processMemory(contactId: string, text: string) {
       
       Text: "${text}"
       
-      Supported Categories:
-      1. FAMILY: Use this when family members are mentioned. 
+      Support Categories:
+      1. FAMILY: Use this when family members or close friends are mentioned. 
          Data Format: { name: string, relationship: string, birthday?: string, hobbies?: string, interests?: string }.
-         Example: "His wife Mary likes gardening" -> { category: "FAMILY", data: { name: "Mary", relationship: "Wife", hobbies: "Gardening" } }
       
       2. INTEREST: Use this for hobbies, sports, likes, or topics of interest.
          Data Format: { value: string }.
-         Example: "He loves playing golf" -> { category: "INTEREST", data: { value: "Golf" } }
          
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
-         Example: "We met at high school" -> { category: "WHERE_WE_MET", data: { value: "High School" } }
          
-      4. STORY: Use this for general memories, stories, or deep lore that doesn't fit other categories.
+      4. SYNOPSIS: A comprehensive, narrative paragraph that summarizes EVERYTHING meaningful from the text (history, friends, interests, where we met) into a cohesive story about the person.
          Data Format: { value: string }.
+         Example: "You met Emmy in Japan when she was 3. She is passionate about tennis and plays the violin. She has a close friend named Sarah."
       
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
     `;
@@ -53,7 +51,7 @@ export async function processMemory(contactId: string, text: string) {
 
     if (extractions.length === 0) {
         // Fallback to basic story if nothing extracted
-        extractions.push({ category: "STORY", data: { value: text } });
+        extractions.push({ category: "SYNOPSIS", data: { value: text } });
     }
 
     const fieldsUpdated: string[] = [];
@@ -99,8 +97,11 @@ export async function processMemory(contactId: string, text: string) {
                 where_met = data.value;
                 fieldsUpdated.push('Where We Met');
                 break;
-            case 'STORY':
-                // Append to deep_lore
+            case 'SYNOPSIS': 
+            case 'STORY': // Handle legacy or fallback
+                // Append this new narrative to existing deep_lore to preserve history, 
+                // but if deep_lore is empty, just set it.
+                // We add a double newline for paragraph separation.
                 const newStory = data.value;
                 deep_lore = deep_lore ? `${deep_lore}\n\n${newStory}` : newStory;
                 fieldsUpdated.push('Story');
