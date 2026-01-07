@@ -58,7 +58,7 @@ export async function processMemory(contactId: string, text: string) {
     const fieldsUpdated: string[] = [];
 
     // 2. Fetch current person data
-    const { data: person, error: fetchError } = await supabase
+    const { data: person, error: fetchError } = await (supabase as any)
         .from('persons')
         .select('*')
         .eq('id', contactId)
@@ -109,7 +109,7 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     // 4. Update Person
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('persons')
         .update({
             family_members: currentFamily,
