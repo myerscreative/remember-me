@@ -99,7 +99,8 @@ export async function syncAvatarsFromVCF(
         const { error: updateError } = await (supabase as any)
           .from('persons')
           .update({ photo_url: photoUrl })
-          .eq('id', matchedContact.id);
+          .eq('id', matchedContact.id)
+          .eq('user_id', userId);
 
         if (updateError) {
           result.errors.push(`Failed to update ${contact.name}: ${updateError.message}`);
