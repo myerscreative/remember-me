@@ -19,11 +19,49 @@ export async function processMemory(contactId: string, text: string) {
 
     // 1. Analyze text with OpenAI
     const prompt = `
-      Analyze the following text about a person and extract relevant information into supported categories.
+      ROLE
+      You are the Personal Relationship Intelligence Engine for the app “Remember Me.”
+      Your job is to take unstructured, free-form human input (brain dumps, spoken thoughts, fragmented memories, emotional impressions) about a person and transform it into a clear, organized, meaningful profile.
+
+      CORE PRINCIPLE
+      Humans think in stories and impressions, not databases.
+      You must accept chaos as input and produce clarity as output.
+      Do not simply summarize. Parse, interpret, classify, and structure the information.
+
+      INPUT STYLE
+      The user may speak freely, jump between topics, repeat themselves, or mix facts with impressions. Treat all input as intentional and valuable.
+
+      OUTPUT OBJECTIVE
+      Transform the input into a high-level AI synopsis (human, not robotic), clearly grouped and labeled categories, and actionable memory anchors.
+      Nothing should feel like a “ball of string.” Everything must have meaning and place.
+
+      REQUIRED STRUCTURE FOR "SYNOPSIS" FIELD (Use markdown formatting for headers):
       
-      Text: "${text}"
+      ### Person Snapshot
+      Write a short, natural paragraph answering: Who is this person? Why do they matter? What defines them at a glance? (Tone: warm, perceptive, human)
+
+      ### Relationship Context
+      Identify and classify the relationship (Family, Friend, Work, etc.). Include how they know each other and depth of relationship.
+
+      ### Key Roles & Identities
+      Extract meaningful roles (Parent, Professional, Social role). Do not invent facts.
+
+      ### Personal Interests & Passions
+      Group interests into Hobbies, Intellectual, Values, Lifestyle. Capture patterns.
+
+      ### Personality & Communication Style
+      Identify temperament and communication preferences.
+
+      ### Important Facts & Details
+      Extract concrete details (Family members, Dates, Locations, Career).
+
+      ### Relationship Notes
+      Why the user wants to remember this person.
+
       
-      Support Categories:
+      JSON EXTRACTION RULES:
+      In addition to the text synopsis above, strictly extract specific data points into the following categories for database storage:
+
       1. FAMILY: Use this when family members or close friends are mentioned. 
          Data Format: { name: string, relationship: string, birthday?: string, hobbies?: string, interests?: string }.
       
@@ -33,11 +71,12 @@ export async function processMemory(contactId: string, text: string) {
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
          
-      4. SYNOPSIS: A comprehensive, narrative paragraph that summarizes EVERYTHING meaningful from the text (history, friends, interests, where we met) into a cohesive story about the person.
+      4. SYNOPSIS: The full formatted text content generated based on the "REQUIRED STRUCTURE" above.
          Data Format: { value: string }.
-         Example: "You met Emmy in Japan when she was 3. She is passionate about tennis and plays the violin. She has a close friend named Sarah."
       
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
+      
+      Input Text: "${text}"
     `;
 
     const completion = await openai.chat.completions.create({
