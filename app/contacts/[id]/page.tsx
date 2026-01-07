@@ -253,6 +253,24 @@ export default function ContactDetailPage({
     await handleImportanceChange(newImportance as any);
   };
 
+  const handleLastContactChange = async (date: string, method: string) => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await (supabase as any).from("persons").update({
+        last_contact_date: date,
+        last_contact_method: method
+      }).eq("id", id).eq("user_id", user.id);
+
+      setContact({ ...contact, last_contact_date: date, last_contact_method: method });
+      toast.success("Last contact updated");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update last contact");
+    }
+  };
 
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Loading profile...</div></div>;
