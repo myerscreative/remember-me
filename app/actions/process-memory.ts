@@ -75,8 +75,8 @@ export async function processMemory(contactId: string, text: string) {
     } = person;
 
     // Normalize arrays
-    let currentFamily = Array.isArray(family_members) ? family_members : [];
-    let currentInterests = Array.isArray(interests) ? interests : [];
+    let currentFamily: any[] = Array.isArray(family_members) ? family_members : [];
+    let currentInterests: string[] = Array.isArray(interests) ? interests : [];
 
     // 3. Process extractions
     for (const item of extractions) {
