@@ -140,65 +140,72 @@ export function OverviewTab({ contact }: OverviewTabProps) {
             </h2>
           </div>
           
-          {/* Content or Empty State */}
+          {/* Content or Empty State with Integrated Input */}
           {contact.deep_lore || contact.where_met || contact.ai_summary ? (
-            <div className="space-y-4">
-              {/* Where We Met */}
-              {contact.where_met && (
-                <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                  <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3" />
-                    Where We Met
-                  </p>
-                  <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-                    {contact.where_met}
-                  </p>
-                </div>
-              )}
-              
-              {/* Deep Lore / Shared Memories */}
-              {contact.deep_lore && (
-                <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                  <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                    Shared Memories
-                  </p>
-                  <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
-                    {contact.deep_lore}
-                  </p>
-                </div>
-              )}
-              
-              {/* AI Summary (if different from deep_lore) */}
-              {contact.ai_summary && contact.ai_summary !== contact.deep_lore && (
-                <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
-                  <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                    Quick Summary
-                  </p>
-                  <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-                    {contact.ai_summary}
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-indigo-400 dark:text-indigo-500" />
+            <>
+              <div className="space-y-4 mb-6">
+                {/* Where We Met */}
+                {contact.where_met && (
+                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
+                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3" />
+                      Where We Met
+                    </p>
+                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                      {contact.where_met}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Deep Lore / Shared Memories */}
+                {contact.deep_lore && (
+                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
+                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
+                      Shared Memories
+                    </p>
+                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                      {contact.deep_lore}
+                    </p>
+                  </div>
+                )}
+                
+                {/* AI Summary (if different from deep_lore) */}
+                {contact.ai_summary && contact.ai_summary !== contact.deep_lore && (
+                  <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/30">
+                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
+                      Quick Summary
+                    </p>
+                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                      {contact.ai_summary}
+                    </p>
+                  </div>
+                )}
               </div>
-              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                No story yet
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Use the memory capture below to add important details about {contact.name?.split(' ')[0] || 'this person'}. 
-                Share where you met, memorable moments, or anything that helps you remember your connection.
-              </p>
+              
+              {/* Memory Capture - Below content */}
+              <div className="pt-4 border-t border-indigo-200/50 dark:border-indigo-900/30">
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mb-3 uppercase tracking-wider">
+                  Add More Memories
+                </p>
+                <MemoryCapture contactId={contact.id} />
+              </div>
+            </>
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center py-4">
+                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  No story yet
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                  Start building {contact.name?.split(' ')[0] || 'this person'}'s story. 
+                  Share where you met, memorable moments, or anything that helps you remember your connection.
+                </p>
+              </div>
+              
+              {/* Memory Capture - Integrated in empty state */}
+              <MemoryCapture contactId={contact.id} />
             </div>
           )}
-        </section>
-
-        {/* Memory Prompt */}
-        <section>
-             <MemoryCapture contactId={contact.id} />
         </section>
 
         {/* Tags & Interests Grid */}
