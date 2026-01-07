@@ -30,21 +30,25 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false;
-        recognitionRef.current.interimResults = false;
+        recognitionRef.current.continuous = true; // Keep listening until manually stopped
+        recognitionRef.current.interimResults = true; // Show results as user speaks
         recognitionRef.current.lang = 'en-US';
 
         recognitionRef.current.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          setInput(prev => prev ? `${prev} ${transcript}` : transcript);
-          setIsListening(false);
-          inputRef.current?.focus();
+          // Capture all results, not just the first one
+          let transcript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          setInput(transcript);
         };
 
         recognitionRef.current.onerror = (event: any) => {
           console.error('Speech recognition error', event.error);
           setIsListening(false);
-          toast.error('Voice capture failed. Please try again.');
+          if (event.error !== 'no-speech') {
+            toast.error('Voice capture failed. Please try again.');
+          }
         };
 
         recognitionRef.current.onend = () => {
@@ -131,7 +135,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
 
         {/* Label */}
         <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-          {isListening ? "Listening..." : isProcessing ? "Processing..." : "Add important info"}
+          {isListening ? "Click again to stop" : isProcessing ? "Processing..." : "Add important info"}
         </p>
 
         {/* Text Display Area - Shows when there's input or listening */}
