@@ -406,27 +406,20 @@ export default function GardenPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto px-4 py-8">
         
-        {/* Header */}
-        <div className="mb-6">
-          <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-4 transition-colors">
+        {/* Header - Compact on mobile */}
+        <div className="mb-4 md:mb-6">
+          <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-3 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
           </Link>
           <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">🍃 Relationship Garden</h1>
-              <p className="text-slate-500 dark:text-slate-400">Click a health status to see contacts in that group</p>
-            </div>
-            
-            {/* Mobile Controls Position (Visible only on mobile) */}
-            <div className="md:hidden w-full flex flex-col items-center gap-1 bg-white/50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-2">
-               <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Showing</div>
-               <div className="text-lg font-black text-slate-800 dark:text-slate-200">
-                 {categoryFilter === 'all' ? 'All Contacts' : categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
-               </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">🍃 Relationship Garden</h1>
+              <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 hidden md:block">Click a health status to see contacts in that group</p>
             </div>
 
-            <div className="flex items-center gap-2 self-end md:self-start w-full md:w-auto justify-end">
+            {/* Desktop-only view controls */}
+            <div className="hidden md:flex items-center gap-2">
               <Link
                 href="/triage"
                 className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
@@ -437,8 +430,8 @@ export default function GardenPage() {
               <button
                 onClick={() => setViewMode('garden')}
                 className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'garden' 
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                  viewMode === 'garden'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
                     : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 title="Garden View"
@@ -448,8 +441,8 @@ export default function GardenPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'list' 
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                  viewMode === 'list'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
                     : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 title="List View"
@@ -459,8 +452,8 @@ export default function GardenPage() {
               <button
                 onClick={() => setViewMode('graph')}
                 className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'graph' 
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700' 
+                  viewMode === 'graph'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
                     : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 title="Network Graph"
@@ -471,182 +464,405 @@ export default function GardenPage() {
           </div>
         </div>
 
-        {/* Health Status Bar (clickable filters) */}
-        <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setHealthFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                healthFilter === 'all'
-                  ? 'bg-slate-900 dark:bg-slate-700 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              All ({contacts.length})
-            </button>
-            
-            {(Object.keys(healthConfig) as Array<keyof typeof healthConfig>).map((status) => {
-              const config = healthConfig[status];
-              const count = stats[status];
-              return (
-                <button
-                  key={status}
-                  onClick={() => setHealthFilter(status)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    healthFilter === status
-                      ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-500 dark:ring-offset-[#1e293b]'
-                      : 'hover:opacity-80'
-                  }`}
-                  style={{ 
-                    backgroundColor: healthFilter === status ? config.color : `${config.color}20`,
-                    color: healthFilter === status ? 'white' : config.color
-                  }}
-                >
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: config.color }}
-                  />
-                  {config.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Category Filters */}
-        <CategoryFilters 
-          currentFilter={categoryFilter} 
-          onFilterChange={setCategoryFilter} 
-          counts={categoryCounts}
-        />
-
-        {/* Main Content */}
-        <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 pb-10 transition-colors">
-          
-            {viewMode === 'garden' && healthFilter === 'all' && (
-              <div className="flex flex-col lg:flex-row gap-6 items-start max-w-[1280px] mx-auto justify-center">
-              <div className="flex-1 w-full min-w-0">
-                <RelationshipGarden 
-                  contacts={filteredContacts} 
-                  filter={categoryFilter} 
-                  onContactClick={(contact) => {
-                    const extendedContact = contacts.find(c => c.id === contact.id);
-                    if (extendedContact) {
-                      setSelectedContactForModal(extendedContact);
-                    }
-                  }}
-                  onQuickLog={handleQuickLog}
-                  hoveredContactId={hoveredContactId}
-                />
-              </div>
-              
-              <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0 h-full">
-                <NurtureSidebar 
-                  contacts={contacts} 
-                  onQuickLog={handleQuickLog} 
-                  onHover={setHoveredContactId}
-                />
-                <GardenLegend />
-              </div>
+        {/* MOBILE: Garden First, Filters Below */}
+        <div className="md:hidden">
+          {/* Garden View */}
+          {viewMode === 'garden' && healthFilter === 'all' && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
+              <RelationshipGarden
+                contacts={filteredContacts}
+                filter={categoryFilter}
+                onContactClick={(contact) => {
+                  const extendedContact = contacts.find(c => c.id === contact.id);
+                  if (extendedContact) {
+                    setSelectedContactForModal(extendedContact);
+                  }
+                }}
+                onQuickLog={handleQuickLog}
+                hoveredContactId={hoveredContactId}
+              />
             </div>
           )}
 
-          {/* List View or Filtered Health View */}
+          {/* Filters & Controls Section */}
+          <div className="space-y-3 mb-4">
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+              <button
+                onClick={() => setViewMode('garden')}
+                className={`flex-1 py-2 rounded-lg border transition-colors ${
+                  viewMode === 'garden'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <LayoutGrid className="w-5 h-5 mx-auto" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex-1 py-2 rounded-lg border transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <List className="w-5 h-5 mx-auto" />
+              </button>
+              <button
+                onClick={() => setViewMode('graph')}
+                className={`flex-1 py-2 rounded-lg border transition-colors ${
+                  viewMode === 'graph'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <Share2 className="w-5 h-5 mx-auto" />
+              </button>
+            </div>
+
+            {/* Health Status Filters - Compact */}
+            <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Health Status</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setHealthFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    healthFilter === 'all'
+                      ? 'bg-slate-900 dark:bg-slate-700 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  All ({contacts.length})
+                </button>
+                {(Object.keys(healthConfig) as Array<keyof typeof healthConfig>).map((status) => {
+                  const config = healthConfig[status];
+                  const count = stats[status];
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => setHealthFilter(status)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all`}
+                      style={{
+                        backgroundColor: healthFilter === status ? config.color : `${config.color}20`,
+                        color: healthFilter === status ? 'white' : config.color
+                      }}
+                    >
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
+                      {config.label} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Category Filters */}
+            <CategoryFilters
+              currentFilter={categoryFilter}
+              onFilterChange={setCategoryFilter}
+              counts={categoryCounts}
+            />
+
+            {/* Triage Link */}
+            <Link
+              href="/triage"
+              className="block text-center px-4 py-3 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors font-medium"
+            >
+              🚨 Triage Mode
+            </Link>
+
+            {/* Nurture Sidebar */}
+            {viewMode === 'garden' && healthFilter === 'all' && (
+              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+                <NurtureSidebar
+                  contacts={contacts}
+                  onQuickLog={handleQuickLog}
+                  onHover={setHoveredContactId}
+                />
+              </div>
+            )}
+
+            {/* Legend */}
+            {viewMode === 'garden' && healthFilter === 'all' && (
+              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+                <GardenLegend />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* DESKTOP: Original Layout */}
+        <div className="hidden md:block">
+          {/* Health Status Bar (clickable filters) */}
+          <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => setHealthFilter('all')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  healthFilter === 'all'
+                    ? 'bg-slate-900 dark:bg-slate-700 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                All ({contacts.length})
+              </button>
+
+              {(Object.keys(healthConfig) as Array<keyof typeof healthConfig>).map((status) => {
+                const config = healthConfig[status];
+                const count = stats[status];
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setHealthFilter(status)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      healthFilter === status
+                        ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-500 dark:ring-offset-[#1e293b]'
+                        : 'hover:opacity-80'
+                    }`}
+                    style={{
+                      backgroundColor: healthFilter === status ? config.color : `${config.color}20`,
+                      color: healthFilter === status ? 'white' : config.color
+                    }}
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: config.color }}
+                    />
+                    {config.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Category Filters */}
+          <CategoryFilters
+            currentFilter={categoryFilter}
+            onFilterChange={setCategoryFilter}
+            counts={categoryCounts}
+          />
+
+          {/* Main Content */}
+          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 pb-10 transition-colors">
+
+            {viewMode === 'garden' && healthFilter === 'all' && (
+              <div className="flex flex-col lg:flex-row gap-6 items-start max-w-[1280px] mx-auto justify-center">
+                <div className="flex-1 w-full min-w-0">
+                  <RelationshipGarden
+                    contacts={filteredContacts}
+                    filter={categoryFilter}
+                    onContactClick={(contact) => {
+                      const extendedContact = contacts.find(c => c.id === contact.id);
+                      if (extendedContact) {
+                        setSelectedContactForModal(extendedContact);
+                      }
+                    }}
+                    onQuickLog={handleQuickLog}
+                    hoveredContactId={hoveredContactId}
+                  />
+                </div>
+
+                <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0 h-full">
+                  <NurtureSidebar
+                    contacts={contacts}
+                    onQuickLog={handleQuickLog}
+                    onHover={setHoveredContactId}
+                  />
+                  <GardenLegend />
+                </div>
+              </div>
+            )}
+
+            {/* List View or Filtered Health View */}
+            {(viewMode === 'list' || healthFilter !== 'all') && (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                    {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
+                    <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
+                  </h3>
+                </div>
+
+                {filteredContacts.length === 0 ? (
+                  <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                    No contacts in this category
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {filteredContacts.map(contact => {
+                      const status = getHealthStatus(contact.days);
+                      const config = healthConfig[status];
+                      return (
+                        <div
+                          key={contact.dbId}
+                          onClick={() => window.location.href = `/contacts/${contact.dbId}`}
+                          className="group py-4 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/40 transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <div className="flex items-center gap-4">
+                            {/* Status indicator */}
+                            <div
+                              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                              style={{ backgroundColor: config.color }}
+                            >
+                              {contact.initials}
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                  {contact.name}
+                                </span>
+
+                                {/* Connect Now Button */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const extendedContact = contacts.find(c => c.id === contact.id);
+                                    if (extendedContact) setSelectedContactForModal(extendedContact);
+                                  }}
+                                  className="hidden group-hover:inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                                >
+                                  Connect Now
+                                </button>
+                              </div>
+
+                              <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                                <span>{contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`}</span>
+                                <span>•</span>
+                                <span className="capitalize">{contact.category}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Controls */}
+                          <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                            {/* Importance Selector */}
+                            <select
+                              value={contact.importance || 'medium'}
+                              onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
+                              disabled={updatingId === contact.dbId}
+                              className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-600 dark:text-slate-300"
+                            >
+                              <option value="high">⭐ High</option>
+                              <option value="medium">🔹 Medium</option>
+                              <option value="low">▫️ Casual</option>
+                            </select>
+
+                            {/* Health Status Selector */}
+                            <div className="flex items-center gap-2">
+                              {updatingId === contact.dbId ? (
+                                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                              ) : (
+                                <select
+                                  value={status}
+                                  onChange={(e) => setHealthStatus(contact, e.target.value as 'blooming' | 'nourished' | 'thirsty' | 'fading')}
+                                  className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  style={{
+                                    color: config.color,
+                                    borderColor: config.color + '40'
+                                  }}
+                                >
+                                  <option value="blooming" style={{ color: '#22c55e' }}>🟢 Blooming</option>
+                                  <option value="nourished" style={{ color: '#84cc16' }}>🟡 Nourished</option>
+                                  <option value="thirsty" style={{ color: '#eab308' }}>🟠 Thirsty</option>
+                                  <option value="fading" style={{ color: '#f97316' }}>🔴 Fading</option>
+                                </select>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Graph View */}
+            {viewMode === 'graph' && (
+              <div>
+                <NetworkGraphView
+                  contacts={filteredContacts}
+                  relationships={relationships}
+                  onNodeClick={(id) => window.location.href = `/contacts/${id}`}
+                />
+              </div>
+            )}
+
+            {/* Stats (only in garden view with no health filter) */}
+            {viewMode === 'garden' && healthFilter === 'all' && (
+              <GardenStats stats={stats} />
+            )}
+
+            {/* Vertical spacing for bottom of list view */}
+            {viewMode === 'list' && (
+              <div className="h-4"></div>
+            )}
+          </div>
+        </div>
+
+        {/* MOBILE: List and Graph views */}
+        <div className="md:hidden">
           {(viewMode === 'list' || healthFilter !== 'all') && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center mb-4">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+              <div className="mb-4">
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
                   {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
                   <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
                 </h3>
               </div>
-              
+
               {filteredContacts.length === 0 ? (
                 <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                   No contacts in this category
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="space-y-3">
                   {filteredContacts.map(contact => {
                     const status = getHealthStatus(contact.days);
                     const config = healthConfig[status];
                     return (
-                      <div 
-                        key={contact.dbId} 
+                      <div
+                        key={contact.dbId}
                         onClick={() => window.location.href = `/contacts/${contact.dbId}`}
-                        className="group py-4 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/40 transition-colors flex items-center justify-between cursor-pointer"
+                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
                       >
-                        <div className="flex items-center gap-4">
-                          {/* Status indicator */}
-                          <div 
+                        <div className="flex items-start gap-3 mb-2">
+                          <div
                             className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                             style={{ backgroundColor: config.color }}
                           >
                             {contact.initials}
                           </div>
-                          
-                          <div>
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                {contact.name}
-                              </span>
-                              
-                              {/* Connect Now Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const extendedContact = contacts.find(c => c.id === contact.id);
-                                  if (extendedContact) setSelectedContactForModal(extendedContact);
-                                }}
-                                className="hidden group-hover:inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-                              >
-                                Connect Now
-                              </button>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-slate-800 dark:text-slate-200 truncate">
+                              {contact.name}
                             </div>
-                            
-                            <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                              <span>{contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`}</span>
-                              <span>•</span>
-                              <span className="capitalize">{contact.category}</span>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`} • {contact.category}
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Controls */}
-                        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                          {/* Importance Selector */}
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                           <select
                             value={contact.importance || 'medium'}
                             onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
                             disabled={updatingId === contact.dbId}
-                            className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-600 dark:text-slate-300"
+                            className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800"
                           >
                             <option value="high">⭐ High</option>
                             <option value="medium">🔹 Medium</option>
                             <option value="low">▫️ Casual</option>
                           </select>
-
-                          {/* Health Status Selector */}
-                          <div className="flex items-center gap-2">
-                            {updatingId === contact.dbId ? (
-                              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                            ) : (
-                              <select
-                                value={status}
-                                onChange={(e) => setHealthStatus(contact, e.target.value as 'blooming' | 'nourished' | 'thirsty' | 'fading')}
-                                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                style={{ 
-                                  color: config.color,
-                                  borderColor: config.color + '40'
-                                }}
-                              >
-                                <option value="blooming" style={{ color: '#22c55e' }}>🟢 Blooming</option>
-                                <option value="nourished" style={{ color: '#84cc16' }}>🟡 Nourished</option>
-                                <option value="thirsty" style={{ color: '#eab308' }}>🟠 Thirsty</option>
-                                <option value="fading" style={{ color: '#f97316' }}>🔴 Fading</option>
-                              </select>
-                            )}
-                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const extendedContact = contacts.find(c => c.id === contact.id);
+                              if (extendedContact) setSelectedContactForModal(extendedContact);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium"
+                          >
+                            Connect
+                          </button>
                         </div>
                       </div>
                     );
@@ -656,14 +872,22 @@ export default function GardenPage() {
             </div>
           )}
 
-          {/* Stats (only in garden view with no health filter) */}
-          {viewMode === 'garden' && healthFilter === 'all' && (
-            <GardenStats stats={stats} />
+          {/* Graph View on Mobile */}
+          {viewMode === 'graph' && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+              <NetworkGraphView
+                contacts={filteredContacts}
+                relationships={relationships}
+                onNodeClick={(id) => window.location.href = `/contacts/${id}`}
+              />
+            </div>
           )}
 
-          {/* Vertical spacing for bottom of list view */}
-          {viewMode === 'list' && (
-            <div className="h-4"></div>
+          {/* Stats on Mobile */}
+          {viewMode === 'garden' && healthFilter === 'all' && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+              <GardenStats stats={stats} />
+            </div>
           )}
         </div>
       </div>
