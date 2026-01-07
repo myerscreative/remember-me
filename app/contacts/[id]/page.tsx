@@ -277,6 +277,14 @@ export default function ContactDetailPage({
             contact={contact} 
             onFrequencyChange={handleFrequencyChange}
             onImportanceChange={handleImportanceChange}
+            onContactAction={(method) => {
+                 setLogInitialMethod(method === 'text' ? 'text' : method === 'email' ? 'email' : 'call');
+                 setIsLogModalOpen(true);
+            }}
+            onLastContactChange={handleLastContactChange}
+            onPhotoUpdate={(newUrl) => {
+                setContact(prev => ({ ...prev, photo_url: newUrl }));
+            }}
         />
       </div>
 

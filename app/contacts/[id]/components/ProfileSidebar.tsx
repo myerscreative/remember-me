@@ -1,10 +1,10 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import toast from 'react-hot-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat, Info, Edit2 } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat, Info, Edit2, Camera, Loader2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
@@ -35,11 +35,14 @@ interface ProfileSidebarProps {
   onImportanceChange?: (importance: ContactImportance) => void;
   onContactAction?: (method: 'call' | 'email' | 'text') => void;
   onLastContactChange?: (date: string, method: string) => void;
+  onPhotoUpdate?: (url: string) => void;
 }
 
-export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange, onContactAction, onLastContactChange }: ProfileSidebarProps) {
+export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange, onContactAction, onLastContactChange, onPhotoUpdate }: ProfileSidebarProps) {
   const initials = ((contact.firstName?.[0] || "") + (contact.lastName?.[0] || "")).toUpperCase();
   const fullName = `${contact.firstName} ${contact.lastName || ""}`.trim();
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to format date
   const formatDate = (dateStr?: string) => {
@@ -62,17 +65,103 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
     return method ? `${date} via ${method}` : date;
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+    }
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image must be less than 5MB');
+        return;
+    }
+
+    setIsUploading(true);
+    const supabase = createClient();
+
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${contact.id}-${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // 1. Upload to Storage
+        const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // 2. Get Public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+
+        // 3. Update Database
+        const { error: dbError } = await (supabase as any)
+            .from('persons')
+            .update({ photo_url: publicUrl })
+            .eq('id', contact.id);
+
+        if (dbError) throw dbError;
+
+        toast.success("Profile photo updated");
+        onPhotoUpdate?.(publicUrl);
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        toast.error('Failed to update photo');
+    } finally {
+        setIsUploading(false);
+        // Reset input
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto px-8 py-8">
       {/* 1. Profile Photo */}
       <div className="flex flex-col items-center">
-        <div className="relative mb-6 group">
-          <Avatar className="h-[160px] w-[160px] border-[3px] border-[#6366f1] shadow-[0_4px_12px_rgba(99,102,241,0.15)]">
-            <AvatarImage src={contact.photo_url || ""} className="object-cover" />
-            <AvatarFallback className="text-4xl bg-gray-100 dark:bg-gray-800 text-gray-400">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+        <div className="relative mb-6 group cursor-pointer" onClick={handleAvatarClick}>
+          
+          <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*"
+              onChange={handleFileChange}
+          />
+
+          <div className="relative">
+              <Avatar className={cn(
+                  "h-[160px] w-[160px] border-[3px] border-[#6366f1] shadow-[0_4px_12px_rgba(99,102,241,0.15)] transition-all duration-300",
+                  isUploading && "opacity-50"
+              )}>
+                <AvatarImage src={contact.photo_url || ""} className="object-cover" />
+                <AvatarFallback className="text-4xl bg-gray-100 dark:bg-gray-800 text-gray-400">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Upload Overlay */}
+              <div className={cn(
+                  "absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                  isUploading && "opacity-100 bg-black/50"
+              )}>
+                  {isUploading ? (
+                      <Loader2 className="w-8 h-8 text-white animate-spin" />
+                  ) : (
+                      <Camera className="w-8 h-8 text-white drop-shadow-md" />
+                  )}
+              </div>
+          </div>
         </div>
 
         {/* 2. Name & Title */}
