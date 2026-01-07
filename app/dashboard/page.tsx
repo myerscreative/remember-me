@@ -175,12 +175,12 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background pb-16 md:pb-0 overflow-x-hidden">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1600px] mx-auto w-full px-4 py-6 space-y-6">
+        <div className="max-w-[1600px] mx-auto w-full px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
           
             {/* Mobile Header (Simplified) */}
-            <div className="flex md:hidden items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <Activity className="h-6 w-6 text-purple-600" />
+            <div className="flex md:hidden items-center justify-between mb-3">
+                <h1 className="text-xl font-bold flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-purple-600" />
                     Dashboard
                 </h1>
                 <Button
@@ -188,11 +188,11 @@ export default function DashboardPage() {
                     variant={isTriageActive ? "default" : "outline"}
                     size="sm"
                     className={cn(
-                        "rounded-full font-bold uppercase tracking-tighter text-[10px] h-8 px-3 gap-2",
+                        "rounded-full font-bold uppercase tracking-tighter text-[10px] h-7 px-2.5 gap-1.5",
                         isTriageActive ? "bg-orange-600" : "border-orange-200 text-orange-600"
                     )}
                 >
-                    {isTriageActive ? "Exit Triage" : "Triage Mode"}
+                    {isTriageActive ? "Exit" : "Triage"}
                 </Button>
             </div>
 
@@ -217,10 +217,10 @@ export default function DashboardPage() {
             
             // MAIN 3-COLUMN GRID
             <div className="flex flex-col lg:grid lg:grid-cols-[250px_1fr_350px] gap-6 items-start">
-            
-              {/* COLUMN 1: SIDEBAR RAIL (250px) */}
-              <div className="space-y-6 lg:sticky lg:top-6">
-                 
+
+              {/* COLUMN 1: SIDEBAR RAIL (250px) - Hidden on Mobile */}
+              <div className="hidden lg:block space-y-6 lg:sticky lg:top-6">
+
                  {/* Quick Actions */}
                  <div className="space-y-2">
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Actions</h3>
@@ -283,14 +283,36 @@ export default function DashboardPage() {
               </div>
 
               {/* COLUMN 2: MAIN CENTER (Auto) */}
-              <div className="space-y-6 min-w-0">
-                  
+              <div className="space-y-6 min-w-0 w-full">
+
+                  {/* Mobile Quick Stats - Only visible on mobile */}
+                  <div className="lg:hidden grid grid-cols-3 gap-3">
+                      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+                          <CardContent className="p-3 text-center">
+                              <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Total</div>
+                              <div className="text-2xl font-black text-purple-900 dark:text-purple-100">{stats?.totalContacts || 0}</div>
+                          </CardContent>
+                      </Card>
+                      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+                          <CardContent className="p-3 text-center">
+                              <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Context</div>
+                              <div className="text-2xl font-black text-blue-900 dark:text-blue-100">{stats?.withContext || 0}</div>
+                          </CardContent>
+                      </Card>
+                      <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
+                          <CardContent className="p-3 text-center">
+                              <div className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">Neglected</div>
+                              <div className="text-2xl font-black text-red-900 dark:text-red-100">{stats?.needingAttention || 0}</div>
+                          </CardContent>
+                      </Card>
+                  </div>
+
                   {/* Critical Drifters (Urgent) */}
                   <CriticalNudges />
 
                   {/* Daily Practice */}
                   <DailyPracticeWidget />
-                  
+
                   {/* Weekly Briefing (Automated Context Summary) */}
                   <WeeklyBriefing />
 
@@ -304,8 +326,8 @@ export default function DashboardPage() {
 
               </div>
 
-              {/* COLUMN 3: DATA RIGHT (350px) */}
-              <div className="space-y-4 lg:sticky lg:top-6">
+              {/* COLUMN 3: DATA RIGHT (350px) - Hidden on Mobile, Shows below main content */}
+              <div className="space-y-4 lg:sticky lg:top-6 w-full lg:w-auto">
                  
                  {/* Relationship Health Card (Map + Stats) */}
                  {/* Relationship Health Card (Map + Stats) */}

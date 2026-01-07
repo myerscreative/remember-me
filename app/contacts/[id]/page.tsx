@@ -291,70 +291,70 @@ export default function ContactDetailPage({
          />
 
          {/* MOBILE HEADER (Visible < 768px) */}
-         <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white min-h-[300px] rounded-b-[2.5rem] p-6 shadow-xl relative overflow-hidden">
+         <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-b-[2rem] p-4 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('/noise.png')]"></div>
-            
+
             {/* Top Bar Mobile */}
-            <div className="flex justify-between items-center relative z-10 mb-8">
+            <div className="flex justify-between items-center relative z-10 mb-4">
                 <Link href="/">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full">
-                        <ArrowLeft className="h-6 w-6" />
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full h-8 w-8">
+                        <ArrowLeft className="h-5 w-5" />
                     </Button>
                 </Link>
-                <div className="flex gap-2 relative z-10">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
+                <div className="flex gap-1.5 relative z-10">
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         className={cn(
-                          "hover:bg-white/10 rounded-full transition-all duration-200",
+                          "h-8 w-8 hover:bg-white/10 rounded-full transition-all duration-200",
                           contact.importance === 'high' ? "text-amber-400" : "text-white"
                         )}
                         onClick={handleToggleFavorite}
                     >
-                        <Star className={cn("h-5 w-5", contact.importance === 'high' && "fill-amber-400")} />
+                        <Star className={cn("h-4 w-4", contact.importance === 'high' && "fill-amber-400")} />
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-white hover:bg-white/10 rounded-full"
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-white hover:bg-white/10 rounded-full"
                         onClick={() => setIsEditMode(!isEditMode)}
                     >
-                        {isEditMode ? <Check className="h-5 w-5" /> : <Edit className="h-5 w-5" />}
+                        {isEditMode ? <Check className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
                     </Button>
                 </div>
             </div>
 
             {/* Mobile Profile Info */}
             <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="mb-4 relative">
-                    <Avatar className="h-28 w-28 border-4 border-white/30 shadow-2xl">
+                <div className="mb-3 relative">
+                    <Avatar className="h-20 w-20 border-4 border-white/30 shadow-2xl">
                         <AvatarImage src={contact.photo_url} className="object-cover" />
-                        <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
+                        <AvatarFallback className="text-xl bg-indigo-700 text-white/50">
                             {(contact.firstName?.[0] || "")}
                         </AvatarFallback>
                     </Avatar>
                 </div>
-                
+
                 {isEditMode ? (
                      <div className="flex gap-2 mb-2">
-                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-9" placeholder="First" />
-                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-9" placeholder="Last" />
-                        <Button size="sm" onClick={handleSaveName} className="bg-white text-indigo-600 h-9 w-9 p-0"><Check className="h-4 w-4" /></Button>
+                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-8 text-sm" placeholder="First" />
+                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-8 text-sm" placeholder="Last" />
+                        <Button size="sm" onClick={handleSaveName} className="bg-white text-indigo-600 h-8 w-8 p-0"><Check className="h-3.5 w-3.5" /></Button>
                      </div>
                 ) : (
-                    <h1 className="text-2xl font-bold mb-1">{contact.firstName} {contact.lastName}</h1>
+                    <h1 className="text-xl font-bold mb-1">{contact.firstName} {contact.lastName}</h1>
                 )}
 
-                <p className="text-indigo-100 text-sm mb-6">{contact.linkedin || "Contact"}</p>
-                
+                <p className="text-indigo-100 text-xs mb-3">{contact.linkedin || "Contact"}</p>
+
                 {/* Mobile Frequency Selector */}
-                <div className="mb-6 flex justify-center w-full px-8">
-                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1 flex items-center gap-2 px-3 border border-white/20">
-                      <Repeat className="w-3.5 h-3.5 text-indigo-100" />
-                      <select 
+                <div className="mb-3 flex justify-center w-full">
+                   <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex items-center gap-1.5 px-2.5 border border-white/20">
+                      <Repeat className="w-3 h-3 text-indigo-100" />
+                      <select
                         value={contact.target_frequency_days || 30}
                         onChange={(e) => handleFrequencyChange(parseInt(e.target.value))}
-                        className="bg-transparent text-white text-sm focus:outline-none appearance-none cursor-pointer text-center font-medium"
+                        className="bg-transparent text-white text-xs focus:outline-none appearance-none cursor-pointer text-center font-medium"
                       >
                          {FREQUENCY_PRESETS.map(preset => (
                             <option key={preset.days} value={preset.days} className="text-gray-900">
@@ -364,14 +364,14 @@ export default function ContactDetailPage({
                       </select>
                    </div>
                 </div>
-                
+
                 {/* Mobile Actions */}
-                <div className="flex items-center gap-3 w-full max-w-xs mx-auto">
-                    <Button className="flex-1 bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg font-semibold rounded-xl h-11">
-                        <Phone className="h-4 w-4 mr-2" /> Call
+                <div className="flex items-center gap-2 w-full max-w-xs mx-auto">
+                    <Button className="flex-1 bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg font-semibold rounded-lg h-9 text-sm">
+                        <Phone className="h-3.5 w-3.5 mr-1.5" /> Call
                     </Button>
-                    <Button className="flex-1 bg-indigo-700/50 text-white hover:bg-indigo-700/70 border-0 shadow-lg backdrop-blur-sm rounded-xl h-11">
-                        <Mail className="h-4 w-4 mr-2" /> Email
+                    <Button className="flex-1 bg-indigo-700/50 text-white hover:bg-indigo-700/70 border-0 shadow-lg backdrop-blur-sm rounded-lg h-9 text-sm">
+                        <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
                     </Button>
                 </div>
             </div>
@@ -379,18 +379,18 @@ export default function ContactDetailPage({
 
 
          {/* SCROLLABLE CONTENT */}
-         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar overflow-x-hidden">
+         <main className="flex-1 p-3 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar overflow-x-hidden">
 
             {/* TAB NAVIGATION */}
-            <div className="flex items-center gap-8 border-b border-border/50 mb-8 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-6 md:gap-8 border-b border-border/50 mb-6 md:mb-8 overflow-x-auto scrollbar-hide">
                 {tabs.map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={cn(
-                            "pb-3 text-[15px] font-medium transition-all relative whitespace-nowrap",
-                            activeTab === tab 
-                                ? "text-primary dark:text-primary" 
+                            "pb-2.5 md:pb-3 text-sm md:text-[15px] font-medium transition-all relative whitespace-nowrap",
+                            activeTab === tab
+                                ? "text-primary dark:text-primary"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
                     >

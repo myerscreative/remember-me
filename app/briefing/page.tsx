@@ -89,15 +89,15 @@ export default function BriefingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
-      <div className="max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
-        
+      <div className="max-w-3xl mx-auto w-full px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
+
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
+        <div className="flex items-center gap-3 md:gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8 md:h-10 md:w-10">
+            <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+          <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
+            <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
             Daily Briefing
           </h1>
         </div>

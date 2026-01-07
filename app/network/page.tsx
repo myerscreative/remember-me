@@ -121,19 +121,19 @@ export default function NetworkPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        
+    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
+
         {/* Header Area */}
-        <div className="text-center space-y-4 pt-8 pb-4 relative">
-          <div className="absolute top-4 right-0">
+        <div className="text-center space-y-3 md:space-y-4 pt-4 md:pt-8 pb-3 md:pb-4 relative">
+          <div className="absolute top-2 md:top-4 right-0">
             <TutorialButton onClick={() => setShowTutorial(true)} />
           </div>
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+          <h1 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             {selectedDomainGroup ? selectedDomainGroup.domain.name : 'Tribe Search'}
           </h1>
           {!selectedDomainGroup && !searchTerm && (
-              <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto">
+              <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-lg mx-auto px-4">
                 Discover connections, nurture groups, and see your network as a living ecosystem.
               </p>
           )}
