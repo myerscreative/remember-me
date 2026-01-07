@@ -2,7 +2,6 @@
 
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
-import type { Person } from '@/types/database.types';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -19,16 +18,27 @@ export async function processMemory(contactId: string, text: string) {
 
     // 1. Analyze text with OpenAI
     const prompt = `
-      Analyze the following text about a person and categorize it.
+      Analyze the following text about a person and extract relevant information into supported categories.
       
       Text: "${text}"
       
-      Rules:
-      1. If it describes a location where people met or an origin story, category is "WHERE_WE_MET". Value is the location/origin.
-      2. If it describes a hobby, interest, sport, or like, category is "INTEREST". Value is the specific interest (noun).
-      3. Otherwise, category is "STORY". Value is the full text.
+      Supported Categories:
+      1. FAMILY: Use this when family members are mentioned. 
+         Data Format: { name: string, relationship: string, birthday?: string, hobbies?: string, interests?: string }.
+         Example: "His wife Mary likes gardening" -> { category: "FAMILY", data: { name: "Mary", relationship: "Wife", hobbies: "Gardening" } }
       
-      Return JSON: { "category": "...", "value": "..." }
+      2. INTEREST: Use this for hobbies, sports, likes, or topics of interest.
+         Data Format: { value: string }.
+         Example: "He loves playing golf" -> { category: "INTEREST", data: { value: "Golf" } }
+         
+      3. WHERE_WE_MET: Use this for origin stories or meeting locations.
+         Data Format: { value: string }.
+         Example: "We met at high school" -> { category: "WHERE_WE_MET", data: { value: "High School" } }
+         
+      4. STORY: Use this for general memories, stories, or deep lore that doesn't fit other categories.
+         Data Format: { value: string }.
+      
+      Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
     `;
 
     const completion = await openai.chat.completions.create({
@@ -38,78 +48,90 @@ export async function processMemory(contactId: string, text: string) {
     });
 
     const result = JSON.parse(completion.choices[0].message.content || '{}');
-    const { category, value } = result;
+    const extractions = result.extractions || [];
 
-    if (!category || !value) {
-      return { success: false, error: 'Failed to analyze text' };
+    if (extractions.length === 0) {
+        // Fallback to basic story if nothing extracted
+        extractions.push({ category: "STORY", data: { value: text } });
     }
 
-    // 2. Routing Logic
-    let fieldUpdated = '';
+    const fieldsUpdated: string[] = [];
 
-    // Note: TypeScript type inference issue with Supabase client - using @ts-expect-error pragmas
-    // The Database types are correctly defined but the client chain returns 'never' incorrectly
-    if (category === 'WHERE_WE_MET') {
-      const { error } = await supabase
+    // 2. Fetch current person data
+    const { data: person, error: fetchError } = await supabase
         .from('persons')
-        // @ts-expect-error - Supabase type inference issue with chained queries
-        .update({ where_met: value })
+        .select('*')
         .eq('id', contactId)
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
-      fieldUpdated = 'Where We Met';
-    } 
-    else if (category === 'INTEREST') {
-      // Fetch current interests first to append
-      const { data: person } = await supabase
-        .from('persons')
-        .select('interests')
-        .eq('id', contactId)
-        .single() as { data: Pick<Person, 'interests'> | null; error: unknown };
+        .eq('user_id', user.id)
+        .single();
         
-      const currentInterests = person?.interests || [];
-      // Avoid duplicates
-      const newInterests = currentInterests.includes(value) 
-        ? currentInterests 
-        : [...currentInterests, value];
+    if (fetchError || !person) throw new Error("Person not found");
 
-      const { error } = await supabase
-        .from('persons')
-        // @ts-expect-error - Supabase type inference issue with chained queries
-        .update({ interests: newInterests })
-        .eq('id', contactId)
-        .eq('user_id', user.id);
+    let { 
+        family_members, 
+        interests, 
+        where_met, 
+        deep_lore
+    } = person;
 
-      if (error) throw error;
-      fieldUpdated = 'Interests';
-    } 
-    else {
-      // Default to "Points of Interest" (what_found_interesting)
-      // We should probably append to it if it exists, or just overwrite?
-      // "Add it as a new note" implies appending.
-      
-      const { data: person } = await supabase
-        .from('persons')
-        .select('what_found_interesting')
-        .eq('id', contactId)
-        .single() as { data: Pick<Person, 'what_found_interesting'> | null; error: unknown };
+    // Normalize arrays
+    let currentFamily = Array.isArray(family_members) ? family_members : [];
+    let currentInterests = Array.isArray(interests) ? interests : [];
 
-      const currentNotes = person?.what_found_interesting || '';
-      const newNotes = currentNotes ? `${currentNotes}\n\n${value}` : value;
-
-      const { error } = await supabase
-        .from('persons')
-        // @ts-expect-error - Supabase type inference issue with chained queries
-        .update({ what_found_interesting: newNotes })
-        .eq('id', contactId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      fieldUpdated = 'Points of Interest';
+    // 3. Process extractions
+    for (const item of extractions) {
+        const { category, data } = item;
+        
+        switch (category) {
+            case 'FAMILY':
+                // Check if member already exists (simple name check)
+                const exists = currentFamily.some((m: any) => m.name?.toLowerCase() === data.name?.toLowerCase());
+                if (!exists) {
+                    currentFamily.push(data);
+                    fieldsUpdated.push('Family');
+                }
+                break;
+            case 'INTEREST':
+                if (data.value && !currentInterests.includes(data.value)) {
+                    currentInterests.push(data.value);
+                    fieldsUpdated.push('Interests');
+                }
+                break;
+            case 'WHERE_WE_MET':
+                where_met = data.value;
+                fieldsUpdated.push('Where We Met');
+                break;
+            case 'STORY':
+                // Append to deep_lore
+                const newStory = data.value;
+                deep_lore = deep_lore ? `${deep_lore}\n\n${newStory}` : newStory;
+                fieldsUpdated.push('Story');
+                break;
+        }
     }
 
-    return { success: true, field: fieldUpdated, value };
+    if (fieldsUpdated.length === 0) {
+        return { success: true, field: 'No changes', value: '' };
+    }
+
+    // 4. Update Person
+    const { error } = await supabase
+        .from('persons')
+        .update({
+            family_members: currentFamily,
+            interests: currentInterests,
+            where_met: where_met,
+            deep_lore: deep_lore,
+        })
+        .eq('id', contactId);
+
+    if (error) throw error;
+
+    return { 
+        success: true, 
+        field: fieldsUpdated.join(', '), 
+        value: extractions.map((e: any) => e.data.value || e.data.name).join(', ') 
+    };
 
   } catch (error) {
     console.error('Error processing memory:', error);

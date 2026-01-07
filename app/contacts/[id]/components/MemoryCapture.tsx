@@ -19,7 +19,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
   // Speech Recognition Setup
@@ -98,7 +98,8 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // Prevent default new line
         handleSubmit();
     }
   };
@@ -113,14 +114,21 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
            <Sparkles className={cn("w-5 h-5 shrink-0 transition-colors", input ? "text-indigo-400" : "text-[#9ca3af] group-hover:text-indigo-500 dark:group-hover:text-indigo-400")} />
 
            {/* Input Field */}
-           <Input 
-              ref={inputRef}
+           <textarea
+              ref={inputRef as any}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Add important info to your memory..."
-              className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 text-base placeholder:text-[#9ca3af] dark:placeholder:text-gray-500 h-10 px-2"
+              rows={1}
+              className="flex-1 border-0 bg-transparent shadow-none focus:ring-0 text-base placeholder:text-[#9ca3af] dark:placeholder:text-gray-500 min-h-[40px] px-2 resize-none py-2 leading-6"
               disabled={isProcessing}
+              style={{ overflow: 'hidden' }}
+              onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+              }}
            />
 
            {/* Info Popover */}
