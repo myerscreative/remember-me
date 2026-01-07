@@ -109,7 +109,8 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     if (fieldsUpdated.length === 0) {
-        return { success: true, field: 'No changes', value: '' };\n    }
+        return { success: true, field: 'No changes', value: '' };
+    }
 
     // 4. Update Person
     const { error } = await (supabase as any)
