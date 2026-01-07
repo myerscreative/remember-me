@@ -2,6 +2,7 @@
 
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
+import type { Person } from '@/types/database.types';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -58,14 +59,17 @@ export async function processMemory(contactId: string, text: string) {
     const fieldsUpdated: string[] = [];
 
     // 2. Fetch current person data
-    const { data: person, error: fetchError } = await supabase
+    const { data: personData, error: fetchError } = await supabase
         .from('persons')
         .select('*')
         .eq('id', contactId)
         .eq('user_id', user.id)
         .single();
         
-    if (fetchError || !person) throw new Error("Person not found");
+    if (fetchError || !personData) throw new Error("Person not found");
+    
+    // Explicit cast to fix TypeScript 'never' inference
+    const person = personData as unknown as Person;
 
     let currentFamily: any[] = Array.isArray(person.family_members) ? person.family_members : [];
     let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];
