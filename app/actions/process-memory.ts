@@ -109,8 +109,7 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     if (fieldsUpdated.length === 0) {
-        return { success: true, field: 'No changes', value: '' };
-    }
+        return { success: true, field: 'No changes', value: '' };\n    }
 
     // 4. Update Person
     const { error } = await (supabase as any)
@@ -121,9 +120,13 @@ export async function processMemory(contactId: string, text: string) {
             where_met: where_met,
             deep_lore: deep_lore,
         })
-        .eq('id', contactId);
+        .eq('id', contactId)
+        .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
 
-    if (error) throw error;
+    if (error) {
+        console.error('Error updating person:', error);
+        throw error;
+    }
 
     return { 
         success: true, 
@@ -133,6 +136,9 @@ export async function processMemory(contactId: string, text: string) {
 
   } catch (error) {
     console.error('Error processing memory:', error);
-    return { success: false, error: 'Failed to process memory' };
+    return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to process memory' 
+    };
   }
 }
