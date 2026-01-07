@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { ProfileSidebar } from "./components/ProfileSidebar";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { OverviewTab } from "./components/tabs/OverviewTab";
+import { AvatarCropModal } from "./components/AvatarCropModal";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
 import { ContactImportance } from "@/types/database.types";
@@ -54,6 +55,11 @@ export default function ContactDetailPage({
   // Log Interaction Modal State
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [logInitialMethod, setLogInitialMethod] = useState<InteractionType | undefined>(undefined);
+
+  // Avatar Crop Modal State
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string>('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Check searchParams for action trigger
   useEffect(() => {
@@ -272,6 +278,67 @@ export default function ContactDetailPage({
     }
   };
 
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setIsCropModalOpen(false);
+    setIsUploadingAvatar(true);
+    console.log('Starting avatar upload, blob size:', croppedBlob.size);
+
+    const supabase = createClient();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('No user found');
+        toast.error('Not authenticated');
+        return;
+      }
+
+      const fileName = `${contact.id}-${Date.now()}.jpg`;
+      const filePath = `${fileName}`;
+
+      console.log('Uploading to Supabase Storage, path:', filePath);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, croppedBlob, {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful, getting public URL');
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      console.log('Public URL:', publicUrl);
+
+      const { error: dbError } = await (supabase as any)
+        .from('persons')
+        .update({ photo_url: publicUrl })
+        .eq('id', contact.id)
+        .eq('user_id', user.id);
+
+      if (dbError) {
+        console.error('Database update error:', dbError);
+        throw dbError;
+      }
+
+      console.log('Avatar updated successfully');
+      toast.success("Profile photo updated");
+      setContact({ ...contact, photo_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Failed to update photo: ' + (error as any).message);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Loading profile...</div></div>;
   }
@@ -353,12 +420,19 @@ export default function ContactDetailPage({
             {/* Mobile Profile Info */}
             <div className="relative z-10 flex flex-col items-center text-center">
                 <div className="mb-3 relative group cursor-pointer" onClick={() => {
+                    if (isUploadingAvatar) return;
+                    
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
-                    input.onchange = async (e: any) => {
+                    input.onchange = (e: any) => {
                         const file = e.target?.files?.[0];
-                        if (!file) return;
+                        if (!file) {
+                            console.log('No file selected');
+                            return;
+                        }
+
+                        console.log('File selected:', file.name, file.type, file.size);
 
                         if (!file.type.startsWith('image/')) {
                             toast.error('Please upload an image file');
@@ -370,35 +444,18 @@ export default function ContactDetailPage({
                             return;
                         }
 
-                        const supabase = createClient();
-                        try {
-                            const fileExt = file.name.split('.').pop();
-                            const fileName = `${contact.id}-${Math.random()}.${fileExt}`;
-                            const filePath = `${fileName}`;
-
-                            const { error: uploadError } = await supabase.storage
-                                .from('avatars')
-                                .upload(filePath, file);
-
-                            if (uploadError) throw uploadError;
-
-                            const { data: { publicUrl } } = supabase.storage
-                                .from('avatars')
-                                .getPublicUrl(filePath);
-
-                            const { error: dbError } = await (supabase as any)
-                                .from('persons')
-                                .update({ photo_url: publicUrl })
-                                .eq('id', contact.id);
-
-                            if (dbError) throw dbError;
-
-                            toast.success("Profile photo updated");
-                            setContact({ ...contact, photo_url: publicUrl });
-                        } catch (error) {
-                            console.error('Error uploading avatar:', error);
-                            toast.error('Failed to update photo');
-                        }
+                        // Read file and show crop modal
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            console.log('File read successfully, opening crop modal');
+                            setSelectedImageSrc(reader.result as string);
+                            setIsCropModalOpen(true);
+                        };
+                        reader.onerror = () => {
+                            console.error('Error reading file');
+                            toast.error('Failed to read image');
+                        };
+                        reader.readAsDataURL(file);
                     };
                     input.click();
                 }}>
@@ -539,6 +596,14 @@ export default function ContactDetailPage({
             onSuccess={handleRefresh}
           />
       )}
+
+      {/* Avatar Crop Modal */}
+      <AvatarCropModal
+        open={isCropModalOpen}
+        imageSrc={selectedImageSrc}
+        onClose={() => setIsCropModalOpen(false)}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 }
