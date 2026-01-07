@@ -67,16 +67,10 @@ export async function processMemory(contactId: string, text: string) {
         
     if (fetchError || !person) throw new Error("Person not found");
 
-    let { 
-        family_members, 
-        interests, 
-        where_met, 
-        deep_lore
-    } = person;
-
-    // Normalize arrays
-    let currentFamily: any[] = Array.isArray(family_members) ? family_members : [];
-    let currentInterests: string[] = Array.isArray(interests) ? interests : [];
+    let currentFamily: any[] = Array.isArray(person.family_members) ? person.family_members : [];
+    let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];
+    let where_met: string | null = person.where_met;
+    let deep_lore: string | null = person.deep_lore;
 
     // 3. Process extractions
     for (const item of extractions) {
