@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, ChevronRight } from "lucide-react";
+import { AlertCircle, ChevronRight, Cake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getGradient, getInitials } from "@/lib/utils/contact-helpers";
+import { getGradient, getInitials, formatBirthday } from "@/lib/utils/contact-helpers";
 import { getMethodIcon, getLastSeenText } from "@/lib/utils/interaction-utils";
 import { UnifiedActionHub } from "@/components/dashboard/UnifiedActionHub";
 import { getRelationshipStatus } from "@/app/network/utils/relationshipStatus";
@@ -98,22 +98,31 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                     setIsSharedMemoryOpen(true);
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8 border-2 border-background shadow-sm">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar className="h-8 w-8 border-2 border-background shadow-sm shrink-0">
                     <AvatarImage src={contact.photo_url} />
                     <AvatarFallback className={cn("text-[10px] text-white", getGradient(contact.name || ""))}>
                       {getInitials(contact.first_name, contact.last_name)}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-bold text-xs text-foreground leading-tight">{contact.name}</p>
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-xs text-foreground leading-tight truncate">{contact.name}</p>
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1 opacity-75">
                         {getMethodIcon(contact.last_interaction_method)}
                         {contact.last_interaction_method || 'Contacted'}
                       </span>
                       <span>•</span>
                       <span>{getLastSeenText(contact.last_interaction_date)}</span>
+                      {contact.birthday && (
+                        <>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:flex items-center gap-1 text-pink-500/80">
+                            <Cake className="h-3 w-3" />
+                            {formatBirthday(contact.birthday)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

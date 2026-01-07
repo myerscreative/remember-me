@@ -141,18 +141,18 @@ export function SearchResultCard({
           )}
           
           {isCompactView && (
-            <div className="flex gap-4 text-xs text-gray-500 ml-auto items-center">
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-auto items-end sm:items-center shrink-0">
                {birthday && (
-                  <div className="hidden sm:flex items-center gap-1" title="Birthday">
-                    <Cake size={12} className="text-pink-400" />
-                    <span>{birthday}</span>
+                  <div className="flex items-center gap-1" title="Birthday">
+                    <Cake size={12} className="text-pink-400 shrink-0" />
+                    <span className="whitespace-nowrap">{birthday}</span>
                   </div>
                )}
-                <div className="hidden sm:flex items-center gap-1" title="Last Contact">
-                   <CalendarDays size={12} className="text-gray-400" />
-                   <span>{lastContact || "-"}</span>
+                <div className="flex items-center gap-1" title="Last Contact">
+                   <CalendarDays size={12} className="text-gray-400 shrink-0" />
+                   <span className="whitespace-nowrap">{lastContact || "No contact yet"}</span>
                 </div>
-               <ChevronRight size={16} className="text-gray-300" />
+               <ChevronRight size={16} className="text-gray-300 hidden sm:block" />
             </div>
           )}
         </div>
