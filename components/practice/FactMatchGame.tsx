@@ -183,10 +183,10 @@ export function FactMatchGame({ onBack }: FactMatchGameProps) {
         isActive={isPlaying}
     >
       {/* Game Card */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        
+      <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+
         {/* Question Header */}
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 md:p-12 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-8 md:p-12 flex flex-col items-center text-center relative overflow-hidden">
              
              {/* Background Decoration */}
              <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
@@ -194,10 +194,10 @@ export function FactMatchGame({ onBack }: FactMatchGameProps) {
                 <div className="absolute bottom-10 right-10 transform rotate-12"><Heart size={100} /></div>
              </div>
 
-             <div className="bg-white p-6 rounded-full shadow-lg mb-6 relative z-10">
+             <div className="bg-white dark:bg-gray-800 p-6 rounded-full shadow-lg mb-6 relative z-10">
                  {renderIcon()}
              </div>
-             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight relative z-10 max-w-lg">
+             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight relative z-10 max-w-lg">
                 {renderPrompt()}
              </h2>
         </div>
@@ -209,18 +209,18 @@ export function FactMatchGame({ onBack }: FactMatchGameProps) {
                     const isSelected = gameState.selectedOption === option.id;
                     const isTarget = gameState.question?.target.id === option.id;
                     
-                    let buttonStyle = "bg-white border-2 border-gray-100 hover:border-pink-300 hover:bg-pink-50";
+                    let buttonStyle = "bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/30 text-gray-900 dark:text-white";
                     let icon: React.ReactNode = null;
 
                     if (gameState.selectedOption) {
                         if (isTarget) {
-                            buttonStyle = "bg-green-100 border-2 border-green-500 text-green-800";
-                            icon = <CheckCircle size={20} className="text-green-600" />;
+                            buttonStyle = "bg-green-100 dark:bg-green-900/40 border-2 border-green-500 dark:border-green-600 text-green-800 dark:text-green-300";
+                            icon = <CheckCircle size={20} className="text-green-600 dark:text-green-400" />;
                         } else if (isSelected && !isTarget) {
-                            buttonStyle = "bg-red-50 border-2 border-red-200 text-red-800";
-                            icon = <XCircle size={20} className="text-red-500" />;
+                            buttonStyle = "bg-red-50 dark:bg-red-900/40 border-2 border-red-200 dark:border-red-600 text-red-800 dark:text-red-300";
+                            icon = <XCircle size={20} className="text-red-500 dark:text-red-400" />;
                         } else {
-                            buttonStyle = "bg-gray-50 border-gray-100 text-gray-400 opacity-50";
+                            buttonStyle = "bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-600 opacity-50";
                         }
                     }
 

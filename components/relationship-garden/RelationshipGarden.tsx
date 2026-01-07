@@ -147,6 +147,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         const newZoom = Math.min(Math.max(touchStartRef.current.zoom * ratio, 25), 150);
         setZoom(newZoom);
       } else if (e.touches.length === 1 && isDragging) {
+          e.preventDefault(); // Prevent page scroll while dragging garden
           setPanOffset({
             x: e.touches[0].clientX - dragStart.x,
             y: e.touches[0].clientY - dragStart.y

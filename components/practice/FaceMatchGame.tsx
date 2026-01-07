@@ -139,10 +139,10 @@ export function FaceMatchGame({ onBack }: FaceMatchGameProps) {
         isActive={isPlaying}
     >
       {/* Game Card */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        
+      <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+
         {/* Photo Section */}
-        <div className="h-64 bg-gray-100 relative flex items-center justify-center overflow-hidden">
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 relative flex items-center justify-center overflow-hidden">
              {roundState.target.photo ? (
                  <img 
                     src={roundState.target.photo} 
@@ -169,7 +169,7 @@ export function FaceMatchGame({ onBack }: FaceMatchGameProps) {
 
         {/* Question */}
         <div className="p-8">
-            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
+            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">
                 Who is this?
             </h2>
 
@@ -178,15 +178,15 @@ export function FaceMatchGame({ onBack }: FaceMatchGameProps) {
                     const isSelected = roundState.selectedOption === option.id;
                     const isTarget = roundState.target?.id === option.id;
                     
-                    let buttonStyle = "bg-white border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50";
-                    
+                    let buttonStyle = "bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-900 dark:text-white";
+
                     if (roundState.selectedOption) {
                         if (isTarget) {
-                            buttonStyle = "bg-green-100 border-2 border-green-500 text-green-800";
+                            buttonStyle = "bg-green-100 dark:bg-green-900/40 border-2 border-green-500 dark:border-green-600 text-green-800 dark:text-green-300";
                         } else if (isSelected && !isTarget) {
-                            buttonStyle = "bg-red-50 border-2 border-red-200 text-red-800";
+                            buttonStyle = "bg-red-50 dark:bg-red-900/40 border-2 border-red-200 dark:border-red-600 text-red-800 dark:text-red-300";
                         } else {
-                            buttonStyle = "bg-gray-50 border-gray-100 text-gray-400 opacity-50";
+                            buttonStyle = "bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-600 opacity-50";
                         }
                     }
 
@@ -206,7 +206,7 @@ export function FaceMatchGame({ onBack }: FaceMatchGameProps) {
         
         {/* Footer / Next Button */}
         {roundState.selectedOption && (
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center animate-in slide-in-from-bottom-4 fade-in">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-center animate-in slide-in-from-bottom-4 fade-in">
                 <Button 
                     onClick={startNextRound} 
                     size="lg" 
