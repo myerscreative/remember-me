@@ -62,7 +62,7 @@ export function SearchResultCard({
     <Link href={`/contacts/${contact.id}`}>
       <div 
         className={cn(
-          "group relative bg-white dark:bg-[#1e1e2dCC] border border-gray-200 dark:border-gray-700/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 w-full p-5 backdrop-blur-sm",
+          "group relative bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-700/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 w-full p-5 backdrop-blur-sm",
           isCompactView && "flex items-center p-3 gap-3"
         )}
       >
@@ -104,7 +104,7 @@ export function SearchResultCard({
                     {!isCompactView && onConnect && (
                         <button
                             onClick={handleConnectClick}
-                            className="shrink-0 bg-indigo-500/15 border border-indigo-500/25 text-indigo-600 dark:text-indigo-200 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold flex items-center gap-1.5 hover:bg-indigo-500/25 hover:border-indigo-500/40 hover:text-indigo-700 dark:hover:text-indigo-100 transition-all z-20"
+                            className="shrink-0 bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-200 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold flex items-center gap-1.5 hover:bg-indigo-500/20 dark:hover:bg-indigo-500/30 hover:border-indigo-500/50 hover:text-indigo-700 dark:hover:text-indigo-100 transition-all z-20"
                         >
                             Connect <ArrowRight className="w-3 h-3 opacity-70" />
                         </button>
@@ -135,7 +135,7 @@ export function SearchResultCard({
                         {tags.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3 mb-1">
                                 {tags.slice(0, 3).map(tag => (
-                                <Badge key={tag} variant="secondary" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
+                                <Badge key={tag} variant="secondary" className="bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-200 border border-indigo-500/20 text-[11px] h-6 px-2 rounded-md font-medium hover:bg-indigo-500/20 dark:hover:bg-indigo-500/30 transition-colors">
                                     {tag}
                                 </Badge>
                                 ))}
