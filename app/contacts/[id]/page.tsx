@@ -22,6 +22,7 @@ import { OverviewTab } from "./components/tabs/OverviewTab";
 import { AvatarCropModal } from "./components/AvatarCropModal";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
+import { MobileProfileHeader } from "@/app/contacts/[id]/components/MobileProfileHeader";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
@@ -384,137 +385,61 @@ export default function ContactDetailPage({
          />
 
          {/* MOBILE HEADER (Visible < 768px) */}
-         <div className="md:hidden bg-[#6366f1] text-white pt-4 pb-4 px-4 shadow-xl relative overflow-hidden">
-            
-            {/* Top Bar Mobile */}
-            <div className="flex justify-between items-center relative z-10 mb-4">
-                <Link href="/">
-                    <Button variant="ghost" size="icon" className="text-white bg-white/20 hover:bg-white/30 rounded-xl h-10 w-10 backdrop-blur-sm border border-white/10">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
-                
-                <div className="flex gap-3 relative z-10">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          "h-10 w-10 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-sm border border-white/10 transition-all duration-200",
-                          contact.importance === 'high' ? "text-amber-300 bg-amber-400/20 border-amber-400/30" : "text-white"
-                        )}
-                        onClick={handleToggleFavorite}
-                    >
-                        <Star className={cn("h-5 w-5", contact.importance === 'high' && "fill-amber-300")} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-10 w-10 text-white bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-sm border border-white/10"
-                        onClick={() => setIsEditMode(!isEditMode)}
-                    >
-                        {isEditMode ? <Check className="h-5 w-5" /> : <Edit className="h-5 w-5" />}
-                    </Button>
-                </div>
-            </div>
-
-            {/* Mobile Profile Info */}
-            <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="mb-3 relative group cursor-pointer" onClick={() => {
-                    if (isUploadingAvatar) return;
+         <MobileProfileHeader
+            contact={contact}
+            isEditMode={isEditMode}
+            onToggleEditMode={() => setIsEditMode(!isEditMode)}
+            onSaveName={async (first, last) => {
+                try {
+                    const supabase = createClient();
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if(!user) return;
                     
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e: any) => {
-                        const file = e.target?.files?.[0];
-                        if (!file) {
-                            console.log('No file selected');
-                            return;
-                        }
-                        if (!file.type.startsWith('image/')) {
-                            toast.error('Please upload an image file');
-                            return;
-                        }
-                        if (file.size > 5 * 1024 * 1024) {
-                            toast.error('Image must be less than 5MB');
-                            return;
-                        }
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            setSelectedImageSrc(reader.result as string);
-                            setIsCropModalOpen(true);
-                        };
-                        reader.readAsDataURL(file);
+                    const fullName = `${first} ${last}`.trim();
+                    await (supabase as any).from("persons").update({
+                        first_name: first,
+                        last_name: last,
+                        name: fullName
+                    }).eq("id", id).eq("user_id", user.id);
+                    
+                    setContact({...contact, firstName: first, lastName: last, name: fullName});
+                    setIsEditMode(false);
+                    toast.success("Name updated");
+                } catch {
+                    toast.error("Failed to update name");
+                }
+            }}
+            onToggleFavorite={handleToggleFavorite}
+            onAvatarClick={() => {
+                if (isUploadingAvatar) return;
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e: any) => {
+                    const file = e.target?.files?.[0];
+                    if (!file) {
+                        return;
+                    }
+                    if (!file.type.startsWith('image/')) {
+                        toast.error('Please upload an image file');
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        toast.error('Image must be less than 5MB');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        setSelectedImageSrc(reader.result as string);
+                        setIsCropModalOpen(true);
                     };
-                    input.click();
-                }}>
-                    <Avatar className="h-[90px] w-[90px] border-[3px] border-white/30 shadow-xl transition-all duration-300 hover:scale-105">
-                        <AvatarImage src={contact.photo_url} className="object-cover" />
-                        <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
-                            {(contact.firstName?.[0] || "")}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <Camera className="w-6 h-6 text-white drop-shadow-md" />
-                    </div>
-                </div>
-
-                {isEditMode ? (
-                     <div className="flex gap-2 mb-3">
-                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-28 h-9 text-base font-bold" placeholder="First Name" />
-                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-28 h-9 text-base font-bold" placeholder="Last Name" />
-                        <Button size="icon" onClick={handleSaveName} className="bg-white text-[#6366f1] h-9 w-9 rounded-lg"><Check className="h-4 w-4" /></Button>
-                     </div>
-                ) : (
-                    <div className="flex flex-col items-center gap-1 mb-3 w-full">
-                        <div className="flex items-center justify-center flex-wrap gap-2 px-4">
-                            <h1 className="text-2xl font-semibold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>
-                            
-                            {/* Frequency Badge - Inline Compact */}
-                             <div className="relative group">
-                                <span className={cn(
-                                    "text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full border border-white/15 flex items-center gap-1 transition-colors backdrop-blur-sm",
-                                    contact.current_health === 'neglected' ? "bg-rose-500/30 text-white border-rose-300/40" : "bg-white/20 text-white"
-                                )}>
-                                    <RefreshCw className="w-3 h-3 opacity-70" />
-                                    {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly"}
-                                </span>
-                                <select
-                                    value={contact.target_frequency_days || 30}
-                                    onChange={(e) => handleFrequencyChange(parseInt(e.target.value))}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    title="Change Frequency"
-                                >
-                                    {FREQUENCY_PRESETS.map(preset => (
-                                    <option key={preset.days} value={preset.days} className="text-gray-900">
-                                        {preset.label}
-                                    </option>
-                                    ))}
-                                </select>
-                             </div>
-                        </div>
-                    </div>
-                )}
-
-
-                {/* Contact Actions (Compact) */}
-                <div className="w-full space-y-2 px-4">
-                   {contact.phone && (
-                        <a href={`tel:${contact.phone}`} className="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/5 font-medium backdrop-blur-sm text-sm active:scale-[0.98]"> 
-                            <Phone className="h-3.5 w-3.5 opacity-80" />
-                            <span>{contact.phone}</span>
-                        </a>
-                   )}
-                   
-                   {contact.email && (
-                        <a href={`mailto:${contact.email}`} className="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/5 font-medium backdrop-blur-sm text-sm active:scale-[0.98]"> 
-                            <Mail className="h-3.5 w-3.5 opacity-80" />
-                            <span>{contact.email}</span>
-                        </a>
-                   )}
-                </div>
-                </div>
-            </div>
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            }}
+            onFrequencyChange={handleFrequencyChange}
+          />
 
 
          {/* SCROLLABLE CONTENT */}

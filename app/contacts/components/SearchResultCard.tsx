@@ -18,7 +18,8 @@ interface SearchResultCardProps {
 }
 
 import { getRelationshipHealth } from "@/lib/conversation-helpers";
-import { ArrowRight } from "lucide-react";
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
+import { ArrowRight, RefreshCw } from "lucide-react";
 
 // ... existing imports ...
 
@@ -121,6 +122,12 @@ export function SearchResultCard({
                         )}>
                              <CalendarDays size={14} className={cn("shrink-0", !lastContact && "opacity-70")} />
                              <span>{lastContact ? `Last contacted: ${lastContact}` : "No contact yet"}</span>
+                             {contact.target_frequency_days && (
+                                <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/5">
+                                    <RefreshCw size={10} className="opacity-70" />
+                                    {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Custom"}
+                                </span>
+                             )}
                         </div>
 
                         {/* Birthday Row */}
@@ -160,6 +167,11 @@ export function SearchResultCard({
                         )}>
                         {lastContact || "No contact"}
                      </span>
+                     {contact.target_frequency_days && (
+                       <span className="text-[10px] text-gray-400">
+                         {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label}
+                       </span>
+                     )}
                 </div>
             )}
         </div>

@@ -4,9 +4,10 @@ import { Person } from '@/types/database.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { CalendarDays, Cake } from 'lucide-react';
+import { CalendarDays, Cake, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { getRelationshipStatus } from '../utils/relationshipStatus';
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 
@@ -81,6 +82,12 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
                <div className="flex items-center gap-1">
                  <CalendarDays className="h-3 w-3 opacity-70" />
                  <span>{lastContact || 'No contact'}</span>
+                 {contact.target_frequency_days && (
+                   <span className="flex items-center gap-1 bg-black/5 dark:bg-white/10 px-1 rounded text-[9px] font-bold uppercase tracking-wider">
+                      <RefreshCw className="h-2.5 w-2.5 opacity-60" />
+                      {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Custom"}
+                   </span>
+                 )}
                </div>
                
                {/* Birthday */}
