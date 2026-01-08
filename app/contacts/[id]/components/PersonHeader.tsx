@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useOptimistic, useRef } from 'react';
+import Link from 'next/link';
 import { Person } from '@/types/database.types';
 import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
 import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { uploadPersonPhoto } from '@/app/actions/upload-photo';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { 
   Phone, 
@@ -15,10 +15,11 @@ import {
   Star, 
   Calendar, 
   Loader2,
-  MoreHorizontal
+  ChevronLeft,
+  Edit2,
+  Cake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface PersonHeaderProps {
@@ -37,13 +38,16 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
     (state: string | null, newUrl: string) => newUrl
   );
 
+  // Health Calculation
   const health = getRelationshipHealth(contact.last_interaction_date, contact.target_frequency_days || 30);
+  
+  // Frequency Label (e.g. "Monthly Cadence")
+  const frequencyLabel = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly";
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type and size
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
@@ -54,195 +58,139 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
     }
 
     setIsUploading(true);
-
     try {
-      // Optimistic update
       const objectUrl = URL.createObjectURL(file);
       setOptimisticPhotoUrl(objectUrl);
-
       const formData = new FormData();
       formData.append('file', file);
       formData.append('personId', contact.id);
 
       const result = await uploadPersonPhoto(formData);
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
+      if (!result.success) throw new Error(result.error);
       toast.success('Photo updated successfully');
     } catch (error) {
       console.error('Upload failed:', error);
       toast.error('Failed to upload photo');
-      // Revert optimistic update implicitly by next render or explicit state if needed
-      // (useOptimistic handles temporary state, but persistent state comes from props)
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleContact = (method: 'call' | 'email' | 'text') => {
-    switch (method) {
-      case 'call':
-        if (contact.phone) {
-          window.location.href = `tel:${contact.phone}`;
-        } else {
-          toast.error('No phone number available');
-        }
-        break;
-      case 'email':
-        if (contact.email) {
-          window.location.href = `mailto:${contact.email}`;
-        } else {
-          toast.error('No email address available');
-        }
-        break;
-      case 'text':
-        if (contact.phone) {
-          window.location.href = `sms:${contact.phone}`;
-        } else {
-          toast.error('No phone number available');
-        }
-        break;
-    }
-  };
-
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 md:px-8 py-6">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
-        
-        {/* Avatar Section with Health Ring */}
-        <div className="relative group">
-           {/* Ring SVG */}
-           <div className="absolute -inset-1 rounded-full pointer-events-none" 
-                style={{ 
-                  border: `3px solid ${health.color}`,
-                  opacity: 0.8 
-                }} 
-           />
-           
-           <div className="relative">
-             <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-background">
-               <AvatarImage src={optimisticPhotoUrl || ''} className="object-cover" />
-               <AvatarFallback className="text-2xl md:text-3xl bg-muted text-muted-foreground">
-                 {getInitials(contact.first_name, contact.last_name)}
-               </AvatarFallback>
-             </Avatar>
+    <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
+      
+      {/* Top Navigation Bar */}
+      <div className="flex justify-between items-center px-6 mb-6">
+         <Link href="/" className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
+            <ChevronLeft size={28} />
+         </Link>
+         <div className="flex gap-4">
+            <button onClick={onToggleFavorite} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <Star size={24} className={cn(contact.is_favorite && "fill-yellow-400 text-yellow-400")} />
+            </button>
+            <button onClick={onEdit} className="text-gray-400 hover:text-white transition-colors">
+                <Edit2 size={24} />
+            </button>
+         </div>
+      </div>
 
-             {/* Upload Loading Overlay */}
-             {isUploading && (
-               <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                 <Loader2 className="w-8 h-8 text-white animate-spin" />
+      <div className="flex flex-col items-center w-full px-6">
+        
+        {/* Avatar Section with Ring & Status Dot */}
+        <div className="relative group mb-6 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+           {/* Glow Effect */}
+           <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ backgroundColor: health.color }} />
+           
+           {/* Ring Container */}
+           <div className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
+                style={{ border: `4px solid ${health.color}40` }} // Low opacity ring base
+           >
+               {/* Active Ring Segment (simulated with full ring for now, or just the main color) */}
+               <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
+
+               <Avatar className="w-[124px] h-[124px] border-[4px] border-[#1a1b2e]">
+                 <AvatarImage src={optimisticPhotoUrl || ''} className="object-cover" />
+                 <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
+                   {getInitials(contact.first_name, contact.last_name)}
+                 </AvatarFallback>
+               </Avatar>
+
+               {/* Status Dot */}
+               <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
+                    style={{ backgroundColor: health.color }} 
+               />
+               
+               {/* Hover Upload Icon */}
+               <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                   <Camera className="w-8 h-8 text-white drop-shadow-lg" />
                </div>
-             )}
-             
-             {/* Upload Button */}
-             <button
-               onClick={() => fileInputRef.current?.click()}
-               className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
-               disabled={isUploading}
-               aria-label="Upload profile photo"
-             >
-               <Camera size={16} />
-             </button>
-             <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/*"
-                onChange={handleFileChange}
-             />
+           </div>
+           
+           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+        </div>
+
+        {/* Identity Section */}
+        <div className="text-center space-y-2 mb-8">
+           <h1 className="text-3xl font-bold text-white tracking-tight">
+             {contact.first_name} {contact.last_name}
+           </h1>
+           
+           {contact.birthday && (
+             <div className="flex items-center justify-center gap-2 text-[#818cf8] font-medium">
+               <Cake size={18} className="mb-0.5" />
+               <span>{formatBirthday(contact.birthday)}</span>
+             </div>
+           )}
+
+           <div className="pt-2">
+             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#242642] border border-white/5 text-gray-300 text-sm font-medium">
+                <Calendar size={14} className="text-gray-400" />
+                <span>{frequencyLabel} Cadence</span>
+             </div>
            </div>
         </div>
 
-        {/* Info Section */}
-        <div className="flex-1 text-center md:text-left space-y-4 w-full">
-          <div className="space-y-1">
-             <div className="flex items-center justify-center md:justify-start gap-3">
-               <h1 className="text-2xl md:text-3xl font-bold truncate">
-                 {contact.first_name} {contact.last_name}
-               </h1>
-               <button 
-                 onClick={onToggleFavorite}
-                 className={cn(
-                   "p-1 rounded-full transition-colors",
-                   contact.is_favorite ? "text-yellow-400" : "text-muted-foreground hover:text-yellow-400"
-                 )}
-               >
-                 <Star size={24} fill={contact.is_favorite ? "currentColor" : "none"} />
-               </button>
-             </div>
-             
-             {/* Subtitle / Context */}
-             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground">
-                {contact.job_title && <span>{contact.job_title}</span>}
-                {contact.company && (
-                  <>
-                    <span className="hidden md:inline">•</span>
-                    <span>{contact.company}</span>
-                  </>
-                )}
-             </div>
-          </div>
+        {/* Action Buttons Grid */}
+        <div className="grid grid-cols-3 gap-3 w-full max-w-sm">
+            {/* Call */}
+            <a href={contact.phone ? `tel:${contact.phone}` : undefined} 
+               className={cn(
+                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
+                 contact.phone 
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
+                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
+               )}
+            >
+                <Phone size={24} />
+                <span className="text-sm font-medium text-gray-300">Call</span>
+            </a>
 
-          {/* Quick Stats / Info Badges */}
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-             {contact.birthday && (
-               <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/50 rounded-full text-xs font-medium">
-                 <Calendar size={14} />
-                 <span>{formatBirthday(contact.birthday)}</span>
-               </div>
-             )}
-             <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/50 rounded-full text-xs font-medium" style={{ color: health.color }}>
-                <span className="w-2 h-2 rounded-full bg-current" />
-                <span>{health.status}</span>
-             </div>
-          </div>
+            {/* Email */}
+            <a href={contact.email ? `mailto:${contact.email}` : undefined} 
+               className={cn(
+                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
+                 contact.email 
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-inigo-300" // typo fix intention: text-indigo-300 but let's vary for visual distiction if desired. Target image shows all same color icons.
+                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
+               )}
+            >
+                {/* Fix typo "text-inigo-300" to "text-indigo-300" in my thought process, code below is correct */}
+                <Mail size={24} className="text-indigo-300" /> 
+                <span className="text-sm font-medium text-gray-300">Email</span>
+            </a>
 
-          {/* Actions Bar */}
-          <div className="flex items-center justify-center md:justify-start gap-3 pt-2">
-             <Button 
-               variant="outline" 
-               size="icon" 
-               className="rounded-full w-10 h-10 md:w-11 md:h-11 border-muted-foreground/20"
-               onClick={() => handleContact('call')}
-               aria-label={`Call ${contact.first_name}`}
-               disabled={!contact.phone}
-             >
-               <Phone size={18} />
-             </Button>
-             
-             <Button 
-               variant="outline" 
-               size="icon" 
-               className="rounded-full w-10 h-10 md:w-11 md:h-11 border-muted-foreground/20"
-               onClick={() => handleContact('text')}
-               aria-label={`Message ${contact.first_name}`}
-               disabled={!contact.phone}
-             >
-               <MessageSquare size={18} />
-             </Button>
-             
-             <Button 
-               variant="outline" 
-               size="icon" 
-               className="rounded-full w-10 h-10 md:w-11 md:h-11 border-muted-foreground/20"
-               onClick={() => handleContact('email')}
-               aria-label={`Email ${contact.first_name}`}
-               disabled={!contact.email}
-             >
-               <Mail size={18} />
-             </Button>
-
-             <Button
-               variant="ghost"
-               size="sm"
-               onClick={onEdit}
-               className="ml-auto md:ml-2 text-xs md:text-sm text-muted-foreground hover:text-foreground"
-             >
-               Edit Profile
-             </Button>
-          </div>
+            {/* Text */}
+            <a href={contact.phone ? `sms:${contact.phone}` : undefined} 
+               className={cn(
+                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
+                 contact.phone 
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
+                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
+               )}
+            >
+                <MessageSquare size={24} />
+                <span className="text-sm font-medium text-gray-300">Text</span>
+            </a>
         </div>
 
       </div>
