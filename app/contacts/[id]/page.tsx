@@ -384,35 +384,35 @@ export default function ContactDetailPage({
          />
 
          {/* MOBILE HEADER (Visible < 768px) */}
-         <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-b-[2rem] pt-4 pb-5 px-4 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('/noise.png')]"></div>
-
+         <div className="md:hidden bg-[#6366f1] text-white pt-4 pb-4 px-4 shadow-xl relative overflow-hidden">
+            
             {/* Top Bar Mobile */}
-            <div className="flex justify-between items-center relative z-10 mb-2">
+            <div className="flex justify-between items-center relative z-10 mb-4">
                 <Link href="/">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full h-8 w-8">
+                    <Button variant="ghost" size="icon" className="text-white bg-white/20 hover:bg-white/30 rounded-xl h-10 w-10 backdrop-blur-sm border border-white/10">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                 </Link>
-                <div className="flex gap-1.5 relative z-10">
+                
+                <div className="flex gap-3 relative z-10">
                     <Button
                         variant="ghost"
                         size="icon"
                         className={cn(
-                          "h-8 w-8 hover:bg-white/10 rounded-full transition-all duration-200",
-                          contact.importance === 'high' ? "text-amber-400" : "text-white"
+                          "h-10 w-10 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-sm border border-white/10 transition-all duration-200",
+                          contact.importance === 'high' ? "text-amber-300 bg-amber-400/20 border-amber-400/30" : "text-white"
                         )}
                         onClick={handleToggleFavorite}
                     >
-                        <Star className={cn("h-4 w-4", contact.importance === 'high' && "fill-amber-400")} />
+                        <Star className={cn("h-5 w-5", contact.importance === 'high' && "fill-amber-300")} />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-white hover:bg-white/10 rounded-full"
+                        className="h-10 w-10 text-white bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-sm border border-white/10"
                         onClick={() => setIsEditMode(!isEditMode)}
                     >
-                        {isEditMode ? <Check className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+                        {isEditMode ? <Check className="h-5 w-5" /> : <Edit className="h-5 w-5" />}
                     </Button>
                 </div>
             </div>
@@ -431,64 +431,52 @@ export default function ContactDetailPage({
                             console.log('No file selected');
                             return;
                         }
-
-                        console.log('File selected:', file.name, file.type, file.size);
-
                         if (!file.type.startsWith('image/')) {
                             toast.error('Please upload an image file');
                             return;
                         }
-
                         if (file.size > 5 * 1024 * 1024) {
                             toast.error('Image must be less than 5MB');
                             return;
                         }
-
-                        // Read file and show crop modal
                         const reader = new FileReader();
                         reader.onload = () => {
-                            console.log('File read successfully, opening crop modal');
                             setSelectedImageSrc(reader.result as string);
                             setIsCropModalOpen(true);
-                        };
-                        reader.onerror = () => {
-                            console.error('Error reading file');
-                            toast.error('Failed to read image');
                         };
                         reader.readAsDataURL(file);
                     };
                     input.click();
                 }}>
-                    <Avatar className="h-24 w-24 border-4 border-white/30 shadow-2xl transition-all duration-300 hover:scale-105">
+                    <Avatar className="h-24 w-24 border-[3px] border-white/30 shadow-xl transition-all duration-300 hover:scale-105">
                         <AvatarImage src={contact.photo_url} className="object-cover" />
                         <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
                             {(contact.firstName?.[0] || "")}
                         </AvatarFallback>
                     </Avatar>
-                    {/* Camera overlay hint */}
                     <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <Camera className="w-6 h-6 text-white drop-shadow-md" />
                     </div>
                 </div>
 
                 {isEditMode ? (
-                     <div className="flex gap-2 mb-2">
-                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-8 text-sm" placeholder="First" />
-                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-24 h-8 text-sm" placeholder="Last" />
-                        <Button size="sm" onClick={handleSaveName} className="bg-white text-indigo-600 h-8 w-8 p-0"><Check className="h-3.5 w-3.5" /></Button>
+                     <div className="flex gap-2 mb-3">
+                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-28 h-9 text-base font-bold" placeholder="First Name" />
+                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-28 h-9 text-base font-bold" placeholder="Last Name" />
+                        <Button size="icon" onClick={handleSaveName} className="bg-white text-[#6366f1] h-9 w-9 rounded-lg"><Check className="h-4 w-4" /></Button>
                      </div>
                 ) : (
-                    <div className="flex flex-col items-center gap-1 mb-2">
-                        <div className="flex items-center gap-2 justify-center flex-wrap px-4">
-                            <h1 className="text-xl font-bold leading-tight">{contact.firstName} {contact.lastName}</h1>
-                            <span className="hidden sm:inline text-indigo-200">•</span>
+                    <div className="flex flex-col items-center gap-1 mb-4 w-full">
+                        <div className="flex items-center justify-center flex-wrap gap-2 px-4">
+                            <h1 className="text-xl font-bold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>
                             
-                            {/* Inline Frequency Pill */}
+                            {/* Frequency Badge - Inline Compact */}
                              <div className="relative group">
                                 <span className={cn(
-                                    "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-300/30",
-                                    contact.current_health === 'neglected' ? "bg-rose-500/20 text-rose-100 border-rose-400/30" : "bg-indigo-400/20 text-indigo-100"
+                                    "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20 flex items-center gap-1 transition-colors",
+                                    contact.current_health === 'neglected' ? "bg-rose-500/30 text-white border-rose-300/40" : "bg-white/20 text-white"
                                 )}>
+                                    <RefreshCw className="w-3 h-3 opacity-70" />
                                     {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly"}
                                 </span>
                                 <select
@@ -505,20 +493,26 @@ export default function ContactDetailPage({
                                 </select>
                              </div>
                         </div>
-                        {contact.job_title && (
-                            <p className="text-indigo-200 text-xs font-medium">{contact.job_title}</p>
-                        )}
                     </div>
                 )}
 
 
-                {/* Contact Details (Icons Row) */}
-                <div className="flex items-center justify-center gap-4 mt-1">
+                {/* Contact Actions (Compact) */}
+                <div className="w-full space-y-2 px-4">
                    {contact.phone && (
-                        <a href={`tel:${contact.phone}`} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors border border-white/10"> 
-                            <Phone className="h-4 w-4" />
+                        <a href={`tel:${contact.phone}`} className="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/5 font-medium backdrop-blur-sm text-sm active:scale-[0.98]"> 
+                            <Phone className="h-3.5 w-3.5 opacity-80" />
+                            <span>{contact.phone}</span>
                         </a>
                    )}
+                   
+                   {contact.email && (
+                        <a href={`mailto:${contact.email}`} className="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/5 font-medium backdrop-blur-sm text-sm active:scale-[0.98]"> 
+                            <Mail className="h-3.5 w-3.5 opacity-80" />
+                            <span>{contact.email}</span>
+                        </a>
+                   )}
+                </div>
                    {contact.email && (
                         <a href={`mailto:${contact.email}`} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors border border-white/10">
                             <Mail className="h-4 w-4" />
