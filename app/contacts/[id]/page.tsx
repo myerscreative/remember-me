@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star, Camera } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star, Camera, RefreshCw } from "lucide-react";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
