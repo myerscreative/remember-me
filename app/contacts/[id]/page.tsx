@@ -513,14 +513,8 @@ export default function ContactDetailPage({
                         </a>
                    )}
                 </div>
-                   {contact.email && (
-                        <a href={`mailto:${contact.email}`} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors border border-white/10">
-                            <Mail className="h-4 w-4" />
-                        </a>
-                   )}
                 </div>
             </div>
-         </div>
 
 
          {/* SCROLLABLE CONTENT */}
