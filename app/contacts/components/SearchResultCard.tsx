@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatBirthday, getGradient, getInitialsFromFullName } from "@/lib/utils/contact-helpers";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Star, Link as LinkIcon, CalendarDays, Cake } from "lucide-react";
+import { ChevronRight, Star, Link as LinkIcon, CalendarDays, Cake, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Person } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
@@ -89,14 +89,35 @@ export function SearchResultCard({
         {/* Content */}
         <div className={cn("relative z-10 min-w-0 flex-1", isCompactView ? "" : "px-4 pb-4")}>
           <div className="mb-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {contact.name}
-            </h3>
-            {contact.job_title && !isCompactView && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                {contact.job_title}
-                {contact.company && <span className="text-gray-400"> at {contact.company}</span>}
-              </p>
+            {isCompactView ? (
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-1 min-w-0">
+                  {contact.name}
+                </h3>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // TODO: Open contact dialog/menu
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600/15 dark:bg-indigo-500/15 border border-indigo-500/25 dark:border-indigo-400/25 text-indigo-200 dark:text-indigo-300 rounded-lg text-xs font-semibold hover:bg-indigo-600/25 dark:hover:bg-indigo-500/25 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all whitespace-nowrap shrink-0"
+                >
+                  Connect
+                  <ArrowRight size={12} className="opacity-80" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="font-semibold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {contact.name}
+                </h3>
+                {contact.job_title && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                    {contact.job_title}
+                    {contact.company && <span className="text-gray-400"> at {contact.company}</span>}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
@@ -141,19 +162,35 @@ export function SearchResultCard({
           )}
           
           {isCompactView && (
-            <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-auto items-end sm:items-center shrink-0">
-               {birthday && (
-                  <div className="flex items-center gap-1" title="Birthday">
-                    <Cake size={12} className="text-pink-400 shrink-0" />
-                    <span className="whitespace-nowrap">{birthday}</span>
-                  </div>
-               )}
-                <div className="flex items-center gap-1" title="Last Contact">
-                   <CalendarDays size={12} className="text-gray-400 shrink-0" />
-                   <span className="whitespace-nowrap">{lastContact || "No contact yet"}</span>
+            <>
+              <div className="flex flex-col gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <div className="flex items-center gap-1.5" title="Last Contact">
+                  <CalendarDays size={14} className="text-gray-400 shrink-0" />
+                  <span>{lastContact || "No contact yet"}</span>
                 </div>
-               <ChevronRight size={16} className="text-gray-300 hidden sm:block" />
-            </div>
+                {birthday && (
+                  <div className="flex items-center gap-1.5" title="Birthday">
+                    <Cake size={14} className="text-pink-400 shrink-0" />
+                    <span>{birthday}</span>
+                  </div>
+                )}
+              </div>
+
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.slice(0, 3).map(tag => (
+                    <Badge key={tag} variant="secondary" className="bg-indigo-600/15 dark:bg-indigo-500/15 border border-indigo-500/20 dark:border-indigo-400/20 text-indigo-300 dark:text-indigo-200 text-xs h-6 px-2.5">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {tags.length > 3 && (
+                    <Badge variant="secondary" className="bg-gray-700/50 dark:bg-gray-800/50 text-gray-400 text-xs h-6 px-2.5">
+                      +{tags.length - 3}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
