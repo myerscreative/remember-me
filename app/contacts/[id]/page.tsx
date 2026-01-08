@@ -17,12 +17,12 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { Input } from "@/components/ui/input";
 
 import { ProfileSidebar } from "./components/ProfileSidebar";
-import { ProfileHeader } from "./components/ProfileHeader";
+
 import { OverviewTab } from "./components/tabs/OverviewTab";
 import { AvatarCropModal } from "./components/AvatarCropModal";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
-import { MobileProfileHeader } from "@/app/contacts/[id]/components/MobileProfileHeader";
+import { PersonHeader } from "@/app/contacts/[id]/components/PersonHeader";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
@@ -377,69 +377,11 @@ export default function ContactDetailPage({
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
          
-         {/* DESKTOP HEADER (Hidden on Mobile) */}
-         <ProfileHeader 
-            onEdit={() => setIsEditModalOpen(true)} 
-            importance={contact.importance}
+         <PersonHeader 
+            contact={contact} 
+            onEdit={() => setIsEditModalOpen(true)}
             onToggleFavorite={handleToggleFavorite}
          />
-
-         {/* MOBILE HEADER (Visible < 768px) */}
-         <MobileProfileHeader
-            contact={contact}
-            isEditMode={isEditMode}
-            onToggleEditMode={() => setIsEditMode(!isEditMode)}
-            onSaveName={async (first, last) => {
-                try {
-                    const supabase = createClient();
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if(!user) return;
-                    
-                    const fullName = `${first} ${last}`.trim();
-                    await (supabase as any).from("persons").update({
-                        first_name: first,
-                        last_name: last,
-                        name: fullName
-                    }).eq("id", id).eq("user_id", user.id);
-                    
-                    setContact({...contact, firstName: first, lastName: last, name: fullName});
-                    setIsEditMode(false);
-                    toast.success("Name updated");
-                } catch {
-                    toast.error("Failed to update name");
-                }
-            }}
-            onToggleFavorite={handleToggleFavorite}
-            onAvatarClick={() => {
-                if (isUploadingAvatar) return;
-                
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e: any) => {
-                    const file = e.target?.files?.[0];
-                    if (!file) {
-                        return;
-                    }
-                    if (!file.type.startsWith('image/')) {
-                        toast.error('Please upload an image file');
-                        return;
-                    }
-                    if (file.size > 5 * 1024 * 1024) {
-                        toast.error('Image must be less than 5MB');
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        setSelectedImageSrc(reader.result as string);
-                        setIsCropModalOpen(true);
-                    };
-                    reader.readAsDataURL(file);
-                };
-                input.click();
-            }}
-            onFrequencyChange={handleFrequencyChange}
-          />
 
 
          {/* SCROLLABLE CONTENT */}

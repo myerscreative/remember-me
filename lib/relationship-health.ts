@@ -133,3 +133,8 @@ export const FREQUENCY_PRESETS = [
   { days: 180, label: 'Twice a year' },
   { days: 365, label: 'Yearly' },
 ];
+
+export function getFrequencyLabel(days: number): string {
+  const preset = FREQUENCY_PRESETS.find(p => p.days === days);
+  return preset ? preset.label : 'Custom';
+}

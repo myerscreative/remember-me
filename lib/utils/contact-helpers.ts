@@ -68,14 +68,18 @@ export function getGradient(name: string): string {
  * @param birthday - Birthday string in YYYY-MM-DD format
  * @returns Formatted birthday (e.g., "Dec 1")
  */
+import { parseISO, format } from 'date-fns';
+
+/**
+ * Format birthday as "Month Day" (e.g., "October 26")
+ * @param birthday - Birthday string in YYYY-MM-DD format
+ * @returns Formatted birthday (e.g., "October 26")
+ */
 export function formatBirthday(birthday: string | null): string {
   if (!birthday) return "";
   try {
-    // Parse the date string (format: YYYY-MM-DD)
-    const date = new Date(birthday + 'T00:00:00'); // Add time to avoid timezone issues
-    // Check if date is valid
-    if (isNaN(date.getTime())) return "";
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const date = parseISO(birthday);
+    return format(date, 'MMMM d');
   } catch {
     return "";
   }
