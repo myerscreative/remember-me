@@ -26,14 +26,12 @@ interface PersonHeaderProps {
   contact: Person;
   onEdit: () => void;
   onToggleFavorite: () => void;
+  onAvatarClick: () => void;
 }
 
-export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeaderProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
+export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick }: PersonHeaderProps) {
   // Optimistic UI for photo
-  const [optimisticPhotoUrl, setOptimisticPhotoUrl] = useOptimistic(
+  const [optimisticPhotoUrl] = useOptimistic(
     contact.photo_url,
     (state: string | null, newUrl: string) => newUrl
   );
@@ -44,37 +42,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
   // Frequency Label (e.g. "Monthly Cadence")
   const frequencyLabel = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly";
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be less than 5MB');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      const objectUrl = URL.createObjectURL(file);
-      setOptimisticPhotoUrl(objectUrl);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('personId', contact.id);
-
-      const result = await uploadPersonPhoto(formData);
-      if (!result.success) throw new Error(result.error);
-      toast.success('Photo updated successfully');
-    } catch (error) {
-      console.error('Upload failed:', error);
-      toast.error('Failed to upload photo');
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   return (
     <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
@@ -97,7 +65,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
       <div className="flex flex-col items-center w-full px-6">
         
         {/* Avatar Section with Ring & Status Dot */}
-        <div className="relative group mb-6 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+        <div className="relative group mb-6 cursor-pointer" onClick={onAvatarClick}>
            {/* Glow Effect */}
            <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ backgroundColor: health.color }} />
            
@@ -109,7 +77,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
                <Avatar className="w-[124px] h-[124px] border-[4px] border-[#1a1b2e]">
-                 <AvatarImage src={optimisticPhotoUrl || ''} className="object-cover" />
+                 <AvatarImage src={optimisticPhotoUrl || contact.photo_url || ''} className="object-cover" />
                  <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
                    {getInitials(contact.first_name, contact.last_name)}
                  </AvatarFallback>
@@ -125,8 +93,6 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
                    <Camera className="w-8 h-8 text-white drop-shadow-lg" />
                </div>
            </div>
-           
-           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
         </div>
 
         {/* Identity Section */}
@@ -170,11 +136,10 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
                  contact.email 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-inigo-300" // typo fix intention: text-indigo-300 but let's vary for visual distiction if desired. Target image shows all same color icons.
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
                    : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
                )}
             >
-                {/* Fix typo "text-inigo-300" to "text-indigo-300" in my thought process, code below is correct */}
                 <Mail size={24} className="text-indigo-300" /> 
                 <span className="text-sm font-medium text-gray-300">Email</span>
             </a>
