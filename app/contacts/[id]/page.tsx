@@ -448,7 +448,7 @@ export default function ContactDetailPage({
                     };
                     input.click();
                 }}>
-                    <Avatar className="h-24 w-24 border-[3px] border-white/30 shadow-xl transition-all duration-300 hover:scale-105">
+                    <Avatar className="h-[90px] w-[90px] border-[3px] border-white/30 shadow-xl transition-all duration-300 hover:scale-105">
                         <AvatarImage src={contact.photo_url} className="object-cover" />
                         <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
                             {(contact.firstName?.[0] || "")}
@@ -466,14 +466,14 @@ export default function ContactDetailPage({
                         <Button size="icon" onClick={handleSaveName} className="bg-white text-[#6366f1] h-9 w-9 rounded-lg"><Check className="h-4 w-4" /></Button>
                      </div>
                 ) : (
-                    <div className="flex flex-col items-center gap-1 mb-4 w-full">
+                    <div className="flex flex-col items-center gap-1 mb-3 w-full">
                         <div className="flex items-center justify-center flex-wrap gap-2 px-4">
-                            <h1 className="text-xl font-bold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>
+                            <h1 className="text-2xl font-semibold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>
                             
                             {/* Frequency Badge - Inline Compact */}
                              <div className="relative group">
                                 <span className={cn(
-                                    "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20 flex items-center gap-1 transition-colors",
+                                    "text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full border border-white/15 flex items-center gap-1 transition-colors backdrop-blur-sm",
                                     contact.current_health === 'neglected' ? "bg-rose-500/30 text-white border-rose-300/40" : "bg-white/20 text-white"
                                 )}>
                                     <RefreshCw className="w-3 h-3 opacity-70" />
