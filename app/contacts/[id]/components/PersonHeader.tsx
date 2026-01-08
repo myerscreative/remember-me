@@ -182,12 +182,6 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite }: PersonHeader
                     <span>{contact.company}</span>
                   </>
                 )}
-                {contact.location && (
-                  <>
-                    <span className="hidden md:inline">•</span>
-                    <span>{contact.location}</span>
-                  </>
-                )}
              </div>
           </div>
 
