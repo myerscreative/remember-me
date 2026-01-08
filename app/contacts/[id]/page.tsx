@@ -390,9 +390,17 @@ export default function ContactDetailPage({
                 input.onchange = (e: any) => {
                     const file = e.target?.files?.[0];
                     if (!file) return;
+
+                    console.log('Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
                     
                     if (!file.type.startsWith('image/')) {
-                        // toast.error('Please upload an image file'); // Assuming toast available or irrelevant
+                        toast.error('Please upload an image file (JPG, PNG, etc)');
+                        return;
+                    }
+
+                    // 20MB Limit for initial load
+                    if (file.size > 20 * 1024 * 1024) {
+                        toast.error('File is too large (max 20MB)');
                         return;
                     }
                     
@@ -400,6 +408,10 @@ export default function ContactDetailPage({
                     reader.onload = () => {
                         setSelectedImageSrc(reader.result as string);
                         setIsCropModalOpen(true);
+                    };
+                    reader.onerror = (err) => {
+                        console.error('FileReader error:', err);
+                        toast.error('Failed to read image file');
                     };
                     reader.readAsDataURL(file);
                 };

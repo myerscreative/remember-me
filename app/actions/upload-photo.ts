@@ -20,9 +20,9 @@ export async function uploadPersonPhoto(formData: FormData) {
       return { success: false, error: 'Unauthorized' };
     }
 
-    // validate file size (e.g. 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return { success: false, error: 'File too large (max 5MB)' };
+    // validate file size (e.g. 20MB)
+    if (file.size > 20 * 1024 * 1024) {
+      return { success: false, error: 'File too large (max 20MB)' };
     }
 
     const fileExt = file.name.split('.').pop();
