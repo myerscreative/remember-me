@@ -17,28 +17,47 @@ export async function processMemory(contactId: string, text: string) {
       return { success: false, error: 'Not authenticated' };
     }
 
-    // 1. Analyze text with OpenAI
+    // 1. Fetch person data for context and current state
+    const { data: personData, error: fetchError } = await supabase
+        .from('persons')
+        .select('*')
+        .eq('id', contactId)
+        .eq('user_id', user.id)
+        .single();
+        
+    if (fetchError || !personData) {
+        return { success: false, error: 'Person not found' };
+    }
+
+    // Explicit cast to fix TypeScript 'never' inference
+    const person = personData as unknown as Person;
+    const personName = person.name || `${person.first_name || ''} ${person.last_name || ''}`.trim() || 'this person';
+
+    // 2. Analyze text with OpenAI
     const prompt = `
       ROLE
-      You are the Personal Relationship Intelligence Engine for the app “Remember Me.”
+      You are the Personal Relationship Intelligence Engine for the app "Remember Me."
       Your job is to take unstructured, free-form human input (brain dumps, spoken thoughts, fragmented memories, emotional impressions) about a person and transform it into a clear, organized, meaningful profile.
 
       CORE PRINCIPLE
       Humans think in stories and impressions, not databases.
-      You must accept chaos as input and produce clarity as output.
+      You must accept chaos as output and produce clarity as output.
       Do not simply summarize. Parse, interpret, classify, and structure the information.
+
+      CRITICAL: The person's name is "${personName}". Always use this EXACT spelling when referring to them in the synopsis. Do not change, shorten, or modify this name in any way.
 
       INPUT STYLE
       The user may speak freely, jump between topics, repeat themselves, or mix facts with impressions. Treat all input as intentional and valuable.
 
       OUTPUT OBJECTIVE
       Transform the input into a high-level AI synopsis (human, not robotic), clearly grouped and labeled categories, and actionable memory anchors.
-      Nothing should feel like a “ball of string.” Everything must have meaning and place.
+      Nothing should feel like a "ball of string." Everything must have meaning and place.
 
       REQUIRED STRUCTURE FOR "SYNOPSIS" FIELD (Use markdown formatting for headers):
       
       ### Person Snapshot
       Write a short, natural paragraph answering: Who is this person? Why do they matter? What defines them at a glance? (Tone: warm, perceptive, human)
+      IMPORTANT: Use the name "${personName}" exactly as provided.
 
       ### Relationship Context
       Identify and classify the relationship (Family, Friend, Work, etc.). Include how they know each other and depth of relationship.
@@ -94,19 +113,6 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     const fieldsUpdated: string[] = [];
-
-    // 2. Fetch current person data
-    const { data: personData, error: fetchError } = await supabase
-        .from('persons')
-        .select('*')
-        .eq('id', contactId)
-        .eq('user_id', user.id)
-        .single();
-        
-    if (fetchError || !personData) throw new Error("Person not found");
-    
-    // Explicit cast to fix TypeScript 'never' inference
-    const person = personData as unknown as Person;
 
     let currentFamily: any[] = Array.isArray(person.family_members) ? person.family_members : [];
     let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];

@@ -4,11 +4,14 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sparkles, Plus, Tag, X, Loader2, Info, Mail, MapPin, Users, Phone, MessageSquare } from 'lucide-react';
+import { Sparkles, Plus, Tag, X, Loader2, Info, Mail, MapPin, Users, Phone, MessageSquare, Edit2, Check, RefreshCw } from 'lucide-react';
 import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
+import { processMemory } from '@/app/actions/process-memory';
+import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { ReachOutPanel } from '@/components/contacts/ReachOutPanel';
@@ -45,6 +48,12 @@ export function OverviewTab({ contact }: OverviewTabProps) {
   const [submittingTag, setSubmittingTag] = useState(false);
   const [submittingInterest, setSubmittingInterest] = useState(false);
   const [isReachOutOpen, setIsReachOutOpen] = useState(false);
+
+  // Synopsis editing state
+  const [isEditingSynopsis, setIsEditingSynopsis] = useState(false);
+  const [editedSynopsis, setEditedSynopsis] = useState(contact.deep_lore || '');
+  const [isSavingSynopsis, setIsSavingSynopsis] = useState(false);
+  const [isRefreshingSynopsis, setIsRefreshingSynopsis] = useState(false);
 
   // Handlers
   const handleAddTag = async () => {
@@ -125,6 +134,49 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       }
   };
 
+  const handleSaveSynopsis = async () => {
+    setIsSavingSynopsis(true);
+    try {
+      const supabase = createClient();
+      const { error } = await (supabase as any)
+        .from('persons')
+        .update({ deep_lore: editedSynopsis })
+        .eq('id', contact.id);
+
+      if (error) throw error;
+
+      contact.deep_lore = editedSynopsis;
+      setIsEditingSynopsis(false);
+      toast.success('Synopsis updated');
+    } catch (error) {
+      console.error('Error saving synopsis:', error);
+      toast.error('Failed to save synopsis');
+    } finally {
+      setIsSavingSynopsis(false);
+    }
+  };
+
+  const handleRefreshSynopsis = async () => {
+    setIsRefreshingSynopsis(true);
+    try {
+      // Re-process existing deep_lore to regenerate with latest AI formatting
+      const currentContent = contact.deep_lore || 'Regenerate synopsis for this person';
+      const result = await processMemory(contact.id, currentContent);
+      
+      if (result.success) {
+        // Refresh the page to show updated content
+        window.location.reload();
+      } else {
+        toast.error('Failed to refresh synopsis');
+      }
+    } catch (error) {
+      console.error('Error refreshing synopsis:', error);
+      toast.error('Failed to refresh synopsis');
+    } finally {
+      setIsRefreshingSynopsis(false);
+    }
+  };
+
   return (
     <div className="flex flex-col xl:flex-row gap-4 md:gap-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
       
@@ -145,16 +197,80 @@ export function OverviewTab({ contact }: OverviewTabProps) {
             <>
               <div className="space-y-4 mb-6">
                  {/* Unified Synopsis Display */}
-                 <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-5 border border-indigo-100 dark:border-indigo-900/30">
-                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-medium">
-                        {contact.deep_lore || contact.ai_summary || "No synopsis available."}
-                    </p>
-                    
-                    {/* Append Where Met if not included in deep_lore (simple check) */}
-                    {contact.where_met && (!contact.deep_lore || !contact.deep_lore.includes(contact.where_met)) && (
-                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mt-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/10">
-                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">Where we met:</span> {contact.where_met}
+                 <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-5 border border-indigo-100 dark:border-indigo-900/30 relative group">
+                    {/* Edit/Refresh buttons */}
+                    <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                        onClick={handleRefreshSynopsis}
+                        disabled={isRefreshingSynopsis || isEditingSynopsis}
+                      >
+                        <RefreshCw className={cn("h-3.5 w-3.5", isRefreshingSynopsis && "animate-spin")} />
+                      </Button>
+                      {!isEditingSynopsis && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                          onClick={() => {
+                            setIsEditingSynopsis(true);
+                            setEditedSynopsis(contact.deep_lore || '');
+                          }}
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {isEditingSynopsis ? (
+                      <div className="space-y-3">
+                        <Textarea
+                          value={editedSynopsis}
+                          onChange={(e) => setEditedSynopsis(e.target.value)}
+                          className="min-h-[200px] text-sm font-medium"
+                          placeholder="Edit synopsis..."
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingSynopsis(false);
+                              setEditedSynopsis(contact.deep_lore || '');
+                            }}
+                            disabled={isSavingSynopsis}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveSynopsis}
+                            disabled={isSavingSynopsis}
+                            className="bg-indigo-600 hover:bg-indigo-700"
+                          >
+                            {isSavingSynopsis ? (
+                              <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Saving...</>
+                            ) : (
+                              <><Check className="h-3 w-3 mr-1" /> Save</>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-medium pr-16">
+                            {contact.deep_lore || contact.ai_summary || "No synopsis available."}
                         </p>
+                        
+                        {/* Append Where Met if not included in deep_lore (simple check) */}
+                        {contact.where_met && (!contact.deep_lore || !contact.deep_lore.includes(contact.where_met)) && (
+                            <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mt-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/10">
+                                <span className="font-semibold text-indigo-600 dark:text-indigo-400">Where we met:</span> {contact.where_met}
+                            </p>
+                        )}
+                      </>
                     )}
                  </div>
               </div>
