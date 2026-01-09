@@ -36,7 +36,10 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
       setIsLogging(true);
       try {
+          console.log('Calling logHeaderInteraction with:', { contactId: contact.id, type, note: quickNote });
           const result = await logHeaderInteraction(contact.id, type, quickNote);
+          console.log('logHeaderInteraction result:', result);
+
           if (result.success) {
               // Show appropriate feedback based on action type
               if (type === 'connection') {
@@ -48,11 +51,12 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
               // Refresh page to show new interaction
               window.location.reload();
           } else {
-              toast.error('Failed to log interaction');
+              console.error('Failed to log interaction:', result.error);
+              toast.error(result.error || 'Failed to log interaction');
           }
       } catch (err) {
-          console.error(err);
-          toast.error('Error logging interaction');
+          console.error('Exception logging interaction:', err);
+          toast.error(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
           setIsLogging(false);
       }

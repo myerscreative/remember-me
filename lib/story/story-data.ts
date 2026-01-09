@@ -55,7 +55,17 @@ export async function getContactFacts(contactId: string): Promise<ContactFact[]>
  */
 export async function getContactInteractions(contactId: string): Promise<Interaction[]> {
   const supabase = createClient();
-  
+
+  console.log('Fetching interactions for contact:', contactId);
+
+  // Debug: Check if ANY interactions exist for this user
+  const { data: allUserInteractions, error: allError } = await supabase
+    .from('interactions')
+    .select('*')
+    .limit(5);
+
+  console.log('All user interactions (first 5):', allUserInteractions, 'Error:', allError);
+
   const { data, error } = await supabase
     .from('interactions')
     .select('*')
@@ -66,6 +76,8 @@ export async function getContactInteractions(contactId: string): Promise<Interac
     console.error('Error fetching interactions:', error);
     return [];
   }
+
+  console.log('Interactions result:', { success: !error, interactions: data });
 
   return data || [];
 }
