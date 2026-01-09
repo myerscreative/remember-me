@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
 
 // Icons
-import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star } from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, Check, Repeat, Star, Camera, RefreshCw } from "lucide-react";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 
 // Components
@@ -17,10 +17,12 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { Input } from "@/components/ui/input";
 
 import { ProfileSidebar } from "./components/ProfileSidebar";
-import { ProfileHeader } from "./components/ProfileHeader";
+
 import { OverviewTab } from "./components/tabs/OverviewTab";
+import { AvatarCropModal } from "./components/AvatarCropModal";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
+import { PersonHeader } from "@/app/contacts/[id]/components/PersonHeader";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
@@ -54,6 +56,11 @@ export default function ContactDetailPage({
   // Log Interaction Modal State
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [logInitialMethod, setLogInitialMethod] = useState<InteractionType | undefined>(undefined);
+
+  // Avatar Crop Modal State
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string>('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Check searchParams for action trigger
   useEffect(() => {
@@ -253,6 +260,85 @@ export default function ContactDetailPage({
     await handleImportanceChange(newImportance as any);
   };
 
+  const handleLastContactChange = async (date: string, method: string) => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await (supabase as any).from("persons").update({
+        last_contact_date: date,
+        last_contact_method: method
+      }).eq("id", id).eq("user_id", user.id);
+
+      setContact({ ...contact, last_contact_date: date, last_contact_method: method });
+      toast.success("Last contact updated");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update last contact");
+    }
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setIsCropModalOpen(false);
+    setIsUploadingAvatar(true);
+    console.log('Starting avatar upload, blob size:', croppedBlob.size);
+
+    const supabase = createClient();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('No user found');
+        toast.error('Not authenticated');
+        return;
+      }
+
+      const fileName = `${contact.id}-${Date.now()}.jpg`;
+      const filePath = `${fileName}`;
+
+      console.log('Uploading to Supabase Storage, path:', filePath);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, croppedBlob, {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful, getting public URL');
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      console.log('Public URL:', publicUrl);
+
+      const { error: dbError } = await (supabase as any)
+        .from('persons')
+        .update({ photo_url: publicUrl })
+        .eq('id', contact.id)
+        .eq('user_id', user.id);
+
+      if (dbError) {
+        console.error('Database update error:', dbError);
+        throw dbError;
+      }
+
+      console.log('Avatar updated successfully');
+      toast.success("Profile photo updated");
+      setContact({ ...contact, photo_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Failed to update photo: ' + (error as any).message);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Loading profile...</div></div>;
@@ -277,113 +363,61 @@ export default function ContactDetailPage({
             contact={contact} 
             onFrequencyChange={handleFrequencyChange}
             onImportanceChange={handleImportanceChange}
+            onContactAction={(method) => {
+                 setLogInitialMethod(method === 'text' ? 'text' : method === 'email' ? 'email' : 'call');
+                 setIsLogModalOpen(true);
+            }}
+            onLastContactChange={handleLastContactChange}
+            onPhotoUpdate={(newUrl) => {
+                setContact(prev => ({ ...prev, photo_url: newUrl }));
+            }}
         />
       </div>
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
          
-         {/* DESKTOP HEADER (Hidden on Mobile) */}
-         <ProfileHeader 
-            onEdit={() => setIsEditModalOpen(true)} 
-            importance={contact.importance}
+         <PersonHeader 
+            contact={contact} 
+            onEdit={() => setIsEditModalOpen(true)}
             onToggleFavorite={handleToggleFavorite}
+            onAvatarClick={() => {
+                if (isUploadingAvatar) return;
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e: any) => {
+                    const file = e.target?.files?.[0];
+                    if (!file) return;
+
+                    console.log('Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
+                    
+                    if (!file.type.startsWith('image/')) {
+                        toast.error('Please upload an image file (JPG, PNG, etc)');
+                        return;
+                    }
+
+                    // 20MB Limit for initial load
+                    if (file.size > 20 * 1024 * 1024) {
+                        toast.error('File is too large (max 20MB)');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        setSelectedImageSrc(reader.result as string);
+                        setIsCropModalOpen(true);
+                    };
+                    reader.onerror = (err) => {
+                        console.error('FileReader error:', err);
+                        toast.error('Failed to read image file');
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            }}
          />
-
-         {/* MOBILE HEADER (Visible < 768px) - Compact Design ~280px */}
-         <div className="md:hidden bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-b-[2rem] p-3 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('/noise.png')]"></div>
-
-            {/* Top Bar Mobile */}
-            <div className="flex justify-between items-center relative z-10 mb-3">
-                <Link href="/">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full h-7 w-7">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                </Link>
-                <div className="flex gap-1 relative z-10">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          "h-7 w-7 hover:bg-white/10 rounded-full transition-all duration-200",
-                          contact.importance === 'high' ? "text-amber-400" : "text-white"
-                        )}
-                        onClick={handleToggleFavorite}
-                    >
-                        <Star className={cn("h-3.5 w-3.5", contact.importance === 'high' && "fill-amber-400")} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-white hover:bg-white/10 rounded-full"
-                        onClick={() => setIsEditMode(!isEditMode)}
-                    >
-                        {isEditMode ? <Check className="h-3.5 w-3.5" /> : <Edit className="h-3.5 w-3.5" />}
-                    </Button>
-                </div>
-            </div>
-
-            {/* Mobile Profile Info - Compact Layout */}
-            <div className="relative z-10 flex flex-col items-center text-center">
-                {/* Avatar - 90px */}
-                <div className="mb-2 relative">
-                    <Avatar className="h-[90px] w-[90px] border-4 border-white/30 shadow-2xl">
-                        <AvatarImage src={contact.photo_url} className="object-cover" />
-                        <AvatarFallback className="text-2xl bg-indigo-700 text-white/50">
-                            {(contact.firstName?.[0] || "")}
-                        </AvatarFallback>
-                    </Avatar>
-                </div>
-
-                {/* Name + Frequency Inline */}
-                {isEditMode ? (
-                     <div className="flex gap-2 mb-2 items-center">
-                        <Input value={firstName} onChange={e => setFirstName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-20 h-7 text-xs" placeholder="First" />
-                        <Input value={lastName} onChange={e => setLastName(e.target.value)} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center w-20 h-7 text-xs" placeholder="Last" />
-                        <Button size="sm" onClick={handleSaveName} className="bg-white text-indigo-600 h-7 w-7 p-0"><Check className="h-3 w-3" /></Button>
-                     </div>
-                ) : (
-                    <div className="flex items-center justify-center gap-2 mb-1 flex-wrap">
-                        <h1 className="text-lg font-bold">{contact.firstName} {contact.lastName}</h1>
-                        <div className="bg-white/15 backdrop-blur-sm rounded-md px-2 py-0.5 flex items-center gap-1 border border-white/20">
-                            <Repeat className="w-2.5 h-2.5 text-indigo-100" />
-                            <select
-                                value={contact.target_frequency_days || 30}
-                                onChange={(e) => handleFrequencyChange(parseInt(e.target.value))}
-                                className="bg-transparent text-white text-[10px] focus:outline-none appearance-none cursor-pointer font-medium"
-                            >
-                                {FREQUENCY_PRESETS.map(preset => (
-                                    <option key={preset.days} value={preset.days} className="text-gray-900">
-                                        {preset.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                )}
-
-                {contact.job_title && (
-                    <p className="text-indigo-100 text-[11px] mb-2">{contact.job_title}</p>
-                )}
-
-                {/* Compact Contact Info - Clickable Items */}
-                <div className="flex flex-col gap-1.5 mb-3 w-full max-w-xs text-xs">
-                    {contact.phone && (
-                        <a href={`tel:${contact.phone}`} className="flex items-center justify-center gap-2 py-1.5 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg border border-white/20 transition-colors">
-                            <Phone className="h-3 w-3" />
-                            <span className="font-medium">{contact.phone}</span>
-                        </a>
-                    )}
-                    {contact.email && (
-                        <a href={`mailto:${contact.email}`} className="flex items-center justify-center gap-2 py-1.5 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg border border-white/20 transition-colors">
-                            <Mail className="h-3 w-3" />
-                            <span className="font-medium truncate">{contact.email}</span>
-                        </a>
-                    )}
-                </div>
-            </div>
-         </div>
 
 
          {/* SCROLLABLE CONTENT */}
@@ -453,6 +487,14 @@ export default function ContactDetailPage({
             onSuccess={handleRefresh}
           />
       )}
+
+      {/* Avatar Crop Modal */}
+      <AvatarCropModal
+        open={isCropModalOpen}
+        imageSrc={selectedImageSrc}
+        onClose={() => setIsCropModalOpen(false)}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 }
