@@ -38,7 +38,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
+    <div className="relative w-full bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
       
       {/* ... Top Navigation Bar ... */}
       <div className="flex justify-between items-center px-6 mb-6">
@@ -155,7 +155,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         <div className="w-full max-w-sm border-t border-white/5 mb-6" />
 
         {/* Interaction Logger */}
-        <div className="w-full max-w-sm space-y-3">
+        <div className="w-full max-w-sm space-y-3 border-2 border-red-500 p-2">
             {/* Note Input */}
             <input 
                 type="text" 
