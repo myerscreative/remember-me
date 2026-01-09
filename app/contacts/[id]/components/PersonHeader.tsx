@@ -78,9 +78,12 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   }, [contact.id, refreshTrigger]);
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
+      console.log('[CLIENT] handleLogInteraction called with type:', type);
       setIsLogging(true);
       try {
+          console.log('[CLIENT] Calling logHeaderInteraction...');
           const result = await logHeaderInteraction(contact.id, type, quickNote);
+          console.log('[CLIENT] logHeaderInteraction result:', result);
           if (result.success) {
               // Show appropriate feedback based on action type
               if (type === 'connection') {
@@ -95,7 +98,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
               toast.error('Failed to log interaction');
           }
       } catch (err) {
-          console.error(err);
+          console.error('[CLIENT] Error in handleLogInteraction:', err);
           toast.error('Error logging interaction');
       } finally {
           setIsLogging(false);
