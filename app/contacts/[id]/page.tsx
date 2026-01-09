@@ -426,13 +426,8 @@ export default function ContactDetailPage({
          {/* SCROLLABLE CONTENT */}
          <main className="flex-1 p-3 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar overflow-x-hidden">
             
-            {/* DESKTOP INTERACTION LOGGER */}
-            <div className="hidden md:block mb-8 max-w-2xl">
-                <InteractionLogger 
-                    contactId={contact.id} 
-                    contactName={contact.first_name}
-                />
-            </div>
+{/* DESKTOP INTERACTION LOGGER (Moved to Sidebar) */}
+
 
             {/* TAB NAVIGATION */}
             <div className="flex items-center gap-6 md:gap-8 border-b border-border/50 mb-6 md:mb-8 overflow-x-auto scrollbar-hide">
