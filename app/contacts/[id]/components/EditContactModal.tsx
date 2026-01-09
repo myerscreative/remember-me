@@ -105,13 +105,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
-        onPointerDownOutside={(e) => {
-          // Prevent closing if we are editing (formData has values) or just safety in general
-          e.preventDefault();
-        }}
-      >
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Contact Info</DialogTitle>
           <DialogDescription>

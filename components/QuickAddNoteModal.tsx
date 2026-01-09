@@ -168,10 +168,7 @@ export function QuickAddNoteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-slate-50 dark:bg-[#0f172a]"
-        onPointerDownOutside={(e) => e.preventDefault()}
-      >
+      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-slate-50 dark:bg-[#0f172a]">
         <DialogHeader className="p-6 bg-white dark:bg-[#1e293b] border-b border-slate-100 dark:border-slate-800">
           <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
             <BookOpen className="h-5 w-5 text-indigo-500" />
