@@ -33,7 +33,7 @@ export async function logHeaderInteraction(
 
     if (insertError) {
         console.error("Error logging interaction record:", insertError);
-        // We continue, as the memory might be more important to the user
+        return { success: false, error: `Failed to log interaction: ${insertError.message}` };
     }
 
     // 2. Shared Memory Log (User Narrative)
