@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useOptimistic } from 'react';
+import { useState, useOptimistic, useEffect } from 'react';
 import Link from 'next/link';
 import { Person } from '@/types/database.types';
 import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
 import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
 import { toast } from 'sonner';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
 import { 
@@ -29,6 +30,21 @@ interface PersonHeaderProps {
   onAvatarClick: () => void;
 }
 
+// Helper function to format time ago
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
 export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick }: PersonHeaderProps) {
   // Optimistic UI for photo
   const [optimisticPhotoUrl] = useOptimistic(
@@ -45,6 +61,18 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   // Interaction Logger State
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
+  const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
+
+  // Fetch recent interactions on mount and after logging
+  useEffect(() => {
+    const fetchInteractions = async () => {
+      const result = await getRecentInteractions(contact.id, 3);
+      if (result.success) {
+        setRecentInteractions(result.interactions);
+      }
+    };
+    fetchInteractions();
+  }, [contact.id, isLogging]);
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
       setIsLogging(true);
@@ -58,6 +86,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                   toast.success('Attempt logged');
               }
               setQuickNote(""); // Clear note
+              // Trigger re-fetch of interactions
           } else {
               toast.error('Failed to log interaction');
           }
@@ -221,6 +250,36 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                     </span>
                 </button>
             </div>
+
+            {/* Recent Interactions */}
+            {recentInteractions.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent Activity</h4>
+                {recentInteractions.map((interaction: any) => {
+                  const date = new Date(interaction.interaction_date);
+                  const timeAgo = getTimeAgo(date);
+                  const isAttempt = interaction.notes?.includes('[Attempted Contact]');
+                  
+                  return (
+                    <div 
+                      key={interaction.id} 
+                      className="flex items-start gap-2 p-2 rounded-lg bg-[#1a1b2e] border border-white/5"
+                    >
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0",
+                        isAttempt ? "bg-orange-400" : "bg-emerald-400"
+                      )} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-300 line-clamp-2">
+                          {interaction.notes || 'No note'}
+                        </p>
+                        <p className="text-[10px] text-gray-500 mt-0.5">{timeAgo}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
         </div>
 
       </div>
