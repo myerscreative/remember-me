@@ -62,6 +62,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
   const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Fetch recent interactions on mount and after logging
   useEffect(() => {
@@ -74,7 +75,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
       }
     };
     fetchInteractions();
-  }, [contact.id, isLogging]);
+  }, [contact.id, refreshTrigger]);
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
       setIsLogging(true);
@@ -89,6 +90,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
               }
               setQuickNote(""); // Clear note
               // Trigger re-fetch of interactions
+              setRefreshTrigger(prev => prev + 1);
           } else {
               toast.error('Failed to log interaction');
           }
