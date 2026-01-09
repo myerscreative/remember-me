@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Star, Edit2, Camera, Cake, Calendar, Phone, Mail, MessageSquare } from 'lucide-react';
