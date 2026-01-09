@@ -66,7 +66,9 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   // Fetch recent interactions on mount and after logging
   useEffect(() => {
     const fetchInteractions = async () => {
+      console.log('Fetching interactions for contact:', contact.id);
       const result = await getRecentInteractions(contact.id, 3);
+      console.log('Interactions result:', result);
       if (result.success) {
         setRecentInteractions(result.interactions);
       }
@@ -252,10 +254,14 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
             </div>
 
             {/* Recent Interactions */}
-            {recentInteractions.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent Activity</h4>
-                {recentInteractions.map((interaction: any) => {
+            <div className="mt-4 space-y-2">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Recent Activity ({recentInteractions.length})
+              </h4>
+              {recentInteractions.length === 0 ? (
+                <p className="text-xs text-gray-500 italic">No interactions yet. Log one above!</p>
+              ) : (
+                recentInteractions.map((interaction: any) => {
                   const date = new Date(interaction.interaction_date);
                   const timeAgo = getTimeAgo(date);
                   const isAttempt = interaction.notes?.includes('[Attempted Contact]');
@@ -277,9 +283,9 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                       </div>
                     </div>
                   );
-                })}
-              </div>
-            )}
+                })
+              )}
+            </div>
         </div>
 
       </div>
