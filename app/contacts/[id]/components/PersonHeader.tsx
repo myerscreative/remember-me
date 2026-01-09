@@ -1,18 +1,37 @@
-```typescript
-// ... imports
+import { useState } from 'react';
+import Link from 'next/link';
+import { ChevronLeft, Star, Edit2, Camera, Cake, Calendar, Phone, Mail, MessageSquare } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { getInitials, formatBirthday } from '@/lib/utils/contact-helpers';
+import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { uploadPersonPhoto } from '@/app/actions/upload-photo';
 import { toast } from 'sonner';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
+import type { Person } from '@/types/database.types';
 
-// ... interface
+interface PersonHeaderProps {
+  contact: Person;
+  onEdit: () => void;
+  onToggleFavorite: () => void;
+  onAvatarClick?: () => void;
+}
 
 export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick }: PersonHeaderProps) {
-  // ... existing hooks
-  
-  // Interaction Logger State
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
+  const [optimisticPhotoUrl, setOptimisticPhotoUrl] = useState<string | null>(null);
+
+  // Calculate relationship health
+  const health = getRelationshipHealth(
+    contact.last_interaction_date,
+    contact.target_frequency_days
+  );
+
+  // Get frequency label
+  const frequencyPreset = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days);
+  const frequencyLabel = frequencyPreset?.label || `Every ${contact.target_frequency_days} days`;
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
       setIsLogging(true);
@@ -39,8 +58,8 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
   return (
     <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
-      
-      {/* ... Top Navigation Bar ... */}
+
+      {/* Top Navigation Bar */}
       <div className="flex justify-between items-center px-6 mb-6">
          <Link href="/" className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
             <ChevronLeft size={28} />
@@ -56,17 +75,17 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
       </div>
 
       <div className="flex flex-col items-center w-full px-6">
-        
-        {/* ... Avatar Section ... */}
+
+        {/* Avatar Section */}
         <div className="relative group mb-6 cursor-pointer" onClick={onAvatarClick}>
            {/* Glow Effect */}
            <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ backgroundColor: health.color }} />
-           
+
            {/* Ring Container */}
            <div className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
                 style={{ border: `4px solid ${health.color + '40'}` }}
            >
-               {/* Active Ring Segment (simulated with full ring for now, or just the main color) */}
+               {/* Active Ring Segment */}
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
                <Avatar className="w-[124px] h-[124px] border-[4px] border-[#1a1b2e]">
@@ -77,10 +96,10 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                </Avatar>
 
                {/* Status Dot */}
-               <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
-                    style={{ backgroundColor: health.color }} 
+               <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]"
+                    style={{ backgroundColor: health.color }}
                />
-               
+
                {/* Hover Upload Icon */}
                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                    <Camera className="w-8 h-8 text-white drop-shadow-lg" />
@@ -88,12 +107,12 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
            </div>
         </div>
 
-        {/* ... Identity Section ... */}
+        {/* Identity Section */}
         <div className="text-center space-y-2 mb-8">
            <h1 className="text-3xl font-bold text-white tracking-tight">
              {contact.first_name} {contact.last_name}
            </h1>
-           
+
            {contact.birthday && (
              <div className="flex items-center justify-center gap-2 text-[#818cf8] font-medium">
                <Cake size={18} className="mb-0.5" />
@@ -112,11 +131,11 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         {/* Action Buttons Grid */}
         <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
             {/* Call */}
-            <a href={contact.phone ? `tel:${contact.phone}` : undefined} 
+            <a href={contact.phone ? `tel:${contact.phone}` : undefined}
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.phone 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
+                 contact.phone
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
                    : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
                )}
             >
@@ -125,24 +144,24 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
             </a>
 
             {/* Email */}
-            <a href={contact.email ? `mailto:${contact.email}` : undefined} 
+            <a href={contact.email ? `mailto:${contact.email}` : undefined}
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.email 
+                 contact.email
                    ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
                    : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
                )}
             >
-                <Mail size={24} className="text-indigo-300" /> 
+                <Mail size={24} className="text-indigo-300" />
                 <span className="text-sm font-medium text-gray-300">Email</span>
             </a>
 
             {/* Text */}
-            <a href={contact.phone ? `sms:${contact.phone}` : undefined} 
+            <a href={contact.phone ? `sms:${contact.phone}` : undefined}
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.phone 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
+                 contact.phone
+                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
                    : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
                )}
             >
@@ -157,17 +176,17 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         {/* Interaction Logger */}
         <div className="w-full max-w-sm space-y-3">
             {/* Note Input */}
-            <input 
-                type="text" 
-                placeholder="Add a quick note..." 
+            <input
+                type="text"
+                placeholder="Add a quick note..."
                 value={quickNote}
                 onChange={(e) => setQuickNote(e.target.value)}
                 className="w-full bg-[#242642] border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
             />
-            
+
             {/* Action Buttons */}
             <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                     onClick={() => handleLogInteraction('attempt')}
                     disabled={isLogging}
                     className="flex items-center justify-center py-2.5 rounded-lg border border-orange-500/20 bg-orange-500/10 hover:bg-orange-500/20 active:scale-95 transition-all disabled:opacity-50"
@@ -177,7 +196,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                     </span>
                 </button>
 
-                <button 
+                <button
                     onClick={() => handleLogInteraction('connection')}
                     disabled={isLogging}
                     className="flex items-center justify-center py-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 transition-all disabled:opacity-50"
