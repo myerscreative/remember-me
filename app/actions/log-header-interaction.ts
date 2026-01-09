@@ -28,15 +28,13 @@ export async function logHeaderInteraction(
       notes: finalNote
     });
 
-    const { error: insertError } = await supabase
-      .schema('public')
-      .from('interactions')
-      .insert({
-        person_id: personId,
-        user_id: user.id,
-        interaction_type: interactionType,
-        interaction_date: new Date().toISOString(),
-        notes: finalNote
+    const { data: interactionId, error: insertError } = await supabase
+      .rpc('insert_interaction', {
+        p_person_id: personId,
+        p_user_id: user.id,
+        p_interaction_type: interactionType,
+        p_interaction_date: new Date().toISOString(),
+        p_notes: finalNote
       });
 
     if (insertError) {
