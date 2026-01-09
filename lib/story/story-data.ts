@@ -13,9 +13,9 @@ export interface Interaction {
   id: string;
   person_id: string;
   user_id: string;
-  type: string;
-  note: string | null;
-  notes?: string | null; // Support for 'notes' column
+  interaction_type: string;  // Database column name
+  interaction_date: string;  // Database column name
+  notes: string | null;
   created_at: string;
 }
 
@@ -94,13 +94,15 @@ export async function getStoryTimeline(contactId: string): Promise<TimelineItem[
 
   // Add interactions to timeline
   for (const interaction of interactions) {
+    // Map database types back to app types for display
+    const appType = mapDbTypeToAppType(interaction.interaction_type);
     timelineItems.push({
       id: interaction.id,
       type: 'interaction',
-      date: interaction.created_at,
-      interactionType: interaction.type,
-      content: getInteractionLabel(interaction.type),
-      note: interaction.notes || interaction.note, // Handle both 'notes' and 'note'
+      date: interaction.interaction_date || interaction.created_at,
+      interactionType: appType,
+      content: getInteractionLabel(appType),
+      note: interaction.notes,
     });
   }
 
@@ -108,6 +110,18 @@ export async function getStoryTimeline(contactId: string): Promise<TimelineItem[
   timelineItems.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return timelineItems;
+}
+
+function mapDbTypeToAppType(dbType: string): string {
+  // Map database types back to app types
+  const mapping: Record<string, string> = {
+    'meeting': 'in-person',
+    'call': 'call',
+    'email': 'email',
+    'message': 'text',  // Map 'message' back to 'text'
+    'other': 'other',
+  };
+  return mapping[dbType] || dbType;
 }
 
 function getInteractionLabel(type: string): string {

@@ -23,7 +23,18 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
   const now = new Date().toISOString();
 
   try {
-    console.log('🔍 Attempting to log interaction:', { personId, type, note, nextGoal, userId: user.id });
+    // Map interaction types to database schema
+    const typeMapping: Record<InteractionType, string> = {
+      'call': 'call',
+      'email': 'email',
+      'text': 'message',  // Map 'text' to 'message'
+      'in-person': 'meeting',  // Map 'in-person' to 'meeting'
+      'social': 'message',  // Map 'social' to 'message'
+      'other': 'other'
+    };
+
+    const dbType = typeMapping[type];
+    console.log('🔍 Attempting to log interaction:', { personId, type, dbType, note, nextGoal, userId: user.id });
 
     // Insert interaction record and update person's last_interaction_date in parallel
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,10 +42,10 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
       (supabase as any).from('interactions').insert({
         person_id: personId,
         user_id: user.id,
-        type,
+        interaction_type: dbType,  // Use correct column name
+        interaction_date: now,  // Use correct column name
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
-        next_goal_note: nextGoal || null, // Map nextGoal input
       }),
       (supabase as any).from('persons').update({
         last_interaction_date: now,
