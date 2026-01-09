@@ -26,12 +26,12 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   // Calculate relationship health
   const health = getRelationshipHealth(
     contact.last_interaction_date,
-    contact.target_frequency_days
+    contact.target_frequency_days ?? undefined
   );
 
   // Get frequency label
-  const frequencyPreset = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days);
-  const frequencyLabel = frequencyPreset?.label || `Every ${contact.target_frequency_days} days`;
+  const frequencyPreset = FREQUENCY_PRESETS.find(p => p.days === (contact.target_frequency_days ?? 30));
+  const frequencyLabel = frequencyPreset?.label || `Every ${contact.target_frequency_days ?? 30} days`;
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
       setIsLogging(true);
