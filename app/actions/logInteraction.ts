@@ -23,6 +23,8 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
   const now = new Date().toISOString();
 
   try {
+    console.log('🔍 Attempting to log interaction:', { personId, type, note, nextGoal, userId: user.id });
+
     // Insert interaction record and update person's last_interaction_date in parallel
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [interactionResult, updateResult] = await Promise.all([
@@ -41,8 +43,14 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
     ]);
 
     if (interactionResult.error) {
-      console.error('Error inserting interaction:', interactionResult.error);
-      return { success: false, error: 'Failed to log interaction' };
+      console.error('❌ Database error inserting interaction:', {
+        error: interactionResult.error,
+        code: interactionResult.error?.code,
+        message: interactionResult.error?.message,
+        details: interactionResult.error?.details,
+        hint: interactionResult.error?.hint,
+      });
+      return { success: false, error: `Database error: ${interactionResult.error.message || 'Failed to log interaction'}` };
     }
 
     if (updateResult.error) {
@@ -50,10 +58,12 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
       return { success: false, error: 'Failed to update contact' };
     }
 
+    console.log('✅ Interaction logged successfully');
+
     // Revalidate the garden page to show updated positions
     revalidatePath('/garden');
     revalidatePath('/');
-    
+
     return { success: true };
   } catch (err) {
     console.error('Error in logInteraction:', err);
