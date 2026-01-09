@@ -55,7 +55,10 @@ export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionMo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent 
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Nurture Tribe: {tribe.name}</DialogTitle>
           <DialogDescription>

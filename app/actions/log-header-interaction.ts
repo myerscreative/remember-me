@@ -28,7 +28,8 @@ export async function logHeaderInteraction(
       notes: finalNote
     });
 
-    const { data: interactionId, error: insertError } = await supabase
+    const safeSupabase = supabase as any;
+    const { data: interactionId, error: insertError } = await safeSupabase
       .rpc('insert_interaction', {
         p_person_id: personId,
         p_user_id: user.id,
