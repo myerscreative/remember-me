@@ -64,7 +64,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
            
            {/* Ring Container */}
            <div className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
-                style={{ border: `4px solid ${health.color}40` }} // Low opacity ring base
+                style={{ border: `4px solid ${health.color}40` }}
            >
                {/* Active Ring Segment (simulated with full ring for now, or just the main color) */}
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
