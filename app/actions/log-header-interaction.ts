@@ -19,7 +19,12 @@ export async function logHeaderInteraction(
     // 1. Structured Interaction Log (System Record)
     // We keep this for analytics/interaction counts
     const interactionType = type === 'connection' ? 'call' : 'other'; // or 'call' default
-    const finalNote = note ? note : (type === 'attempt' ? 'Contact Attempt' : 'Quick Update');
+    console.log('Attempting to insert interaction:', {
+      person_id: personId,
+      user_id: user.id,
+      interaction_type: interactionType,
+      notes: finalNote
+    });
 
     const { error: insertError } = await (supabase as any)
       .from('interactions')
@@ -33,8 +38,10 @@ export async function logHeaderInteraction(
 
     if (insertError) {
         console.error("Error logging interaction record:", insertError);
-        // We continue, as the memory might be more important to the user
+        throw new Error(`Failed to insert interaction: ${insertError.message}`);
     }
+
+    console.log('Interaction inserted successfully');
 
     // 2. Shared Memory Log (User Narrative)
     // As per request: "If a note exists or it's a specific type, log to 'shared_memories'"
