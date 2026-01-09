@@ -1,5 +1,9 @@
+```typescript
 // ... imports
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { uploadPersonPhoto } from '@/app/actions/upload-photo';
+import { toast } from 'sonner';
+import { showNurtureToast } from '@/components/ui/nurture-toast';
 
 // ... interface
 
@@ -15,7 +19,12 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
       try {
           const result = await logHeaderInteraction(contact.id, type, quickNote);
           if (result.success) {
-              toast.success(type === 'connection' ? 'Logged connection' : 'Logged attempt');
+              // Show appropriate feedback based on action type
+              if (type === 'connection') {
+                  showNurtureToast(contact.first_name);
+              } else {
+                  toast.success('Attempt logged');
+              }
               setQuickNote(""); // Clear note
           } else {
               toast.error('Failed to log interaction');

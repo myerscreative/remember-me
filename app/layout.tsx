@@ -4,7 +4,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { ThemeProvider } from "./providers/theme-provider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import { MobileHeader } from "@/components/mobile-header";
 
 export const metadata: Metadata = {
@@ -68,7 +68,9 @@ export default function RootLayout({
                 <BottomNav />
               </div>
             </div>
-            <Toaster position="bottom-center" />
+            <Toaster position="bottom-center" toastOptions={{
+              className: 'bg-[#161926] border-emerald-500/30 text-white',
+            }} />
           </ThemeProvider>
         </SessionProvider>
       </body>

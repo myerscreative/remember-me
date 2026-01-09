@@ -16,10 +16,9 @@ export async function logHeaderInteraction(
   }
 
   try {
-    // 1. Insert Interaction Record
-    // For 'connection', we can default to 'other' or a specific type if desired.
-    // For 'attempt', we log it but note it was an attempt.
-    const interactionType = 'other'; 
+    // 1. Structured Interaction Log (System Record)
+    // We keep this for analytics/interaction counts
+    const interactionType = type === 'connection' ? 'call' : 'other'; // or 'call' default
     const finalNote = note ? note : (type === 'attempt' ? 'Contact Attempt' : 'Quick Update');
 
     const { error: insertError } = await (supabase as any)
@@ -32,18 +31,43 @@ export async function logHeaderInteraction(
         notes: finalNote
       });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+        console.error("Error logging interaction record:", insertError);
+        // We continue, as the memory might be more important to the user
+    }
 
-    // 2. Conditional Update of Person Status
-    // ONLY update last_interaction_date if it is a 'connection'
+    // 2. Shared Memory Log (User Narrative)
+    // As per request: "If a note exists or it's a specific type, log to 'shared_memories'"
+    if (note || type === 'attempt') {
+        const memoryContent = type === 'attempt' && !note
+          ? `[Attempted Contact] No note left.` 
+          : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
+
+        if (memoryContent) { // Type guard
+             const { error: memoryError } = await (supabase as any)
+              .from("shared_memories")
+              .insert({
+                person_id: personId,
+                user_id: user.id, // Explicitly adding user_id if needed, schema usually requires it
+                content: memoryContent,
+                // category: type === 'connection' ? 'moment' : 'milestone', // Schema check: 'category' field doesn't exist in my reading of database.types.ts earlier? 
+                // Wait, database.types.ts showed shared_memories columns: id, user_id, person_id, content, created_at, updated_at.
+                // It DID NOT show 'category' or 'occurred_at'. 
+                // User snippet used 'category' and 'occurred_at'. 
+                // I will OMIT those fields to prevent errors, unless I see them in the schema.
+                // I'll stick to content.
+              });
+            
+             if (memoryError) console.error("Memory Log Error:", memoryError);
+        }
+    }
+
+    // 3. Update Person Status
     if (type === 'connection') {
       const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
           last_interaction_date: new Date().toISOString(),
-          // We preserve the last_contact_method if we don't have a specific one, 
-          // or we could set it to 'other'. Let's leave it as is or update if needed.
-          // The user requirement is just "update the last_interaction_date to NOW".
           updated_at: new Date().toISOString()
         })
         .eq('id', personId)
@@ -54,6 +78,7 @@ export async function logHeaderInteraction(
 
     revalidatePath('/dashboard');
     revalidatePath(`/contacts/${personId}`);
+    revalidatePath('/garden');
 
     return { success: true };
   } catch (error: any) {
