@@ -24,7 +24,7 @@ export async function logHeaderInteraction(
     console.log('Attempting to insert interaction:', {
       person_id: personId,
       user_id: user.id,
-      interaction_type: interactionType,
+      type: interactionType,
       notes: finalNote
     });
 
@@ -33,8 +33,8 @@ export async function logHeaderInteraction(
       .insert({
         person_id: personId,
         user_id: user.id,
-        interaction_type: interactionType,
-        interaction_date: new Date().toISOString(),
+        type: interactionType,
+        date: new Date().toISOString(),
         notes: finalNote
       });
 

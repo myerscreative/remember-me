@@ -264,7 +264,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                 <p className="text-xs text-gray-500 italic">No interactions yet. Log one above!</p>
               ) : (
                 recentInteractions.map((interaction: any) => {
-                  const date = new Date(interaction.interaction_date);
+                  const date = new Date(interaction.date);
                   const timeAgo = getTimeAgo(date);
                   const isAttempt = interaction.notes?.includes('[Attempted Contact]');
                   
