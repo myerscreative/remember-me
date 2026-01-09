@@ -28,7 +28,8 @@ export async function logHeaderInteraction(
       notes: finalNote
     });
 
-    const { error: insertError } = await (supabase as any)
+    const { error: insertError } = await supabase
+      .schema('public')
       .from('interactions')
       .insert({
         person_id: personId,
