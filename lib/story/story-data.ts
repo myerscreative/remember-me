@@ -13,10 +13,12 @@ export interface Interaction {
   id: string;
   person_id: string;
   user_id: string;
-  type: string;
+  interaction_type: string;
+  type?: string; // Fallback for compatibility
   note: string | null;
   notes?: string | null; // Support for 'notes' column
   created_at: string;
+  interaction_date?: string;
 }
 
 export interface TimelineItem {
@@ -94,12 +96,13 @@ export async function getStoryTimeline(contactId: string): Promise<TimelineItem[
 
   // Add interactions to timeline
   for (const interaction of interactions) {
+    const interactionType = interaction.interaction_type || interaction.type || 'other';
     timelineItems.push({
       id: interaction.id,
       type: 'interaction',
-      date: interaction.created_at,
-      interactionType: interaction.type,
-      content: getInteractionLabel(interaction.type),
+      date: interaction.interaction_date || interaction.created_at,
+      interactionType: interactionType,
+      content: getInteractionLabel(interactionType),
       note: interaction.notes || interaction.note, // Handle both 'notes' and 'note'
     });
   }

@@ -1,19 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StoryGrid } from '@/app/contacts/[id]/components/StoryGrid';
+import { StoryTimeline } from '@/app/contacts/[id]/components/tabs/story/StoryTimeline';
+import { getStoryTimeline, type TimelineItem } from '@/lib/story/story-data';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { 
-  Cake, 
-  Calendar, 
-  Plus, 
-  Trash2, 
-  BookOpen, 
+import {
+  Cake,
+  Calendar,
+  Plus,
+  Trash2,
+  BookOpen,
   Sparkles,
   Save,
-  Loader2
+  Loader2,
+  History
 } from "lucide-react";
 import { updateDeepLore, addMilestone, deleteMilestone, upsertSharedMemory } from "@/app/actions/story-actions";
 import toast from "react-hot-toast";
@@ -46,6 +49,20 @@ export function StoryTab({ contact }: StoryTabProps) {
   const [isAddingMilestone, setIsAddingMilestone] = useState(false);
   const [newMilestone, setNewMilestone] = useState({ label: "", date: "" });
   const [isSubmittingMilestone, setIsSubmittingMilestone] = useState(false);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [isLoadingTimeline, setIsLoadingTimeline] = useState(true);
+
+  // Fetch timeline data
+  const loadTimeline = async () => {
+    setIsLoadingTimeline(true);
+    const data = await getStoryTimeline(contact.id);
+    setTimeline(data);
+    setIsLoadingTimeline(false);
+  };
+
+  useEffect(() => {
+    loadTimeline();
+  }, [contact.id]);
 
   // Group all milestones
   const milestones: Milestone[] = [];
@@ -94,7 +111,27 @@ export function StoryTab({ contact }: StoryTabProps) {
 
   return (
     <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
+
+      {/* Activity Timeline Section */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+            <History className="w-5 h-5 text-blue-500" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Activity History</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Your interactions and shared moments</p>
+          </div>
+        </div>
+        {isLoadingTimeline ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <StoryTimeline items={timeline} />
+        )}
+      </section>
+
       {/* Narrative Cards Section */}
       <section>
         <div className="flex items-center gap-2 mb-6">
@@ -102,12 +139,12 @@ export function StoryTab({ contact }: StoryTabProps) {
              <span className="text-xl">📖</span> The Story
            </h2>
         </div>
-        <StoryGrid 
-            contactId={contact.id} 
+        <StoryGrid
+            contactId={contact.id}
             story={{
               ...contact.story,
               whatFoundInteresting: contact.whatFoundInteresting
-            }} 
+            }}
         />
       </section>
 
