@@ -45,6 +45,8 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                   toast.success('Attempt logged');
               }
               setQuickNote(""); // Clear note
+              // Refresh page to show new interaction
+              window.location.reload();
           } else {
               toast.error('Failed to log interaction');
           }
