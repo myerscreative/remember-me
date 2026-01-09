@@ -23,6 +23,7 @@ import { AvatarCropModal } from "./components/AvatarCropModal";
 import { StoryTab } from "@/app/contacts/[id]/components/tabs/StoryTab";
 import { FamilyTab } from "@/app/contacts/[id]/components/tabs/FamilyTab";
 import { PersonHeader } from "@/app/contacts/[id]/components/PersonHeader";
+import { InteractionLogger } from "@/app/contacts/[id]/components/InteractionLogger";
 import { ContactImportance } from "@/types/database.types";
 import { EditContactModal } from "./components/EditContactModal";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
@@ -374,54 +375,64 @@ export default function ContactDetailPage({
         />
       </div>
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
          
-         <PersonHeader 
-            contact={contact} 
-            onEdit={() => setIsEditModalOpen(true)}
-            onToggleFavorite={handleToggleFavorite}
-            onAvatarClick={() => {
-                if (isUploadingAvatar) return;
-                
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e: any) => {
-                    const file = e.target?.files?.[0];
-                    if (!file) return;
-
-                    console.log('Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
+         {/* MOBILE HEADER (Hidden on Desktop) */}
+         <div className="md:hidden">
+            <PersonHeader 
+                contact={contact} 
+                onEdit={() => setIsEditModalOpen(true)}
+                onToggleFavorite={handleToggleFavorite}
+                onAvatarClick={() => { /* ... existing avatar click logic ... */
+                    if (isUploadingAvatar) return;
                     
-                    if (!file.type.startsWith('image/')) {
-                        toast.error('Please upload an image file (JPG, PNG, etc)');
-                        return;
-                    }
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e: any) => {
+                        const file = e.target?.files?.[0];
+                        if (!file) return;
 
-                    // 20MB Limit for initial load
-                    if (file.size > 20 * 1024 * 1024) {
-                        toast.error('File is too large (max 20MB)');
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        setSelectedImageSrc(reader.result as string);
-                        setIsCropModalOpen(true);
+                        console.log('Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
+                        
+                        if (!file.type.startsWith('image/')) {
+                            toast.error('Please upload an image file (JPG, PNG, etc)');
+                            return;
+                        }
+
+                        // 20MB Limit for initial load
+                        if (file.size > 20 * 1024 * 1024) {
+                            toast.error('File is too large (max 20MB)');
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            setSelectedImageSrc(reader.result as string);
+                            setIsCropModalOpen(true);
+                        };
+                        reader.onerror = (err) => {
+                            console.error('FileReader error:', err);
+                            toast.error('Failed to read image file');
+                        };
+                        reader.readAsDataURL(file);
                     };
-                    reader.onerror = (err) => {
-                        console.error('FileReader error:', err);
-                        toast.error('Failed to read image file');
-                    };
-                    reader.readAsDataURL(file);
-                };
-                input.click();
-            }}
-         />
+                    input.click();
+                }}
+            />
+         </div>
 
 
          {/* SCROLLABLE CONTENT */}
          <main className="flex-1 p-3 md:p-10 max-w-5xl mx-auto w-full md:mt-6 bg-sidebar overflow-x-hidden">
+            
+            {/* DESKTOP INTERACTION LOGGER */}
+            <div className="hidden md:block mb-8 max-w-2xl">
+                <InteractionLogger 
+                    contactId={contact.id} 
+                    contactName={contact.first_name}
+                />
+            </div>
 
             {/* TAB NAVIGATION */}
             <div className="flex items-center gap-6 md:gap-8 border-b border-border/50 mb-6 md:mb-8 overflow-x-auto scrollbar-hide">

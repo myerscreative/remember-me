@@ -8,6 +8,7 @@ import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
 import { toast } from 'sonner';
+import { InteractionLogger } from './InteractionLogger';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
 import { 
   Phone, 
@@ -58,52 +59,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   // Frequency Label (e.g. "Monthly Cadence")
   const frequencyLabel = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly";
 
-  // Interaction Logger State
-  const [quickNote, setQuickNote] = useState("");
-  const [isLogging, setIsLogging] = useState(false);
-  const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Fetch recent interactions on mount and after logging
-  useEffect(() => {
-    const fetchInteractions = async () => {
-      console.log('Fetching interactions for contact:', contact.id);
-      const result = await getRecentInteractions(contact.id, 3);
-      console.log('Interactions result:', result);
-      if (result.success) {
-        setRecentInteractions(result.interactions);
-      }
-    };
-    fetchInteractions();
-  }, [contact.id, refreshTrigger]);
-
-  const handleLogInteraction = async (type: 'connection' | 'attempt') => {
-      console.log('[CLIENT] handleLogInteraction called with type:', type);
-      setIsLogging(true);
-      try {
-          console.log('[CLIENT] Calling logHeaderInteraction...');
-          const result = await logHeaderInteraction(contact.id, type, quickNote);
-          console.log('[CLIENT] logHeaderInteraction result:', result);
-          if (result.success) {
-              // Show appropriate feedback based on action type
-              if (type === 'connection') {
-                  showNurtureToast(contact.first_name);
-              } else {
-                  toast.success('Attempt logged');
-              }
-              setQuickNote(""); // Clear note
-              // Trigger re-fetch of interactions
-              setRefreshTrigger(prev => prev + 1);
-          } else {
-              toast.error('Failed to log interaction');
-          }
-      } catch (err) {
-          console.error('[CLIENT] Error in handleLogInteraction:', err);
-          toast.error('Error logging interaction');
-      } finally {
-          setIsLogging(false);
-      }
-  };
 
   return (
     <div className="relative w-full bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
@@ -225,72 +181,11 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         <div className="w-full max-w-sm border-t border-white/5 mb-6" />
 
         {/* Interaction Logger */}
-        <div className="w-full max-w-sm space-y-3">
-            {/* Note Input */}
-            <input 
-                type="text" 
-                placeholder="Add a quick note..." 
-                value={quickNote}
-                onChange={(e) => setQuickNote(e.target.value)}
-                className="w-full bg-[#242642] border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+        <div className="w-full max-w-sm">
+            <InteractionLogger 
+                contactId={contact.id} 
+                contactName={contact.first_name} 
             />
-            
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-                <button 
-                    onClick={() => handleLogInteraction('attempt')}
-                    disabled={isLogging}
-                    className="flex items-center justify-center py-2.5 rounded-lg border border-orange-500/20 bg-orange-500/10 hover:bg-orange-500/20 active:scale-95 transition-all disabled:opacity-50"
-                >
-                    <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider">
-                        {isLogging ? 'Saving...' : 'Log Attempt'}
-                    </span>
-                </button>
-
-                <button 
-                    onClick={() => handleLogInteraction('connection')}
-                    disabled={isLogging}
-                    className="flex items-center justify-center py-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 transition-all disabled:opacity-50"
-                >
-                     <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
-                        {isLogging ? 'Saving...' : 'Log Connection'}
-                    </span>
-                </button>
-            </div>
-
-            {/* Recent Interactions */}
-            <div className="mt-4 space-y-2">
-              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Recent Activity ({recentInteractions.length})
-              </h4>
-              {recentInteractions.length === 0 ? (
-                <p className="text-xs text-gray-500 italic">No interactions yet. Log one above!</p>
-              ) : (
-                recentInteractions.map((interaction: any) => {
-                  const date = new Date(interaction.interaction_date);
-                  const timeAgo = getTimeAgo(date);
-                  const isAttempt = interaction.notes?.includes('[Attempted Contact]');
-                  
-                  return (
-                    <div 
-                      key={interaction.id} 
-                      className="flex items-start gap-2 p-2 rounded-lg bg-[#1a1b2e] border border-white/5"
-                    >
-                      <div className={cn(
-                        "w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0",
-                        isAttempt ? "bg-orange-400" : "bg-emerald-400"
-                      )} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-300 line-clamp-2">
-                          {interaction.notes || 'No note'}
-                        </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">{timeAgo}</p>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
         </div>
 
       </div>
