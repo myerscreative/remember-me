@@ -7,7 +7,7 @@ import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-hea
 import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { logInteraction } from '@/app/actions/logInteraction';
 import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
 import { 
   Phone, 
