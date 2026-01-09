@@ -189,7 +189,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         <div className="w-full max-w-sm border-t border-white/5 mb-6" />
 
         {/* Interaction Logger */}
-        <div className="w-full max-w-sm space-y-3 border-2 border-red-500 p-2">
+        <div className="w-full max-w-sm space-y-3">
             {/* Note Input */}
             <input 
                 type="text" 
