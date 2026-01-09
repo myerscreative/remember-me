@@ -1,15 +1,47 @@
-```typescript
-// ... imports
+'use client';
+
+import { useState, useOptimistic } from 'react';
+import Link from 'next/link';
+import { Person } from '@/types/database.types';
+import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
+import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
-import { uploadPersonPhoto } from '@/app/actions/upload-photo';
 import { toast } from 'sonner';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
+import { 
+  Phone, 
+  Mail, 
+  MessageSquare, 
+  Camera, 
+  Star, 
+  Calendar,
+  ChevronLeft,
+  Edit2,
+  Cake
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-// ... interface
+interface PersonHeaderProps {
+  contact: Person;
+  onEdit: () => void;
+  onToggleFavorite: () => void;
+  onAvatarClick: () => void;
+}
 
 export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick }: PersonHeaderProps) {
-  // ... existing hooks
+  // Optimistic UI for photo
+  const [optimisticPhotoUrl] = useOptimistic(
+    contact.photo_url,
+    (state: string | null, newUrl: string) => newUrl
+  );
+
+  // Health Calculation
+  const health = getRelationshipHealth(contact.last_interaction_date, contact.target_frequency_days || 30);
   
+  // Frequency Label (e.g. "Monthly Cadence")
+  const frequencyLabel = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly";
+
   // Interaction Logger State
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
@@ -40,7 +72,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   return (
     <div className="relative w-full bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
       
-      {/* ... Top Navigation Bar ... */}
+      {/* Top Navigation Bar */}
       <div className="flex justify-between items-center px-6 mb-6">
          <Link href="/" className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
             <ChevronLeft size={28} />
@@ -57,16 +89,17 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
       <div className="flex flex-col items-center w-full px-6">
         
-        {/* ... Avatar Section ... */}
+        {/* Avatar Section with Ring & Status Dot */}
         <div className="relative group mb-6 cursor-pointer" onClick={onAvatarClick}>
            {/* Glow Effect */}
            <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ backgroundColor: health.color }} />
            
            {/* Ring Container */}
-           <div className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
+           <div 
+                className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
                 style={{ border: `4px solid ${health.color}40` }}
            >
-               {/* Active Ring Segment (simulated with full ring for now, or just the main color) */}
+               {/* Active Ring Segment */}
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
                <Avatar className="w-[124px] h-[124px] border-[4px] border-[#1a1b2e]">
@@ -77,7 +110,8 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                </Avatar>
 
                {/* Status Dot */}
-               <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
+               <div 
+                    className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
                     style={{ backgroundColor: health.color }} 
                />
                
@@ -88,7 +122,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
            </div>
         </div>
 
-        {/* ... Identity Section ... */}
+        {/* Identity Section */}
         <div className="text-center space-y-2 mb-8">
            <h1 className="text-3xl font-bold text-white tracking-tight">
              {contact.first_name} {contact.last_name}
