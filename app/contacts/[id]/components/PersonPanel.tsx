@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/contact-helpers';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MessageSquare, Star, User, IdCard, Loader2 } from 'lucide-react';
