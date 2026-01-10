@@ -8,21 +8,21 @@ export default function GardenLegend() {
       </div>
 
       <div className="space-y-4">
-        {/* Rings */}
+        {/* Rings - Based on Contact Frequency */}
         <div>
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">RELATIONSHIP RINGS</div>
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">CONTACT FREQUENCY RINGS</div>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-              <span>Favorites (Center)</span>
+              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+              <span>High Priority (Center) - Weekly/Biweekly</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              <span>Friends (Middle)</span>
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Medium (Middle) - Monthly</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-              <span>Contacts (Outer)</span>
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              <span>Low (Outer) - Quarterly+</span>
             </div>
           </div>
           <div className="mt-2 text-[10px] text-slate-400 italic">
@@ -33,9 +33,9 @@ export default function GardenLegend() {
         {/* Separator */}
         <div className="h-px bg-slate-100 dark:bg-slate-800"></div>
 
-        {/* Leaf Color */}
+        {/* Leaf Color - Health Status */}
         <div>
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">LEAF COLOR (Contact Status)</div>
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">LEAF COLOR (Health Status)</div>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -59,21 +59,21 @@ export default function GardenLegend() {
         {/* Separator */}
         <div className="h-px bg-slate-100 dark:bg-slate-800"></div>
 
-        {/* Leaf Sizes */}
+        {/* Leaf Sizes - Relationship Type */}
         <div>
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">LEAF SIZE (Contact Frequency)</div>
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-2">LEAF SIZE (Relationship Type)</div>
           <div className="flex items-end gap-3">
             <div className="flex flex-col items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-              <span className="text-[10px] text-slate-500 text-center">Low<br/>(90+ days)</span>
+              <span className="text-[10px] text-slate-500 text-center">Contact</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <div className="w-4 h-4 rounded-full bg-slate-400 dark:bg-slate-500"></div>
-              <span className="text-[10px] text-slate-500 text-center">Medium<br/>(30 days)</span>
+              <div className="w-5 h-5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+              <span className="text-[10px] text-slate-500 text-center">Friend</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 rounded-full bg-slate-600 dark:bg-slate-400"></div>
-              <span className="text-[10px] text-slate-500 font-medium text-center">High<br/>(7 days)</span>
+              <div className="w-7 h-7 rounded-full bg-slate-600 dark:bg-slate-400"></div>
+              <span className="text-[10px] text-slate-500 font-medium text-center">Favorite</span>
             </div>
           </div>
         </div>

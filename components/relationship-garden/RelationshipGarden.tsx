@@ -223,22 +223,27 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       : contacts.filter(c => c.category === filter);
   }, [contacts, filter]);
 
-  // Calculate Ring-Based positions - NEW LAYOUT
+  // Calculate Ring-Based positions - FREQUENCY-BASED LAYOUT
   const leafPositions = useMemo(() => {
-    // 1. Bucket contacts by relationship type
+    // 1. Bucket contacts by contact frequency (target_frequency_days)
     const buckets = {
-      favorites: [] as Contact[],
-      friends: [] as Contact[],
-      contacts: [] as Contact[],
+      highFrequency: [] as Contact[],    // Need to contact often (center)
+      mediumFrequency: [] as Contact[],  // Moderate contact (middle)
+      lowFrequency: [] as Contact[],     // Less frequent contact (outer)
     };
 
     filteredContacts.forEach(contact => {
-      if (contact.is_favorite) {
-        buckets.favorites.push(contact);
-      } else if (contact.importance === 'high') {
-        buckets.friends.push(contact);
+      const targetFreq = contact.target_frequency_days || contact.targetFrequencyDays || 999;
+
+      if (targetFreq <= 14) {
+        // Weekly to biweekly contact needed - center ring
+        buckets.highFrequency.push(contact);
+      } else if (targetFreq <= 45) {
+        // Monthly contact needed - middle ring
+        buckets.mediumFrequency.push(contact);
       } else {
-        buckets.contacts.push(contact);
+        // Quarterly or less - outer ring
+        buckets.lowFrequency.push(contact);
       }
     });
 
@@ -289,20 +294,17 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
         const color = getColorForDays(contact.days);
 
-        // Scale based on target_frequency_days (contact frequency)
-        // More frequent contact needed = bigger leaf
-        let scale = 1.3; // Default
-        const targetFreq = contact.target_frequency_days || contact.targetFrequencyDays;
-        if (targetFreq) {
-          // Convert frequency to scale:
-          // 7 days or less = 1.8 (big)
-          // 30 days = 1.3 (medium)
-          // 90+ days = 0.9 (small)
-          if (targetFreq <= 7) scale = 1.8;
-          else if (targetFreq <= 14) scale = 1.6;
-          else if (targetFreq <= 30) scale = 1.3;
-          else if (targetFreq <= 60) scale = 1.1;
-          else scale = 0.9;
+        // Scale based on relationship type (favorites/friends/contacts)
+        // Favorites = biggest, Friends = medium, Contacts = smaller
+        let scale = 1.0; // Default for contacts
+        if (contact.is_favorite) {
+          scale = 1.8; // Biggest for favorites
+        } else if (contact.importance === 'high') {
+          scale = 1.4; // Medium for friends
+        } else if (contact.importance === 'medium') {
+          scale = 1.0; // Normal for regular contacts
+        } else {
+          scale = 0.8; // Smaller for low importance
         }
 
         // Add random slight rotation jitter for natural look
@@ -312,15 +314,14 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       });
     };
 
-    // 3. Define Rings (radii in pixels) for three relationship types
-    // Center: Favorites (smallest ring)
-    // Middle: Friends (medium ring)
-    // Outer: Contacts (largest ring)
+    // 3. Define Rings (radii in pixels) for three frequency levels
+    // Center: High frequency (contact often - weekly/biweekly)
+    // Middle: Medium frequency (contact monthly)
+    // Outer: Low frequency (contact quarterly or less)
 
-    // Sort buckets by days so more recently contacted are towards inner edge
-    const p1 = calculateRingPositions(buckets.favorites, 50, 180, 0);
-    const p2 = calculateRingPositions(buckets.friends, 181, 350, p1.length * GOLDEN_ANGLE);
-    const p3 = calculateRingPositions(buckets.contacts, 351, 600, (p1.length + p2.length) * GOLDEN_ANGLE);
+    const p1 = calculateRingPositions(buckets.highFrequency, 50, 180, 0);
+    const p2 = calculateRingPositions(buckets.mediumFrequency, 181, 350, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRingPositions(buckets.lowFrequency, 351, 600, (p1.length + p2.length) * GOLDEN_ANGLE);
 
     return [...p1, ...p2, ...p3];
 
@@ -446,7 +447,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       >
         {/* Center label */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
-          Favorites
+          High Priority
         </div>
 
         {/* Info Badge - Desktop Only */}
@@ -472,10 +473,10 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         >
           {/* Leaves Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {/* Render Rings Guidelines - Three rings for Favorites, Friends, Contacts */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border border-purple-500/20 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-blue-500/15 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full border border-slate-500/10 pointer-events-none" />
+            {/* Render Rings Guidelines - Three rings for contact frequency */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border border-red-500/20 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-amber-500/15 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full border border-green-500/10 pointer-events-none" />
             
             {leafPositions.map(({ contact, x, y, rotation, color, scale }) => {
               const isHovered = hoveredContactId === contact.id.toString();
