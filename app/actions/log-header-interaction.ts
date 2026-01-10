@@ -28,7 +28,8 @@ export async function logHeaderInteraction(
     });
 
     // Direct insert to bypass any RPC issues
-    const { error: insertError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
