@@ -16,7 +16,9 @@ export interface Contact {
   category: FilterType;
   lastContactDate?: string;
   targetFrequencyDays?: number;  // For cadence-based health
+  target_frequency_days?: number | null;  // For leaf sizing
   importance?: 'high' | 'medium' | 'low';
+  is_favorite?: boolean;  // For ring placement
 }
 
 interface RelationshipGardenProps {
@@ -221,96 +223,106 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       : contacts.filter(c => c.category === filter);
   }, [contacts, filter]);
 
-  // Calculate Ring-Based positions
+  // Calculate Ring-Based positions - NEW LAYOUT
   const leafPositions = useMemo(() => {
-    // 1. Bucket contacts by health status
+    // 1. Bucket contacts by relationship type
     const buckets = {
-      healthy: [] as Contact[],
-      good: [] as Contact[],
-      warning: [] as Contact[],
-      needsLove: [] as Contact[],
+      favorites: [] as Contact[],
+      friends: [] as Contact[],
+      contacts: [] as Contact[],
     };
 
     filteredContacts.forEach(contact => {
-      const days = contact.days;
-      if (days <= 14) buckets.healthy.push(contact);
-      else if (days <= 45) buckets.good.push(contact);
-      else if (days <= 120) buckets.warning.push(contact);
-      else buckets.needsLove.push(contact);
+      if (contact.is_favorite) {
+        buckets.favorites.push(contact);
+      } else if (contact.importance === 'high') {
+        buckets.friends.push(contact);
+      } else {
+        buckets.contacts.push(contact);
+      }
     });
 
     // 2. Helper to distribute points in a ring using Golden Angle
     const calculateRingPositions = (
-      items: Contact[], 
-      minRadius: number, 
-      maxRadius: number, 
+      items: Contact[],
+      minRadius: number,
+      maxRadius: number,
       startAngleOffset: number
     ) => {
       // Deterministic pseudo-random jitter helper
-      const getJitter = (id: string | number) => {
-        const str = id.toString();
+      const getJitter = (id: string | number, seed: string = '') => {
+        const str = (id.toString() + seed);
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
           hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
-        // Map hash to range [-5, 5]
-        return (hash % 11) - 5;
+        // Map hash to range for random scatter
+        return hash;
       };
 
       const count = items.length;
-      return items.map((contact, i) => {
-        // Pure spiral logic `r = c * sqrt(i)` is best for area filling.
-        // To fill a RING (annulus) from R_inner to R_outer:
-        // Area_inner = pi * R_inner^2
-        // Area_target = Area_inner + (Area_outer - Area_inner) * (i/N)
-        // R_target = sqrt(Area_target / pi)
-        
-        const areaInner = Math.PI * minRadius * minRadius;
-        const areaOuter = Math.PI * maxRadius * maxRadius;
-        const areaTarget = areaInner + (areaOuter - areaInner) * (i + 1) / (count + 1); // +1 to avoid edge crowding
-        const radius = Math.sqrt(areaTarget / Math.PI);
-        
-        const angle = i * GOLDEN_ANGLE + startAngleOffset;
-        
+
+      // Sort by days so more recently contacted are towards inner edge
+      const sortedItems = [...items].sort((a, b) => a.days - b.days);
+
+      return sortedItems.map((contact, i) => {
+        // Calculate base radius within ring based on recency
+        // More recently contacted (lower days) = inner edge
+        // Less recently contacted (higher days) = outer edge
+        const normalizedPosition = i / Math.max(1, count - 1); // 0 to 1
+        const baseRadius = minRadius + (maxRadius - minRadius) * normalizedPosition;
+
+        // Add deterministic random scatter within the ring
+        const jitterAmount = (maxRadius - minRadius) * 0.3; // 30% of ring width
+        const jitter = (getJitter(contact.id, 'radius') % 1000) / 1000 - 0.5; // -0.5 to 0.5
+        const radius = baseRadius + (jitter * jitterAmount);
+
+        // Golden angle for even distribution
+        const angle = i * GOLDEN_ANGLE + startAngleOffset + (getJitter(contact.id, 'angle') % 100) / 100 * 0.5;
+
         // Base coordinates
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
-        
+
         // Rotation: leaf points outward
-        const rotation = (Math.atan2(y, x) * 180 / Math.PI); 
+        const rotation = (Math.atan2(y, x) * 180 / Math.PI);
 
         const color = getColorForDays(contact.days);
-        
-        // Scale based on importance
-        let scale = 1.3; // Default medium
-        if (contact.importance === 'high') scale = 1.8;
-        else if (contact.importance === 'low') scale = 0.9;
-        
-        // Add random slight rotation jitter (+- 15deg) for more natural look
-        // Uses same hash seed to be stable
-        const rotJitter = getJitter(contact.id + 'r') * 2; 
+
+        // Scale based on target_frequency_days (contact frequency)
+        // More frequent contact needed = bigger leaf
+        let scale = 1.3; // Default
+        const targetFreq = contact.target_frequency_days || contact.targetFrequencyDays;
+        if (targetFreq) {
+          // Convert frequency to scale:
+          // 7 days or less = 1.8 (big)
+          // 30 days = 1.3 (medium)
+          // 90+ days = 0.9 (small)
+          if (targetFreq <= 7) scale = 1.8;
+          else if (targetFreq <= 14) scale = 1.6;
+          else if (targetFreq <= 30) scale = 1.3;
+          else if (targetFreq <= 60) scale = 1.1;
+          else scale = 0.9;
+        }
+
+        // Add random slight rotation jitter for natural look
+        const rotJitter = (getJitter(contact.id, 'rot') % 30) - 15; // -15 to +15 degrees
 
         return { contact, x, y, rotation: rotation + rotJitter, color, scale };
       });
     };
 
-    // 3. Define Rings (radii in pixels) with dynamic sizing
-    // If Blooming ring is sparse (<10), pull it in tighter to 120px
-    const bloomingCount = buckets.healthy.length;
-    const r1Max = bloomingCount < 10 ? 120 : 180;
-    
-    // Sort buckets by days so inner-most in each ring are the "healthiest" of that ring
-    buckets.healthy.sort((a,b) => a.days - b.days);
-    buckets.good.sort((a,b) => a.days - b.days);
-    buckets.warning.sort((a,b) => a.days - b.days);
-    buckets.needsLove.sort((a,b) => a.days - b.days);
+    // 3. Define Rings (radii in pixels) for three relationship types
+    // Center: Favorites (smallest ring)
+    // Middle: Friends (medium ring)
+    // Outer: Contacts (largest ring)
 
-    const p1 = calculateRingPositions(buckets.healthy, 50, r1Max, 0);
-    const p2 = calculateRingPositions(buckets.good, r1Max + 1, 300, p1.length * GOLDEN_ANGLE);
-    const p3 = calculateRingPositions(buckets.warning, 301, 450, (p1.length + p2.length) * GOLDEN_ANGLE);
-    const p4 = calculateRingPositions(buckets.needsLove, 451, 700, (p1.length + p2.length + p3.length) * GOLDEN_ANGLE);
+    // Sort buckets by days so more recently contacted are towards inner edge
+    const p1 = calculateRingPositions(buckets.favorites, 50, 180, 0);
+    const p2 = calculateRingPositions(buckets.friends, 181, 350, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRingPositions(buckets.contacts, 351, 600, (p1.length + p2.length) * GOLDEN_ANGLE);
 
-    return [...p1, ...p2, ...p3, ...p4];
+    return [...p1, ...p2, ...p3];
 
   }, [filteredContacts]);
 
@@ -434,7 +446,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       >
         {/* Center label */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
-          Most Recent
+          Favorites
         </div>
 
         {/* Info Badge - Desktop Only */}
@@ -460,10 +472,10 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         >
           {/* Leaves Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {/* Render Rings Guidelines (Optional, helpful for debugging/visual structure) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-green-500/10 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-lime-500/10 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-amber-500/10 pointer-events-none" />
+            {/* Render Rings Guidelines - Three rings for Favorites, Friends, Contacts */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border border-purple-500/20 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-blue-500/15 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full border border-slate-500/10 pointer-events-none" />
             
             {leafPositions.map(({ contact, x, y, rotation, color, scale }) => {
               const isHovered = hoveredContactId === contact.id.toString();

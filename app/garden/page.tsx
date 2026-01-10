@@ -98,6 +98,8 @@ interface ExtendedContact extends Contact {
   company?: string | null;
   interests?: string[] | null;
   tags?: string[];
+  is_favorite?: boolean;
+  target_frequency_days?: number | null;
 }
 
 export default function GardenPage() {
@@ -144,7 +146,7 @@ export default function GardenPage() {
       // Fetch persons and relationships
       const { data: persons, error: fetchError } = await (supabase as any)
         .from('persons')
-        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance, company, interests')
+        .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance, company, interests, is_favorite, target_frequency_days')
         .eq('user_id', user.id)
         .eq('archived', false)
         .order('name');
@@ -177,7 +179,9 @@ export default function GardenPage() {
           category: mapTagsToCategory(interestsList), // Using interests for categorization
           company: person.company,
           interests: person.interests,
-          tags: interestsList // Using interests as fallback for tags
+          tags: interestsList, // Using interests as fallback for tags
+          is_favorite: person.is_favorite || false,
+          target_frequency_days: person.target_frequency_days
         };
       });
 
