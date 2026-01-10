@@ -1,5 +1,5 @@
--- Create a database function to insert interactions
--- This bypasses the schema path issue by using explicit schema references
+-- Force update the function with correct column names
+-- This ensures the fix is applied even if the previous migration was already run
 
 CREATE OR REPLACE FUNCTION public.insert_interaction(
   p_person_id UUID,
@@ -18,7 +18,7 @@ BEGIN
   INSERT INTO public.interactions (
     person_id,
     user_id,
-    type,
+    type, 
     date,
     notes
   ) VALUES (
