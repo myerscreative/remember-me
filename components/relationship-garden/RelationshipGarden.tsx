@@ -52,7 +52,7 @@ function getStatusLabel(days: number): string {
   return 'Fading';
 }
 
-import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles, Search, X } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles, Search, X, Save } from 'lucide-react';
 
 // ... existing imports ...
 
@@ -412,6 +412,13 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
             >
               ⊙
             </button>
+            <button
+              onClick={handleSetDefaultZoom}
+              className={`w-8 h-8 md:w-7 md:h-7 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95 ml-1 ${saved ? 'text-green-500 dark:text-green-400 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : ''}`}
+              title="Set Default Zoom"
+            >
+              {saved ? <Sparkles className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+            </button>
           </div>
         </div>
 
@@ -452,12 +459,12 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         </div>
 
         {/* Info Badge - Desktop Only */}
-        <div className="hidden md:block absolute top-5 right-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 p-5 rounded-2xl shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/20 text-right z-10 transition-all hover:scale-105 duration-300">
-          <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider mb-1">Showing</div>
-          <div className="text-lg font-bold text-slate-800 dark:text-slate-100">
+        <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-[2rem] shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
+          <div className="text-2xl font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm">
             {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
           </div>
-          <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 opacity-90">
             {filteredContacts.length} contacts
           </div>
         </div>

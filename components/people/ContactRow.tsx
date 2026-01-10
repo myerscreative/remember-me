@@ -5,7 +5,7 @@ import React from "react";
 import { Person } from "@/types/database.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getBirthdayDisplayInfo, getLastContactText, getStatusConfig, getFrequencyLabel } from "@/lib/utils/date-helpers";
-import { getInitials } from "@/lib/utils/get-initials"; // Assuming this exists or I should inline it? I'll inline for safety or check.
+import { getInitials } from "@/lib/utils/contact-helpers";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +18,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
   const router = useRouter();
 
   // Avatar Initials
-  const initials = contact.first_name?.[0] + (contact.last_name?.[0] || "");
+  const initials = getInitials(contact.first_name, contact.last_name);
   
   // Relationship Badge
   const getRelationshipBadge = () => {
