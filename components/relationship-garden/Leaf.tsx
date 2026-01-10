@@ -58,16 +58,10 @@ export default function Leaf({
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full drop-shadow-sm hover:drop-shadow-lg transition-all"
       >
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} stopOpacity="1" />
-            <stop offset="100%" stopColor={darker} stopOpacity="1" />
-          </linearGradient>
-        </defs>
         {/* Round part at bottom (toward center), pointy at top (outward) */}
         <path
           d="M 21 46 C 14 42, 6 36, 4 24 C 4 14, 9 6, 21 2 C 33 6, 38 14, 38 24 C 36 36, 28 42, 21 46 Z"
-          fill={`url(#${gradientId})`}
+          fill={color}
           stroke={darkest}
           strokeWidth="0.5"
         />
