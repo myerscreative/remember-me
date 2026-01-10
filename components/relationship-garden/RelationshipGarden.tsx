@@ -283,7 +283,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         const radius = baseRadius + (jitter * jitterAmount);
 
         // Golden angle for even distribution
-        const angle = i * GOLDEN_ANGLE + startAngleOffset + (getJitter(contact.id, 'angle') % 100) / 100 * 0.5;
+        const angle = i * GOLDEN_ANGLE + startAngleOffset + (getJitter(contact.id, 'angle') % 100) / 100 * 0.1;
 
         // Base coordinates
         const x = Math.cos(angle) * radius;
