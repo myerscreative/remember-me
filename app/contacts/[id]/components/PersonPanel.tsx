@@ -79,8 +79,8 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
             className="w-24 h-24 md:w-[100px] md:h-[100px] rounded-full bg-[#2d3748] flex items-center justify-center text-3xl md:text-[40px] font-semibold text-white overflow-hidden border-[3px]"
             style={{ borderColor: healthColor }}
           >
-            {contact.avatar_url ? (
-              <img src={contact.avatar_url} alt={contact.name} className="w-full h-full object-cover" />
+            {contact.photo_url || contact.avatar_url ? (
+              <img src={contact.photo_url || contact.avatar_url} alt={contact.name} className="w-full h-full object-cover" />
             ) : (
               getInitials(contact.firstName || contact.first_name || contact.name)
             )}
