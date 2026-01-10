@@ -5,8 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sparkles, Plus, Tag, X, Loader2, Info, Mail, MapPin, Users, Phone, MessageSquare, Edit2, Check, RefreshCw } from 'lucide-react';
+import { Sparkles, Plus, Tag, X, Loader2, Mail, MapPin, Users, Phone, Edit2, Check, RefreshCw } from 'lucide-react';
 import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
@@ -308,19 +307,6 @@ export function OverviewTab({ contact }: OverviewTabProps) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Tag className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" /> Tags
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Tags info" role="button" />
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-[9999]" align="start">
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed mb-3">
-                        <span className="text-slate-900 dark:text-white font-bold">Organize your Tribes.</span> Group contacts by commonalities (e.g., &apos;NASA&apos;, &apos;Japan&apos;, &apos;Family&apos;).
-                      </p>
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                        This allows you to monitor the health of entire groups at once on your <span className="text-slate-900 dark:text-white font-bold">Dashboard</span>.
-                      </p>
-                    </PopoverContent>
-                  </Popover>
                 </h3>
                 <Button 
                     variant="ghost" 
@@ -377,19 +363,6 @@ export function OverviewTab({ contact }: OverviewTabProps) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Interests
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors cursor-pointer focus:outline-none" aria-label="Interests info" role="button" />
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-[9999]" align="start">
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed mb-3">
-                        <span className="text-slate-900 dark:text-white font-bold">Personalize your Touch.</span> Log specific likes or hobbies here.
-                      </p>
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                        Use these details to craft meaningful messages that resonate when it&apos;s time to water the relationship.
-                      </p>
-                    </PopoverContent>
-                  </Popover>
                 </h3>
                 <Button 
                     variant="ghost" 
@@ -446,18 +419,7 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       {/* RIGHT SIDEBAR */}
       <div className="w-full xl:w-80 space-y-6">
            
-           {/* Reach Out Action */}
-           <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-5 shadow-sm">
-               <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider mb-2">Ready to connect?</h3>
-               <p className="text-xs text-indigo-700/70 dark:text-indigo-300/60 mb-4">Generate a personalized script based on your memories.</p>
-               <Button 
-                onClick={() => setIsReachOutOpen(true)}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9 font-semibold"
-               >
-                  <MessageSquare className="w-3.5 h-3.5 mr-2" />
-                   Draft Reconnection
-               </Button>
-           </div>
+
 
            {/* Contact Info Card */}
           <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
@@ -497,13 +459,10 @@ export function OverviewTab({ contact }: OverviewTabProps) {
 
           {/* Family & Connections Ghost State */}
           {(!contact.familyMembers || contact.familyMembers.length === 0) && (
-             <div className="bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center">
-                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mx-auto mb-3">
-                     <Users className="w-5 h-5 text-indigo-500" />
-                 </div>
-                 <h4 className="text-sm font-semibold text-foreground mb-1">No Connections</h4>
-                 <p className="text-xs text-muted-foreground mb-4">Link this contact to others to build your network.</p>
-                 <Button variant="outline" size="sm" className="w-full text-xs">
+             <div className="text-center py-4">
+                 <p className="text-sm text-muted-foreground mb-3">No connections yet</p>
+                 <Button variant="outline" size="sm" className="text-xs">
+                    <Users className="w-3.5 h-3.5 mr-1.5" />
                     Link a Connection
                  </Button>
              </div>

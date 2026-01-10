@@ -3,9 +3,7 @@ import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, Clock, Briefcase, Cake, Repeat, Info, Edit2, Camera, Loader2, Star } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2, Star } from 'lucide-react';
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
 import { FREQUENCY_PRESETS, getRelationshipHealth } from '@/lib/relationship-health';
@@ -149,7 +147,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                 />
                 
                 {/* Glow Effect */}
-                <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ backgroundColor: health.color }} />
+                <div className="absolute inset-0 rounded-full blur-xl opacity-10" style={{ backgroundColor: health.color }} />
             
                 {/* Ring Container */}
                 <div 
@@ -198,15 +196,13 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                     {contact.company}
                 </p>
             )}
-             {/* Birthday Badge */}
-             <div className="flex items-center justify-center gap-2 mb-4">
-                <Badge variant="outline" className="px-3 py-1.5 bg-[#242642] border-white/10 text-gray-300 rounded-full font-medium">
-                    <Cake className="w-3.5 h-3.5 mr-1.5 inline-block -mt-0.5 text-indigo-400" />
-                    {contact.birthday
-                    ? new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-                    : "Birthday: Not set"}
-                </Badge>
-            </div>
+             {/* Birthday */}
+             {contact.birthday && (
+                <div className="flex items-center justify-center gap-1.5 mb-3 text-sm text-gray-400">
+                    <Cake className="w-4 h-4 text-indigo-400" />
+                    <span>{new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</span>
+                </div>
+             )}
         </div>
 
         {/* 2. Action Buttons */}
@@ -271,14 +267,6 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                 <div>
                    <div className="flex items-center gap-2 text-sm text-gray-400 mb-1.5">
                       <span className="font-medium">Relationship Level</span>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Info className="w-3.5 h-3.5 text-gray-500 hover:text-indigo-400 transition-colors cursor-pointer" />
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64 p-4 bg-[#1E293B] border-white/10 shadow-xl rounded-xl z-[9999]">
-                             <p className="text-gray-300 text-xs">Defines the depth of your connection.</p>
-                        </PopoverContent>
-                      </Popover>
                    </div>
                    <ImportanceSelector 
                       importance={contact.importance || 'medium'} 
@@ -332,85 +320,9 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
              </div>
         </div>
 
-        {/* Last Contact Editor (Manual Override) */}
-        <div className="pt-2 border-t border-white/5">
-           <LastContactEditor
-               currentDate={contact.last_contact_date}
-               currentMethod={contact.last_contact_method}
-               displayText={lastContactDisplay()}
-               onSave={(date, method) => onLastContactChange?.(date, method)}
-           />
-        </div>
         
       </div>
     </aside>
   );
 }
 
-// Inline Last Contact Editor Component
-function LastContactEditor({ 
-  currentDate, 
-  currentMethod, 
-  displayText,
-  onSave 
-}: { 
-  currentDate?: string;
-  currentMethod?: string;
-  displayText: string;
-  onSave?: (date: string, method: string) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [date, setDate] = useState(currentDate?.split('T')[0] || '');
-  const [method, setMethod] = useState(currentMethod || '');
-
-  const handleSave = () => {
-    onSave?.(date, method);
-    setIsOpen(false);
-  };
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <div className="flex items-center gap-2 text-xs text-gray-500 hover:text-indigo-400 cursor-pointer transition-colors group justify-center">
-          <Clock className="w-3.5 h-3.5" />
-          <span>Last contact: {displayText}</span>
-          <Edit2 className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-      </PopoverTrigger>
-      <PopoverContent className="w-72 p-4 bg-[#1E293B] border border-white/10 shadow-xl rounded-xl z-[9999]">
-        <h4 className="text-sm font-semibold text-white mb-3">Manual Override</h4>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs font-medium text-gray-400 mb-1 block">Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-[#242642] text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-400 mb-1 block">Method</label>
-            <select
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-[#242642] text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="">Select method...</option>
-              <option value="call">Call</option>
-              <option value="email">Email</option>
-              <option value="text">Text</option>
-              <option value="meeting">Meeting</option>
-            </select>
-          </div>
-          <Button 
-            onClick={handleSave}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg"
-          >
-            Update History manually
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
