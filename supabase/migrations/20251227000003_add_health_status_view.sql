@@ -11,8 +11,8 @@ END $$;
 -- 2. Create or replace the health status view
 CREATE OR REPLACE VIEW person_health_status AS
 WITH last_interactions AS (
-    -- Using 'interaction_date' from interactions table
-    SELECT person_id, MAX(interaction_date) as last_contact 
+    -- Using 'date' from interactions table
+    SELECT person_id, MAX(date) as last_contact 
     FROM interactions
     GROUP BY person_id
 )
