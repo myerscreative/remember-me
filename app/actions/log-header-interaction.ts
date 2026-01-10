@@ -28,8 +28,7 @@ export async function logHeaderInteraction(
     });
 
     // Direct insert to bypass any RPC issues
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: insertError } = await (supabase as any)
+    const { error: insertError } = await supabase
       .from('interactions')
       .insert({
         person_id: personId,
@@ -53,8 +52,7 @@ export async function logHeaderInteraction(
           : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
         if (memoryContent) {
-             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-             const { error: memoryError } = await (supabase as any)
+             const { error: memoryError } = await supabase
               .from("shared_memories")
               .insert({
                 person_id: personId,

@@ -289,8 +289,8 @@ export interface Database {
           id: string
           person_id: string
           user_id: string
-          interaction_type: 'meeting' | 'call' | 'email' | 'message' | 'other'
-          interaction_date: string
+          type: 'meeting' | 'call' | 'email' | 'message' | 'other' | 'text' | 'in-person' | 'social'
+          date: string
           title: string | null
           notes: string | null
           next_goal_note: string | null // Added
@@ -303,8 +303,8 @@ export interface Database {
           id?: string
           person_id: string
           user_id: string
-          interaction_type: 'meeting' | 'call' | 'email' | 'message' | 'other'
-          interaction_date?: string
+          type: 'meeting' | 'call' | 'email' | 'message' | 'other' | 'text' | 'in-person' | 'social'
+          date?: string
           title?: string | null
           notes?: string | null
           next_goal_note?: string | null // Added
@@ -317,8 +317,8 @@ export interface Database {
           id?: string
           person_id?: string
           user_id?: string
-          interaction_type?: 'meeting' | 'call' | 'email' | 'message' | 'other'
-          interaction_date?: string
+          type?: 'meeting' | 'call' | 'email' | 'message' | 'other' | 'text' | 'in-person' | 'social'
+          date?: string
           title?: string | null
           notes?: string | null
           next_goal_note?: string | null // Added
