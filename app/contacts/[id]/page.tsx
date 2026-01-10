@@ -453,7 +453,12 @@ export default function ContactDetailPage({
             {/* TAB CONTENT */}
             <div className="min-h-[500px]">
                 {activeTab === "Overview" && (
-                    <OverviewTab contact={contact} />
+                    <OverviewTab 
+                      contact={contact}
+                      onFrequencyChange={handleFrequencyChange}
+                      onImportanceChange={handleImportanceChange}
+                      onNavigateToTab={setActiveTab}
+                    />
                 )}
                 
                 {activeTab === "Story" && (

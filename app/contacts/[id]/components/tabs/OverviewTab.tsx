@@ -1,24 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Plus, Tag, X, Loader2, Mail, MapPin, Users, Phone, MessageSquare, Edit2, Check, RefreshCw } from 'lucide-react';
-import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
+import { Sparkles, Plus, Tag, X, Loader2, MessageSquare } from 'lucide-react';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
-import { processMemory } from '@/app/actions/process-memory';
-import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { ReachOutPanel } from '@/components/contacts/ReachOutPanel';
+import { getInteractionStats } from '@/app/actions/get-interaction-stats';
+import { getConnectionCount } from '@/app/actions/get-connection-count';
+
+// New components
+import { AISynopsisCard } from './overview/AISynopsisCard';
+import { ContactInfoGrid } from './overview/ContactInfoGrid';
+import { RelationshipSettingsCard } from './overview/RelationshipSettingsCard';
+import { QuickStatsCard } from './overview/QuickStatsCard';
+import { ConnectionsNotice } from './overview/ConnectionsNotice';
 
 // Minimal Contact type for typing
 interface Contact {
   id: string;
   name: string;
+  firstName?: string;
+  first_name?: string;
   story: any;
   tags?: string[];
   interests?: string[];
@@ -28,14 +35,25 @@ interface Contact {
   relationship_summary?: string | null;
   ai_summary?: string | null;
   where_met?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  last_contact_date?: string | null;
+  last_contacted_date?: string | null;
+  next_contact_date?: string | null;
+  target_frequency_days?: number;
+  importance?: 'high' | 'medium' | 'low';
+  updated_at?: string;
   [key: string]: any;
 }
 
 interface OverviewTabProps {
   contact: Contact;
+  onFrequencyChange?: (days: number) => void;
+  onImportanceChange?: (importance: 'high' | 'medium' | 'low') => void;
+  onNavigateToTab?: (tab: string) => void;
 }
 
-export function OverviewTab({ contact }: OverviewTabProps) {
+export function OverviewTab({ contact, onFrequencyChange, onImportanceChange, onNavigateToTab }: OverviewTabProps) {
   const [tags, setTags] = useState<string[]>(contact.tags || []);
   const [interests, setInterests] = useState<string[]>(contact.interests || []);
   
@@ -48,18 +66,42 @@ export function OverviewTab({ contact }: OverviewTabProps) {
   const [submittingInterest, setSubmittingInterest] = useState(false);
   const [isReachOutOpen, setIsReachOutOpen] = useState(false);
 
-  // Synopsis editing state
-  const [isEditingSynopsis, setIsEditingSynopsis] = useState(false);
-  const [editedSynopsis, setEditedSynopsis] = useState(contact.deep_lore || '');
-  const [isSavingSynopsis, setIsSavingSynopsis] = useState(false);
-  const [isRefreshingSynopsis, setIsRefreshingSynopsis] = useState(false);
+  // Stats state
+  const [interactionCount, setInteractionCount] = useState(0);
+  const [connectionCount, setConnectionCount] = useState(0);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  // Fetch stats on mount
+  useEffect(() => {
+    async function fetchStats() {
+      setIsLoadingStats(true);
+      try {
+        const [interactionResult, connectionResult] = await Promise.all([
+          getInteractionStats(contact.id),
+          getConnectionCount(contact.id)
+        ]);
+
+        if (interactionResult.success) {
+          setInteractionCount(interactionResult.count);
+        }
+        if (connectionResult.success) {
+          setConnectionCount(connectionResult.count);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+
+    fetchStats();
+  }, [contact.id]);
 
   // Handlers
   const handleAddTag = async () => {
     if (!tagInput.trim()) return;
     const newTag = tagInput.trim();
     
-    // Optimistic update
     setTags(prev => [...prev, newTag]);
     setTagInput('');
     setSubmittingTag(true);
@@ -91,7 +133,6 @@ export function OverviewTab({ contact }: OverviewTabProps) {
     if (!interestInput.trim()) return;
     const newInterest = interestInput.trim();
 
-    // Optimistic update
     setInterests(prev => [...prev, newInterest]);
     setInterestInput('');
     setSubmittingInterest(true);
@@ -133,46 +174,15 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       }
   };
 
-  const handleSaveSynopsis = async () => {
-    setIsSavingSynopsis(true);
-    try {
-      const supabase = createClient();
-      const { error } = await (supabase as any)
-        .from('persons')
-        .update({ deep_lore: editedSynopsis })
-        .eq('id', contact.id);
-
-      if (error) throw error;
-
-      contact.deep_lore = editedSynopsis;
-      setIsEditingSynopsis(false);
-      toast.success('Synopsis updated');
-    } catch (error) {
-      console.error('Error saving synopsis:', error);
-      toast.error('Failed to save synopsis');
-    } finally {
-      setIsSavingSynopsis(false);
+  const handleNavigateToStory = () => {
+    if (onNavigateToTab) {
+      onNavigateToTab('Story');
     }
   };
 
-  const handleRefreshSynopsis = async () => {
-    setIsRefreshingSynopsis(true);
-    try {
-      // Re-process existing deep_lore to regenerate with latest AI formatting
-      const currentContent = contact.deep_lore || 'Regenerate synopsis for this person';
-      const result = await processMemory(contact.id, currentContent);
-      
-      if (result.success) {
-        // Refresh the page to show updated content
-        window.location.reload();
-      } else {
-        toast.error('Failed to refresh synopsis');
-      }
-    } catch (error) {
-      console.error('Error refreshing synopsis:', error);
-      toast.error('Failed to refresh synopsis');
-    } finally {
-      setIsRefreshingSynopsis(false);
+  const handleNavigateToFamily = () => {
+    if (onNavigateToTab) {
+      onNavigateToTab('Family');
     }
   };
 
@@ -180,307 +190,187 @@ export function OverviewTab({ contact }: OverviewTabProps) {
     <div className="flex flex-col xl:flex-row gap-4 md:gap-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
       
       {/* MAIN CONTENT COLUMN */}
-      <div className="flex-1 space-y-8 min-w-0">
+      <div className="flex-1 space-y-6 min-w-0">
         
-        {/* AI Synopsis - Always Visible */}
-        <section className="bg-gradient-to-br from-indigo-50 via-purple-50/30 to-white dark:from-[#1E293B] dark:via-[#1E293B] dark:to-[#0F172A] border-2 border-indigo-200/50 dark:border-indigo-900/50 rounded-2xl p-6 shadow-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-indigo-900 dark:text-indigo-200 font-bold text-lg">
-              AI Synopsis
-            </h2>
-          </div>
-          
-          {/* Content or Empty State with Integrated Input */}
-          {contact.deep_lore || contact.where_met || contact.ai_summary ? (
-            <>
-              <div className="space-y-4 mb-6">
-                 {/* Unified Synopsis Display */}
-                 <div className="bg-white/60 dark:bg-slate-800/30 rounded-lg p-5 border border-indigo-100 dark:border-indigo-900/30 relative group">
-                    {/* Edit/Refresh buttons */}
-                    <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                        onClick={handleRefreshSynopsis}
-                        disabled={isRefreshingSynopsis || isEditingSynopsis}
-                      >
-                        <RefreshCw className={cn("h-3.5 w-3.5", isRefreshingSynopsis && "animate-spin")} />
-                      </Button>
-                      {!isEditingSynopsis && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                          onClick={() => {
-                            setIsEditingSynopsis(true);
-                            setEditedSynopsis(contact.deep_lore || '');
-                          }}
-                        >
-                          <Edit2 className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                    </div>
+        {/* AI Synopsis Card */}
+        <AISynopsisCard
+          contactId={contact.id}
+          contactName={contact.firstName || contact.first_name || contact.name}
+          deepLore={contact.deep_lore}
+          whereMet={contact.where_met}
+          aiSummary={contact.ai_summary}
+          lastUpdated={contact.updated_at}
+          onNavigateToStory={handleNavigateToStory}
+        />
 
-                    {isEditingSynopsis ? (
-                      <div className="space-y-3">
-                        <Textarea
-                          value={editedSynopsis}
-                          onChange={(e) => setEditedSynopsis(e.target.value)}
-                          className="min-h-[200px] text-sm font-medium"
-                          placeholder="Edit synopsis..."
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingSynopsis(false);
-                              setEditedSynopsis(contact.deep_lore || '');
-                            }}
-                            disabled={isSavingSynopsis}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={handleSaveSynopsis}
-                            disabled={isSavingSynopsis}
-                            className="bg-indigo-600 hover:bg-indigo-700"
-                          >
-                            {isSavingSynopsis ? (
-                              <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Saving...</>
-                            ) : (
-                              <><Check className="h-3 w-3 mr-1" /> Save</>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-medium pr-16">
-                            {contact.deep_lore || contact.ai_summary || "No synopsis available."}
-                        </p>
-                        
-                        {/* Append Where Met if not included in deep_lore (simple check) */}
-                        {contact.where_met && (!contact.deep_lore || !contact.deep_lore.includes(contact.where_met)) && (
-                            <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mt-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/10">
-                                <span className="font-semibold text-indigo-600 dark:text-indigo-400">Where we met:</span> {contact.where_met}
-                            </p>
-                        )}
-                      </>
-                    )}
-                 </div>
-              </div>
-              
-              {/* Memory Capture - Below content */}
-              <div className="pt-4 border-t border-indigo-200/50 dark:border-indigo-900/30">
-                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mb-3 uppercase tracking-wider">
-                  Add More Memories
-                </p>
-                <MemoryCapture contactId={contact.id} />
-              </div>
-            </>
-          ) : (
-            <div className="space-y-6">
-              <div className="text-center py-4">
-                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  No story yet
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
-                  Start building {contact.name?.split(' ')[0] || 'this person'}'s story. 
-                  Share where you met, memorable moments, or anything that helps you remember your connection.
-                </p>
-              </div>
-              
-              {/* Memory Capture - Integrated in empty state */}
-              <MemoryCapture contactId={contact.id} />
-            </div>
-          )}
-        </section>
+        {/* Contact Info Grid */}
+        <ContactInfoGrid
+          email={contact.email}
+          phone={contact.phone}
+        />
 
-        {/* Tags & Interests Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Tags Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col shadow-sm transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                  <Tag className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" /> Tags
+        {/* Relationship Settings */}
+        <RelationshipSettingsCard
+          importance={contact.importance || 'medium'}
+          targetFrequencyDays={contact.target_frequency_days || 30}
+          onImportanceChange={(importance) => {
+            if (onImportanceChange) {
+              onImportanceChange(importance);
+            }
+          }}
+          onFrequencyChange={(days) => {
+            if (onFrequencyChange) {
+              onFrequencyChange(days);
+            }
+          }}
+        />
+
+        {/* Tags & Interests - Single Card with 2-column layout */}
+        <section className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Tags Column */}
+            <div className="min-w-0">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                  🏷️ Tags
                 </h3>
                 <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => setIsTagsOpen(!isTagsOpen)}
-                    className={cn("h-6 w-6 p-0 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5", isTagsOpen && "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-400/10")}
+                    className={cn("h-6 w-6 p-0 text-muted-foreground hover:text-foreground", isTagsOpen && "text-teal-600 dark:text-teal-400")}
                 >
                   <Plus className={cn("w-4 h-4 transition-transform", isTagsOpen && "rotate-45")} />
                 </Button>
               </div>
               
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-3">
                 {tags.length > 0 ? (
                   tags.map((tag: string, i: number) => (
                     <Badge 
                         key={i} 
-                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-teal-500/50 hover:text-teal-600 dark:hover:text-teal-400 transition-all cursor-default pr-2"
+                        className="group bg-muted border border-border text-foreground rounded-lg px-3 py-1 text-xs font-medium hover:border-teal-500/50 transition-all cursor-default"
                     >
                         {tag}
                         <button 
                             onClick={() => handleRemoveTag(tag)}
-                            className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500 dark:hover:text-rose-400 focus:opacity-100"
+                            className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500 focus:opacity-100"
                         >
                             <X className="w-3 h-3" />
                         </button>
                     </Badge>
                   ))
                 ) : (
-                  !isTagsOpen && <p className="text-xs font-medium text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-2">No tags set</p>
+                  !isTagsOpen && <span className="text-xs text-muted-foreground italic">No tags</span>
                 )}
               </div>
 
               {isTagsOpen && (
-                  <div className="mt-auto pt-2 animate-in fade-in slide-in-from-top-1">
+                  <div className="animate-in fade-in slide-in-from-top-1">
                       <div className="flex gap-2">
                           <Input 
                               value={tagInput}
                               onChange={(e) => setTagInput(e.target.value)}
                               onKeyDown={(e) => handleKeyDown(e, handleAddTag, setTagInput)}
                               placeholder="Add a tag..."
-                              className="h-9 text-sm bg-white dark:bg-transparent border-slate-200 dark:border-slate-700"
+                              className="h-8 text-sm"
                               autoFocus
                           />
-                          <Button size="sm" onClick={handleAddTag} disabled={!tagInput.trim() || submittingTag}>
-                              {submittingTag ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                          <Button size="sm" onClick={handleAddTag} disabled={!tagInput.trim() || submittingTag} className="h-8">
+                              {submittingTag ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                           </Button>
                       </div>
                   </div>
               )}
             </div>
 
-            {/* Interests Section */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col shadow-sm transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Interests
+            {/* Interests Column */}
+            <div className="min-w-0">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                  ✨ Interests
                 </h3>
                 <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => setIsInterestsOpen(!isInterestsOpen)}
-                    className={cn("h-6 w-6 p-0 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5", isInterestsOpen && "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-400/10")}
+                    className={cn("h-6 w-6 p-0 text-muted-foreground hover:text-foreground", isInterestsOpen && "text-purple-600 dark:text-purple-400")}
                 >
                   <Plus className={cn("w-4 h-4 transition-transform", isInterestsOpen && "rotate-45")} />
                 </Button>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-3">
                 {interests.length > 0 ? (
                   interests.map((interest: string, i: number) => (
                     <Badge 
                         key={i} 
-                        className="group bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-[0.5rem] px-3.5 py-1.5 text-[0.75rem] font-medium hover:border-purple-500/50 hover:text-purple-600 dark:hover:text-purple-400 transition-all cursor-default pr-2"
+                        className="group bg-muted border border-border text-foreground rounded-lg px-3 py-1 text-xs font-medium hover:border-purple-500/50 transition-all cursor-default"
                     >
                         {interest}
                         <button 
                             onClick={() => handleRemoveInterest(interest)}
-                            className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500 dark:hover:text-rose-400 focus:opacity-100"
+                            className="ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500 focus:opacity-100"
                         >
                             <X className="w-3 h-3" />
                         </button>
                     </Badge>
                   ))
                 ) : (
-                    !isInterestsOpen && <p className="text-xs font-medium text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-2">No interests set</p>
+                    !isInterestsOpen && <span className="text-xs text-muted-foreground italic">No interests</span>
                 )}
               </div>
 
               {isInterestsOpen && (
-                  <div className="mt-auto pt-2 animate-in fade-in slide-in-from-top-1">
+                  <div className="animate-in fade-in slide-in-from-top-1">
                       <div className="flex gap-2">
                           <Input 
                               value={interestInput}
                               onChange={(e) => setInterestInput(e.target.value)}
                               onKeyDown={(e) => handleKeyDown(e, handleAddInterest, setInterestInput)}
                               placeholder="Add an interest..."
-                              className="h-9 text-sm bg-white dark:bg-transparent border-slate-200 dark:border-slate-700"
+                              className="h-8 text-sm"
                               autoFocus
                           />
-                          <Button size="sm" onClick={handleAddInterest} disabled={!interestInput.trim() || submittingInterest}>
-                              {submittingInterest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                          <Button size="sm" onClick={handleAddInterest} disabled={!interestInput.trim() || submittingInterest} className="h-8">
+                              {submittingInterest ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                           </Button>
                       </div>
                   </div>
               )}
             </div>
+          </div>
         </section>
       </div>
 
       {/* RIGHT SIDEBAR */}
       <div className="w-full xl:w-80 space-y-6">
            
-           {/* Ready to Connect - Restored for conversation starters */}
-           <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-5 shadow-sm">
-               <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider mb-2">Ready to connect?</h3>
-               <p className="text-xs text-indigo-700/70 dark:text-indigo-300/60 mb-4">Generate a personalized script based on your memories.</p>
+           {/* Ready to Connect */}
+           <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 shadow-lg">
+               <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-white/90">Ready to connect?</h3>
+               <p className="text-xs text-white/70 mb-4">Generate a personalized script based on your memories.</p>
                <Button 
                 onClick={() => setIsReachOutOpen(true)}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9 font-semibold"
+                className="w-full bg-white hover:bg-white/90 text-purple-700 border-0 shadow-md text-xs h-9 font-semibold"
                >
                   <MessageSquare className="w-3.5 h-3.5 mr-2" />
                    Draft Reconnection
                </Button>
            </div>
 
+           {/* Quick Stats */}
+           <QuickStatsCard
+             lastContactDate={contact.last_contact_date || contact.last_contacted_date}
+             totalInteractions={interactionCount}
+             nextContactDate={contact.next_contact_date}
+           />
 
-
-           {/* Contact Info Card */}
-          <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">Contact Info</h3>
-             <div className="space-y-4 text-sm">
-                 <div className="flex items-center gap-3">
-                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                         <Mail className="w-4 h-4 text-slate-500" />
-                     </div>
-                     <div className="overflow-hidden">
-                         <p className="text-xs text-muted-foreground">Email</p>
-                         <p className="text-foreground truncate font-medium">{contact.email || "No email"}</p>
-                     </div>
-                 </div>
-                 <div className="flex items-center gap-3">
-                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                         <Phone className="w-4 h-4 text-slate-500" />
-                     </div>
-                     <div>
-                         <p className="text-xs text-muted-foreground">Phone</p>
-                         <p className="text-foreground font-medium">{contact.phone || "No phone"}</p>
-                     </div>
-                 </div>
-                 {contact.location && (
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                            <MapPin className="w-4 h-4 text-slate-500" />
-                        </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground">Location</p>
-                            <p className="text-foreground font-medium">{contact.location}</p>
-                        </div>
-                    </div>
-                 )}
-             </div>
-          </div>
-
-          {/* Family & Connections Ghost State */}
-          {(!contact.familyMembers || contact.familyMembers.length === 0) && (
-             <div className="text-center py-4">
-                 <p className="text-sm text-muted-foreground mb-3">No connections yet</p>
-                 <Button variant="outline" size="sm" className="text-xs">
-                    <Users className="w-3.5 h-3.5 mr-1.5" />
-                    Link a Connection
-                 </Button>
-             </div>
-          )}
-
+           {/* Connections Notice */}
+           <ConnectionsNotice
+             connectionCount={connectionCount}
+             onLinkConnection={handleNavigateToFamily}
+           />
       </div>
 
        <ReachOutPanel 
