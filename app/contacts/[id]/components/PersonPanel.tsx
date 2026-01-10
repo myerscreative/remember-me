@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MessageSquare, Star, User, IdCard, Loader2 } from 'lucide-react';
 import { InteractionLogger } from './InteractionLogger';
-import { updatePersonImportance } from '@/app/actions/update-person-importance';
-import { updatePersonFrequency } from '@/app/actions/update-person-frequency';
+import { updatePersonImportance } from '@/app/actions/update-importance';
+import { updateTargetFrequency } from '@/app/actions/update-target-frequency';
 import toast from 'react-hot-toast';
 
 interface PersonPanelProps {
@@ -57,7 +57,7 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
     setFrequency(days);
     setIsUpdating(true);
     try {
-      const result = await updatePersonFrequency(contact.id, days);
+      const result = await updateTargetFrequency(contact.id, days);
       if (!result.success) throw new Error(result.error);
       if (onFrequencyChange) onFrequencyChange(days);
       toast.success('Cadence updated');
