@@ -359,7 +359,7 @@ export default function ContactDetailPage({
       <Toaster position="top-center" />
       
       {/* DESKTOP SIDEBAR (Hidden on Mobile) */}
-      <div className="hidden md:block border-r border-border/50">
+      <div className="hidden md:block">
         <ProfileSidebar 
             contact={contact} 
             onFrequencyChange={handleFrequencyChange}
