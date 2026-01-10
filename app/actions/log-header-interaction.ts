@@ -53,7 +53,8 @@ export async function logHeaderInteraction(
           : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
         if (memoryContent) {
-             const { error: memoryError } = await supabase
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             const { error: memoryError } = await (supabase as any)
               .from("shared_memories")
               .insert({
                 person_id: personId,
