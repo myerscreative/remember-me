@@ -133,7 +133,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
   };
 
   return (
-    <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-[#0f111a] border-r border-white/5 overflow-y-auto">
+    <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-[#0f111a] border-r border-white/10 overflow-y-auto">
       <div className="p-8 space-y-8">
         
         {/* 1. Profile Photo with Health Ring */}
