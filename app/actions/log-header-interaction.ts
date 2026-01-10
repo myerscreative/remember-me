@@ -16,26 +16,26 @@ export async function logHeaderInteraction(
   }
 
   try {
-    // 1. Structured Interaction Log (System Record)
-    // We keep this for analytics/interaction counts
+    // 1. Structured Interaction Log (Direct Insert)
     const interactionType = type === 'connection' ? 'call' : 'other';
     const finalNote = note ? note : (type === 'attempt' ? 'Contact Attempt' : 'Quick Update');
     
-    console.log('Attempting to insert interaction:', {
+    console.log('Attempting to insert interaction (Direct):', {
       person_id: personId,
       user_id: user.id,
-      interaction_type: interactionType,
+      type: interactionType,
       notes: finalNote
     });
 
-    const safeSupabase = supabase as any;
-    const { data: interactionId, error: insertError } = await safeSupabase
-      .rpc('insert_interaction', {
-        p_person_id: personId,
-        p_user_id: user.id,
-        p_interaction_type: interactionType,
-        p_interaction_date: new Date().toISOString(),
-        p_notes: finalNote
+    // Direct insert to bypass any RPC issues
+    const { error: insertError } = await supabase
+      .from('interactions')
+      .insert({
+        person_id: personId,
+        user_id: user.id,
+        type: interactionType,
+        date: new Date().toISOString(),
+        notes: finalNote
       });
 
     if (insertError) {
@@ -46,34 +46,27 @@ export async function logHeaderInteraction(
     console.log('Interaction inserted successfully');
 
     // 2. Shared Memory Log (User Narrative)
-    // As per request: "If a note exists or it's a specific type, log to 'shared_memories'"
     if (note || type === 'attempt') {
         const memoryContent = type === 'attempt' && !note
           ? `[Attempted Contact] No note left.` 
           : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
-        if (memoryContent) { // Type guard
-             const { error: memoryError } = await (supabase as any)
+        if (memoryContent) {
+             const { error: memoryError } = await supabase
               .from("shared_memories")
               .insert({
                 person_id: personId,
-                user_id: user.id, // Explicitly adding user_id if needed, schema usually requires it
-                content: memoryContent,
-                // category: type === 'connection' ? 'moment' : 'milestone', // Schema check: 'category' field doesn't exist in my reading of database.types.ts earlier? 
-                // Wait, database.types.ts showed shared_memories columns: id, user_id, person_id, content, created_at, updated_at.
-                // It DID NOT show 'category' or 'occurred_at'. 
-                // User snippet used 'category' and 'occurred_at'. 
-                // I will OMIT those fields to prevent errors, unless I see them in the schema.
-                // I'll stick to content.
+                user_id: user.id,
+                content: memoryContent
               });
             
              if (memoryError) console.error("Memory Log Error:", memoryError);
         }
     }
 
-    // 3. Update Person Status
+    // 3. Update Person Status (Only for connections)
     if (type === 'connection') {
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('persons')
         .update({
           last_interaction_date: new Date().toISOString(),

@@ -46,25 +46,29 @@ export function InteractionLogger({ contactId, contactName, className }: Interac
   }, [contactId, refreshTrigger]);
 
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
+      console.log('Starting interaction log...', { type, contactId });
       setIsLogging(true);
       try {
           const result = await logHeaderInteraction(contactId, type, quickNote);
+          console.log('Interaction log result:', result);
+          
           if (result.success) {
               // Show appropriate feedback based on action type
               if (type === 'connection') {
                   showNurtureToast(contactName);
               } else {
-                  toast.success('Attempt logged');
+                  toast.success('Attempt logged successfully');
               }
               setQuickNote(""); // Clear note
               // Trigger re-fetch of interactions
               setRefreshTrigger(prev => prev + 1);
           } else {
-              toast.error('Failed to log interaction');
+              console.error('Log interaction failed:', result.error);
+              toast.error(`Failed to log: ${result.error}`);
           }
-      } catch (err) {
-          console.error('Error in handleLogInteraction:', err);
-          toast.error('Error logging interaction');
+      } catch (err: any) {
+          console.error('Unexpected error in handleLogInteraction:', err);
+          toast.error(`Error logging interaction: ${err.message || 'Unknown error'}`);
       } finally {
           setIsLogging(false);
       }
