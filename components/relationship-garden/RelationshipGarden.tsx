@@ -521,6 +521,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                 }}
               >
                 <Leaf 
+                  id={contact.id.toString()}
                   color={color} 
                   initials={contact.initials}
                   scale={isHighlighted ? scale * 1.5 : (isHovered ? scale * 1.3 : scale)} 

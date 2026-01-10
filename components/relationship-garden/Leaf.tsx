@@ -10,6 +10,7 @@ interface LeafProps {
   onMouseMove?: (e: React.MouseEvent) => void;
   initials?: string;
   scale?: number;
+  id?: string;
 }
 
 // Helper to darken color for gradient/stroke
@@ -31,11 +32,12 @@ export default function Leaf({
   onMouseLeave,
   onMouseMove,
   initials,
-  scale = 1
+  scale = 1,
+  id
 }: LeafProps) {
   const darker = useMemo(() => adjustBrightness(color, -20), [color]);
   const darkest = useMemo(() => adjustBrightness(color, -40), [color]);
-  const gradientId = `grad-${color.replace('#', '')}`;
+  const gradientId = `grad-${color.replace('#', '')}-${id || Math.random().toString(36).substr(2, 9)}`;
 
   return (
     <div 

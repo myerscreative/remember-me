@@ -45,7 +45,7 @@ export default function HomePage() {
   const [error, setError] = useState<Error | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(true);
   
   // Sorting State
   const [sortOption, setSortOption] = useState<SortOption>("first_name");
