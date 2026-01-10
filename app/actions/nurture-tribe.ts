@@ -28,9 +28,9 @@ export async function nurtureTribe(contactIds: string[], interactionType: string
     const interactions = contactIds.map(id => ({
       user_id: user.id,
       person_id: id,
-      interaction_type: (interactionType as any) || 'other',
+      type: (interactionType as any) || 'other',
       notes: notes,
-      interaction_date: new Date().toISOString()
+      date: new Date().toISOString()
     }));
 
     const { error: insertError } = await (supabase as any)

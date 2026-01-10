@@ -106,8 +106,8 @@ export default function QuickCapturePage() {
           await (supabase as any).from("interactions").insert({
             user_id: user.id,
             person_id: personId,
-            interaction_type: "meeting",
-            interaction_date: new Date().toISOString(),
+            type: "meeting",
+            date: new Date().toISOString(),
             title: "Quick capture note",
             notes: notes.trim(),
           });

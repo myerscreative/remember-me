@@ -22,8 +22,8 @@ export async function logContactInteraction(
       .insert({
         person_id: personId,
         user_id: user.id,
-        interaction_type: type,
-        interaction_date: new Date().toISOString(),
+        type: type,
+        date: new Date().toISOString(),
         notes: notes || null
       });
 

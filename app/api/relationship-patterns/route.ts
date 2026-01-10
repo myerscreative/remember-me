@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Fetch all interactions
     const { data: interactions } = await (supabase as any)
       .from("interactions")
-      .select("person_id, interaction_type, interaction_date")
+      .select("person_id, type, date")
       .eq("user_id", user.id);
 
     if (!persons) {
@@ -53,11 +53,11 @@ export async function GET(request: NextRequest) {
       contactsWithInteractions.forEach((person: any) => {
         const personInteractions = (interactions || [])
           .filter((i: any) => i.person_id === person.id)
-          .sort((a: any, b: any) => new Date(a.interaction_date).getTime() - new Date(b.interaction_date).getTime());
+          .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         for (let i = 1; i < personInteractions.length; i++) {
-          const diff = new Date(personInteractions[i].interaction_date).getTime() -
-                       new Date(personInteractions[i - 1].interaction_date).getTime();
+          const diff = new Date(personInteractions[i].date).getTime() -
+                       new Date(personInteractions[i - 1].date).getTime();
           timeBetweenInteractions.push(diff / (1000 * 60 * 60 * 24)); // Convert to days
         }
       });
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     if (interactions && interactions.length > 5) {
       const typeCounts = new Map<string, number>();
       interactions.forEach((i: any) => {
-        typeCounts.set(i.interaction_type, (typeCounts.get(i.interaction_type) || 0) + 1);
+        typeCounts.set(i.type, (typeCounts.get(i.type) || 0) + 1);
       });
 
       const total = interactions.length;
