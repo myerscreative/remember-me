@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Plus, Tag, X, Loader2, Mail, MapPin, Users, Phone, Edit2, Check, RefreshCw } from 'lucide-react';
+import { Sparkles, Plus, Tag, X, Loader2, Mail, MapPin, Users, Phone, MessageSquare, Edit2, Check, RefreshCw } from 'lucide-react';
 import { MemoryCapture } from '@/app/contacts/[id]/components/MemoryCapture';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
@@ -419,6 +419,19 @@ export function OverviewTab({ contact }: OverviewTabProps) {
       {/* RIGHT SIDEBAR */}
       <div className="w-full xl:w-80 space-y-6">
            
+           {/* Ready to Connect - Restored for conversation starters */}
+           <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-5 shadow-sm">
+               <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider mb-2">Ready to connect?</h3>
+               <p className="text-xs text-indigo-700/70 dark:text-indigo-300/60 mb-4">Generate a personalized script based on your memories.</p>
+               <Button 
+                onClick={() => setIsReachOutOpen(true)}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md text-xs h-9 font-semibold"
+               >
+                  <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                   Draft Reconnection
+               </Button>
+           </div>
+
 
 
            {/* Contact Info Card */}

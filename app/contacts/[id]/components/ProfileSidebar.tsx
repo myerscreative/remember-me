@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2, Star } from 'lucide-react';
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
@@ -196,13 +197,15 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                     {contact.company}
                 </p>
             )}
-             {/* Birthday */}
-             {contact.birthday && (
-                <div className="flex items-center justify-center gap-1.5 mb-3 text-sm text-gray-400">
-                    <Cake className="w-4 h-4 text-indigo-400" />
-                    <span>{new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</span>
-                </div>
-             )}
+             {/* Birthday Badge - Restored */}
+             <div className="flex items-center justify-center gap-2 mb-4">
+                <Badge variant="outline" className="px-3 py-1.5 bg-[#242642] border-white/10 text-gray-300 rounded-full font-medium">
+                    <Cake className="w-3.5 h-3.5 mr-1.5 inline-block -mt-0.5 text-indigo-400" />
+                    {contact.birthday
+                    ? new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+                    : "Birthday: Not set"}
+                </Badge>
+            </div>
         </div>
 
         {/* 2. Action Buttons */}
