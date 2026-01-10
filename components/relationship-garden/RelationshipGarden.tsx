@@ -277,8 +277,8 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         const normalizedPosition = i / Math.max(1, count - 1); // 0 to 1
         const baseRadius = minRadius + (maxRadius - minRadius) * normalizedPosition;
 
-        // Add deterministic random scatter within the ring
-        const jitterAmount = (maxRadius - minRadius) * 0.3; // 30% of ring width
+        // Add deterministic random scatter within the ring - REDUCED JITTER to prevent overlap
+        const jitterAmount = (maxRadius - minRadius) * 0.1; // Reduced from 0.3 to 0.1
         const jitter = (getJitter(contact.id, 'radius') % 1000) / 1000 - 0.5; // -0.5 to 0.5
         const radius = baseRadius + (jitter * jitterAmount);
 
@@ -318,10 +318,11 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     // Center: High frequency (contact often - weekly/biweekly)
     // Middle: Medium frequency (contact monthly)
     // Outer: Low frequency (contact quarterly or less)
+    // ADJUSTED RADII to prevent overlap between rings and spread items out
 
-    const p1 = calculateRingPositions(buckets.highFrequency, 50, 180, 0);
-    const p2 = calculateRingPositions(buckets.mediumFrequency, 181, 350, p1.length * GOLDEN_ANGLE);
-    const p3 = calculateRingPositions(buckets.lowFrequency, 351, 600, (p1.length + p2.length) * GOLDEN_ANGLE);
+    const p1 = calculateRingPositions(buckets.highFrequency, 80, 220, 0);     // Expanded inner ring
+    const p2 = calculateRingPositions(buckets.mediumFrequency, 280, 500, p1.length * GOLDEN_ANGLE); // Gap of 60px
+    const p3 = calculateRingPositions(buckets.lowFrequency, 560, 900, (p1.length + p2.length) * GOLDEN_ANGLE); // Gap of 60px
 
     return [...p1, ...p2, ...p3];
 
@@ -473,10 +474,10 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         >
           {/* Leaves Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
-            {/* Render Rings Guidelines - Three rings for contact frequency */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border border-red-500/20 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-amber-500/15 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full border border-green-500/10 pointer-events-none" />
+            {/* Render Rings Guidelines - Three rings for contact frequency (Matching new max radii: 220, 500, 900) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] rounded-full border border-red-500/20 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-amber-500/15 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1800px] h-[1800px] rounded-full border border-green-500/10 pointer-events-none" />
             
             {leafPositions.map(({ contact, x, y, rotation, color, scale }) => {
               const isHovered = hoveredContactId === contact.id.toString();
