@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Users, Bell, Network, Activity, Settings, Sparkles, Calendar, Brain, Flame, TreePine } from "lucide-react";
+import { NetworkIcon } from "./icons/NetworkIcon";
 import { cn } from "@/lib/utils";
 import { useGameStats } from "@/hooks/useGameStats";
 
@@ -17,7 +18,7 @@ const navGroups = [
     },
     {
       href: "/",
-      label: "Contacts",
+      label: "People",
       icon: Users,
       inactiveColor: "text-gray-600",
     },
@@ -39,7 +40,7 @@ const navGroups = [
     {
       href: "/network",
       label: "Network",
-      icon: Network,
+      icon: NetworkIcon,
       inactiveColor: "text-gray-600",
     },
     {
