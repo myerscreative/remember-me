@@ -28,7 +28,8 @@ export async function logHeaderInteraction(
     });
 
     // Direct insert to bypass any RPC issues
-    const { error: insertError } = await supabase
+    // Type assertion needed due to Supabase client type resolution issue
+    const { error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
@@ -52,7 +53,7 @@ export async function logHeaderInteraction(
           : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
         if (memoryContent) {
-             const { error: memoryError } = await supabase
+             const { error: memoryError } = await (supabase as any)
               .from("shared_memories")
               .insert({
                 person_id: personId,
@@ -66,7 +67,7 @@ export async function logHeaderInteraction(
 
     // 3. Update Person Status (Only for connections)
     if (type === 'connection') {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
           last_interaction_date: new Date().toISOString(),
