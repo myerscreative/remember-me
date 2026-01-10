@@ -25,6 +25,7 @@ import { ConnectNowModal } from "@/components/contacts/ConnectNowModal";
 import { ErrorFallback } from "@/components/error-fallback";
 import { mockContacts } from "@/app/network/mockContacts"; 
 import { sortContacts, SortOption, SortDirection } from "@/lib/utils/contact-sorting";
+import { ContactListTable } from "@/components/people/ContactListTable";
 
 import { useRouter } from "next/navigation";
 // Remove unused imports if necessary, or keep them. keeping imports safe.
@@ -483,24 +484,28 @@ export default function HomePage() {
                 )}
               </div>
             ) : (
-              <div className={cn(
-                "grid gap-3 pb-20",
-                !isCompactView 
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
-                  : "grid-cols-1"
-              )}>
-                {sortedContacts.map((contact) => (
-                  <SearchResultCard
-                    key={contact.id}
-                    contact={contact}
-                    isCompactView={isCompactView}
-                    onToggleFavorite={handleToggleFavorite}
-                    tags={contactTags.get(contact.id) || []}
-                    mutualCount={mutualCounts.get(contact.id) || 0}
-                    onConnect={handleConnect}
+              <>
+                {isCompactView ? (
+                  <ContactListTable 
+                    contacts={sortedContacts} 
+                    onToggleFavorite={handleToggleFavorite} 
                   />
-                ))}
-              </div>
+                ) : (
+                  <div className="grid gap-3 pb-20 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {sortedContacts.map((contact) => (
+                      <SearchResultCard
+                        key={contact.id}
+                        contact={contact}
+                        isCompactView={false} // Force card view style if using grid
+                        onToggleFavorite={handleToggleFavorite}
+                        tags={contactTags.get(contact.id) || []}
+                        mutualCount={mutualCounts.get(contact.id) || 0}
+                        onConnect={handleConnect}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
