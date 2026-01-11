@@ -168,7 +168,6 @@ export default function ContactDetailPage({
       */}
       <OverviewPanel 
         contact={contact}
-        onEdit={() => setIsEditModalOpen(true)}
       />
 
       {/* MODALS */}
