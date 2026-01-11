@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
-import { SearchResultCard } from '@/app/contacts/components/SearchResultCard'; // Using as Reconnect Card for now or create specific? Let's use custom markup from mock
+
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Plus, ExternalLink } from 'lucide-react';
-import { QuickStatsCard } from './tabs/overview/QuickStatsCard';
-import { ContactInfoGrid } from './tabs/overview/ContactInfoGrid';
+
 import { Badge } from '@/components/ui/badge';
 
 interface OverviewPanelProps {
