@@ -348,7 +348,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     setTooltip({
       visible: true,
       x: e.clientX + 15,
-      y: e.clientY - 50,
+      y: e.clientY - 70,
       contact
     });
   };
@@ -357,7 +357,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     setTooltip(prev => ({
       ...prev,
       x: e.clientX + 15,
-      y: e.clientY - 50
+      y: e.clientY - 70
     }));
   };
 
