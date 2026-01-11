@@ -18,7 +18,7 @@ export function ContactListTable({ contacts, onToggleFavorite }: ContactListTabl
   return (
     <div className="w-full">
       {/* Sticky Header - Desktop Only */}
-      <div className="hidden md:grid grid-cols-[auto_1fr_200px_180px_160px] gap-6 items-center px-6 py-4 bg-[#141824] border-b border-[#2d3748] sticky top-0 z-20">
+      <div className="hidden md:grid grid-cols-[auto_1fr_180px_150px_140px] gap-6 items-center px-6 py-4 bg-[#141824] border-b border-[#2d3748] sticky top-0 z-20">
         <div className="w-12">{/* Avatar Buffer */}</div>
         <div className="text-[13px] font-semibold text-[#94a3b8] uppercase tracking-[0.5px]">Name</div>
         <div className="text-[13px] font-semibold text-[#94a3b8] uppercase tracking-[0.5px]">Last Contact</div>

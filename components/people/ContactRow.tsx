@@ -47,7 +47,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
       {/* DESKTOP LAYOUT (Grid) */}
       <div 
         onClick={handleClick}
-        className="hidden md:grid grid-cols-[auto_1fr_200px_180px_160px] gap-6 items-center px-6 py-[18px] border-b border-[#1a1f2e] hover:bg-[#1a1f2e] cursor-pointer transition-colors group"
+        className="hidden md:grid grid-cols-[auto_1fr_180px_150px_140px] gap-6 items-center px-6 py-[18px] border-b border-[#1a1f2e] hover:bg-[#1a1f2e] cursor-pointer transition-colors group"
       >
         {/* Avatar */}
         <div className="relative">
@@ -68,15 +68,15 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
             <span className="text-[16px] font-semibold text-slate-200 truncate">{contact.name}</span>
             {/* Birthday Badge (Today/Upcoming) */}
             {birthdayInfo.state === 'today' && (
-               <span className="text-[13px] font-semibold text-[#ef4444]">🎂 {birthdayInfo.text}</span>
+               <span className="text-[13px] font-semibold text-[#ef4444] whitespace-nowrap">🎂 {birthdayInfo.text}</span>
             )}
             {birthdayInfo.state === 'upcoming' && (
-               <span className="text-[13px] font-medium text-[#f59e0b]">🎂 {birthdayInfo.text}</span>
+               <span className="text-[13px] font-medium text-[#f59e0b] whitespace-nowrap">🎂 {birthdayInfo.text}</span>
             )}
           </div>
           {/* Distant Birthday */}
           {birthdayInfo.state === 'distant' && (
-            <span className="text-[12px] text-slate-500">🎂 {birthdayInfo.text}</span>
+            <span className="text-[12px] text-slate-500 whitespace-nowrap">🎂 {birthdayInfo.text}</span>
           )}
         </div>
 
