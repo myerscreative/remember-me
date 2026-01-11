@@ -12,16 +12,21 @@ import { Badge } from '@/components/ui/badge';
 interface OverviewPanelProps {
   contact: any;
   onNavigateToTab?: (tab: string) => void;
+  onEdit?: () => void;
+  onLinkConnection?: () => void;
 }
 
-export function OverviewPanel({ contact, onNavigateToTab }: OverviewPanelProps) {
+export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnection }: OverviewPanelProps) {
   const [activeTab, setActiveTab] = useState('Overview');
 
-  // Placeholder functions for interactivity
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     if (onNavigateToTab) onNavigateToTab(tab);
-    // In a real implementation this would likely switch routing or view state
+  };
+
+  const handleDraftReconnection = () => {
+    // Placeholder for AI drafting feature
+    alert("AI Reconnection Drafter coming soon! 🤖");
   };
 
   return (
@@ -181,7 +186,10 @@ export function OverviewPanel({ contact, onNavigateToTab }: OverviewPanelProps) 
              {/* Connections */}
              <div className="bg-[#1a1f2e] rounded-2xl p-5 text-center">
                 <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
-                <button className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors">
+                <button 
+                    onClick={onLinkConnection}
+                    className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors"
+                >
                     <span>🔗</span>
                     Link a Connection
                 </button>

@@ -166,41 +166,25 @@ export default function ContactDetailPage({
         COLUMN 3: OVERVIEW PANEL 
         Flexible width, vertical scroll.
       */}
+import { LinkConnectionModal } from './components/LinkConnectionModal';
+
+// ... (in component)
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+
+// ... (in return JSX)
       <OverviewPanel 
         contact={contact}
+        onEdit={() => setIsEditModalOpen(true)}
+        onLinkConnection={() => setIsLinkModalOpen(true)}
       />
 
-      {/* MODALS */}
-      <EditContactModal 
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        contact={contact}
+// ... (in Modals section)
+      <LinkConnectionModal
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+        currentContactId={contact.id}
+        currentContactName={contact.name}
         onSuccess={handleRefresh}
-      />
-      
-      <LogInteractionModal 
-        isOpen={isLogModalOpen}
-        onClose={() => {
-            setIsLogModalOpen(false);
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete('action');
-            router.replace(`/contacts/${id}?${params.toString()}`, { scroll: false });
-        }}
-        contact={{
-            id: contact.id,
-            name: contact.name,
-            initials: getInitials(contact.first_name, contact.last_name),
-            importance: contact.importance
-        }}
-        initialMethod={logInitialMethod}
-        onSuccess={handleRefresh}
-      />
-
-      <AvatarCropModal
-        open={isCropModalOpen}
-        imageSrc={""} // TODO: State lifting for avatar logic if needed, or pass down to PersonPanel
-        onClose={() => setIsCropModalOpen(false)}
-        onCropComplete={(blob) => console.log('Crop complete', blob)} // Handled inside logic
       />
     </div>
   );
