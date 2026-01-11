@@ -544,10 +544,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                   color={color} 
                   initials={contact.initials}
                   scale={isHighlighted ? scale * 1.5 : (isHovered ? scale * 1.3 : scale)} 
-                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
-                  onMouseMove={handleLeafMove}
-                  onMouseLeave={handleLeafLeave}
-                  onClick={(e) => {
+                  onClick={() => {
                     // Hide tooltip immediately on click to prevent overlap with modal
                     setTooltip(prev => ({ ...prev, visible: false }));
                     onContactClick?.(contact);
