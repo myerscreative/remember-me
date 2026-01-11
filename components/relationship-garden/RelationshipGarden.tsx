@@ -340,7 +340,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   }, [filteredContacts]);
 
   const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
-    // console.log('Leaf Enter:', contact.name);
+    console.log('Leaf Enter:', contact.name);
     // Clear any pending hide timeout
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
@@ -355,7 +355,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   };
 
   const handleLeafMove = (e: React.MouseEvent) => {
-    // console.log('Leaf Move');
+    console.log('Leaf Move');
     setTooltip(prev => ({
       ...prev,
       x: e.clientX + 15,
@@ -364,7 +364,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   };
 
   const handleLeafLeave = () => {
-    // console.log('Leaf Leave');
+    console.log('Leaf Leave');
     // Delay hiding to allow user to move mouse to tooltip
     hideTimeoutRef.current = setTimeout(() => {
       setTooltip(prev => ({ ...prev, visible: false }));
