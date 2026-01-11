@@ -103,14 +103,14 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
       {/* MOBILE LAYOUT (Card) */}
       <div 
          onClick={handleClick}
-         className="md:hidden flex flex-col gap-3 p-4 bg-[#1a1f2e] rounded-2xl active:scale-[0.98] active:bg-[#242938] transition-all border border-transparent active:border-violet-600"
+         className="md:hidden flex flex-col gap-3 p-4 bg-[#1a1f2e] rounded-2xl active:scale-[0.98] active:bg-[#242938] transition-all border border-transparent active:border-violet-600 cursor-pointer"
       >
         {/* Row 1: Avatar + Name + Status */}
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
            <div className="relative shrink-0">
-              <Avatar className="h-11 w-11 border-2 border-[#3d4758]">
+              <Avatar className="h-12 w-12 border-2 border-[#3d4758]">
                 <AvatarImage src={contact.photo_url || undefined} className="object-cover" />
-                <AvatarFallback className="bg-[#2d3748] text-white font-semibold text-[16px]">
+                <AvatarFallback className="bg-[#2d3748] text-white font-semibold text-[17px]">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -119,10 +119,10 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
               </div>
            </div>
 
-           <div className="flex-1 min-w-0">
+           <div className="flex-1 min-w-0 flex flex-col gap-1">
               <div className="flex items-center gap-2 flex-wrap">
-                 <h3 className="font-semibold text-base text-slate-200">{contact.name}</h3>
-                 {/* Mobile Birthday Badge */}
+                 <h3 className="font-semibold text-[18px] text-[#e2e8f0] leading-none">{contact.name}</h3>
+                 {/* Mobile Birthday Badge - Inline if Today/Upcoming */}
                  {birthdayInfo.state === 'today' && (
                     <span className="text-[13px] font-semibold text-[#ef4444] whitespace-nowrap">🎂 {birthdayInfo.text}</span>
                  )}
@@ -130,25 +130,26 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
                     <span className="text-[13px] font-medium text-[#f59e0b] whitespace-nowrap">🎂 {birthdayInfo.text}</span>
                  )}
               </div>
+              {/* Distant Birthday - Subtitle */}
               {birthdayInfo.state === 'distant' && (
-                 <p className="text-xs text-slate-500 mt-0.5">🎂 {birthdayInfo.text}</p>
+                 <div className="text-[12px] text-[#64748b]">🎂 {birthdayInfo.text}</div>
               )}
            </div>
 
            <div className="flex items-center gap-2 shrink-0">
-              <span className={cn("text-[13px] font-semibold", statusConfig.colorClass)}>{statusConfig.text}</span>
+              <span className={cn("text-[13px] font-semibold whitespace-nowrap", statusConfig.colorClass)}>{statusConfig.text}</span>
               <div className={cn("w-2 h-2 rounded-full", statusConfig.dotClass)} />
            </div>
         </div>
 
-        {/* Row 2: Last Contact & Frequency */}
-        <div className="pl-[56px] flex flex-col gap-1.5">
-           <div className={cn("text-[13px]", !contact.last_contact ? "text-slate-500" : "text-slate-400")}>
-              <span className="text-slate-500 mr-1">Last:</span>
+        {/* Row 2: Bottom Info (Aligned with Name) */}
+        <div className="pl-[60px] flex items-center gap-2 text-[13px] text-[#94a3b8]">
+           <div className={cn(!contact.last_contact ? "text-[#64748b]" : "")}>
+              <span className="text-[#64748b] mr-1">Last:</span>
               {lastContactText}
            </div>
-           <div className="text-[13px] text-slate-400">
-              <span className="text-slate-500 mr-1">Frequency:</span>
+           <span className="text-[#3d4758] text-[13px]">/</span>
+           <div>
               {frequencyLabel}
            </div>
         </div>
