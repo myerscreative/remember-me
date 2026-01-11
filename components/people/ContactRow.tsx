@@ -23,8 +23,8 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
   // Relationship Badge
   const getRelationshipBadge = () => {
     if (contact.is_favorite) return "⭐";
-    if (contact.importance === "high") return "👤"; // Friends? Prompt said Friends=👤
-    return "🪪"; // Contacts
+    if (contact.importance === "high" || contact.importance === "medium") return "👤"; 
+    return "🪪"; // Contacts (Low / None)
   };
 
   const birthdayInfo = getBirthdayDisplayInfo(contact.birthday);
