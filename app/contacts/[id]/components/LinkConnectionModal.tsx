@@ -88,15 +88,19 @@ export function LinkConnectionModal({
 
     setIsSubmitting(true);
     try {
-      // Insert relationship
+      // Explicitly type the insert object to satisfy Supabase/TypeScript
+      type RelationshipInsert = Database['public']['Tables']['relationships']['Insert'];
+      
+      const newRelationship: RelationshipInsert = {
+        from_person_id: currentContactId,
+        to_person_id: selectedPerson.id,
+        relationship_type: relationshipType,
+        direction: "bidirectional"
+      };
+
       const { error } = await supabase
         .from("relationships")
-        .insert({
-          from_person_id: currentContactId,
-          to_person_id: selectedPerson.id,
-          relationship_type: relationshipType,
-          direction: "bidirectional" // bidirectional by default for simplicity for now
-        });
+        .insert(newRelationship);
 
       if (error) throw error;
 
