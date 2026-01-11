@@ -191,15 +191,26 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) {
-        e.preventDefault();
-        e.stopPropagation();
+      e.preventDefault(); // Always prevent default page scroll when over the garden
+      e.stopPropagation();
+
+      if (e.ctrlKey || e.metaKey) {
+        // ZOOM
         const delta = e.deltaY;
         setZoom(prev => {
           const direction = delta > 0 ? -1 : 1; 
           const newZoom = prev + (direction * 5);
           return Math.min(Math.max(newZoom, 25), 150);
         });
+      } else {
+        // PAN
+        // Standard mouse wheel sends deltaY for vertical.
+        // Shift + wheel usually sends deltaX, but some browsers/mice might verify.
+        // We will accumulate to panOffset.
+        setPanOffset(prev => ({
+          x: prev.x - e.deltaX, // Pan direction might need inversion depending on preference "natural scrolling"
+          y: prev.y - e.deltaY
+        }));
       }
     };
 

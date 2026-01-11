@@ -103,7 +103,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
       {/* MOBILE LAYOUT (Card) */}
       <div 
          onClick={handleClick}
-         className="md:hidden flex flex-col gap-3 p-4 bg-[#1a1f2e] rounded-2xl active:scale-[0.98] active:bg-[#242938] transition-all border border-transparent active:border-indigo-600/30"
+         className="md:hidden flex flex-col gap-3 p-4 bg-[#1a1f2e] rounded-2xl active:scale-[0.98] active:bg-[#242938] transition-all border border-transparent active:border-violet-600"
       >
         {/* Row 1: Avatar + Name + Status */}
         <div className="flex items-start gap-3">
