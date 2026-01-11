@@ -470,7 +470,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         </div>
 
         {/* Info Badge - Desktop Only */}
-        <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-[2rem] shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
+        <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-[2rem] shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
           <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
           <div className="text-2xl font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm">
             {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
