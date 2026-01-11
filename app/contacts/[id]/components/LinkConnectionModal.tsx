@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, UserPlus, X } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils/contact-helpers";
 import { Person } from "@/types/database.types";
@@ -43,7 +43,7 @@ export function LinkConnectionModal({
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [relationshipType, setRelationshipType] = useState("Colleague");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { toast } = useToast();
 
   useEffect(() => {
