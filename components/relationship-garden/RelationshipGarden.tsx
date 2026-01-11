@@ -578,15 +578,13 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         </div>
 
         {/* Tooltip */}
-        {(() => {
-          const shouldShow = tooltip.visible && tooltip.contact;
-          console.log('Tooltip render check:', {
-            visible: tooltip.visible,
-            hasContact: !!tooltip.contact,
-            shouldShow,
-            position: { x: tooltip.x, y: tooltip.y }
+        {tooltip.visible && tooltip.contact && (() => {
+          console.log('✅ TOOLTIP RENDERING:', {
+            name: tooltip.contact?.name,
+            position: { x: tooltip.x, y: tooltip.y },
+            visible: tooltip.visible
           });
-          return shouldShow;
+          return true;
         })() && (
           <div
             className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
