@@ -6,7 +6,7 @@ import { Search, Loader2, UserPlus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils/contact-helpers";
-import { Person } from "@/types/database.types";
+import { Person, Database } from "@/types/database.types";
 import toast from "react-hot-toast";
 
 interface LinkConnectionModalProps {
