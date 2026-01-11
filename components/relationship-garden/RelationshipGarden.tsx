@@ -544,6 +544,9 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                   color={color} 
                   initials={contact.initials}
                   scale={isHighlighted ? scale * 1.5 : (isHovered ? scale * 1.3 : scale)} 
+                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
+                  onMouseMove={handleLeafMove}
+                  onMouseLeave={handleLeafLeave}
                   onClick={() => {
                     // Hide tooltip immediately on click to prevent overlap with modal
                     setTooltip(prev => ({ ...prev, visible: false }));
@@ -558,13 +561,19 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div 
-            className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-default"
+            className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
             style={{ 
               left: tooltip.x, 
               top: tooltip.y,
             }}
             onMouseEnter={handleTooltipEnter}
             onMouseLeave={handleTooltipLeave}
+            onClick={() => {
+              if (tooltip.contact) {
+                setTooltip(prev => ({ ...prev, visible: false }));
+                onContactClick?.(tooltip.contact);
+              }
+            }}
           >
             <div className="font-semibold text-[15px] mb-2">{tooltip.contact.name}</div>
             <div className="flex justify-between text-xs opacity-90 mb-1">
