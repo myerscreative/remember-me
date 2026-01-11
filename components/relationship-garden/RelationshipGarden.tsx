@@ -346,20 +346,36 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
+
+    // Clamp position to ensure tooltip stays on screen
+    const tooltipWidth = 200; // min-w-[200px]
+    const tooltipHeight = 150; // approximate height
+    const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
+    const yPos = Math.max(10, e.clientY - 70); // Ensure it doesn't go above viewport
+
+    console.log('Setting tooltip position:', { x: xPos, y: yPos, contact: contact.name });
+
     setTooltip({
       visible: true,
-      x: e.clientX + 15,
-      y: e.clientY - 70,
+      x: xPos,
+      y: yPos,
       contact
     });
   };
 
   const handleLeafMove = (e: React.MouseEvent) => {
     console.log('Leaf Move');
+
+    // Clamp position to ensure tooltip stays on screen
+    const tooltipWidth = 200;
+    const tooltipHeight = 150;
+    const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
+    const yPos = Math.max(10, e.clientY - 70);
+
     setTooltip(prev => ({
       ...prev,
-      x: e.clientX + 15,
-      y: e.clientY - 70
+      x: xPos,
+      y: yPos
     }));
   };
 
@@ -562,11 +578,20 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         </div>
 
         {/* Tooltip */}
-        {tooltip.visible && tooltip.contact && (
-          <div 
+        {(() => {
+          const shouldShow = tooltip.visible && tooltip.contact;
+          console.log('Tooltip render check:', {
+            visible: tooltip.visible,
+            hasContact: !!tooltip.contact,
+            shouldShow,
+            position: { x: tooltip.x, y: tooltip.y }
+          });
+          return shouldShow;
+        })() && (
+          <div
             className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
-            style={{ 
-              left: tooltip.x, 
+            style={{
+              left: tooltip.x,
               top: tooltip.y,
             }}
             onMouseEnter={handleTooltipEnter}
