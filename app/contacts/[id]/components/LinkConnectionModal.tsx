@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils/contact-helpers";
 import { Person } from "@/types/database.types";
-import { useToast } from "@/components/ui/use-toast";
+import toast from "react-hot-toast";
 
 interface LinkConnectionModalProps {
   isOpen: boolean;
@@ -44,7 +44,6 @@ export function LinkConnectionModal({
   const [relationshipType, setRelationshipType] = useState("Colleague");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const supabase = createClient();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
@@ -101,20 +100,13 @@ export function LinkConnectionModal({
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Linked",
-        description: `Linked ${selectedPerson.name} as ${relationshipType} to ${currentContactName}`,
-      });
+      toast.success(`Linked ${selectedPerson.name} as ${relationshipType} to ${currentContactName}`);
 
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
       console.error("Error linking connection:", error);
-      toast({
-        title: "Error",
-        description: "Failed to link connection. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to link connection. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
