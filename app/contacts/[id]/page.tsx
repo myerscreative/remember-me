@@ -169,6 +169,7 @@ export default function ContactDetailPage({
       <OverviewPanel 
         contact={contact}
         onNavigateToTab={(tab) => console.log('Navigated to', tab)}
+        onEdit={() => setIsEditModalOpen(true)}
       />
 
       {/* MODALS */}
