@@ -512,7 +512,7 @@ export default function GardenPage() {
           {viewMode === 'garden' && healthFilter === 'all' && (
             <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
               <GardenView
-                contacts={filteredContacts as anymore} // casting as extended interface covers it
+                contacts={filteredContacts as any} // casting as extended interface covers it
                 onLeafClick={(contact) => {
                   const extendedContact = contacts.find(c => c.id === contact.id);
                   if (extendedContact) {
