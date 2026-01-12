@@ -117,7 +117,7 @@ export default function ContactDetailPage({
             person: otherPerson
           };
         });
-        setConnections(processedConnections); // Set connections state
+
 
         // 5. Assemble complete object
         const latestMemory = sharedMemories?.[0]?.content;
