@@ -184,14 +184,29 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                     </div>
 
                     {/* Notes / Voice Entry */}
-                    {contact.notes && (
+                    {(contact.notes || contact.deep_lore) && (
                       <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5">
                           <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
-                              Notes / Context
+                              Voice Input & Notes
                           </div>
-                          <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
-                              {contact.notes}
-                          </p>
+                          
+                          {contact.notes && (
+                            <div className="mb-4 last:mb-0">
+                                {contact.deep_lore && <div className="text-[10px] uppercase text-[#64748b] mb-1">Notes</div>}
+                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                    {contact.notes}
+                                </p>
+                            </div>
+                          )}
+
+                          {contact.deep_lore && (
+                            <div className="last:mb-0">
+                                <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
+                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-[#2d3748] pl-3 italic">
+                                    "{contact.deep_lore}"
+                                </p>
+                            </div>
+                          )}
                       </div>
                     )}
 
