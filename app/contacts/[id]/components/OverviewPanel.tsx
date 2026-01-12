@@ -307,7 +307,6 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                 </button>
              </div>
 
->>>>>>> claude/fix-garden-hover-popup-uIZ7l
         </div>
     </div>
   );
