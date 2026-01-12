@@ -258,10 +258,7 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                     <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
                      <p className="max-w-md mx-auto">Map out the important people in their life.</p>
                 </div>
-<<<<<<< HEAD
             )}
-=======
-            </div>
 
             {/* Tags & Interests */}
              <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6">
