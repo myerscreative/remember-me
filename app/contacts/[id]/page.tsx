@@ -14,6 +14,7 @@ import { InteractionType } from "@/lib/relationship-health";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
 import { EditContactModal } from "./components/EditContactModal";
 import { AvatarCropModal } from "./components/AvatarCropModal";
+import { LinkConnectionModal } from "./components/LinkConnectionModal";
 
 export default function ContactDetailPage({
   params,
@@ -32,6 +33,7 @@ export default function ContactDetailPage({
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [logInitialMethod, setLogInitialMethod] = useState<InteractionType | undefined>(undefined);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -166,19 +168,13 @@ export default function ContactDetailPage({
         COLUMN 3: OVERVIEW PANEL 
         Flexible width, vertical scroll.
       */}
-import { LinkConnectionModal } from './components/LinkConnectionModal';
-
-// ... (in component)
-  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
-
-// ... (in return JSX)
       <OverviewPanel 
         contact={contact}
         onEdit={() => setIsEditModalOpen(true)}
         onLinkConnection={() => setIsLinkModalOpen(true)}
       />
 
-// ... (in Modals section)
+      {/* MODALS */}
       <LinkConnectionModal
         isOpen={isLinkModalOpen}
         onClose={() => setIsLinkModalOpen(false)}
