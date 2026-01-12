@@ -27,14 +27,6 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
   const handleDraftReconnection = () => {
     // Placeholder for AI drafting feature
     alert("AI Reconnection Drafter coming soon! 🤖");
-<<<<<<< HEAD
-  };
-
-  const handleLinkConnection = () => {
-    // Placeholder for linking feature
-    alert("Connection Linking coming soon! 🔗");
-=======
->>>>>>> claude/fix-garden-hover-popup-uIZ7l
   };
 
   return (
