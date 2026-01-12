@@ -910,6 +910,7 @@ export default function GardenPage() {
             name: selectedContactForModal.name,
             initials: selectedContactForModal.initials,
             importance: selectedContactForModal.importance,
+            targetFrequencyDays: selectedContactForModal.target_frequency_days || selectedContactForModal.targetFrequencyDays,
           }}
           isOpen={!!selectedContactForModal}
           onClose={() => setSelectedContactForModal(null)}

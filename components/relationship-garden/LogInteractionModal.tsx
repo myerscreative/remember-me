@@ -12,7 +12,7 @@ interface LogInteractionModalProps {
     id: string;
     name: string;
     initials: string;
-    importance?: 'high' | 'medium' | 'low';
+    targetFrequencyDays?: number;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -99,7 +99,7 @@ export default function LogInteractionModal({
       <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-800">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold ring-2 ring-slate-700 shadow-inner">
               {contact.initials}
@@ -108,20 +108,6 @@ export default function LogInteractionModal({
               <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                 {contact.name}
               </h2>
-              <div className="flex items-center gap-2 mt-1">
-                {onUpdateImportance && (
-                  <select
-                    value={contact.importance || 'medium'}
-                    onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
-                    className="text-[10px] py-0.5 px-2 rounded-full border border-slate-700 bg-slate-800 text-slate-400 focus:outline-none focus:border-indigo-500 cursor-pointer uppercase font-bold tracking-wider"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <option value="high">⭐ High</option>
-                    <option value="medium">🔹 Medium</option>
-                    <option value="low">▫️ Casual</option>
-                  </select>
-                )}
-              </div>
             </div>
           </div>
           <button
@@ -130,6 +116,40 @@ export default function LogInteractionModal({
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Stats Row (Tier & Frequency) */}
+        <div className="px-6 py-3 bg-slate-900/50 border-b border-slate-800 flex items-center gap-6">
+            {/* Importance / Tier */}
+            <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Tier</span>
+                {onUpdateImportance ? (
+                  <select
+                    value={contact.importance || 'medium'}
+                    onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
+                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors"
+                  >
+                    <option value="high">⭐ High (Favorites)</option>
+                    <option value="medium">🔹 Medium (Friends)</option>
+                    <option value="low">▫️ Low (Contacts)</option>
+                  </select>
+                ) : (
+                    <span className="text-xs text-slate-300 font-medium capitalize flex items-center gap-1">
+                        {contact.importance === 'high' ? '⭐ High' : contact.importance === 'low' ? '▫️ Low' : '🔹 Medium'}
+                    </span>
+                )}
+            </div>
+
+            {/* Separator */}
+            <div className="h-8 w-px bg-slate-800" />
+
+            {/* Frequency */}
+            <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Frequency</span>
+                <span className="text-xs text-slate-300 font-medium">
+                    {contact.targetFrequencyDays ? `Every ${contact.targetFrequencyDays} days` : 'No target set'}
+                </span>
+            </div>
         </div>
 
         {/* Form */}
