@@ -180,6 +180,7 @@ export default function ContactDetailPage({
   const handleUnlinkConnection = async (connectionId: string) => {
     if (!confirm("Are you sure you want to unlink this connection?")) return;
 
+    const supabase = createClient(); // Initialize Supabase client
     const { error } = await supabase
         .from('relationships')
         .delete()
