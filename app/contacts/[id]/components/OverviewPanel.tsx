@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 
@@ -189,9 +190,11 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                                  <span className="block text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-2.5">🏷️ Tags</span>
                                  <div className="flex flex-wrap gap-1.5">
                                     {(contact.tags || []).map((tag: string) => (
-                                        <Badge key={tag} className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal">
-                                            {tag}
-                                        </Badge>
+                                        <Link key={tag} href={`/network?search=${encodeURIComponent(tag)}`}>
+                                            <Badge className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
+                                                {tag}
+                                            </Badge>
+                                        </Link>
                                     ))}
                                     <button 
                                         onClick={onEdit}
@@ -205,9 +208,11 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                                  <span className="block text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-2.5">✨ Interests</span>
                                  <div className="flex flex-wrap gap-1.5">
                                     {(contact.interests || []).map((interest: string) => (
-                                        <Badge key={interest} className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal">
-                                            {interest}
-                                        </Badge>
+                                        <Link key={interest} href={`/network?search=${encodeURIComponent(interest)}`}>
+                                            <Badge className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
+                                                {interest}
+                                            </Badge>
+                                        </Link>
                                     ))}
                                     <button 
                                         onClick={onEdit}

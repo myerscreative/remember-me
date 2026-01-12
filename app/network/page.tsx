@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { networkService, NetworkData, SubTribe } from './components/NetworkDataService';
 import NetworkSearchBar from './components/NetworkSearchBar';
 import { TribeView } from './components/TribeView';
@@ -13,7 +14,8 @@ import { Loader2 } from 'lucide-react';
 export default function NetworkPage() {
   const [data, setData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   
   // Tutorial State
   const [showTutorial, setShowTutorial] = useState(false);
@@ -26,6 +28,12 @@ export default function NetworkPage() {
   const [isNurtureModalOpen, setIsNurtureModalOpen] = useState(false);
 
   useEffect(() => {
+    // Check search params on mount or change
+    const query = searchParams.get('search');
+    if (query) {
+      setSearchTerm(query);
+    }
+
     // Check if tutorial should be shown
     const hideTutorial = localStorage.getItem('hideTribeSearchTutorial');
     if (!hideTutorial) {
@@ -43,7 +51,7 @@ export default function NetworkPage() {
       }
     }
     loadData();
-  }, []);
+  }, [searchParams]);
 
   const handleNurtureTribe = (tribe: SubTribe) => {
     setNurtureTribe(tribe);
