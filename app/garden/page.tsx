@@ -902,8 +902,6 @@ export default function GardenPage() {
             )}
           </div>
         </div>
-
-        </div>
       </div>
 
       {/* Log Interaction Modal */}
