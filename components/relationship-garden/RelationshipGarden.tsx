@@ -37,7 +37,21 @@ interface TooltipState {
   contact: Contact | null;
 }
 
-// ... existing helper functions ...
+// Get color based on days since contact
+function getColorForDays(days: number): string {
+  if (days <= 14) return '#10b981';   // Green - Blooming
+  if (days <= 45) return '#84cc16';   // Lime - Nourished
+  if (days <= 120) return '#fbbf24';  // Yellow - Thirsty
+  return '#f97316';                   // Orange - Fading
+}
+
+// Get status label
+function getStatusLabel(days: number): string {
+  if (days <= 14) return 'Blooming';
+  if (days <= 45) return 'Nourished';
+  if (days <= 120) return 'Thirsty';
+  return 'Fading';
+}
 
 import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles, Search, X, Save } from 'lucide-react';
 
