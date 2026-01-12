@@ -142,6 +142,7 @@ export class NetworkDataService {
           items.forEach(item => {
              let group: DomainGroup;
              
+             if (item.domain_id && domainMap.has(item.domain_id)) {
                 group = domainMap.get(item.domain_id)!;
              } else {
                 // Smart Auto-Categorization Fallback
