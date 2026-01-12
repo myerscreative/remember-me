@@ -210,9 +210,17 @@ export default function GardenPage() {
 
       if (error) throw error;
       
+      const updatedContact = { ...contact, importance: newImportance };
+      
       setContacts(prev => prev.map(c => 
-        c.dbId === contact.dbId ? { ...c, importance: newImportance } : c
+        c.dbId === contact.dbId ? updatedContact : c
       ));
+
+      // Update modal state if open
+      if (selectedContactForModal?.dbId === contact.dbId) {
+        setSelectedContactForModal(updatedContact);
+      }
+
       toast.success('Updated importance');
     } catch (err) {
       console.error('Error updating importance:', err);
@@ -234,9 +242,17 @@ export default function GardenPage() {
 
       if (error) throw error;
       
+      const updatedContact = { ...contact, target_frequency_days: newFrequency, targetFrequencyDays: newFrequency };
+
       setContacts(prev => prev.map(c => 
-        c.dbId === contact.dbId ? { ...c, target_frequency_days: newFrequency, targetFrequencyDays: newFrequency } : c
+        c.dbId === contact.dbId ? updatedContact : c
       ));
+
+      // Update modal state if open
+      if (selectedContactForModal?.dbId === contact.dbId) {
+        setSelectedContactForModal(updatedContact);
+      }
+
       toast.success('Updated target frequency');
     } catch (err) {
       console.error('Error updating frequency:', err);
