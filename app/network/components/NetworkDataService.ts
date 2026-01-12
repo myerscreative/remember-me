@@ -142,11 +142,39 @@ export class NetworkDataService {
           items.forEach(item => {
              let group: DomainGroup;
              
-             if (item.domain_id && domainMap.has(item.domain_id)) {
                 group = domainMap.get(item.domain_id)!;
              } else {
-                // Fallback to Uncategorized
-                group = uncategorizedDomain;
+                // Smart Auto-Categorization Fallback
+                // Try to find a matching domain by name or keyword
+                const itemNameLower = item.name.toLowerCase();
+                
+                // 1. Direct Domain Name Match (e.g. tag "Work" -> Work Domain)
+                let matchedDomainId = Array.from(domainMap.keys()).find(id => {
+                    const domainName = domainMap.get(id)?.domain.name.toLowerCase();
+                    return domainName === itemNameLower || (domainName === 'relationships' && (itemNameLower === 'friend' || itemNameLower === 'family'));
+                });
+
+                // 2. Keyword Mapping (Simple Heuristics)
+                if (!matchedDomainId) {
+                    const interestsKeywords = ['fishing', 'coffee', 'guitar', 'hiking', 'photography', 'books', 'tennis', 'cooking', 'golf', 'wine', 'yoga', 'travel', 'running', 'music', 'art', 'surfing', 'basketball', 'sport', 'gym', 'reading'];
+                    const workKeywords = ['software', 'product', 'manager', 'designer', 'entrepreneur', 'data', 'agent', 'marketing', 'teacher', 'business', 'sales', 'developer', 'engineer', 'ceo', 'founder', 'windows', 'doors', 'panoramic'];
+                    const travelKeywords = ['japan', 'japanese', 'france', 'italy', 'trip', 'vacation', 'visit'];
+                    const relationshipKeywords = ['daughter', 'son', 'wife', 'husband', 'mom', 'dad', 'neighbor', 'classmate', 'school', 'mentor', 'client'];
+
+                    const checkKeywords = (keywords: string[]) => keywords.some(k => itemNameLower.includes(k));
+
+                    if (checkKeywords(interestsKeywords)) matchedDomainId = Array.from(domainMap.values()).find(d => d.domain.name === 'Interests')?.domain.id;
+                    else if (checkKeywords(workKeywords)) matchedDomainId = Array.from(domainMap.values()).find(d => d.domain.name === 'Work')?.domain.id;
+                    else if (checkKeywords(travelKeywords)) matchedDomainId = Array.from(domainMap.values()).find(d => d.domain.name === 'Travel')?.domain.id;
+                    else if (checkKeywords(relationshipKeywords)) matchedDomainId = Array.from(domainMap.values()).find(d => d.domain.name === 'Relationships' || d.domain.name === 'Friends')?.domain.id;
+                }
+
+                if (matchedDomainId && domainMap.has(matchedDomainId)) {
+                    group = domainMap.get(matchedDomainId)!;
+                } else {
+                    // Finally, Fallback to Uncategorized
+                    group = uncategorizedDomain;
+                }
              }
 
              // Find or create sub-tribe
