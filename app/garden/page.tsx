@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles } from 'lucide-r
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
+import GardenView from '@/components/garden/GardenView';
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
 import GardenStats from '@/components/relationship-garden/GardenStats';
 import NurtureSidebar from '@/components/relationship-garden/NurtureSidebar';
@@ -180,7 +181,12 @@ export default function GardenPage() {
           interests: person.interests,
           tags: interestsList, // Using interests as fallback for tags
           is_favorite: person.is_favorite || false,
-          target_frequency_days: person.target_frequency_days
+          is_favorite: person.is_favorite || false,
+          target_frequency_days: person.target_frequency_days,
+          // Mapped for GardenView
+          targetFrequencyDays: person.target_frequency_days,
+          daysSinceLastContact: calculateDaysSinceContact(person.last_contact, person.last_interaction_date),
+          photoUrl: person.photo_url || null,
         };
       });
 
@@ -506,18 +512,14 @@ export default function GardenPage() {
           {/* Garden View */}
           {viewMode === 'garden' && healthFilter === 'all' && (
             <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
-              <RelationshipGarden
-                contacts={filteredContacts}
-                relationships={relationships} // Pass relationships data
-                filter={categoryFilter}
-                onContactClick={(contact) => {
+              <GardenView
+                contacts={filteredContacts as anymore} // casting as extended interface covers it
+                onLeafClick={(contact) => {
                   const extendedContact = contacts.find(c => c.id === contact.id);
                   if (extendedContact) {
                     setSelectedContactForModal(extendedContact);
                   }
                 }}
-                onQuickLog={handleQuickLog}
-                hoveredContactId={hoveredContactId}
               />
             </div>
           )}
@@ -750,18 +752,14 @@ export default function GardenPage() {
             {viewMode === 'garden' && healthFilter === 'all' && (
               <div className="flex flex-col lg:flex-row gap-6 items-start max-w-[1280px] mx-auto justify-center">
                 <div className="flex-1 w-full min-w-0">
-                  <RelationshipGarden
-                    contacts={filteredContacts}
-                    relationships={relationships} // Pass relationships data
-                    filter={categoryFilter}
-                    onContactClick={(contact) => {
+                  <GardenView
+                    contacts={filteredContacts as any}
+                    onLeafClick={(contact) => {
                       const extendedContact = contacts.find(c => c.id === contact.id);
                       if (extendedContact) {
                         setSelectedContactForModal(extendedContact);
                       }
                     }}
-                    onQuickLog={handleQuickLog}
-                    hoveredContactId={hoveredContactId}
                   />
                 </div>
 
