@@ -221,7 +221,7 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                      <div className="bg-[#1a1f2e] rounded-2xl p-5 text-center">
                         <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
                         <button 
-                            onClick={handleLinkConnection}
+                            onClick={onLinkConnection}
                             className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors"
                         >
                             <span>🔗</span>
