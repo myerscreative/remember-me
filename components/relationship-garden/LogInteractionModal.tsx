@@ -19,6 +19,7 @@ interface LogInteractionModalProps {
   onClose: () => void;
   onSuccess?: () => void;
   onUpdateImportance?: (newImportance: 'high' | 'medium' | 'low') => Promise<void>;
+  onUpdateFrequency?: (newFrequency: number) => Promise<void>;
   initialNote?: string;
   initialMethod?: InteractionType; 
 }
@@ -38,8 +39,9 @@ export default function LogInteractionModal({
   contact, 
   isOpen, 
   onClose,
-  onSuccess,
+  onSuccess, 
   onUpdateImportance,
+  onUpdateFrequency,
   initialNote = '',
   initialMethod
 }: LogInteractionModalProps) {
@@ -122,13 +124,13 @@ export default function LogInteractionModal({
         {/* Stats Row (Tier & Frequency) */}
         <div className="px-6 py-3 bg-slate-900/50 border-b border-slate-800 flex items-center gap-6">
             {/* Importance / Tier */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-1/2">
                 <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Tier</span>
                 {onUpdateImportance ? (
                   <select
                     value={contact.importance || 'medium'}
                     onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
-                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors"
+                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
                   >
                     <option value="high">⭐ High (Favorites)</option>
                     <option value="medium">🔹 Medium (Friends)</option>
@@ -142,14 +144,29 @@ export default function LogInteractionModal({
             </div>
 
             {/* Separator */}
-            <div className="h-8 w-px bg-slate-800" />
+            <div className="h-8 w-px bg-slate-800 shrink-0" />
 
             {/* Frequency */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-1/2">
                 <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Frequency</span>
-                <span className="text-xs text-slate-300 font-medium">
-                    {contact.targetFrequencyDays ? `Every ${contact.targetFrequencyDays} days` : 'No target set'}
-                </span>
+                {onUpdateFrequency ? (
+                  <select
+                    value={contact.targetFrequencyDays || 30}
+                    onChange={(e) => onUpdateFrequency(Number(e.target.value))}
+                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
+                  >
+                    <option value="7">Every 7 days (Weekly)</option>
+                    <option value="14">Every 14 days (Bi-weekly)</option>
+                    <option value="30">Every 30 days (Monthly)</option>
+                    <option value="90">Every 90 days (Quarterly)</option>
+                    <option value="180">Every 180 days (Bi-annual)</option>
+                    <option value="365">Every 365 days (Yearly)</option>
+                  </select>
+                ) : (
+                  <span className="text-xs text-slate-300 font-medium">
+                      {contact.targetFrequencyDays ? `Every ${contact.targetFrequencyDays} days` : 'No target set'}
+                  </span>
+                )}
             </div>
         </div>
 

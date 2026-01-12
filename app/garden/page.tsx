@@ -222,6 +222,30 @@ export default function GardenPage() {
     }
   }
 
+  // Set target frequency
+  async function setTargetFrequency(contact: ExtendedContact, newFrequency: number) {
+    setUpdatingId(contact.dbId);
+    try {
+      const supabase = createClient();
+      const { error } = await (supabase as any)
+        .from('persons')
+        .update({ target_frequency_days: newFrequency })
+        .eq('id', contact.dbId);
+
+      if (error) throw error;
+      
+      setContacts(prev => prev.map(c => 
+        c.dbId === contact.dbId ? { ...c, target_frequency_days: newFrequency, targetFrequencyDays: newFrequency } : c
+      ));
+      toast.success('Updated target frequency');
+    } catch (err) {
+      console.error('Error updating frequency:', err);
+      toast.error('Failed to update frequency');
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   // Set health status by calculating a date that puts them in that ring
   async function setHealthStatus(contact: ExtendedContact, targetStatus: 'blooming' | 'nourished' | 'thirsty' | 'fading') {
     setUpdatingId(contact.dbId);
@@ -923,6 +947,7 @@ export default function GardenPage() {
           isOpen={!!selectedContactForModal}
           onClose={() => setSelectedContactForModal(null)}
           onUpdateImportance={(newImp) => setImportance(selectedContactForModal, newImp)}
+          onUpdateFrequency={(newFreq) => setTargetFrequency(selectedContactForModal, newFreq)}
           onSuccess={() => {
             // Reload contacts to update positions
             loadContacts();
