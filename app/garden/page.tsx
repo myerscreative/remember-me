@@ -488,6 +488,104 @@ export default function GardenPage() {
             </div>
           )}
 
+          {/* List View on Mobile */}
+          {(viewMode === 'list' || healthFilter !== 'all') && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                  {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
+                  <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
+                </h3>
+              </div>
+
+              {filteredContacts.length === 0 ? (
+                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                  No contacts in this category
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredContacts.map(contact => {
+                    const status = getHealthStatus(contact.days);
+                    const config = healthConfig[status];
+                    return (
+                      <div
+                        key={contact.dbId}
+                        onClick={() => window.location.href = `/contacts/${contact.dbId}`}
+                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-start gap-3 mb-2">
+                          <div
+                            className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                            style={{ backgroundColor: config.color }}
+                          >
+                            {contact.initials}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-slate-800 dark:text-slate-200 truncate">
+                              {contact.name}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`} • {contact.category}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <select
+                            value={contact.importance || 'medium'}
+                            onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
+                            disabled={updatingId === contact.dbId}
+                            className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800"
+                          >
+                            <option value="high">⭐ High</option>
+                            <option value="medium">🔹 Medium</option>
+                            <option value="low">▫️ Casual</option>
+                          </select>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const extendedContact = contacts.find(c => c.id === contact.id);
+                              if (extendedContact) setSelectedContactForModal(extendedContact);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium"
+                          >
+                            Connect
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Graph View on Mobile */}
+          {viewMode === 'graph' && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+              <NetworkGraphView
+                contacts={filteredContacts}
+                relationships={relationships}
+                onNodeClick={(id) => window.location.href = `/contacts/${id}`}
+              />
+            </div>
+          )}
+          
+          {/* Stats on Mobile - moved below graph/list but above filters if in list/graph mode? 
+              User request: "Garden graphic... underneath it the statistics... same for other items".
+              So we want Content -> Stats -> Filters?
+              Or Content -> Filters -> Stats?
+              
+              "On the view of the garden... Garden graphic up near the top... Underneath it, the statistics..."
+              Original Garden Layout: Garden -> Filters -> Stats (at bottom).
+              Wait, Image 1 shows Stats (Health Status) DIRECTLY under Garden.
+              
+              Let's keep Stats at the bottom effectively or right after content?
+              The user wants CONSISTENCY.
+              
+              If I put List/Graph here, then the Filters (Health Status) will be BELOW them.
+              Which matches "Order ... same as view of all leaves" (Visual -> Filters).
+          */}
+          
           {/* Filters & Controls Section */}
           <div className="space-y-3 mb-4">
             {/* View Mode Toggle */}
@@ -805,95 +903,6 @@ export default function GardenPage() {
           </div>
         </div>
 
-        {/* MOBILE: List and Graph views */}
-        <div className="md:hidden">
-          {(viewMode === 'list' || healthFilter !== 'all') && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                  {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
-                  <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
-                </h3>
-              </div>
-
-              {filteredContacts.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                  No contacts in this category
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredContacts.map(contact => {
-                    const status = getHealthStatus(contact.days);
-                    const config = healthConfig[status];
-                    return (
-                      <div
-                        key={contact.dbId}
-                        onClick={() => window.location.href = `/contacts/${contact.dbId}`}
-                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-start gap-3 mb-2">
-                          <div
-                            className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                            style={{ backgroundColor: config.color }}
-                          >
-                            {contact.initials}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-slate-800 dark:text-slate-200 truncate">
-                              {contact.name}
-                            </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400">
-                              {contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`} • {contact.category}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                          <select
-                            value={contact.importance || 'medium'}
-                            onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
-                            disabled={updatingId === contact.dbId}
-                            className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800"
-                          >
-                            <option value="high">⭐ High</option>
-                            <option value="medium">🔹 Medium</option>
-                            <option value="low">▫️ Casual</option>
-                          </select>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const extendedContact = contacts.find(c => c.id === contact.id);
-                              if (extendedContact) setSelectedContactForModal(extendedContact);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium"
-                          >
-                            Connect
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Graph View on Mobile */}
-          {viewMode === 'graph' && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
-              <NetworkGraphView
-                contacts={filteredContacts}
-                relationships={relationships}
-                onNodeClick={(id) => window.location.href = `/contacts/${id}`}
-              />
-            </div>
-          )}
-
-          {/* Stats on Mobile */}
-          {viewMode === 'garden' && healthFilter === 'all' && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
-              <GardenStats stats={stats} />
-            </div>
-          )}
         </div>
       </div>
 
