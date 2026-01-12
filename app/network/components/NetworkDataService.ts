@@ -121,7 +121,17 @@ export class NetworkDataService {
     });
 
     // Fallback 'General' or 'Friends' domain if we can't match?
-    // For now, only map if explicit domain_id exists
+    // Create a virtual "Uncategorized" domain for items with missing/invalid domain_id
+    const uncategorizedDomain: DomainGroup = {
+        domain: {
+            id: 'uncategorized',
+            name: 'Uncategorized',
+            icon: '📦',
+            color: '#94a3b8' // Slate-400
+        },
+        subTribes: [],
+        totalMembers: 0
+    };
 
     contacts.forEach(contact => {
        const mappedSubTribes = new Set<string>(); // avoid double counting member in same subtribe for this contact
@@ -130,28 +140,32 @@ export class NetworkDataService {
        const processItems = (items: { id: string, name: string, domain_id: string | null }[] | undefined) => {
           if (!items) return;
           items.forEach(item => {
+             let group: DomainGroup;
+             
              if (item.domain_id && domainMap.has(item.domain_id)) {
-                const group = domainMap.get(item.domain_id)!;
-                
-                // Find or create sub-tribe
-                let subTribe = group.subTribes.find(st => st.name === item.name);
-                if (!subTribe) {
-                   subTribe = {
-                     id: item.id, // Use interest/tag ID as subtribe ID
-                     name: item.name,
-                     domainId: item.domain_id,
-                     memberCount: 0,
-                     members: []
-                   };
-                   group.subTribes.push(subTribe);
-                }
+                group = domainMap.get(item.domain_id)!;
+             } else {
+                // Fallback to Uncategorized
+                group = uncategorizedDomain;
+             }
 
-                // Add member if not already added to this specific subtribe
-                // (Though logically a person has the interest only once, so push is fine if data is clean)
-                if (!subTribe.members.find(m => m.id === contact.id)) {
-                    subTribe.members.push(contact);
-                    subTribe.memberCount++;
-                }
+             // Find or create sub-tribe
+             let subTribe = group.subTribes.find(st => st.name === item.name);
+             if (!subTribe) {
+                subTribe = {
+                    id: item.id, // Use interest/tag ID as subtribe ID
+                    name: item.name,
+                    domainId: group.domain.id,
+                    memberCount: 0,
+                    members: []
+                };
+                group.subTribes.push(subTribe);
+             }
+
+             // Add member if not already added to this specific subtribe
+             if (!subTribe.members.find(m => m.id === contact.id)) {
+                subTribe.members.push(contact);
+                subTribe.memberCount++;
              }
           });
        };
@@ -161,7 +175,12 @@ export class NetworkDataService {
     });
 
     // Calculate total unique members per domain
-    domainMap.forEach(group => {
+    const allGroups = [...Array.from(domainMap.values())];
+    if (uncategorizedDomain.subTribes.length > 0) {
+        allGroups.push(uncategorizedDomain);
+    }
+
+    allGroups.forEach(group => {
        const uniquemembers = new Set<string>();
        group.subTribes.forEach(st => {
           st.members.forEach(m => uniquemembers.add(m.id));
@@ -172,7 +191,7 @@ export class NetworkDataService {
        group.subTribes.sort((a, b) => b.memberCount - a.memberCount);
     });
 
-    return Array.from(domainMap.values());
+    return allGroups;
   }
 }
 
