@@ -181,7 +181,6 @@ export default function GardenPage() {
           interests: person.interests,
           tags: interestsList, // Using interests as fallback for tags
           is_favorite: person.is_favorite || false,
-          is_favorite: person.is_favorite || false,
           target_frequency_days: person.target_frequency_days,
           // Mapped for GardenView
           targetFrequencyDays: person.target_frequency_days,
