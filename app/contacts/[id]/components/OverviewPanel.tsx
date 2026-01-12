@@ -1,43 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnection, onUnlinkConnection }: OverviewPanelProps) {
-  const router = useRouter(); // Initialize router
-  const [activeTab, setActiveTab] = useState('Overview');
-  // ... existing code ...
-
-  // Inside the Connections map:
-  // ...
-                                    {contact.connections.map((conn: any) => (
-                                        <div 
-                                            key={conn.id} 
-                                            onClick={() => router.push(`/contacts/${conn.person.id}`)}
-                                            className="flex items-center gap-3 bg-[#0f1419] p-3 rounded-xl border border-[#2d3748]/50 group cursor-pointer hover:bg-[#1e293b] transition-colors"
-                                        >
-                                            <div className="h-10 w-10 rounded-full bg-[#2d3748] flex items-center justify-center overflow-hidden border border-[#3d4758]">
-                                                {conn.person.photo_url ? (
-                                                    <img src={conn.person.photo_url} alt={conn.person.name} className="h-full w-full object-cover" />
-                                                ) : (
-                                                    <span className="text-xs text-slate-400">
-                                                        {conn.person.first_name?.[0]}{conn.person.last_name?.[0]}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[13px] font-medium text-slate-200 truncate group-hover:text-white transition-colors">{conn.person.name}</div>
-                                                <div className="text-[11px] text-[#94a3b8]">{conn.relationship_type}</div>
-                                            </div>
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent navigation
-                                                    onUnlinkConnection?.(conn.id);
-                                                }}
-                                                className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-red-400 transition-all hover:bg-slate-800 rounded-full"
-                                                title="Unlink connection"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    ))}
+import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 
 import { Button } from '@/components/ui/button';
