@@ -100,7 +100,7 @@ export function LinkConnectionModal({
 
       const { error } = await supabase
         .from("relationships")
-        .insert(newRelationship);
+        .insert(newRelationship as any);
 
       if (error) throw error;
 
