@@ -484,10 +484,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
         onMouseLeave={handleMouseUp}
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
-        {/* Center label */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
-          High Priority
-        </div>
+
 
         {/* Info Badge - Desktop Only */}
         <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-[2rem] shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
@@ -512,6 +509,10 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
         >
           {/* Leaves Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
+            {/* Center label */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
+              High Priority
+            </div>
             {/* Render Rings Guidelines - Three rings for contact frequency (Matching new max radii: 220, 500, 900) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] rounded-full border border-red-500/20 pointer-events-none" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-amber-500/15 pointer-events-none" />
