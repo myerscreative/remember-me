@@ -68,7 +68,7 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
   const handleMouseUp = () => setIsDragging(false);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] select-none rounded-3xl border border-slate-200 shadow-inner">
+    <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] dark:from-slate-900 dark:to-[#0f172a] select-none rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner">
         {/* Header Controls */}
         <div className="absolute top-4 right-4 z-50">
             <GardenToggle mode={mode} onChange={handleModeChange} />
@@ -94,13 +94,15 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
                     y: position.y,
                     scale: scale 
                 }}
+                initial={{ scale: 0.8 }} // Zoom out slightly by default
+                animate={{ scale: scale }}
             >
                 {/* Rings Background */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                     {[1, 2, 3, 4, 5, 6].map(i => (
                         <div 
                            key={i} 
-                           className="absolute rounded-full border border-slate-300/30 -translate-x-1/2 -translate-y-1/2"
+                           className="absolute rounded-full border border-slate-300/30 dark:border-slate-700/30 -translate-x-1/2 -translate-y-1/2"
                            style={{ 
                                width: (80 + (i-1)*60) * 2, 
                                height: (80 + (i-1)*60) * 2 

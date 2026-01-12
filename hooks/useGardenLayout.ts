@@ -62,35 +62,39 @@ export function useGardenLayout(contacts: GardenContact[], mode: GardenMode) {
     const positioned: PositionedContact[] = [];
 
     rings.forEach((ringContacts, ringIndex) => {
-        const radius = RING_RADIUS_START + (ringIndex * RING_RADIUS_STEP);
+        const baseRadius = RING_RADIUS_START + (ringIndex * RING_RADIUS_STEP);
         const count = ringContacts.length;
         
         if (count === 0) return;
 
-        // Shuffle slightly for "organic" feel or sort? 
-        // Sorting by health status or name helps consistency
-        const sortedRing = [...ringContacts].sort((a, b) => a.name.localeCompare(b.name));
+        // Shuffle contacts to randomize color/size placement
+        const shuffled = [...ringContacts].sort(() => Math.random() - 0.5);
 
         const angleStep = (2 * Math.PI) / count;
-        
-        // Add a random start angle offset per ring for visual variety
-        const angleOffset = ringIndex * 0.5; 
+        // Random start angle per ring
+        const angleOffset = Math.random() * Math.PI * 2; 
 
-        sortedRing.forEach((contact, i) => {
-            const angle = (i * angleStep) + angleOffset;
+        shuffled.forEach((contact, i) => {
+            const angle = (i * angleStep) + angleOffset + ((Math.random() - 0.5) * 0.1); // Slight angle jitter
+            
+            // Scatter sporadically: Add +/- jitter to radius
+            // Ring 0 (center) less jitter, outer rings more jitter
+            const jitterRange = RING_RADIUS_STEP * 0.7; // 70% of gap
+            const radiusJitter = (Math.random() - 0.5) * jitterRange;
+            
+            const radius = baseRadius + radiusJitter;
+
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
 
             // Determine Size
             let leafSize = SIZE_M;
             if (mode === 'frequency') {
-                // Size = Relationship Tier
                 const tier = contact.importance || 'medium';
                 if (tier === 'high') leafSize = SIZE_L;
                 else if (tier === 'medium') leafSize = SIZE_M;
                 else leafSize = SIZE_S;
             } else {
-                // Size = Contact Frequency
                 const freq = contact.targetFrequencyDays || 365;
                 if (freq <= 7) leafSize = 56; // XXL
                 else if (freq <= 14) leafSize = 48; // XL
