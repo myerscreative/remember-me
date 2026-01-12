@@ -81,10 +81,13 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
     // 1. Database Relationships
     relationships.forEach(rel => {
         // Find if both nodes exist in our current filtered subset
-        const hasA = nodes.find(n => n.id === rel.contact_id_a);
-        const hasB = nodes.find(n => n.id === rel.contact_id_b);
+        const fromId = rel.from_person_id;
+        const toId = rel.to_person_id;
+        
+        const hasA = nodes.find(n => n.id === fromId);
+        const hasB = nodes.find(n => n.id === toId);
         if (hasA && hasB) {
-            addLink(rel.contact_id_a, rel.contact_id_b, 'manual');
+            addLink(fromId, toId, 'manual');
         }
     });
 
