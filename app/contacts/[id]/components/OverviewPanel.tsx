@@ -183,6 +183,18 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                         </div>
                     </div>
 
+                    {/* Notes / Voice Entry */}
+                    {contact.notes && (
+                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5">
+                          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
+                              Notes / Context
+                          </div>
+                          <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+                              {contact.notes}
+                          </p>
+                      </div>
+                    )}
+
                     {/* Tags & Interests */}
                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
