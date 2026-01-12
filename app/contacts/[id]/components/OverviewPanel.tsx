@@ -34,7 +34,7 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
   };
 
   return (
-    <div className="flex-1 bg-[#0a0e1a] flex flex-col overflow-y-auto h-full min-w-0">
+    <div className="flex-1 bg-[#0a0e1a] flex flex-col md:overflow-y-auto h-auto md:h-full min-w-0">
         {/* TABS - STICKY */}
         <div className="flex px-5 md:px-8 pt-5 md:pt-6 gap-6 md:gap-8 border-b border-[#2d3748] bg-[#0a0e1a] sticky top-0 z-10 shrink-0">
             {['Overview', 'Story', 'Family'].map((tab) => (
