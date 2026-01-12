@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
 import { ResultsScreen } from '@/components/game/ResultsScreen';
+import { useGameData } from '@/hooks/useGameData';
+import { Loader2 } from 'lucide-react';
 
 interface Contact {
   id: string;
@@ -12,10 +14,6 @@ interface Contact {
   initials: string;
   company?: string;
   location?: string;
-  family?: {
-      spouse?: string;
-      children?: Array<{ name: string; age: number }>;
-  };
 }
 
 interface GameState {
@@ -32,18 +30,7 @@ interface GameState {
 
 export default function FactMatchGame() {
   const router = useRouter();
-  
-  // Mock contact data
-  const allContacts: Contact[] = [
-    { id: '1', name: 'Sarah Chen', initials: 'SC', company: 'TechCorp', location: 'San Francisco' },
-    { id: '2', name: 'Mike Johnson', initials: 'MJ', company: 'Startup Inc', location: 'Austin' },
-    { id: '3', name: 'Tom Hall', initials: 'TH', company: 'Finance Co', location: 'New York' },
-    { id: '4', name: 'Jennifer Martinez', initials: 'JM', company: 'Design Studio', location: 'Portland' },
-    { id: '5', name: 'David Kim', initials: 'DK', company: 'TechCorp', location: 'San Francisco' },
-    { id: '6', name: 'Emily Brown', initials: 'EB', company: 'Education', location: 'Chicago' },
-    { id: '7', name: 'James Wilson', initials: 'JW', company: 'Healthcare', location: 'Boston' },
-    { id: '8', name: 'Lisa Anderson', initials: 'LA', company: 'Law Firm', location: 'DC' },
-  ];
+  const { contacts: allContacts, loading } = useGameData();
 
   const [gameState, setGameState] = useState<GameState>({
     currentQuestion: 0,
@@ -64,46 +51,94 @@ export default function FactMatchGame() {
   }>>([]);
 
   const generateQuestions = useCallback(() => {
+    if (loading || allContacts.length < 4) return;
+
     const newQuestions: { prompt: string; correct: Contact; choices: Contact[] }[] = [];
     const usedIndices = new Set<string>();
 
     const questionTypes = [
-        (c: Contact) => `Who works at ${c.company}?`,
-        (c: Contact) => `Who lives in ${c.location}?`,
+        (c: Contact) => c.company ? `Who works at ${c.company}?` : null,
+        // (c: Contact) => c.location ? `Who lives in ${c.location}?` : null, // Location removed from types, disabling
     ];
 
-    for (let i = 0; i < 10; i++) {
+    const MAX_ATTEMPTS = 50;
+    let attempts = 0;
+
+    while (newQuestions.length < 10 && attempts < MAX_ATTEMPTS) {
+        attempts++;
+        
         // Pick random contact
         const contact = allContacts[Math.floor(Math.random() * allContacts.length)];
+        
+        // Map to local Contact interface
+        const contactMapped: Contact = {
+             id: contact.id,
+             name: contact.name,
+             initials: contact.initials,
+             company: contact.company || undefined,
+             location: contact.location || undefined
+        };
+
         // Pick random question type
         const typeIndex = Math.floor(Math.random() * questionTypes.length);
+        const promptGenerator = questionTypes[typeIndex];
+        const prompt = promptGenerator(contactMapped);
+
+        if (!prompt) continue; // Skip if data missing for this question type
         
         const questionKey = `${contact.id}-${typeIndex}`;
         
-        // Simple duplicate avoidance (not strict for mock)
-        if(usedIndices.has(questionKey)) {
-             // quick retry
-             i--; 
-             continue; 
-        }
+        if(usedIndices.has(questionKey)) continue;
+        
         usedIndices.add(questionKey);
-
-        const prompt = questionTypes[typeIndex](contact);
 
         const otherContacts = allContacts.filter(c => c.id !== contact.id);
         const shuffled = [...otherContacts].sort(() => Math.random() - 0.5);
-        const choices = [contact, ...shuffled.slice(0, 3)].sort(() => Math.random() - 0.5);
+        const choices = [contactMapped, ...shuffled.slice(0, 3).map(c => ({
+             id: c.id,
+             name: c.name,
+             initials: c.initials,
+             company: c.company || undefined,
+             location: c.location || undefined
+        }))].sort(() => Math.random() - 0.5);
 
-        newQuestions.push({ prompt, correct: contact, choices });
+        newQuestions.push({ prompt, correct: contactMapped, choices });
     }
 
     setQuestions(newQuestions);
-  }, []); // Dependencies: allContacts is static
+    setGameState(prev => ({
+        ...prev,
+        totalQuestions: newQuestions.length || 1 // Avoid 0 if failed
+    }));
+  }, [allContacts, loading]);
 
   // Generate questions on mount
   useEffect(() => {
-    generateQuestions();
-  }, [generateQuestions]);
+    if (!loading && allContacts.length > 0) {
+        generateQuestions();
+    }
+  }, [loading, allContacts, generateQuestions]);
+  
+  if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        </div>
+      );
+  }
+
+  if (allContacts.length < 4 || questions.length === 0) {
+       return (
+        <div className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
+            <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+                <div className="text-4xl mb-4">🧩</div>
+                <h2 className="text-xl font-bold mb-2">Not enough data</h2>
+                <p className="text-gray-600 mb-6">We need more contacts with Company info to play Fact Match!</p>
+                <button onClick={() => router.push('/')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Go to Dashboard</button>
+            </div>
+        </div>
+      );
+  }
 
   // Timer countdown
   useEffect(() => {

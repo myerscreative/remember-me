@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
 import { ResultsScreen } from '@/components/game/ResultsScreen';
+import { useGameData } from '@/hooks/useGameData';
+import { Loader2 } from 'lucide-react';
 
 interface Contact {
   id: string;
@@ -12,6 +14,8 @@ interface Contact {
   initials: string;
   avatar?: string;
   group?: string;
+  // GameData fields
+  company?: string | null;
 }
 
 interface GameState {
@@ -26,24 +30,10 @@ interface GameState {
   showFeedback: boolean;
 }
 
-const allContacts: Contact[] = [
-  { id: '1', name: 'Sarah Chen', initials: 'SC', group: 'work' },
-  { id: '2', name: 'Mike Johnson', initials: 'MJ', group: 'work' },
-  { id: '3', name: 'Tom Hall', initials: 'TH', group: 'family' },
-  { id: '4', name: 'Jennifer Martinez', initials: 'JM', group: 'work' },
-  { id: '5', name: 'David Kim', initials: 'DK', group: 'tech-conf' },
-  { id: '6', name: 'Emily Brown', initials: 'EB', group: 'family' },
-  { id: '7', name: 'James Wilson', initials: 'JW', group: 'tech-conf' },
-  { id: '8', name: 'Lisa Anderson', initials: 'LA', group: 'work' },
-  { id: '9', name: 'Marcus Reid', initials: 'MR', group: 'tech-conf' },
-  { id: '10', name: 'Sophie Turner', initials: 'ST', group: 'family' },
-  { id: '11', name: 'Alex Foster', initials: 'AF', group: 'tech-conf' },
-  { id: '12', name: 'Emma Davis', initials: 'ED', group: 'work' }
-];
-
 function FaceMatchGameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { contacts: allContacts, loading } = useGameData();
   
   const [gameState, setGameState] = useState<GameState>({
     currentQuestion: 0,
@@ -63,6 +53,8 @@ function FaceMatchGameContent() {
   }>>([]);
 
   const generateQuestions = useCallback(() => {
+    if (loading || allContacts.length < 4) return; // Need at least 4 contacts
+
     const newQuestions: { correct: Contact; choices: Contact[] }[] = [];
     const usedContacts = new Set<string>();
 
@@ -80,44 +72,79 @@ function FaceMatchGameContent() {
             availablePool = allContacts;
         }
     } else if (filterType === 'recent') {
-        availablePool = allContacts.slice(0, 5);
+        availablePool = allContacts.slice(0, 10); // Take top 10 recent
     }
 
     const questionCount = Math.min(10, availablePool.length);
-    
-    // We update state here which triggers re-render, but this function is called in useEffect
-    if (questionCount < 10) { 
-        // Logic to adjusting totalQuestions if pool is small handled in effect or here?
-        // Ideally we don't call setGameState here to avoid loop if this function is in dep array of effect that depends on gameState.
-        // But here generateQuestions is called ONCE on mount (or when params change).
-    }
+    if (questionCount === 0) return;
 
     for (let i = 0; i < questionCount; i++) {
+        // Pick a correct contact that hasn't been used yet if possible
         const unusedInPool = availablePool.filter(c => !usedContacts.has(c.id));
         const pool = unusedInPool.length > 0 ? unusedInPool : availablePool;
         
+        if (pool.length === 0) break;
+
         const correct = pool[Math.floor(Math.random() * pool.length)];
         usedContacts.add(correct.id);
 
+        // Map GameContact to local Contact interface
+        const correctMapped: Contact = {
+             id: correct.id,
+             name: correct.name,
+             initials: correct.initials,
+             avatar: correct.photo_url || undefined,
+             group: correct.group
+        };
+
         const otherContacts = allContacts.filter(c => c.id !== correct.id);
         const shuffled = [...otherContacts].sort(() => Math.random() - 0.5);
-        const choices = [correct, ...shuffled.slice(0, 3)].sort(() => Math.random() - 0.5);
+        const choices = [correctMapped, ...shuffled.slice(0, 3).map(c => ({
+             id: c.id,
+             name: c.name,
+             initials: c.initials,
+             avatar: c.photo_url || undefined,
+             group: c.group
+        }))].sort(() => Math.random() - 0.5);
 
-        newQuestions.push({ correct, choices });
+        newQuestions.push({ correct: correctMapped, choices });
     }
 
     setQuestions(newQuestions);
     setGameState(prev => ({
         ...prev,
-        totalQuestions: questionCount
+        totalQuestions: newQuestions.length
     }));
 
-  }, [searchParams]); 
+  }, [searchParams, allContacts, loading]); 
 
-  // Generate questions on mount
+  // Generate questions when contacts load
   useEffect(() => {
-    generateQuestions();
-  }, [generateQuestions]);
+    if (!loading && allContacts.length > 0) {
+        generateQuestions();
+    }
+  }, [loading, allContacts, generateQuestions]);
+
+  if (loading) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        </div>
+      );
+  }
+
+  if (allContacts.length < 4) {
+      return (
+        <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
+            <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+                <div className="text-4xl mb-4">👥</div>
+                <h2 className="text-xl font-bold mb-2">Not enough contacts</h2>
+                <p className="text-gray-600 mb-6">You need at least 4 contacts to play Face Match. Go add some friends!</p>
+                <button onClick={() => router.push('/')} className="px-4 py-2 bg-indigo-600 text-white rounded-lg">Go to Dashboard</button>
+            </div>
+        </div>
+      );
+  }
 
   // Timer countdown
   useEffect(() => {

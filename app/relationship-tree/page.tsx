@@ -19,10 +19,12 @@ import TreeStatsPanel from './components/TreeStats';
 import TreeFilters from './components/TreeFilters';
 import ActionPanel from './components/ActionPanel';
 
-// Mock data transformer - in production, this would come from Supabase
-function transformContactsToTreeFormat(contacts: MockContact[]): ContactHealth[] {
+import { useGameData, GameContact } from '@/hooks/useGameData';
+
+// Mock data transformer - adapted for Real Data
+function transformContactsToTreeFormat(contacts: GameContact[]): ContactHealth[] {
   return contacts.map(contact => {
-    const daysAgo = calculateDaysSince(contact.lastContact?.date);
+    const daysAgo = calculateDaysSince(contact.lastContactDate || undefined);
     const healthStatus = calculateTreeHealth(daysAgo);
     
     // Infer category from tags (simplified logic)
@@ -36,181 +38,32 @@ function transformContactsToTreeFormat(contacts: MockContact[]): ContactHealth[]
       contactId: String(contact.id),
       name: contact.name,
       initials: contact.initials,
-      photoUrl: contact.photo,
-      lastContactDate: contact.lastContact?.date ? new Date(contact.lastContact.date) : null,
+      photoUrl: contact.photo_url || null,
+      lastContactDate: contact.lastContactDate ? new Date(contact.lastContactDate) : null,
       daysAgo,
       healthStatus,
       category,
       position: { x: 0, y: 0 }, // Will be positioned by the tree
-      email: contact.email,
-      phone: contact.phone,
+      email: '', // Not in GameContact yet, add if needed or optional
+      phone: '', 
     };
   });
 }
 
-// Mock contact interface (matches existing mockContacts.ts)
-interface MockContact {
-  id: number;
-  name: string;
-  initials: string;
-  photo: string | null;
-  role: string;
-  location: string;
-  interests: string[];
-  tags: string[];
-  lastContact?: {
-    date: string;
-    method: string;
-  };
-  email?: string;
-  phone?: string;
-}
-
-// Mock contacts for demo (same as network page)
-const mockContacts: MockContact[] = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    initials: "SC",
-    photo: null,
-    role: "Software Engineer",
-    location: "Austin, TX",
-    interests: ["fishing", "coffee", "guitar"],
-    tags: ["Work", "Friend"],
-    lastContact: { date: "2024-12-15", method: "phone" },
-    email: "sarah.chen@email.com",
-    phone: "(555) 123-4567",
-  },
-  {
-    id: 2,
-    name: "Mike Johnson",
-    initials: "MJ",
-    photo: null,
-    role: "Product Manager",
-    location: "Austin, TX",
-    interests: ["fishing", "guitar", "hiking"],
-    tags: ["Work"],
-    lastContact: { date: "2024-11-20", method: "email" },
-    email: "mike.j@email.com",
-    phone: "(555) 234-5678",
-  },
-  {
-    id: 3,
-    name: "Emma Davis",
-    initials: "ED",
-    photo: null,
-    role: "Designer",
-    location: "San Francisco, CA",
-    interests: ["coffee", "running", "photography"],
-    tags: ["Friend"],
-    lastContact: { date: "2024-12-10", method: "text" },
-    email: "emma.davis@email.com",
-    phone: "(555) 345-6789",
-  },
-  {
-    id: 4,
-    name: "Tom Hall",
-    initials: "TH",
-    photo: null,
-    role: "Entrepreneur",
-    location: "Austin, TX",
-    interests: ["startups", "books", "tennis"],
-    tags: ["Work", "Mentor"],
-    lastContact: { date: "2024-09-15", method: "in-person" },
-    email: "tom.hall@email.com",
-    phone: "(555) 456-7890",
-  },
-  {
-    id: 5,
-    name: "Alex Kim",
-    initials: "AK",
-    photo: null,
-    role: "Data Scientist",
-    location: "Seattle, WA",
-    interests: ["running", "books", "cooking"],
-    tags: ["School", "Friend"],
-    lastContact: { date: "2024-12-01", method: "video" },
-    email: "alex.kim@email.com",
-    phone: "(555) 567-8901",
-  },
-  {
-    id: 6,
-    name: "David Wilson",
-    initials: "DW",
-    photo: null,
-    role: "Real Estate Agent",
-    location: "Austin, TX",
-    interests: ["fishing", "golf", "wine"],
-    tags: ["Client"],
-    lastContact: { date: "2024-12-14", method: "phone" },
-    email: "david.w@email.com",
-    phone: "(555) 678-9012",
-  },
-  {
-    id: 7,
-    name: "Lisa Martinez",
-    initials: "LM",
-    photo: null,
-    role: "Marketing Director",
-    location: "Austin, TX",
-    interests: ["coffee", "yoga", "travel"],
-    tags: ["Work"],
-    lastContact: { date: "2024-10-05", method: "email" },
-    email: "lisa.m@email.com",
-    phone: "(555) 789-0123",
-  },
-  {
-    id: 8,
-    name: "James Brown",
-    initials: "JB",
-    photo: null,
-    role: "Teacher",
-    location: "Austin, TX",
-    interests: ["guitar", "hiking", "photography"],
-    tags: ["Friend", "Family"],
-    lastContact: { date: "2024-12-17", method: "in-person" },
-    email: "james.b@email.com",
-    phone: "(555) 890-1234",
-  },
-  {
-    id: 9,
-    name: "Robert Myers",
-    initials: "RM",
-    photo: null,
-    role: "CEO",
-    location: "Austin, TX",
-    interests: ["startups", "coffee", "travel"],
-    tags: ["Mentor", "Network"],
-    lastContact: { date: "2024-08-01", method: "email" },
-    email: "robert.m@email.com",
-    phone: "(555) 901-2345",
-  },
-  {
-    id: 10,
-    name: "Jennifer Lee",
-    initials: "JL",
-    photo: null,
-    role: "Investor",
-    location: "New York, NY",
-    interests: ["finance", "art", "wine"],
-    tags: ["Client", "Network"],
-    lastContact: { date: "2024-12-12", method: "video" },
-    email: "jennifer.l@email.com",
-    phone: "(555) 012-3456",
-  },
-];
-
 export default function RelationshipTreePage() {
+  const { contacts, loading } = useGameData();
+
   const [showFilters, setShowFilters] = useState(false);
   const [showLabels, setShowLabels] = useState(true);
   const [healthFilters, setHealthFilters] = useState<TreeHealthStatus[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<ContactCategory[]>([]);
   const [selectedContactId, setSelectedContactId] = useState<string | undefined>();
 
-  // Transform mock contacts to tree format
+  // Transform real contacts to tree format
   const treeContacts = useMemo(() => {
-    return transformContactsToTreeFormat(mockContacts);
-  }, []);
+    if (loading) return [];
+    return transformContactsToTreeFormat(contacts);
+  }, [contacts, loading]);
 
   // Calculate stats
   const stats = useMemo(() => {
