@@ -68,7 +68,7 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
   const handleMouseUp = () => setIsDragging(false);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] select-none rounded-3xl border border-slate-200 shadow-inner">
+    <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] select-none rounded-3xl border border-slate-200 shadow-inner">
         {/* Header Controls */}
         <div className="absolute top-4 right-4 z-50">
             <GardenToggle mode={mode} onChange={handleModeChange} />
