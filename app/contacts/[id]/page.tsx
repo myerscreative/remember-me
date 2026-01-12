@@ -177,6 +177,32 @@ export default function ContactDetailPage({
       );
   }
 
+  const handleUnlinkConnection = async (connectionId: string) => {
+    if (!confirm("Are you sure you want to unlink this connection?")) return;
+
+    const { error } = await supabase
+        .from('relationships')
+        .delete()
+        .eq('id', connectionId);
+
+    if (error) {
+        toast.error("Failed to unlink connection");
+        console.error(error);
+        return;
+    }
+
+    toast.success("Connection removed");
+    
+    // Update local state
+    setContact(prev => {
+        if (!prev) return null;
+        return {
+            ...prev,
+            connections: prev.connections?.filter((c: any) => c.id !== connectionId) || []
+        };
+    });
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-theme(spacing.16))] md:h-screen overflow-hidden bg-[#0a0e1a] text-gray-200">
       <Toaster position="top-center" />
@@ -201,6 +227,7 @@ export default function ContactDetailPage({
         onNavigateToTab={(tab) => console.log('Navigated to', tab)}
         onEdit={() => setIsEditModalOpen(true)}
         onLinkConnection={() => setIsLinkModalOpen(true)}
+        onUnlinkConnection={handleUnlinkConnection}
       />
 
       {/* MODALS */}
