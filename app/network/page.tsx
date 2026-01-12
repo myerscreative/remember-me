@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { networkService, NetworkData, SubTribe } from './components/NetworkDataService';
 import NetworkSearchBar from './components/NetworkSearchBar';
@@ -11,7 +11,7 @@ import { NetworkSubTribeDrawer } from './components/NetworkSubTribeDrawer';
 import { NetworkTutorial, TutorialButton } from './components/NetworkTutorial';
 import { Loader2 } from 'lucide-react';
 
-export default function NetworkPage() {
+function NetworkContent() {
   const [data, setData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -220,5 +220,17 @@ export default function NetworkPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function NetworkPage() {
+  return (
+    <Suspense fallback={
+       <div className="flex items-center justify-center min-h-screen bg-[#0a0e1a]">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+       </div>
+    }>
+       <NetworkContent />
+    </Suspense>
   );
 }
