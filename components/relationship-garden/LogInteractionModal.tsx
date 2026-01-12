@@ -13,6 +13,7 @@ interface LogInteractionModalProps {
     name: string;
     initials: string;
     targetFrequencyDays?: number;
+    importance?: 'high' | 'medium' | 'low';
   };
   isOpen: boolean;
   onClose: () => void;
