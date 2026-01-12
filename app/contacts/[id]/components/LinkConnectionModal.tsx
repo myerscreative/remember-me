@@ -100,7 +100,9 @@ export function LinkConnectionModal({
 
       const { error } = await supabase
         .from("relationships")
-        .insert(newRelationship as any);
+        .upsert(newRelationship as any, {
+          onConflict: 'from_person_id,to_person_id' 
+        });
 
       if (error) throw error;
 
