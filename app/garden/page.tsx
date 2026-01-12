@@ -469,6 +469,40 @@ export default function GardenPage() {
 
         {/* MOBILE: Garden First, Filters Below */}
         <div className="md:hidden">
+          {/* View Mode Toggle - ALWAYS AT TOP */}
+          <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
+            <button
+              onClick={() => setViewMode('garden')}
+              className={`flex-1 py-2 rounded-lg border transition-colors ${
+                viewMode === 'garden'
+                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5 mx-auto" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex-1 py-2 rounded-lg border transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <List className="w-5 h-5 mx-auto" />
+            </button>
+            <button
+              onClick={() => setViewMode('graph')}
+              className={`flex-1 py-2 rounded-lg border transition-colors ${
+                viewMode === 'graph'
+                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <Share2 className="w-5 h-5 mx-auto" />
+            </button>
+          </div>
+
           {/* Garden View */}
           {viewMode === 'garden' && healthFilter === 'all' && (
             <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
@@ -588,40 +622,7 @@ export default function GardenPage() {
           
           {/* Filters & Controls Section */}
           <div className="space-y-3 mb-4">
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <button
-                onClick={() => setViewMode('garden')}
-                className={`flex-1 py-2 rounded-lg border transition-colors ${
-                  viewMode === 'garden'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                }`}
-              >
-                <LayoutGrid className="w-5 h-5 mx-auto" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex-1 py-2 rounded-lg border transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                }`}
-              >
-                <List className="w-5 h-5 mx-auto" />
-              </button>
-              <button
-                onClick={() => setViewMode('graph')}
-                className={`flex-1 py-2 rounded-lg border transition-colors ${
-                  viewMode === 'graph'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                }`}
-              >
-                <Share2 className="w-5 h-5 mx-auto" />
-              </button>
-            </div>
-
+            
             {/* Health Status Filters - Compact */}
             <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
               <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Health Status</div>
