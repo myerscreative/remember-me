@@ -3,20 +3,20 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
-import { SearchResultCard } from '@/app/contacts/components/SearchResultCard'; // Using as Reconnect Card for now or create specific? Let's use custom markup from mock
+
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Plus, ExternalLink } from 'lucide-react';
-import { QuickStatsCard } from './tabs/overview/QuickStatsCard';
-import { ContactInfoGrid } from './tabs/overview/ContactInfoGrid';
+
 import { Badge } from '@/components/ui/badge';
 
 interface OverviewPanelProps {
   contact: any;
   onNavigateToTab?: (tab: string) => void;
   onEdit?: () => void;
+  onLinkConnection?: () => void;
 }
 
-export function OverviewPanel({ contact, onNavigateToTab, onEdit }: OverviewPanelProps) {
+export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnection }: OverviewPanelProps) {
   const [activeTab, setActiveTab] = useState('Overview');
 
   const handleTabChange = (tab: string) => {
@@ -27,11 +27,14 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit }: OverviewPane
   const handleDraftReconnection = () => {
     // Placeholder for AI drafting feature
     alert("AI Reconnection Drafter coming soon! 🤖");
+<<<<<<< HEAD
   };
 
   const handleLinkConnection = () => {
     // Placeholder for linking feature
     alert("Connection Linking coming soon! 🔗");
+=======
+>>>>>>> claude/fix-garden-hover-popup-uIZ7l
   };
 
   return (
@@ -255,7 +258,56 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit }: OverviewPane
                     <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
                      <p className="max-w-md mx-auto">Map out the important people in their life.</p>
                 </div>
+<<<<<<< HEAD
             )}
+=======
+            </div>
+
+            {/* Tags & Interests */}
+             <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                         <span className="block text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-2.5">🏷️ Tags</span>
+                         <div className="flex flex-wrap gap-1.5">
+                            {(contact.tags || []).map((tag: string) => (
+                                <Badge key={tag} className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal">
+                                    {tag}
+                                </Badge>
+                            ))}
+                            <button className="bg-transparent border border-dashed border-[#3d4758] text-[#94a3b8] px-2.5 py-1.5 rounded-md text-[11px] hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors">
+                                +
+                            </button>
+                         </div>
+                    </div>
+                    <div>
+                         <span className="block text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-2.5">✨ Interests</span>
+                         <div className="flex flex-wrap gap-1.5">
+                            {(contact.interests || []).map((interest: string) => (
+                                <Badge key={interest} className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal">
+                                    {interest}
+                                </Badge>
+                            ))}
+                            <button className="bg-transparent border border-dashed border-[#3d4758] text-[#94a3b8] px-2.5 py-1.5 rounded-md text-[11px] hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors">
+                                + Add interests
+                            </button>
+                         </div>
+                    </div>
+                </div>
+             </div>
+
+             {/* Connections */}
+             <div className="bg-[#1a1f2e] rounded-2xl p-5 text-center">
+                <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
+                <button 
+                    onClick={onLinkConnection}
+                    className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors"
+                >
+                    <span>🔗</span>
+                    Link a Connection
+                </button>
+             </div>
+
+>>>>>>> claude/fix-garden-hover-popup-uIZ7l
         </div>
     </div>
   );

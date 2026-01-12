@@ -340,31 +340,47 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   }, [filteredContacts]);
 
   const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
-    // console.log('Leaf Enter:', contact.name);
+    console.log('Leaf Enter:', contact.name);
     // Clear any pending hide timeout
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
+
+    // Clamp position to ensure tooltip stays on screen
+    const tooltipWidth = 200; // min-w-[200px]
+    const tooltipHeight = 150; // approximate height
+    const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
+    const yPos = Math.max(10, e.clientY - 70); // Ensure it doesn't go above viewport
+
+    console.log('Setting tooltip position:', { x: xPos, y: yPos, contact: contact.name });
+
     setTooltip({
       visible: true,
-      x: e.clientX + 15,
-      y: e.clientY - 70,
+      x: xPos,
+      y: yPos,
       contact
     });
   };
 
   const handleLeafMove = (e: React.MouseEvent) => {
-    // console.log('Leaf Move');
+    console.log('Leaf Move');
+
+    // Clamp position to ensure tooltip stays on screen
+    const tooltipWidth = 200;
+    const tooltipHeight = 150;
+    const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
+    const yPos = Math.max(10, e.clientY - 70);
+
     setTooltip(prev => ({
       ...prev,
-      x: e.clientX + 15,
-      y: e.clientY - 70
+      x: xPos,
+      y: yPos
     }));
   };
 
   const handleLeafLeave = () => {
-    // console.log('Leaf Leave');
+    console.log('Leaf Leave');
     // Delay hiding to allow user to move mouse to tooltip
     hideTimeoutRef.current = setTimeout(() => {
       setTooltip(prev => ({ ...prev, visible: false }));
@@ -562,11 +578,18 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         </div>
 
         {/* Tooltip */}
-        {tooltip.visible && tooltip.contact && (
-          <div 
+        {tooltip.visible && tooltip.contact && (() => {
+          console.log('✅ TOOLTIP RENDERING:', {
+            name: tooltip.contact?.name,
+            position: { x: tooltip.x, y: tooltip.y },
+            visible: tooltip.visible
+          });
+          return true;
+        })() && (
+          <div
             className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
-            style={{ 
-              left: tooltip.x, 
+            style={{
+              left: tooltip.x,
               top: tooltip.y,
             }}
             onMouseEnter={handleTooltipEnter}

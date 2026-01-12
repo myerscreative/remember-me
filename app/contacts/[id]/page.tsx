@@ -14,6 +14,7 @@ import { InteractionType } from "@/lib/relationship-health";
 import LogInteractionModal from "@/components/relationship-garden/LogInteractionModal";
 import { EditContactModal } from "./components/EditContactModal";
 import { AvatarCropModal } from "./components/AvatarCropModal";
+import { LinkConnectionModal } from "./components/LinkConnectionModal";
 
 export default function ContactDetailPage({
   params,
@@ -32,6 +33,7 @@ export default function ContactDetailPage({
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [logInitialMethod, setLogInitialMethod] = useState<InteractionType | undefined>(undefined);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -170,39 +172,16 @@ export default function ContactDetailPage({
         contact={contact}
         onNavigateToTab={(tab) => console.log('Navigated to', tab)}
         onEdit={() => setIsEditModalOpen(true)}
+        onLinkConnection={() => setIsLinkModalOpen(true)}
       />
 
       {/* MODALS */}
-      <EditContactModal 
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        contact={contact}
+      <LinkConnectionModal
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+        currentContactId={contact.id}
+        currentContactName={contact.name}
         onSuccess={handleRefresh}
-      />
-      
-      <LogInteractionModal 
-        isOpen={isLogModalOpen}
-        onClose={() => {
-            setIsLogModalOpen(false);
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete('action');
-            router.replace(`/contacts/${id}?${params.toString()}`, { scroll: false });
-        }}
-        contact={{
-            id: contact.id,
-            name: contact.name,
-            initials: getInitials(contact.first_name, contact.last_name),
-            importance: contact.importance
-        }}
-        initialMethod={logInitialMethod}
-        onSuccess={handleRefresh}
-      />
-
-      <AvatarCropModal
-        open={isCropModalOpen}
-        imageSrc={""} // TODO: State lifting for avatar logic if needed, or pass down to PersonPanel
-        onClose={() => setIsCropModalOpen(false)}
-        onCropComplete={(blob) => console.log('Crop complete', blob)} // Handled inside logic
       />
     </div>
   );
