@@ -92,7 +92,34 @@ export default function ContactDetailPage({
           .eq("person_id", id)
           .order('created_at', { ascending: false });
 
-        // 4. Assemble complete object
+        // 4. Fetch Connections (Relationships)
+        // We need both directions: where this person is 'from' OR 'to'
+        const { data: rawRelationships, error: relError } = await (supabase as any)
+          .from("relationships")
+          .select(`
+            id,
+            relationship_type,
+            from_person:from_person_id(id, name, photo_url, first_name, last_name),
+            to_person:to_person_id(id, name, photo_url, first_name, last_name)
+          `)
+          .or(`from_person_id.eq.${id},to_person_id.eq.${id}`);
+
+        if (relError) console.error("Error fetching relationships:", relError);
+
+        // Process relationships to get the "other" person
+        const processedConnections = (rawRelationships || []).map((rel: any) => {
+          const isFrom = rel.from_person.id === id;
+          const otherPerson = isFrom ? rel.to_person : rel.from_person;
+          
+          return {
+            id: rel.id,
+            relationship_type: rel.relationship_type,
+            person: otherPerson
+          };
+        });
+        setConnections(processedConnections); // Set connections state
+
+        // 5. Assemble complete object
         const latestMemory = sharedMemories?.[0]?.content;
         const baseAiSummary = person.ai_summary || "";
         const enhancedAiSummary = latestMemory 
@@ -105,6 +132,7 @@ export default function ContactDetailPage({
             lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
             tags: tags,
             shared_memories: sharedMemories || [],
+            connections: processedConnections, // Add connections to contact object
             story: {
                 whereWeMet: person.where_met,
                 whyStayInContact: person.why_stay_in_contact,

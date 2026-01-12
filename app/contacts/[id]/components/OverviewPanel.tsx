@@ -285,15 +285,47 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
              </div>
 
              {/* Connections */}
-             <div className="bg-[#1a1f2e] rounded-2xl p-5 text-center">
-                <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
-                <button 
-                    onClick={onLinkConnection}
-                    className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors"
-                >
-                    <span>🔗</span>
-                    Link a Connection
-                </button>
+             <div className="bg-[#1a1f2e] rounded-2xl p-5">
+                {(!contact.connections || contact.connections.length === 0) ? (
+                    <div className="text-center">
+                        <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
+                        <button 
+                            onClick={onLinkConnection}
+                            className="bg-transparent border border-[#3d4758] text-[#94a3b8] py-2.5 px-4 rounded-[10px] text-[13px] font-medium inline-flex items-center gap-1.5 hover:border-[#7c3aed] hover:text-[#a78bfa] transition-colors"
+                        >
+                            <span>🔗</span>
+                            Link a Connection
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between mb-2">
+                             <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8]">🔗 Connections</span>
+                             <button onClick={onLinkConnection} className="text-[#a78bfa] hover:text-white transition-colors">
+                                <Plus className="h-4 w-4" />
+                             </button>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                            {contact.connections.map((conn: any) => (
+                                <div key={conn.id} className="flex items-center gap-3 bg-[#0f1419] p-3 rounded-xl border border-[#2d3748]/50">
+                                    <div className="h-10 w-10 rounded-full bg-[#2d3748] flex items-center justify-center overflow-hidden border border-[#3d4758]">
+                                        {conn.person.photo_url ? (
+                                            <img src={conn.person.photo_url} alt={conn.person.name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="text-xs text-slate-400">
+                                                {conn.person.first_name?.[0]}{conn.person.last_name?.[0]}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[13px] font-medium text-slate-200 truncate">{conn.person.name}</div>
+                                        <div className="text-[11px] text-[#94a3b8]">{conn.relationship_type}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
              </div>
 
         </div>
