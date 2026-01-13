@@ -30,6 +30,7 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
         person_id: personId,
         user_id: user.id,
         type,
+        date: now, // Required: interaction timestamp
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
       }),
