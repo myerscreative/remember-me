@@ -263,7 +263,7 @@ export default function LogInteractionModal({
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {recentInteractions.map((interaction, index) => {
                   const typeInfo = INTERACTION_TYPES.find(t => t.value === interaction.type) || { value: interaction.type, label: interaction.type, emoji: '✨' };
-                  const date = new Date(interaction.interaction_date || interaction.created_at);
+                  const date = new Date(interaction.date || interaction.created_at);
                   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                   return (
