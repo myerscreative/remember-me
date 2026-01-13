@@ -523,50 +523,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-amber-500/15 pointer-events-none" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1800px] h-[1800px] rounded-full border border-green-500/10 pointer-events-none" />
             
-            {/* Relationships Layer (SVG) */}
-            <svg className="absolute top-1/2 left-1/2 overflow-visible pointer-events-none" width="0" height="0">
-              {relationships.map((rel) => {
-                const fromId = rel.from_person_id;
-                const toId = rel.to_person_id;
-                
-                // Find positions
-                const startNode = leafPositions.find(p => p.contact.id.toString() === fromId?.toString());
-                const endNode = leafPositions.find(p => p.contact.id.toString() === toId?.toString());
-                
-                if (!startNode || !endNode) return null;
 
-                // Check visibility
-                const isRelevant = 
-                  highlightedContactId === fromId?.toString() || 
-                  highlightedContactId === toId?.toString() ||
-                  hoveredContactId === fromId?.toString() ||
-                  hoveredContactId === toId?.toString();
-
-                if (!isRelevant && !highlightedContactId) {
-                   // Optional: Render very faint lines if nothing highlighted? 
-                   // specific user request: "click on a contact... show me people they are connected to"
-                   // So we focus on relevance.
-                   return null; 
-                }
-
-                // If something IS highlighted but this edge isn't relevant, don't show it
-                if (highlightedContactId && !isRelevant) return null;
-
-                return (
-                  <line
-                    key={rel.id}
-                    x1={startNode.x}
-                    y1={startNode.y}
-                    x2={endNode.x}
-                    y2={endNode.y}
-                    stroke={isRelevant ? "#a78bfa" : "#cbd5e1"} 
-                    strokeWidth={isRelevant ? 2 : 1}
-                    strokeOpacity={isRelevant ? 0.8 : 0.2}
-                    strokeDasharray={isRelevant ? "0" : "5,5"}
-                  />
-                );
-              })}
-            </svg>
 
             {leafPositions.map(({ contact, x, y, rotation, color, scale }) => {
               const isHovered = hoveredContactId === contact.id.toString();
