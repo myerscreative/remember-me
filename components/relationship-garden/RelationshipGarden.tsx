@@ -280,7 +280,12 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
       const count = items.length;
 
       // Sort by days so more recently contacted are towards inner edge
-      const sortedItems = [...items].sort((a, b) => a.days - b.days);
+      // STABLE SORT FIX: Add ID as tie-breaker to prevent jitter
+      const sortedItems = [...items].sort((a, b) => {
+        const daysDiff = a.days - b.days;
+        if (daysDiff !== 0) return daysDiff;
+        return a.id.toString().localeCompare(b.id.toString());
+      });
 
       return sortedItems.map((contact, i) => {
         // Calculate base radius within ring based on recency
@@ -519,7 +524,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1800px] h-[1800px] rounded-full border border-green-500/10 pointer-events-none" />
             
             {/* Relationships Layer (SVG) */}
-            <svg className="absolute top-1/2 left-1/2 overflow-visible" style={{ transform: 'translate(-50%, -50%)' }}>
+            <svg className="absolute top-1/2 left-1/2 overflow-visible pointer-events-none" width="0" height="0">
               {relationships.map((rel) => {
                 const fromId = rel.from_person_id;
                 const toId = rel.to_person_id;
@@ -681,6 +686,9 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
                     if (tooltip.contact && onQuickLog) {
                       onQuickLog(tooltip.contact);
                       setTooltip(prev => ({ ...prev, visible: false }));
+                      // Clear search/highlight to stop animation and reset view
+                      setSearchQuery('');
+                      setHighlightedContactId(null);
                     }
                   }}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm transition-colors"
