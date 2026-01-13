@@ -101,27 +101,71 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
         </div>
 
         <div className="grid grid-cols-3 gap-2 md:gap-2.5">
-          <Button 
-            variant="outline" 
-            className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-          >
-            <Phone className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-[10px] md:text-xs font-medium">Call</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-          >
-            <Mail className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-[10px] md:text-xs font-medium">Email</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-          >
-            <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-[10px] md:text-xs font-medium">Text</span>
-          </Button>
+          {contact.phone ? (
+            <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
+              asChild
+            >
+              <a href={`tel:${contact.phone}`}>
+                <Phone className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-[10px] md:text-xs font-medium">Call</span>
+              </a>
+            </Button>
+          ) : (
+             <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
+              disabled
+            >
+              <Phone className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Call</span>
+            </Button>
+          )}
+
+          {contact.email ? (
+            <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
+              asChild
+            >
+              <a href={`mailto:${contact.email}`}>
+                <Mail className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-[10px] md:text-xs font-medium">Email</span>
+              </a>
+            </Button>
+          ) : (
+             <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
+              disabled
+            >
+              <Mail className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Email</span>
+            </Button>
+          )}
+
+          {contact.phone ? (
+            <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
+              asChild
+            >
+              <a href={`sms:${contact.phone}`}>
+                <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-[10px] md:text-xs font-medium">Text</span>
+              </a>
+            </Button>
+          ) : (
+            <Button 
+              variant="outline" 
+              className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
+              disabled
+            >
+              <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Text</span>
+            </Button>
+          )}
         </div>
       </div>
 
