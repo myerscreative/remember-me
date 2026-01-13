@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { INTERACTION_TYPES, type InteractionType } from '@/lib/relationship-health';
 import { logInteraction } from '@/app/actions/logInteraction';
-import toast from 'react-hot-toast';
+import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
+import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 
 interface LogInteractionModalProps {
@@ -48,18 +49,37 @@ export default function LogInteractionModal({
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
   const [note, setNote] = useState(initialNote);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
+  const [loadingInteractions, setLoadingInteractions] = useState(false);
   const noteInputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync initialMethod when modal opens
+  // Load recent interactions when modal opens
   useEffect(() => {
-    if (isOpen && initialMethod) {
-      setSelectedType(initialMethod);
-      // Auto-focus note input if coming from a specific action
-      setTimeout(() => {
-        noteInputRef.current?.focus();
-      }, 100);
+    if (isOpen) {
+      loadInteractions();
+      if (initialMethod) {
+        setSelectedType(initialMethod);
+        // Auto-focus note input if coming from a specific action
+        setTimeout(() => {
+          noteInputRef.current?.focus();
+        }, 100);
+      }
     }
   }, [isOpen, initialMethod]);
+
+  const loadInteractions = async () => {
+    setLoadingInteractions(true);
+    try {
+      const result = await getRecentInteractions(contact.id, 3);
+      if (result.success) {
+        setRecentInteractions(result.interactions);
+      }
+    } catch (err) {
+      console.error('Error loading interactions:', err);
+    } finally {
+      setLoadingInteractions(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -77,13 +97,25 @@ export default function LogInteractionModal({
       if (result.success) {
         const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
         toast.success(randomMessage, { icon: '🌱', duration: 4000 });
+
+        // Reload interactions to show the newly saved one
+        await loadInteractions();
+
+        // Clear the note input
         setNote('');
+
+        // Call onSuccess to refresh the garden
         onSuccess?.();
-        onClose();
+
+        // Close the modal after a brief delay so user can see the saved interaction
+        setTimeout(() => {
+          onClose();
+        }, 1500);
       } else {
         toast.error(result.error || 'Failed to log interaction');
       }
     } catch (err) {
+      console.error('Error submitting interaction:', err);
       toast.error('An error occurred');
     } finally {
       setIsSubmitting(false);
@@ -221,6 +253,42 @@ export default function LogInteractionModal({
               className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all"
             />
           </div>
+
+          {/* Recent Interactions */}
+          {recentInteractions.length > 0 && (
+            <div className="border-t border-slate-800 pt-4">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                Recent Interactions
+              </label>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {recentInteractions.map((interaction, index) => {
+                  const typeInfo = INTERACTION_TYPES.find(t => t.value === interaction.type) || { value: interaction.type, label: interaction.type, emoji: '✨' };
+                  const date = new Date(interaction.interaction_date || interaction.created_at);
+                  const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                  return (
+                    <div key={interaction.id || index} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{typeInfo.emoji}</span>
+                        <span className="text-xs font-bold text-slate-400 uppercase">{typeInfo.label}</span>
+                        <span className="text-xs text-slate-500 ml-auto">{formattedDate}</span>
+                      </div>
+                      {interaction.notes && (
+                        <p className="text-sm text-slate-300 mt-2">{interaction.notes}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {loadingInteractions && recentInteractions.length === 0 && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+              <span className="ml-2 text-sm text-slate-400">Loading recent interactions...</span>
+            </div>
+          )}
 
           {/* Submit */}
           <button

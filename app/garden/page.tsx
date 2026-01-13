@@ -13,7 +13,7 @@ import GardenStats from '@/components/relationship-garden/GardenStats';
 import NurtureSidebar from '@/components/relationship-garden/NurtureSidebar';
 import GardenLegend from '@/components/relationship-garden/GardenLegend';
 import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const NetworkGraphView = dynamic(() => import('@/components/relationship-garden/NetworkGraphView'), {
   ssr: false,
