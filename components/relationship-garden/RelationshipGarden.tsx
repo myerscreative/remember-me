@@ -573,13 +573,22 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
                 ? "drop-shadow(0 0 12px rgba(99, 102, 241, 0.8))" 
                 : (isHovered ? `drop-shadow(0 0 15px ${color})` : 'none');
 
+              // Calculate dimensions to center the leaf
+              // Must match Leaf.tsx logic: w = max(44, 42*scale), h = max(44, 48*scale)
+              // NOTE: We use the base 'scale' here, not 'currentScale', because FRAMER handles the scaling animation.
+              // If we used currentScale, the centering would jump during animation.
+              const leafW = Math.max(44, 42 * scale);
+              const leafH = Math.max(44, 48 * scale);
+
               return (
               <motion.div
                 key={contact.id}
                 layout
                 initial={false}
                 animate={isHighlighted ? {
-                  x, y, rotate: rotation,
+                  x: x - leafW / 2, 
+                  y: y - leafH / 2, 
+                  rotate: rotation,
                   scale: [currentScale, currentScale * 1.15, currentScale],
                   filter: [
                     "drop-shadow(0 0 12px rgba(99, 102, 241, 0.6))",
@@ -587,7 +596,9 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
                     "drop-shadow(0 0 12px rgba(99, 102, 241, 0.6))"
                   ]
                 } : {
-                  x, y, rotate: rotation,
+                  x: x - leafW / 2, 
+                  y: y - leafH / 2, 
+                  rotate: rotation,
                   scale: currentScale,
                   filter: highlightFilter
                 }}
