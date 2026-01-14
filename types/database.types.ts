@@ -26,6 +26,7 @@ export interface Database {
           birthday: string | null
           custom_anniversary: string | null
           deep_lore: string | null
+          ai_summary: string | null
           family_members: Json | null
           where_met: string | null
           who_introduced: string | null
@@ -81,6 +82,7 @@ export interface Database {
           birthday?: string | null
           custom_anniversary?: string | null
           deep_lore?: string | null
+          ai_summary?: string | null
           family_members?: Json | null
           where_met?: string | null
           who_introduced?: string | null
@@ -127,6 +129,7 @@ export interface Database {
           birthday?: string | null
           custom_anniversary?: string | null
           deep_lore?: string | null
+          ai_summary?: string | null
           family_members?: Json | null
           where_met?: string | null
           who_introduced?: string | null
@@ -680,6 +683,7 @@ export interface Person {
   target_frequency_days: number | null;
   company: string | null;
   deep_lore: string | null; // This is our 'Shared Memory' source
+  ai_summary: string | null; // AI-generated synopsis for Overview tab
   job_title: string | null;
   relationship_value: string | null;
   what_i_offered: string | null;
