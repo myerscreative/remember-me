@@ -25,11 +25,10 @@ export interface PositionedContact extends GardenContact, GardenPosition {}
 const RING_RADIUS_START = 80;
 const RING_RADIUS_STEP = 60;
 
-// Leaf sizes (pixels) - reduced for lighter, more delicate appearance
-const SIZE_L = 32; // Reduced from 48
-const SIZE_M = 24; // Reduced from 36
-const SIZE_S = 20; // Reduced from 28
-
+// Leaf sizes (pixels)
+const SIZE_L = 48;
+const SIZE_M = 36;
+const SIZE_S = 28;
 
 export function useGardenLayout(contacts: GardenContact[], mode: GardenMode) {
   const positionedContacts = useMemo(() => {
@@ -97,12 +96,12 @@ export function useGardenLayout(contacts: GardenContact[], mode: GardenMode) {
                 else leafSize = SIZE_S;
             } else {
                 const freq = contact.targetFrequencyDays || 365;
-                if (freq <= 7) leafSize = 36; // XXL (reduced from 56)
-                else if (freq <= 14) leafSize = 32; // XL (reduced from 48)
-                else if (freq <= 30) leafSize = 28; // L (reduced from 40)
-                else if (freq <= 90) leafSize = 24; // M (reduced from 32)
-                else if (freq <= 180) leafSize = 20; // S (reduced from 28)
-                else leafSize = 18; // XS (reduced from 24)
+                if (freq <= 7) leafSize = 56; // XXL
+                else if (freq <= 14) leafSize = 48; // XL
+                else if (freq <= 30) leafSize = 40; // L
+                else if (freq <= 90) leafSize = 32; // M
+                else if (freq <= 180) leafSize = 28; // S
+                else leafSize = 24; // XS
             }
 
             positioned.push({
