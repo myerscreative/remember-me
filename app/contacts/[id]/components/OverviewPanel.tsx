@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
+import { MemoryCapture } from './MemoryCapture';
 
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Plus, ExternalLink, X } from 'lucide-react';
@@ -314,13 +315,66 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
 
             {/* STORY TAB */}
             {activeTab === 'Story' && (
-                <div className="text-center py-12 text-[#94a3b8]">
-                    <div className="text-4xl mb-4">📖</div>
-                    <h3 className="text-lg font-medium text-white mb-2">Story Timeline</h3>
-                     <p className="max-w-md mx-auto mb-6">Capture the journey of your relationship here.</p>
-                     <Button variant="outline" onClick={handleDraftReconnection}>
-                        Add First Memory
-                     </Button>
+                <div className="space-y-6">
+                    {/* AI Memory Capture */}
+                    <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-8">
+                        <div className="text-center mb-6">
+                            <div className="text-4xl mb-3">📖</div>
+                            <h3 className="text-lg font-medium text-white mb-2">Audio Brain Dump</h3>
+                            <p className="text-sm text-[#94a3b8] max-w-md mx-auto">
+                                Click the AI button to record everything you know about this person.
+                                AI will automatically organize it into structured fields.
+                            </p>
+                        </div>
+                        <MemoryCapture
+                            contactId={contact.id}
+                            onSuccess={(field) => {
+                                // Refresh to show updated data
+                                if (field === 'Story') handleTabChange('Overview');
+                            }}
+                        />
+                    </div>
+
+                    {/* Display existing story content if available */}
+                    {(contact.where_met || contact.why_stay_in_contact || contact.most_important_to_them) && (
+                        <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-6">
+                            <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-4">
+                                Story Details
+                            </h3>
+                            <div className="space-y-4">
+                                {contact.where_met && (
+                                    <div>
+                                        <div className="text-xs font-medium text-[#94a3b8] mb-1.5">Where We Met</div>
+                                        <p className="text-sm text-slate-300 leading-relaxed">{contact.where_met}</p>
+                                    </div>
+                                )}
+                                {contact.why_stay_in_contact && (
+                                    <div>
+                                        <div className="text-xs font-medium text-[#94a3b8] mb-1.5">Why Stay in Contact</div>
+                                        <p className="text-sm text-slate-300 leading-relaxed">{contact.why_stay_in_contact}</p>
+                                    </div>
+                                )}
+                                {contact.most_important_to_them && (
+                                    <div>
+                                        <div className="text-xs font-medium text-[#94a3b8] mb-1.5">What's Important to Them</div>
+                                        <p className="text-sm text-slate-300 leading-relaxed">{contact.most_important_to_them}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Display deep lore if available */}
+                    {contact.deep_lore && (
+                        <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-6">
+                            <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
+                                Original Voice Context
+                            </h3>
+                            <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap border-l-2 border-[#7c3aed] pl-4 italic opacity-90">
+                                "{contact.deep_lore}"
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
