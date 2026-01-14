@@ -19,6 +19,7 @@ export function PersonPanel({ contact }: PersonPanelProps) {
     ? Math.floor((new Date().getTime() - lastContactDate.getTime()) / (1000 * 3600 * 24))
     : Infinity;
   
+  const frequency = contact.target_frequency_days || 30;
   const isOverdue = daysSinceContact > frequency;
   const isHealthy = daysSinceContact <= frequency * 0.5; // Green if contacted recently
   
