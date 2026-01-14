@@ -102,19 +102,17 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
 
         <div className="grid grid-cols-3 gap-2 md:gap-2.5">
           {contact.phone ? (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-              asChild
+              onClick={() => window.location.href = `tel:${contact.phone}`}
             >
-              <a href={`tel:${contact.phone}`}>
-                <Phone className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-[10px] md:text-xs font-medium">Call</span>
-              </a>
+              <Phone className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Call</span>
             </Button>
           ) : (
-             <Button 
-              variant="outline" 
+             <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
               disabled
             >
@@ -124,19 +122,17 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
           )}
 
           {contact.email ? (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-              asChild
+              onClick={() => window.location.href = `mailto:${contact.email}`}
             >
-              <a href={`mailto:${contact.email}`}>
-                <Mail className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-[10px] md:text-xs font-medium">Email</span>
-              </a>
+              <Mail className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Email</span>
             </Button>
           ) : (
-             <Button 
-              variant="outline" 
+             <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
               disabled
             >
@@ -146,19 +142,17 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
           )}
 
           {contact.phone ? (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-              asChild
+              onClick={() => window.location.href = `sms:${contact.phone}`}
             >
-              <a href={`sms:${contact.phone}`}>
-                <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-[10px] md:text-xs font-medium">Text</span>
-              </a>
+              <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-[10px] md:text-xs font-medium">Text</span>
             </Button>
           ) : (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
               disabled
             >
