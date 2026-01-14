@@ -60,16 +60,26 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
             {/* OVERVIEW TAB */}
             {activeTab === 'Overview' && (
                 <>
+                    {/* Memory Capture Button */}
+                    <div className="flex justify-center mb-6">
+                        <MemoryCapture
+                            contactId={contact.id}
+                            onSuccess={(field) => {
+                                router.refresh();
+                            }}
+                        />
+                    </div>
+
                     {/* AI Synopsis */}
                     <div className={cn(
                         "bg-[#1a1f2e] border border-[#2d3748] rounded-2xl",
-                        contact.ai_summary ? "p-5 md:p-6" : "p-4 md:px-6 md:py-4"
+                        (contact.ai_summary || contact.deep_lore) ? "p-5 md:p-6" : "p-4 md:px-6 md:py-4"
                     )}>
-                         {contact.ai_summary ? (
-                            <AISynopsisCard 
+                         {(contact.ai_summary || contact.deep_lore) ? (
+                            <AISynopsisCard
                                 contactId={contact.id}
                                 contactName={contact.name}
-                                aiSummary={contact.ai_summary}
+                                aiSummary={contact.ai_summary || contact.deep_lore}
                                 deepLore={contact.deep_lore}
                                 whereMet={contact.where_met}
                                 lastUpdated={contact.updated_at}
@@ -82,13 +92,7 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-[13px] md:text-sm text-[#64748b] leading-snug">
-                                        Add story details to generate an AI summary. 
-                                        <button 
-                                            onClick={() => handleTabChange('Story')}
-                                            className="ml-1 text-[#7c3aed] font-medium cursor-pointer hover:underline bg-transparent border-none p-0 inline"
-                                        >
-                                            Go to Story →
-                                        </button>
+                                        Use the audio button above to add story details and generate an AI summary.
                                     </p>
                                 </div>
                             </div>
@@ -378,10 +382,65 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
 
             {/* FAMILY TAB */}
             {activeTab === 'Family' && (
-                <div className="text-center py-12 text-[#94a3b8]">
-                    <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-                    <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
-                     <p className="max-w-md mx-auto">Map out the important people in their life.</p>
+                <div className="space-y-6">
+                    {/* Memory Capture Button */}
+                    <div className="flex justify-center">
+                        <MemoryCapture
+                            contactId={contact.id}
+                            onSuccess={(field) => {
+                                router.refresh();
+                            }}
+                        />
+                    </div>
+
+                    {/* Family Members Display */}
+                    {contact.familyMembers && contact.familyMembers.length > 0 ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-3xl">👨‍👩‍👧‍👦</div>
+                                <div>
+                                    <h3 className="text-lg font-medium text-white">Family & Circle</h3>
+                                    <p className="text-sm text-[#64748b]">{contact.familyMembers.length} {contact.familyMembers.length === 1 ? 'person' : 'people'} in their circle</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                {contact.familyMembers.map((member: any, idx: number) => (
+                                    <div key={idx} className="bg-[#1a1f2e] rounded-2xl p-5 border border-[#2d3748]">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
+                                                {member.name?.charAt(0)?.toUpperCase() || '?'}
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="text-base font-semibold text-white mb-1">{member.name}</h4>
+                                                <p className="text-sm text-[#94a3b8] mb-2">{member.relationship}</p>
+                                                {member.birthday && (
+                                                    <p className="text-xs text-[#64748b] mb-2">🎂 Birthday: {member.birthday}</p>
+                                                )}
+                                                {member.hobbies && (
+                                                    <p className="text-xs text-slate-400">💫 {member.hobbies}</p>
+                                                )}
+                                                {member.interests && (
+                                                    <p className="text-xs text-slate-400 mt-1">✨ {member.interests}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 bg-[#1a1f2e] rounded-2xl border border-[#2d3748]">
+                            <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
+                            <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
+                            <p className="max-w-md mx-auto text-[#64748b] mb-4">
+                                Use the audio button above to mention family members, friends, or important people in {contact.name?.split(' ')[0] || 'their'} life.
+                            </p>
+                            <p className="text-sm text-[#94a3b8] max-w-md mx-auto">
+                                Example: "She's married to Dave" or "Their son Michael loves soccer"
+                            </p>
+                        </div>
+                    )}
                 </div>
             )}
 

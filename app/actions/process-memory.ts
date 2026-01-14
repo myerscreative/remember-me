@@ -81,20 +81,25 @@ export async function processMemory(contactId: string, text: string) {
       JSON EXTRACTION RULES:
       In addition to the text synopsis above, strictly extract specific data points into the following categories for database storage:
 
-      1. FAMILY: Use this when family members or close friends are mentioned. 
+      1. FAMILY: Use this when family members, spouse, partner, children, parents, siblings, or close friends are mentioned.
+         CRITICAL: If you mention someone is their "spouse", "husband", "wife", "partner", "married to", or similar in the synopsis, you MUST extract them as FAMILY.
          Data Format: { name: string, relationship: string, birthday?: string, hobbies?: string, interests?: string }.
-      
+         Examples:
+         - "married to Dave Enns" → { name: "Dave Enns", relationship: "Husband" }
+         - "her son Michael" → { name: "Michael", relationship: "Son" }
+         - "his wife Sarah" → { name: "Sarah", relationship: "Wife" }
+
       2. INTEREST: Use this for hobbies, sports, likes, or topics of interest.
          Data Format: { value: string }.
-         
+
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
-         
+
       4. SYNOPSIS: The full formatted text content generated based on the "REQUIRED STRUCTURE" above.
          Data Format: { value: string }.
-      
+
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
-      
+
       Input Text: "${text}"
     `;
 
@@ -118,6 +123,7 @@ export async function processMemory(contactId: string, text: string) {
     let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];
     let where_met: string | null = person.where_met;
     let deep_lore: string | null = person.deep_lore;
+    let ai_summary: string | null = person.ai_summary;
 
     // 3. Process extractions
     for (const item of extractions) {
@@ -142,13 +148,17 @@ export async function processMemory(contactId: string, text: string) {
                 where_met = data.value;
                 fieldsUpdated.push('Where We Met');
                 break;
-            case 'SYNOPSIS': 
+            case 'SYNOPSIS':
             case 'STORY': // Handle legacy or fallback
-                // Append this new narrative to existing deep_lore to preserve history, 
-                // but if deep_lore is empty, just set it.
-                // We add a double newline for paragraph separation.
+                // Save to BOTH deep_lore (full history) and ai_summary (latest synopsis)
                 const newStory = data.value;
+
+                // ai_summary: Always replace with latest synopsis (for Overview tab)
+                ai_summary = newStory;
+
+                // deep_lore: Append to preserve full history (for Story tab)
                 deep_lore = deep_lore ? `${deep_lore}\n\n${newStory}` : newStory;
+
                 fieldsUpdated.push('Story');
                 break;
         }
@@ -166,6 +176,7 @@ export async function processMemory(contactId: string, text: string) {
             interests: currentInterests,
             where_met: where_met,
             deep_lore: deep_lore,
+            ai_summary: ai_summary,
         })
         .eq('id', contactId)
         .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
