@@ -74,17 +74,20 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
     .slice(0, 400); 
 
     const count = displayContacts.length;
-    // Dynamic scaling based on count - balanced for visibility without being too heavy
+    // Dynamic scaling - smaller dots with more spread for organic look
     const spacing = 16; 
-    let spiralConstant = 5; 
-    let seedSize = 6; // Balanced size
+    let spiralConstant = 8; // Increased for more spread
+    let seedSize = 4; // Much smaller for delicate appearance
 
     if (count < 50) {
-        seedSize = 8; // Slightly larger for fewer contacts
-        spiralConstant = 7;
+        seedSize = 5; // Small even with few contacts
+        spiralConstant = 10; // More spread
     } else if (count < 100) {
-        seedSize = 7; // Medium size
-        spiralConstant = 6;
+        seedSize = 4.5; // Medium-small
+        spiralConstant = 9;
+    } else {
+        seedSize = 3; // Very small for many contacts
+        spiralConstant = 8;
     }
 
     const positions = displayContacts.map((contact, i) => {
