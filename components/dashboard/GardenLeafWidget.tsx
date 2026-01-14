@@ -102,8 +102,8 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
 
     const count = displayContacts.length;
     
-    // Dynamic seed size based on contact count
-    const seedSize = count > 100 ? 4 : count > 50 ? 5 : 6;
+    // Dynamic seed size based on contact count - increased for better visibility
+    const seedSize = count > 100 ? 8 : count > 50 ? 10 : 12;
     
     // Spiral packing - tighter constant for small dots
     const spiralConstant = Math.max(2.5, 4.0 * Math.pow(30 / Math.max(30, count), 0.3));
@@ -141,12 +141,24 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
     <div className={`block bg-linear-to-br from-emerald-50/50 to-teal-100/30 dark:from-[#0B1120] dark:to-[#0F172A] rounded-2xl border border-emerald-100 dark:border-emerald-800/30 shadow-sm overflow-hidden ${className}`}>
       <Link href="/garden" className="block p-5 hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-xl">🌱</span>
             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Relationship Garden</h3>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
+        </div>
+        
+        {/* Info Banner - Full Width at Top */}
+        <div className="mb-3 px-3 py-2 bg-slate-800/60 backdrop-blur-sm rounded-lg border border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-white/90">Network Graph</div>
+            <div className="flex items-center gap-3 text-xs text-white/70">
+              <span>Nodes: {transformedContacts.length}</span>
+              <span>•</span>
+              <span>Drag to move • Scroll to zoom</span>
+            </div>
+          </div>
         </div>
         
         {/* Mini Garden Visualization - Seeds */}

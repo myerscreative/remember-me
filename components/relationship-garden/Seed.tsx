@@ -36,7 +36,7 @@ export default function Seed({
         backgroundColor: color,
         boxShadow: isHighlighted 
           ? `0 0 8px 3px ${color}80, 0 0 16px 6px ${color}40`
-          : `0 1px 2px rgba(0,0,0,0.3)`,
+          : `0 0 4px 1px ${color}60, 0 1px 2px rgba(0,0,0,0.3)`, // Added subtle glow to all seeds
         transform: isHighlighted ? 'scale(1.8)' : 'scale(1)',
       }}
       onClick={onClick}
