@@ -445,7 +445,7 @@ export default function GardenPage() {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to log interaction");
+      toast.error(err instanceof Error ? err.message : "Failed to log interaction");
       loadContacts(); // Reload to be safe
     }
   };

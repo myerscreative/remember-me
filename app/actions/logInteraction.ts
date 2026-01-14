@@ -33,6 +33,7 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
         date: now, // Required: interaction timestamp
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
+        next_goal_note: nextGoal || null,
       }),
       (supabase as any).from('persons').update({
         last_interaction_date: now,
