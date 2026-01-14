@@ -159,15 +159,15 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
       />
       
       {/* Info Banner - Full Width at Top */}
-      <div className="absolute top-0 left-0 right-0 px-4 py-2.5 bg-slate-700/90 backdrop-blur-sm border-b border-slate-600/50 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-50 px-4 py-3 bg-slate-800 border-b border-slate-700 pointer-events-none shadow-md">
          <div className="flex items-center justify-between text-xs text-white">
-            <div className="font-semibold">Network Graph</div>
-            <div className="flex items-center gap-4 text-white/80">
-               <span>Nodes: {graphData.nodes.length}</span>
-               <span>•</span>
-               <span>Links: {graphData.links.length}</span>
-               <span>•</span>
-               <span className="text-[10px]">Drag to move • Scroll to zoom</span>
+            <div className="font-bold uppercase tracking-wider text-slate-400">Relationship Graph</div>
+            <div className="flex items-center gap-4 text-slate-200">
+               <span className="font-medium"><span className="text-white font-bold">{graphData.nodes.length}</span> People</span>
+               <span className="text-slate-600">•</span>
+               <span className="font-medium"><span className="text-white font-bold">{graphData.links.length}</span> Connections</span>
+               <span className="text-slate-600">•</span>
+               <span className="text-[10px] text-slate-400">Drag to move • Scroll to zoom</span>
             </div>
          </div>
       </div>
