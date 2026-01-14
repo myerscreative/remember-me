@@ -111,7 +111,7 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
               <span className="text-[10px] md:text-xs font-medium">Call</span>
             </Button>
           ) : (
-             <Button
+            <Button
               variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
               disabled
@@ -125,13 +125,18 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
             <Button
               variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] hover:bg-[#2d3748] hover:text-white text-gray-300 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50"
-              onClick={() => window.location.href = `mailto:${contact.email}`}
+              onClick={(e) => {
+                e.preventDefault();
+                const emailLink = document.createElement('a');
+                emailLink.href = `mailto:${contact.email}`;
+                emailLink.click();
+              }}
             >
               <Mail className="w-4 h-4 md:w-5 md:h-5" />
               <span className="text-[10px] md:text-xs font-medium">Email</span>
             </Button>
           ) : (
-             <Button
+            <Button
               variant="outline"
               className="bg-[#1a1f2e] border-[#2d3748] text-gray-500 h-auto py-3 flex flex-col gap-1.5 rounded-xl border-opacity-50 cursor-not-allowed"
               disabled
