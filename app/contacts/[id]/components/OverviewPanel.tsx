@@ -446,11 +446,53 @@ export function OverviewPanel({
             )}
 
             {/* FAMILY TAB */}
+            {/* FAMILY TAB */}
             {activeTab === 'Family' && (
-                <div className="text-center py-12 text-[#94a3b8]">
-                    <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-                    <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
-                     <p className="max-w-md mx-auto">Map out the important people in their life.</p>
+                <div className="py-2">
+                    <div className="flex items-center justify-between mb-4 px-1">
+                        <h3 className="text-[15px] font-bold text-gray-200">Family Members</h3>
+                        <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => toast.success("Add family member coming soon!")}>
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Member
+                        </Button>
+                    </div>
+
+                    {!contact.familyMembers || contact.familyMembers.length === 0 ? (
+                        <div className="text-center py-12 bg-[#1a1f2e] rounded-xl border border-[#2d3748] border-dashed">
+                            <div className="text-4xl mb-3 opacity-50">👨‍👩‍👧‍👦</div>
+                            <h3 className="text-sm font-medium text-gray-300 mb-1">No family members yet</h3>
+                            <p className="text-xs text-gray-500 mb-4 px-8">Add family members to keep track of their important relationships.</p>
+                            <Button size="sm" variant="secondary" onClick={() => toast.success("Add family member coming soon!")}>
+                                Add First Member
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-3">
+                            {contact.familyMembers.map((member: any, idx: number) => (
+                                <div key={idx} className="bg-[#1a1f2e] p-4 rounded-xl border border-[#2d3748] flex items-center gap-4">
+                                     <div className="w-10 h-10 rounded-full bg-[#2d3748] flex items-center justify-center text-lg shrink-0 border border-[#3d4758]">
+                                        {member.photo_url ? (
+                                            <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover rounded-full" />
+                                        ) : (
+                                            <span>{member.name?.[0]}</span>
+                                        )}
+                                     </div>
+                                     <div className="flex-1 min-w-0">
+                                        <div className="text-[13px] font-medium text-gray-200 truncate">{member.name}</div>
+                                        <div className="text-[11px] text-[#94a3b8] flex items-center gap-2">
+                                            <span className="capitalize">{member.relationship || 'Relative'}</span>
+                                            {member.birthday && (
+                                                <>
+                                                    <span className="w-1 h-1 rounded-full bg-[#3d4758]" />
+                                                    <span>🎂 {member.birthday}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                     </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 
