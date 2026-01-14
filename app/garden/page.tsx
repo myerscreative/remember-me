@@ -615,9 +615,9 @@ export default function GardenPage() {
                             disabled={updatingId === contact.dbId}
                             className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800"
                           >
-                            <option value="high">⭐ High</option>
-                            <option value="medium">🔹 Medium</option>
-                            <option value="low">▫️ Casual</option>
+                            <option value="high">⭐ Favorite</option>
+                            <option value="medium">🔹 Friend</option>
+                            <option value="low">▫️ Contact</option>
                           </select>
                           <button
                             onClick={(e) => {
@@ -891,9 +891,9 @@ export default function GardenPage() {
                               disabled={updatingId === contact.dbId}
                               className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-600 dark:text-slate-300"
                             >
-                              <option value="high">⭐ High</option>
-                              <option value="medium">🔹 Medium</option>
-                              <option value="low">▫️ Casual</option>
+                              <option value="high">⭐ Favorite</option>
+                              <option value="medium">🔹 Friend</option>
+                              <option value="low">▫️ Contact</option>
                             </select>
 
                             {/* Health Status Selector */}
