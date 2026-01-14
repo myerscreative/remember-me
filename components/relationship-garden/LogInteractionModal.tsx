@@ -53,9 +53,16 @@ export default function LogInteractionModal({
   const [loadingInteractions, setLoadingInteractions] = useState(false);
   const noteInputRef = useRef<HTMLTextAreaElement>(null);
 
+  // DEBUG: Log when modal is mounted/opened
+  useEffect(() => {
+    console.log('[CLIENT LogInteractionModal] Component mounted/rendered');
+    console.log('[CLIENT LogInteractionModal] Debug version: v2.1');
+  }, []);
+
   // Load recent interactions when modal opens
   useEffect(() => {
     if (isOpen) {
+      console.log('[CLIENT LogInteractionModal] Modal opened for contact:', contact.id, contact.name);
       loadInteractions();
       if (initialMethod) {
         setSelectedType(initialMethod);
@@ -65,7 +72,7 @@ export default function LogInteractionModal({
         }, 100);
       }
     }
-  }, [isOpen, initialMethod]);
+  }, [isOpen, initialMethod, contact.id, contact.name]);
 
   const loadInteractions = async () => {
     setLoadingInteractions(true);
@@ -313,6 +320,11 @@ export default function LogInteractionModal({
               <span className="ml-2 text-sm text-slate-400">Loading recent interactions...</span>
             </div>
           )}
+
+          {/* Debug Info - Remove after testing */}
+          <div className="text-[10px] text-slate-500 text-center mb-2 font-mono">
+            🐛 Debug Mode Active v2.1 - Enhanced Logging
+          </div>
 
           {/* Submit */}
           <button
