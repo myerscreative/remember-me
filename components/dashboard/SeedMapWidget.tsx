@@ -74,16 +74,16 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
     .slice(0, 400); 
 
     const count = displayContacts.length;
-    // Dynamic scaling based on count
+    // Dynamic scaling based on count - increased for better visibility
     const spacing = 16; 
     let spiralConstant = 5; 
-    let seedSize = 5;
+    let seedSize = 10; // Increased from 5
 
     if (count < 50) {
-        seedSize = 8;
+        seedSize = 14; // Increased from 8
         spiralConstant = 7;
     } else if (count < 100) {
-        seedSize = 6;
+        seedSize = 12; // Increased from 6
         spiralConstant = 6;
     }
 
