@@ -46,6 +46,9 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
        // Health score 0-100. 0 days = 100 health. 100 days = 0 health.
        const health = Math.max(10, 100 - c.days); 
        
+       // Normalize to a smaller range for more uniform node sizes (20-40 instead of 10-100)
+       const normalizedSize = 20 + (health / 100) * 20;
+       
        // Color based on tribe (simplistic for now)
        let color = '#94a3b8'; // slate-400 default
        if (c.tags && c.tags.length > 0) {
@@ -59,7 +62,7 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
        return {
          id: c.dbId,
          name: c.name,
-         val: health, // size
+         val: normalizedSize, // size (normalized to 20-40 range)
          color: color,
          contact: c
        };
