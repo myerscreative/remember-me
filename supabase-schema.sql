@@ -276,9 +276,9 @@ CREATE OR REPLACE FUNCTION update_person_last_contact()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE persons
-  SET last_contact = NEW.interaction_date
+  SET last_contact = NEW.date
   WHERE id = NEW.person_id
-    AND (last_contact IS NULL OR last_contact < NEW.interaction_date);
+    AND (last_contact IS NULL OR last_contact < NEW.date);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql

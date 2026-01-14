@@ -215,8 +215,6 @@ export default function ContactDetailPage({
       */}
       <PersonPanel 
         contact={contact}
-        onFrequencyChange={(days) => setContact({...contact, target_frequency_days: days})}
-        onImportanceChange={(imp) => setContact({...contact, importance: imp})}
       />
 
       {/* 
@@ -229,6 +227,8 @@ export default function ContactDetailPage({
         onEdit={() => setIsEditModalOpen(true)}
         onLinkConnection={() => setIsLinkModalOpen(true)}
         onUnlinkConnection={handleUnlinkConnection}
+        onFrequencyChange={(days) => setContact({...contact, target_frequency_days: days})}
+        onImportanceChange={(imp) => setContact({...contact, importance: imp})}
       />
 
       {/* MODALS */}

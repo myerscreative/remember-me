@@ -86,9 +86,17 @@ export function AISynopsisCard({
       <div className="space-y-3">
         {aiSummary ? (
             <div className="prose prose-invert prose-sm max-w-none">
-                <p className="text-sm text-gray-300 leading-relaxed">
-                    {aiSummary}
-                </p>
+                <div className="text-[13px] md:text-sm text-gray-300 leading-relaxed">
+                    {isExpanded ? aiSummary : (aiSummary.length > 500 ? aiSummary.slice(0, 500) + '...' : aiSummary)}
+                    {aiSummary.length > 500 && (
+                        <button 
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="ml-1 text-[#60a5fa] hover:text-[#93c5fd] font-medium text-xs bg-transparent border-none cursor-pointer inline-flex items-center gap-0.5"
+                        >
+                            {isExpanded ? 'Show less' : 'Read more'}
+                        </button>
+                    )}
+                </div>
             </div>
         ) : (
             <div className="space-y-2">

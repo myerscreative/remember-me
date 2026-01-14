@@ -7,7 +7,10 @@ import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Plus, ExternalLink, X } from 'lucide-react';
+import { MessageSquare, Plus, ExternalLink, X, Star, User, IdCard } from 'lucide-react';
+import { updatePersonImportance } from '@/app/actions/update-importance';
+import { updateTargetFrequency } from '@/app/actions/update-target-frequency';
+import toast from 'react-hot-toast';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -17,9 +20,19 @@ interface OverviewPanelProps {
   onEdit?: () => void;
   onLinkConnection?: () => void;
   onUnlinkConnection?: (connectionId: string) => void;
+  onFrequencyChange?: (days: number) => void;
+  onImportanceChange?: (importance: 'high' | 'medium' | 'low') => void;
 }
 
-export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnection, onUnlinkConnection }: OverviewPanelProps) {
+export function OverviewPanel({ 
+  contact, 
+  onNavigateToTab, 
+  onEdit, 
+  onLinkConnection, 
+  onUnlinkConnection,
+  onFrequencyChange,
+  onImportanceChange
+}: OverviewPanelProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -31,6 +44,44 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
   const handleDraftReconnection = () => {
     // Placeholder for AI drafting feature
     alert("AI Reconnection Drafter coming soon! 🤖");
+  };
+
+  const [importance, setImportance] = useState<'high' | 'medium' | 'low'>(contact.importance || 'medium');
+  const [frequency, setFrequency] = useState<number>(contact.target_frequency_days || 30);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleImportanceUpdate = async (newImportance: 'high' | 'medium' | 'low') => {
+    setImportance(newImportance);
+    setIsUpdating(true);
+    try {
+      const result = await updatePersonImportance(contact.id, newImportance);
+      if (!result.success) throw new Error(result.error);
+      if (onImportanceChange) onImportanceChange(newImportance);
+      // toast.success('Relationship level updated'); // Optional: reduce toast noise
+    } catch (error) {
+      console.error('Failed to update importance:', error);
+      toast.error('Failed to update relationship level');
+      setImportance(contact.importance || 'medium'); // Revert
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleFrequencyUpdate = async (days: number) => {
+    setFrequency(days);
+    setIsUpdating(true);
+    try {
+      const result = await updateTargetFrequency(contact.id, days);
+      if (!result.success) throw new Error(result.error);
+      if (onFrequencyChange) onFrequencyChange(days);
+      // toast.success('Cadence updated'); // Optional
+    } catch (error) {
+      console.error('Failed to update frequency:', error);
+      toast.error('Failed to update cadence');
+      setFrequency(contact.target_frequency_days || 30); // Revert
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -181,34 +232,76 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                                 </div>
                             </div>
                         </div>
+
+                        {/* Details Card: Relationship & Cadence */}
+                        <div className="bg-[#1a1f2e] rounded-xl p-4 md:p-[18px]">
+                          <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
+                            Details
+                          </h3>
+                          
+                          <div className="mb-4">
+                            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Relationship Level</span>
+                            <div className="grid grid-cols-3 gap-2">
+                                <button 
+                                  onClick={() => handleImportanceUpdate('high')}
+                                  className={cn(
+                                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
+                                    importance === 'high' 
+                                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
+                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                  )}
+                                >
+                                  <Star className={cn("w-5 h-5 mb-1", importance === 'high' ? "fill-current" : "")} />
+                                  <span className="text-[9px] font-bold uppercase tracking-wide">Favorites</span>
+                                </button>
+                                
+                                <button 
+                                  onClick={() => handleImportanceUpdate('medium')}
+                                  className={cn(
+                                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
+                                    importance === 'medium' 
+                                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
+                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                  )}
+                                >
+                                  <User className="w-5 h-5 mb-1" />
+                                  <span className="text-[9px] font-bold uppercase tracking-wide">Friends</span>
+                                </button>
+                                
+                                <button 
+                                  onClick={() => handleImportanceUpdate('low')}
+                                  className={cn(
+                                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
+                                    importance === 'low' 
+                                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
+                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                  )}
+                                >
+                                  <IdCard className="w-5 h-5 mb-1" />
+                                  <span className="text-[9px] font-bold uppercase tracking-wide">Contacts</span>
+                                </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Contact Cadence</span>
+                            <select 
+                              value={frequency}
+                              onChange={(e) => handleFrequencyUpdate(Number(e.target.value))}
+                              className="w-full bg-[#0f1419] border-2 border-[#2d3748] rounded-[10px] p-3 text-sm text-gray-200 focus:outline-none focus:border-[#7c3aed] cursor-pointer appearance-none"
+                            >
+                              <option value="7">Weekly (7 days)</option>
+                              <option value="14">Bi-Weekly (14 days)</option>
+                              <option value="30">Monthly (30 days)</option>
+                              <option value="90">Quarterly (90 days)</option>
+                              <option value="180">Semi-Annually (180 days)</option>
+                              <option value="365">Yearly (365 days)</option>
+                            </select>
+                          </div>
+                        </div>
                     </div>
 
-                    {/* Notes / Voice Entry */}
-                    {(contact.notes || contact.deep_lore) && (
-                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5">
-                          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
-                              Voice Input & Notes
-                          </div>
-                          
-                          {contact.notes && (
-                            <div className="mb-4 last:mb-0">
-                                {contact.deep_lore && <div className="text-[10px] uppercase text-[#64748b] mb-1">Notes</div>}
-                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
-                                    {contact.notes}
-                                </p>
-                            </div>
-                          )}
 
-                          {contact.deep_lore && (
-                            <div className="last:mb-0">
-                                <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
-                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-[#2d3748] pl-3 italic">
-                                    "{contact.deep_lore}"
-                                </p>
-                            </div>
-                          )}
-                      </div>
-                    )}
 
                     {/* Tags & Interests */}
                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6">
@@ -318,6 +411,34 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                     <div className="text-4xl mb-4">📖</div>
                     <h3 className="text-lg font-medium text-white mb-2">Story Timeline</h3>
                      <p className="max-w-md mx-auto mb-6">Capture the journey of your relationship here.</p>
+                     
+                    {/* Notes / Voice Entry */}
+                    {(contact.notes || contact.deep_lore) && (
+                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5 text-left mb-6">
+                          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
+                              Voice Input & Notes
+                          </div>
+                          
+                          {contact.notes && (
+                            <div className="mb-4 last:mb-0">
+                                {contact.deep_lore && <div className="text-[10px] uppercase text-[#64748b] mb-1">Notes</div>}
+                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                    {contact.notes}
+                                </p>
+                            </div>
+                          )}
+
+                          {contact.deep_lore && (
+                            <div className="last:mb-0">
+                                <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
+                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-[#2d3748] pl-3 italic">
+                                    "{contact.deep_lore}"
+                                </p>
+                            </div>
+                          )}
+                      </div>
+                    )}
+
                      <Button variant="outline" onClick={handleDraftReconnection}>
                         Add First Memory
                      </Button>

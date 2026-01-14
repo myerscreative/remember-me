@@ -4,22 +4,14 @@ import { useState, useEffect } from 'react';
 import { getInitials } from '@/lib/utils/contact-helpers';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Phone, Mail, MessageSquare, Star, User, IdCard, Loader2 } from 'lucide-react';
+import { Phone, Mail, MessageSquare } from 'lucide-react';
 import { InteractionLogger } from './InteractionLogger';
-import { updatePersonImportance } from '@/app/actions/update-importance';
-import { updateTargetFrequency } from '@/app/actions/update-target-frequency';
-import toast from 'react-hot-toast';
 
 interface PersonPanelProps {
   contact: any;
-  onFrequencyChange?: (days: number) => void;
-  onImportanceChange?: (importance: 'high' | 'medium' | 'low') => void;
 }
 
-export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: PersonPanelProps) {
-  const [importance, setImportance] = useState<'high' | 'medium' | 'low'>(contact.importance || 'medium');
-  const [frequency, setFrequency] = useState<number>(contact.target_frequency_days || 30);
-  const [isUpdating, setIsUpdating] = useState(false);
+export function PersonPanel({ contact }: PersonPanelProps) {
 
   // Calculate health status
   const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
@@ -36,39 +28,7 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
       ? '#10b981' // emerald-500
       : '#f59e0b'; // amber-500
 
-  const handleImportanceUpdate = async (newImportance: 'high' | 'medium' | 'low') => {
-    setImportance(newImportance);
-    setIsUpdating(true);
-    try {
-      const result = await updatePersonImportance(contact.id, newImportance);
-      if (!result.success) throw new Error(result.error);
-      if (onImportanceChange) onImportanceChange(newImportance);
-      toast.success('Relationship level updated');
-    } catch (error) {
-      console.error('Failed to update importance:', error);
-      toast.error('Failed to update relationship level');
-      setImportance(contact.importance || 'medium'); // Revert
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
-  const handleFrequencyUpdate = async (days: number) => {
-    setFrequency(days);
-    setIsUpdating(true);
-    try {
-      const result = await updateTargetFrequency(contact.id, days);
-      if (!result.success) throw new Error(result.error);
-      if (onFrequencyChange) onFrequencyChange(days);
-      toast.success('Cadence updated');
-    } catch (error) {
-      console.error('Failed to update frequency:', error);
-      toast.error('Failed to update cadence');
-      setFrequency(contact.target_frequency_days || 30); // Revert
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   return (
     <div className="w-full md:w-[420px] bg-[#0f1419] border-b md:border-b-0 md:border-r border-[#1a1f2e] flex flex-col overflow-y-auto flex-shrink-0 h-auto md:h-full">
@@ -189,72 +149,7 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
             />
         </div>
 
-        {/* Details Card */}
-        <div className="bg-[#1a1f2e] rounded-xl p-4 md:p-[18px]">
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
-            Details
-          </h3>
-          
-          <div className="mb-4">
-            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Relationship Level</span>
-            <div className="grid grid-cols-3 gap-2">
-                <button 
-                  onClick={() => handleImportanceUpdate('high')}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
-                    importance === 'high' 
-                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
-                  )}
-                >
-                  <Star className={cn("w-5 h-5 mb-1", importance === 'high' ? "fill-current" : "")} />
-                  <span className="text-[9px] font-bold uppercase tracking-wide">Favorites</span>
-                </button>
-                
-                <button 
-                  onClick={() => handleImportanceUpdate('medium')}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
-                    importance === 'medium' 
-                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
-                  )}
-                >
-                  <User className="w-5 h-5 mb-1" />
-                  <span className="text-[9px] font-bold uppercase tracking-wide">Friends</span>
-                </button>
-                
-                <button 
-                  onClick={() => handleImportanceUpdate('low')}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
-                    importance === 'low' 
-                      ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
-                  )}
-                >
-                  <IdCard className="w-5 h-5 mb-1" />
-                  <span className="text-[9px] font-bold uppercase tracking-wide">Contacts</span>
-                </button>
-            </div>
-          </div>
 
-          <div>
-            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Contact Cadence</span>
-            <select 
-              value={frequency}
-              onChange={(e) => handleFrequencyUpdate(Number(e.target.value))}
-              className="w-full bg-[#0f1419] border-2 border-[#2d3748] rounded-[10px] p-3 text-sm text-gray-200 focus:outline-none focus:border-[#7c3aed] cursor-pointer appearance-none"
-            >
-              <option value="7">Weekly (7 days)</option>
-              <option value="14">Bi-Weekly (14 days)</option>
-              <option value="30">Monthly (30 days)</option>
-              <option value="90">Quarterly (90 days)</option>
-              <option value="180">Semi-Annually (180 days)</option>
-              <option value="365">Yearly (365 days)</option>
-            </select>
-          </div>
-        </div>
 
       </div>
     </div>
