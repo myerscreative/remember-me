@@ -315,14 +315,64 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
 
             {/* STORY TAB */}
             {activeTab === 'Story' && (
-                <div className="flex flex-col items-center py-8 md:py-12">
-                    <MemoryCapture
-                        contactId={contact.id}
-                        onSuccess={(field) => {
-                            // Refresh the contact data when memory is added
-                            router.refresh();
-                        }}
-                    />
+                <div className="space-y-6">
+                    {/* Memory Capture - Voice Input */}
+                    <div className="flex flex-col items-center py-8 md:py-12">
+                        <MemoryCapture
+                            contactId={contact.id}
+                            onSuccess={(field) => {
+                                // Refresh the contact data when memory is added
+                                router.refresh();
+                            }}
+                        />
+                    </div>
+
+                    {/* Saved Story Content */}
+                    {contact.deep_lore && (
+                        <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6 border border-[#2d3748]">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                                    <span className="text-xl">📖</span>
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-semibold text-white">Your Story</h3>
+                                    <p className="text-xs text-[#64748b]">AI-organized memories and context</p>
+                                </div>
+                            </div>
+                            <div className="prose prose-sm prose-invert max-w-none">
+                                <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                                    {contact.deep_lore}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Family Members */}
+                    {contact.familyMembers && contact.familyMembers.length > 0 && (
+                        <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6 border border-[#2d3748]">
+                            <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-4">
+                                👨‍👩‍👧‍👦 Family & Close Connections
+                            </div>
+                            <div className="space-y-3">
+                                {contact.familyMembers.map((member: any, idx: number) => (
+                                    <div key={idx} className="bg-[#0f1419] rounded-lg p-4 border border-[#2d3748]/50">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <p className="text-sm font-semibold text-white">{member.name}</p>
+                                                <p className="text-xs text-[#94a3b8] mt-1">{member.relationship}</p>
+                                                {member.birthday && (
+                                                    <p className="text-xs text-[#64748b] mt-1">🎂 {member.birthday}</p>
+                                                )}
+                                                {member.hobbies && (
+                                                    <p className="text-xs text-slate-400 mt-2">{member.hobbies}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
