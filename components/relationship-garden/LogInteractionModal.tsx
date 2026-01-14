@@ -85,16 +85,29 @@ export default function LogInteractionModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log('[CLIENT LogInteractionModal] handleSubmit called');
+    console.log('[CLIENT LogInteractionModal] Contact:', { id: contact.id, name: contact.name });
+    console.log('[CLIENT LogInteractionModal] Selected Type:', selectedType);
+    console.log('[CLIENT LogInteractionModal] Note:', note.substring(0, 100));
+
     setIsSubmitting(true);
 
     try {
-      const result = await logInteraction({
+      const payload = {
         personId: contact.id,
         type: selectedType,
         note: note.trim() || undefined,
-      });
+      };
+
+      console.log('[CLIENT LogInteractionModal] Calling logInteraction with payload:', payload);
+
+      const result = await logInteraction(payload);
+
+      console.log('[CLIENT LogInteractionModal] Result received:', result);
 
       if (result.success) {
+        console.log('[CLIENT LogInteractionModal] Success! Showing toast and refreshing.');
         const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
         toast.success(randomMessage, { icon: '🌱', duration: 4000 });
 
@@ -112,18 +125,23 @@ export default function LogInteractionModal({
           onClose();
         }, 1500);
       } else {
-        console.error('[LogInteractionModal] Error result:', result);
+        console.error('[CLIENT LogInteractionModal] Error result:', result);
+        console.error('[CLIENT LogInteractionModal] Error message:', result.error);
+        console.error('[CLIENT LogInteractionModal] Error details:', result.details);
         toast.error(result.error || 'Failed to log interaction', {
           duration: 6000,
           description: result.details ? `Details: ${result.details}` : undefined
         });
       }
     } catch (err) {
-      console.error('[LogInteractionModal] Error submitting interaction:', err);
+      console.error('[CLIENT LogInteractionModal] Caught exception:', err);
+      console.error('[CLIENT LogInteractionModal] Exception type:', typeof err);
+      console.error('[CLIENT LogInteractionModal] Exception stringified:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
       toast.error('An error occurred', {
         description: err instanceof Error ? err.message : 'Unknown error'
       });
     } finally {
+      console.log('[CLIENT LogInteractionModal] handleSubmit complete, setting isSubmitting to false');
       setIsSubmitting(false);
     }
   };
