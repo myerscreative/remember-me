@@ -46,8 +46,8 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
        // Health score 0-100. 0 days = 100 health. 100 days = 0 health.
        const health = Math.max(10, 100 - c.days); 
        
-       // Normalize to a smaller range for lighter, more delicate nodes (8-15 instead of 20-40)
-       const normalizedSize = 8 + (health / 100) * 7;
+       // Normalize to prevent extreme size differences
+       const normalizedSize = 20 + (health / 100) * 20;
        
        // Color based on tribe (simplistic for now)
        let color = '#94a3b8'; // slate-400 default
@@ -62,7 +62,7 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
        return {
          id: c.dbId,
          name: c.name,
-         val: normalizedSize, // size (normalized to 8-15 range for lighter appearance)
+         val: normalizedSize, // size
          color: color,
          contact: c
        };
@@ -121,13 +121,13 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
         graphData={graphData}
         backgroundColor={isDark ? '#0f172a' : '#f8fafc'} // slate-900 or slate-50
         nodeLabel="name"
-        nodeRelSize={4} // relative size based on 'val' (reduced from 6 for lighter appearance)
+        nodeRelSize={6} // relative size based on 'val'
         linkColor={(link: any) => {
-            if (link.type === 'manual') return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
-            if (link.type === 'company') return 'rgba(148, 163, 184, 0.2)'; // slate-400 with transparency
-            return 'rgba(203, 213, 225, 0.15)';
+            if (link.type === 'manual') return isDark ? '#ffffff' : '#000000';
+            if (link.type === 'company') return '#94a3b8'; // slate-400
+            return '#cbd5e1';
         }}
-        linkWidth={(link: any) => link.type === 'manual' ? 1.5 : 0.8}
+        linkWidth={(link: any) => link.type === 'manual' ? 2 : 1}
         onNodeClick={(node: any) => {
             onNodeClick(node.id);
             // Center view?
@@ -139,20 +139,11 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
             const label = node.name;
             const fontSize = 12/globalScale;
             
-            // Draw circle with lighter appearance
-            const r = Math.sqrt(Math.max(0, node.val || 1)) * 0.8; // Reduced scale factor from 1.5 to 0.8
+            // Draw circle
+            const r = Math.sqrt(Math.max(0, node.val || 1)) * 1.5; // Scale factor
             ctx.beginPath();
             ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
-            
-            // Add transparency to color for lighter appearance
-            const hexToRgba = (hex: string, alpha: number) => {
-                const r = parseInt(hex.slice(1, 3), 16);
-                const g = parseInt(hex.slice(3, 5), 16);
-                const b = parseInt(hex.slice(5, 7), 16);
-                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-            };
-            
-            ctx.fillStyle = hexToRgba(node.color, 0.8); // 80% opacity for lighter look
+            ctx.fillStyle = node.color;
             ctx.fill();
 
             // Text
