@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
+import { MemoryCapture } from './MemoryCapture';
 
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Plus, ExternalLink, X } from 'lucide-react';
@@ -314,13 +315,14 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
 
             {/* STORY TAB */}
             {activeTab === 'Story' && (
-                <div className="text-center py-12 text-[#94a3b8]">
-                    <div className="text-4xl mb-4">📖</div>
-                    <h3 className="text-lg font-medium text-white mb-2">Story Timeline</h3>
-                     <p className="max-w-md mx-auto mb-6">Capture the journey of your relationship here.</p>
-                     <Button variant="outline" onClick={handleDraftReconnection}>
-                        Add First Memory
-                     </Button>
+                <div className="flex flex-col items-center py-8 md:py-12">
+                    <MemoryCapture
+                        contactId={contact.id}
+                        onSuccess={(field) => {
+                            // Refresh the contact data when memory is added
+                            router.refresh();
+                        }}
+                    />
                 </div>
             )}
 

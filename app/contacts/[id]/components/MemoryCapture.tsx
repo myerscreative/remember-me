@@ -118,18 +118,18 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
           onClick={toggleListening}
           disabled={isProcessing}
           className={cn(
-            "rounded-full w-16 h-16 transition-all shadow-lg hover:scale-105 active:scale-95",
-            isListening 
-              ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
+            "rounded-full w-20 h-20 md:w-16 md:h-16 transition-all shadow-lg hover:scale-105 active:scale-95",
+            isListening
+              ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
               : isProcessing
               ? "bg-indigo-400 text-white cursor-not-allowed"
               : "bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
           )}
         >
           {isProcessing ? (
-            <Loader2 className="w-7 h-7 animate-spin" />
+            <Loader2 className="w-8 h-8 md:w-7 md:h-7 animate-spin" />
           ) : (
-            <Sparkles className="w-7 h-7" />
+            <Sparkles className="w-8 h-8 md:w-7 md:h-7" />
           )}
         </Button>
 
