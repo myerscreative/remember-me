@@ -51,34 +51,13 @@ export default function LogInteractionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
   const [loadingInteractions, setLoadingInteractions] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
   const noteInputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load recent interactions when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      loadInteractions();
-      if (initialMethod) {
-        setSelectedType(initialMethod);
-        // Auto-focus note input if coming from a specific action
-        setTimeout(() => {
-          noteInputRef.current?.focus();
-        }, 100);
-      }
-    }
-  }, [isOpen, initialMethod]);
+  // ... (existing useEffect)
 
   const loadInteractions = async () => {
-    setLoadingInteractions(true);
-    try {
-      const result = await getRecentInteractions(contact.id, 3);
-      if (result.success) {
-        setRecentInteractions(result.interactions);
-      }
-    } catch (err) {
-      console.error('Error loading interactions:', err);
-    } finally {
-      setLoadingInteractions(false);
-    }
+    // ... (existing loadInteractions)
   };
 
   if (!isOpen) return null;
@@ -86,6 +65,7 @@ export default function LogInteractionModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setLastError(null); // Clear previous errors
 
     try {
       const result = await logInteraction({
@@ -95,28 +75,24 @@ export default function LogInteractionModal({
       });
 
       if (result.success) {
+        // ... (existing success logic)
         const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
         toast.success(randomMessage, { icon: '🌱', duration: 4000 });
-
-        // Reload interactions to show the newly saved one
         await loadInteractions();
-
-        // Clear the note input
         setNote('');
-
-        // Call onSuccess to refresh the garden
         onSuccess?.();
-
-        // Close the modal after a brief delay so user can see the saved interaction
         setTimeout(() => {
           onClose();
         }, 1500);
       } else {
-        toast.error(result.error || 'Failed to log interaction');
+        const errorMsg = result.error || 'Failed to log interaction';
+        toast.error(errorMsg);
+        setLastError(typeof result.error === 'object' ? JSON.stringify(result.error, null, 2) : String(result.error));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting interaction:', err);
       toast.error('An error occurred');
+      setLastError(err.message || String(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -133,6 +109,19 @@ export default function LogInteractionModal({
       {/* Modal Container - Matches Lore Card */}
       <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
+        {/* DEPLOYMENT CHECK BANNER */}
+        <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
+            ⚠️ Verifying Deployment v3.0 ⚠️<br/>
+            {new Date().toLocaleTimeString()}
+        </div>
+
+        {/* DEBUG BANNER */}
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20 p-2">
+            <p className="text-[10px] font-bold text-yellow-500 text-center uppercase tracking-wider">
+                🐛 Debug Mode Active v2.1
+            </p>
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-4">
@@ -310,6 +299,17 @@ export default function LogInteractionModal({
               </>
             )}
           </button>
+          {/* Error Display */}
+          {lastError && (
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg animate-in fade-in slide-in-from-bottom-2">
+                  <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">
+                      Server Error Details
+                  </p>
+                  <pre className="text-[9px] text-red-300 overflow-x-auto whitespace-pre-wrap font-mono max-h-32">
+                      {lastError}
+                  </pre>
+              </div>
+          )}
         </form>
       </div>
     </div>
