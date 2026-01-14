@@ -112,11 +112,17 @@ export default function LogInteractionModal({
           onClose();
         }, 1500);
       } else {
-        toast.error(result.error || 'Failed to log interaction');
+        console.error('[LogInteractionModal] Error result:', result);
+        toast.error(result.error || 'Failed to log interaction', {
+          duration: 6000,
+          description: result.details ? `Details: ${result.details}` : undefined
+        });
       }
     } catch (err) {
-      console.error('Error submitting interaction:', err);
-      toast.error('An error occurred');
+      console.error('[LogInteractionModal] Error submitting interaction:', err);
+      toast.error('An error occurred', {
+        description: err instanceof Error ? err.message : 'Unknown error'
+      });
     } finally {
       setIsSubmitting(false);
     }
