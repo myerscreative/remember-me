@@ -37,21 +37,23 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
   return (
     <div className="flex-1 bg-[#0a0e1a] flex flex-col md:overflow-y-auto h-auto md:h-full min-w-0">
         {/* TABS - STICKY */}
-        <div className="flex px-5 md:px-8 pt-5 md:pt-6 gap-6 md:gap-8 border-b border-[#2d3748] bg-[#0a0e1a] sticky top-0 z-10 shrink-0">
-            {['Overview', 'Story', 'Family'].map((tab) => (
-                <button
-                    key={tab}
-                    onClick={() => handleTabChange(tab)}
-                    className={cn(
-                        "pb-3 text-[15px] font-medium border-b-2 transition-all",
-                        activeTab === tab 
-                            ? "text-[#60a5fa] border-[#60a5fa]" 
-                            : "text-[#94a3b8] border-transparent hover:text-gray-300"
-                    )}
-                >
-                    {tab}
-                </button>
-            ))}
+        <div className="overflow-x-auto border-b border-[#2d3748] bg-[#0a0e1a] sticky top-0 z-10 shrink-0 scrollbar-hide">
+            <div className="flex px-5 md:px-8 pt-5 md:pt-6 gap-4 md:gap-8 min-w-max">
+                {['Overview', 'Story', 'Family', 'Brain Dump'].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => handleTabChange(tab)}
+                        className={cn(
+                            "pb-3 text-[14px] md:text-[15px] font-medium border-b-2 transition-all whitespace-nowrap",
+                            activeTab === tab
+                                ? "text-[#60a5fa] border-[#60a5fa]"
+                                : "text-[#94a3b8] border-transparent hover:text-gray-300"
+                        )}
+                    >
+                        {tab}
+                    </button>
+                ))}
+            </div>
         </div>
 
         {/* CONTENT AREA */}
@@ -316,27 +318,8 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
             {/* STORY TAB */}
             {activeTab === 'Story' && (
                 <div className="space-y-6">
-                    {/* AI Memory Capture */}
-                    <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-8">
-                        <div className="text-center mb-6">
-                            <div className="text-4xl mb-3">📖</div>
-                            <h3 className="text-lg font-medium text-white mb-2">Audio Brain Dump</h3>
-                            <p className="text-sm text-[#94a3b8] max-w-md mx-auto">
-                                Click the AI button to record everything you know about this person.
-                                AI will automatically organize it into structured fields.
-                            </p>
-                        </div>
-                        <MemoryCapture
-                            contactId={contact.id}
-                            onSuccess={(field) => {
-                                // Refresh to show updated data
-                                if (field === 'Story') handleTabChange('Overview');
-                            }}
-                        />
-                    </div>
-
                     {/* Display existing story content if available */}
-                    {(contact.where_met || contact.why_stay_in_contact || contact.most_important_to_them) && (
+                    {(contact.where_met || contact.why_stay_in_contact || contact.most_important_to_them) ? (
                         <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-6">
                             <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-4">
                                 Story Details
@@ -362,6 +345,15 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                                 )}
                             </div>
                         </div>
+                    ) : (
+                        <div className="text-center py-12 text-[#94a3b8]">
+                            <div className="text-4xl mb-4">📖</div>
+                            <h3 className="text-lg font-medium text-white mb-2">No Story Yet</h3>
+                            <p className="max-w-md mx-auto mb-4">Use Brain Dump to capture your relationship story.</p>
+                            <Button variant="outline" onClick={() => handleTabChange('Brain Dump')}>
+                                Go to Brain Dump
+                            </Button>
+                        </div>
                     )}
 
                     {/* Display deep lore if available */}
@@ -384,6 +376,53 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
                     <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
                     <h3 className="text-lg font-medium text-white mb-2">Family & Circle</h3>
                      <p className="max-w-md mx-auto">Map out the important people in their life.</p>
+                </div>
+            )}
+
+            {/* BRAIN DUMP TAB */}
+            {activeTab === 'Brain Dump' && (
+                <div className="space-y-6">
+                    {/* AI Memory Capture */}
+                    <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-6 md:p-8">
+                        <div className="text-center mb-6">
+                            <div className="text-4xl md:text-5xl mb-3">🧠</div>
+                            <h3 className="text-lg md:text-xl font-medium text-white mb-2">Brain Dump</h3>
+                            <p className="text-sm text-[#94a3b8] max-w-md mx-auto">
+                                Tap the AI button and say everything you know about {contact.firstName || contact.name}.
+                                AI will automatically organize it into the right fields.
+                            </p>
+                        </div>
+                        <MemoryCapture
+                            contactId={contact.id}
+                            onSuccess={(field) => {
+                                // Refresh to show updated data
+                                handleTabChange('Overview');
+                            }}
+                        />
+                    </div>
+
+                    {/* Tips Card */}
+                    <div className="bg-gradient-to-br from-[#7c3aed]/10 to-[#5b21b6]/10 border border-[#7c3aed]/20 rounded-2xl p-5">
+                        <h4 className="text-sm font-bold text-[#a78bfa] mb-3">💡 Tips for Great Brain Dumps</h4>
+                        <ul className="space-y-2 text-xs text-[#94a3b8]">
+                            <li className="flex items-start gap-2">
+                                <span className="text-[#7c3aed] mt-0.5">•</span>
+                                <span>Just talk naturally - don't worry about structure</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-[#7c3aed] mt-0.5">•</span>
+                                <span>Include where you met, what they do, their interests, family</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-[#7c3aed] mt-0.5">•</span>
+                                <span>Mention memorable moments or conversations</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-[#7c3aed] mt-0.5">•</span>
+                                <span>The AI will sort everything into the right places</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             )}
 
