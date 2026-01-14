@@ -72,6 +72,12 @@ export function PersonPanel({ contact, onFrequencyChange, onImportanceChange }: 
 
   return (
     <div className="w-full md:w-[420px] bg-[#0f1419] border-b md:border-b-0 md:border-r border-[#1a1f2e] flex flex-col overflow-y-auto flex-shrink-0 h-auto md:h-full">
+      {/* DEPLOYMENT CHECK BANNER */}
+      <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
+        ⚠️ Verifying Deployment v3.0 ⚠️<br/>
+        {new Date().toLocaleTimeString()}
+      </div>
+
       {/* HEADER */}
       <div className="p-6 md:p-7 text-center border-b border-[#1a1f2e]">
         <div className="relative inline-block mb-4">
