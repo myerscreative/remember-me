@@ -60,19 +60,27 @@ export function InteractionLogger({ contactId, contactName, className }: Interac
                   toast.success('Attempt logged successfully');
               }
               setQuickNote(""); // Clear note
+              setLastError(null); // Clear error
               // Trigger re-fetch of interactions
               setRefreshTrigger(prev => prev + 1);
           } else {
               console.error('Log interaction failed:', result.error);
               toast.error(`Failed to log: ${result.error}`);
+              setLastError(JSON.stringify(result, null, 2));
           }
       } catch (err: any) {
           console.error('Unexpected error in handleLogInteraction:', err);
           toast.error(`Error logging interaction: ${err.message || 'Unknown error'}`);
+          setLastError(err.stack || err.message);
       } finally {
           setIsLogging(false);
       }
   };
+
+  const [lastError, setLastError] = useState<string | null>(null);
+
+  // ... (inside handleLogInteraction catch/error blocks)
+  // Replace references to setLastError with: setLastError(JSON.stringify(result.error || err.message))
 
   return (
     <div className={cn("w-full space-y-3", className)}>
@@ -150,6 +158,17 @@ export function InteractionLogger({ contactId, contactName, className }: Interac
                 </div>
                 );
             })
+            )}
+
+            {lastError && (
+                <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">
+                        Last Error Details
+                    </p>
+                    <pre className="text-[9px] text-red-300 overflow-x-auto whitespace-pre-wrap font-mono">
+                        {lastError}
+                    </pre>
+                </div>
             )}
         </div>
     </div>
