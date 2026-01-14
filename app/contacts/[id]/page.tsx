@@ -205,7 +205,7 @@ export default function ContactDetailPage({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-auto md:h-screen overflow-y-auto md:overflow-hidden bg-[#0a0e1a] text-gray-200">
+    <div className="flex flex-col md:flex-row h-auto md:h-screen overflow-y-auto md:overflow-hidden bg-[#0a0e1a] text-gray-200 pb-20 md:pb-0">
       <Toaster position="top-center" />
       
       {/* 

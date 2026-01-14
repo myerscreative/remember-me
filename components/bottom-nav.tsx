@@ -22,7 +22,7 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
   },
   {
     href: "/",
-    label: "Contacts",
+    label: "People",
     icon: Users,
     activeColor: "text-blue-600",
     inactiveColor: "text-gray-600",

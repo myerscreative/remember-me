@@ -452,7 +452,7 @@ export default function GardenPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden">
-      <div className="max-w-[1400px] mx-auto px-4 py-8">
+      <div className="max-w-[1400px] mx-auto px-4 py-8 pb-24 md:pb-8">
         
         {/* Header - Compact on mobile */}
         <div className="mb-4 md:mb-6">

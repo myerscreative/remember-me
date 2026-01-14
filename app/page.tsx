@@ -267,7 +267,7 @@ export default function HomePage() {
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
       {/* Main Container */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[950px] mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[950px] mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
           {/* Header & Banner */}
           <div className="pt-6 pb-2 md:pt-8 md:pb-4 space-y-4">
              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">

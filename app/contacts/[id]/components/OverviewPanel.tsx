@@ -57,7 +57,7 @@ export function OverviewPanel({ contact, onNavigateToTab, onEdit, onLinkConnecti
         </div>
 
         {/* CONTENT AREA */}
-        <div className="p-5 md:p-8 flex flex-col gap-5">
+        <div className="p-5 md:p-8 pb-20 md:pb-8 flex flex-col gap-5">
             
             {/* OVERVIEW TAB */}
             {activeTab === 'Overview' && (
