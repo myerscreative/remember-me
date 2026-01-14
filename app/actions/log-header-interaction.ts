@@ -9,11 +9,28 @@ export async function logHeaderInteraction(
   note?: string
 ) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  
+  // DIAGNOSTIC LOGGING
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const hasAnonKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  console.log(`[DIAGNOSTIC] LogInteraction Init - URL: ${supabaseUrl ? 'Set' : 'MISSING'}, AnonKey: ${hasAnonKey ? 'Set' : 'MISSING'}`);
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError) {
+    console.error("[DIAGNOSTIC] Auth Check Failed:", {
+      message: authError.message,
+      status: authError.status,
+      name: authError.name
+    });
+  }
 
   if (!user) {
-    return { success: false, error: "Unauthorized" };
+    console.error("[DIAGNOSTIC] No user session found");
+    return { success: false, error: "Unauthorized - No active session" };
   }
+
+  console.log(`[DIAGNOSTIC] User Authenticated: ${user.id}`);
 
   try {
     // 1. Structured Interaction Log (Direct Insert)
@@ -29,7 +46,7 @@ export async function logHeaderInteraction(
 
     // Direct insert to bypass any RPC issues
     // Type assertion needed due to Supabase client type resolution issue
-    const { error: insertError } = await (supabase as any)
+    const { data: insertData, error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
@@ -37,14 +54,20 @@ export async function logHeaderInteraction(
         type: interactionType,
         date: new Date().toISOString(),
         notes: finalNote
-      });
+      })
+      .select();
 
     if (insertError) {
-        console.error("Error logging interaction record:", insertError);
-        throw new Error(`Failed to insert interaction: ${insertError.message}`);
+        console.error("Error logging interaction record:", {
+            code: insertError.code,
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint
+        });
+        throw new Error(`Failed to insert interaction: ${insertError.message} (Code: ${insertError.code})`);
     }
 
-    console.log('Interaction inserted successfully');
+    console.log('Interaction inserted successfully:', insertData);
 
     // 2. Shared Memory Log (User Narrative)
     if (note || type === 'attempt') {
@@ -76,7 +99,10 @@ export async function logHeaderInteraction(
         .eq('id', personId)
         .eq('user_id', user.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+          console.error("Error updating person status:", updateError);
+          throw updateError;
+      }
     }
 
     revalidatePath('/dashboard');
@@ -86,6 +112,10 @@ export async function logHeaderInteraction(
     return { success: true };
   } catch (error: any) {
     console.error("Error logging header interaction:", error);
-    return { success: false, error: error.message };
+    return { 
+        success: false, 
+        error: error.message,
+        details: error 
+    };
   }
 }

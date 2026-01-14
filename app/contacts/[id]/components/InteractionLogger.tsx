@@ -113,6 +113,17 @@ export function InteractionLogger({ contactId, contactName, className }: Interac
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Recent Activity ({recentInteractions.length})
             </h4>
+
+            {/* DEBUG BANNER */}
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2 mb-3">
+                <p className="text-[10px] font-bold text-yellow-500 text-center uppercase tracking-wider">
+                    🐛 Debug Mode Active v2.1 - Enhanced Logging
+                </p>
+                <p className="text-[9px] text-yellow-500/80 text-center mt-1">
+                    Check server console for detailed diag
+                </p>
+            </div>
+
             {recentInteractions.length === 0 ? (
             <p className="text-xs text-gray-500 italic">No interactions yet. Log one above!</p>
             ) : (

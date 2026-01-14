@@ -120,7 +120,10 @@ export default function GardenPage() {
 
   // Fetch contacts from Supabase
   useEffect(() => {
-    loadContacts();
+    console.log("🌱🌱🌱 GARDEN PAGE v2.1 - NEW CODE IS RUNNING! 🌱🌱🌱");
+    
+    const fetchGardenData = async () => { loadContacts(); };
+    fetchGardenData();
   }, []);
 
   async function loadContacts() {
