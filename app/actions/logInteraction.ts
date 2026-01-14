@@ -11,13 +11,18 @@ interface LogInteractionInput {
   nextGoal?: string; // New field
 }
 
-export async function logInteraction({ personId, type, note, nextGoal }: LogInteractionInput) {
+
+export type InteractionResult = 
+  | { success: true; error?: never }
+  | { success: false; error: string; details?: any };
+
+export async function logInteraction({ personId, type, note, nextGoal }: LogInteractionInput): Promise<InteractionResult> {
   const supabase = await createClient();
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
-    return { success: false, error: 'Not authenticated' };
+    return { success: false, error: 'Not authenticated', details: userError };
   }
 
   const now = new Date().toISOString();
@@ -43,12 +48,12 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
 
     if (interactionResult.error) {
       console.error('Error inserting interaction:', interactionResult.error);
-      return { success: false, error: 'Failed to log interaction' };
+      return { success: false, error: interactionResult.error.message || 'Failed to log interaction', details: interactionResult.error };
     }
 
     if (updateResult.error) {
       console.error('Error updating person:', updateResult.error);
-      return { success: false, error: 'Failed to update contact' };
+      return { success: false, error: updateResult.error.message || 'Failed to update contact', details: updateResult.error };
     }
 
     // Revalidate the garden page to show updated positions
@@ -56,8 +61,8 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
     revalidatePath('/');
     
     return { success: true };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error in logInteraction:', err);
-    return { success: false, error: 'An unexpected error occurred' };
+    return { success: false, error: err.message || 'An unexpected error occurred', details: err };
   }
 }

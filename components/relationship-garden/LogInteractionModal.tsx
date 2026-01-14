@@ -87,7 +87,10 @@ export default function LogInteractionModal({
       } else {
         const errorMsg = result.error || 'Failed to log interaction';
         toast.error(errorMsg);
-        setLastError(typeof result.error === 'object' ? JSON.stringify(result.error, null, 2) : String(result.error));
+        
+        // Use details if available, otherwise fallback to the error message
+        const debugInfo = result.details ? JSON.stringify(result.details, null, 2) : errorMsg;
+        setLastError(debugInfo);
       }
     } catch (err: any) {
       console.error('Error submitting interaction:', err);
