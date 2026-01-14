@@ -112,11 +112,17 @@ export default function GardenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  
+
   // Modal state for logging interactions
   const [selectedContactForModal, setSelectedContactForModal] = useState<ExtendedContact | null>(null);
   const [hoveredContactId, setHoveredContactId] = useState<string | null>(null);
   const [uncategorizedCount, setUncategorizedCount] = useState(0);
+
+  // DEBUG: Verify new code is deployed - this will show IMMEDIATELY on page load
+  useEffect(() => {
+    console.log('🌱🌱🌱 GARDEN PAGE v2.1 - NEW CODE IS RUNNING! 🌱🌱🌱');
+    console.log('If you see this message, the new code has deployed successfully.');
+  }, []);
 
   // Fetch contacts from Supabase
   useEffect(() => {
