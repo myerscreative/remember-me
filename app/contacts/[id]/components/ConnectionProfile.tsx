@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, Mail, MessageSquare, Plus, Info, X } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Plus, Info, X, Sparkles } from 'lucide-react';
 import { getInitials } from '@/lib/utils/contact-helpers';
 import { InteractionLogger } from './InteractionLogger';
 import Link from 'next/link';
@@ -12,7 +12,6 @@ import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
 import { MemoryCapture } from './MemoryCapture';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
-import { Sparkles, Info, X } from 'lucide-react'; // Ensure Sparkles is imported
 
 interface ProfileProps {
   contact: any;
@@ -22,10 +21,13 @@ interface ProfileProps {
   sharedMemory?: string;
 }
 
+import { PostCallPulse } from './PostCallPulse';
+
 const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemory }: ProfileProps) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [isPulseOpen, setIsPulseOpen] = useState(false);
 
   // Health Color Logic
   const healthStyles = healthColorMap[health];
@@ -256,10 +258,23 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
             <InteractionLogger 
                 contactId={contact.id} 
                 contactName={name}
-                onSuccess={() => setIsLogOpen(false)}
+                onSuccess={() => {
+                   setIsLogOpen(false);
+                   setIsPulseOpen(true); // Trigger the Post-Call Pulse
+                }}
             />
           </div>
         </div>
+      )}
+
+      {/* POST-CALL PULSE OVERLAY */}
+      {isPulseOpen && (
+        <PostCallPulse 
+          contactId={contact.id}
+          name={contact.first_name || name.split(' ')[0]} 
+          onClose={() => setIsPulseOpen(false)}
+          onComplete={() => setIsPulseOpen(false)}
+        />
       )}
     </div>
   );
