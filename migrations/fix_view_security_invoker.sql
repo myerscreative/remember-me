@@ -28,13 +28,13 @@ GROUP BY p.id;
 CREATE VIEW person_interaction_counts
 WITH (security_invoker = true)
 AS
-SELECT 
+SELECT
   person_id,
   COUNT(*) as total_interactions,
-  MAX(interaction_date) as last_interaction_date,
-  COUNT(*) FILTER (WHERE interaction_type = 'meeting') as meeting_count,
-  COUNT(*) FILTER (WHERE interaction_type = 'call') as call_count,
-  COUNT(*) FILTER (WHERE interaction_type = 'email') as email_count
+  MAX(date) as last_interaction_date,  -- Fixed: changed from interaction_date to date
+  COUNT(*) FILTER (WHERE type = 'meeting') as meeting_count,  -- Fixed: changed from interaction_type to type
+  COUNT(*) FILTER (WHERE type = 'call') as call_count,
+  COUNT(*) FILTER (WHERE type = 'email') as email_count
 FROM interactions
 GROUP BY person_id;
 
@@ -57,9 +57,9 @@ CREATE OR REPLACE FUNCTION update_person_last_contact()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE persons
-  SET last_contact = NEW.interaction_date
+  SET last_contact = NEW.date  -- Fixed: changed from NEW.interaction_date to NEW.date
   WHERE id = NEW.person_id
-    AND (last_contact IS NULL OR last_contact < NEW.interaction_date);
+    AND (last_contact IS NULL OR last_contact < NEW.date);  -- Fixed: changed from interaction_date to date
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql
