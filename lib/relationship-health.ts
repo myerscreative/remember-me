@@ -1,85 +1,101 @@
-// Relationship Health Utilities
-// Calculates health based on target frequency (cadence-based system)
 
-export type HealthStatus = 'BLOOMING' | 'NOURISHED' | 'THIRSTY' | 'FADING';
+/**
+ * Logic to determine Relationship Health based on "Intention over Automation"
+ */
+export type HealthStatus = 'nurtured' | 'drifting' | 'neglected';
+
+interface HealthCalculatorProps {
+  lastContactDate: Date | string | null;
+  cadenceDays: number; // e.g., 30
+}
+
+export const getRelationshipHealth = ({
+  lastContactDate,
+  cadenceDays,
+}: HealthCalculatorProps): HealthStatus => {
+  if (!lastContactDate) return 'neglected';
+
+  const last = new Date(lastContactDate);
+  const now = new Date();
+  
+  // Calculate difference in days
+  const diffInMs = now.getTime() - last.getTime();
+  const daysSinceLastContact = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  // 1. Nurtured: Within the cadence window
+  if (daysSinceLastContact < cadenceDays) {
+    return 'nurtured';
+  }
+
+  // 2. Drifting: Missed the window, but within a 50% "grace period"
+  const gracePeriod = cadenceDays * 1.5;
+  if (daysSinceLastContact < gracePeriod) {
+    return 'drifting';
+  }
+
+  // 3. Neglected: Beyond the grace period
+  return 'neglected';
+};
+
+// UI Mapping for Anti-Gravity/Tailwind
+export const healthColorMap = {
+  nurtured: {
+    border: 'border-green-500',
+    bg: 'bg-green-500/10',
+    text: 'text-green-500',
+    label: 'Nurtured'
+  },
+  drifting: {
+    border: 'border-orange-500',
+    bg: 'bg-orange-500/10',
+    text: 'text-orange-500',
+    label: 'Drifting'
+  },
+  neglected: {
+    border: 'border-red-500',
+    bg: 'bg-red-500/10',
+    text: 'text-red-500',
+    label: 'Neglected'
+  }
+};
+
+/**
+ * Detailed health calculation for components needing metadata (daysSince, ratio, etc.)
+ * Adapts new logic to legacy object structure where needed.
+ */
+export function getDetailedRelationshipHealth(
+  lastContactDate: string | Date | null,
+  targetDays: number = 30
+): { status: HealthStatus; daysSince: number; color: string; label: string } {
+  const lastDateObj = lastContactDate ? new Date(lastContactDate) : null;
+  const now = new Date();
+  const daysSince = lastDateObj 
+    ? Math.floor((now.getTime() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24))
+    : 999;
+
+  const status = getRelationshipHealth({ lastContactDate, cadenceDays: targetDays });
+  const styles = healthColorMap[status];
+
+  return {
+    status,
+    daysSince,
+    color: styles.bg.replace('/10', ''), // Approximation for legacy color usage (e.g. dots) which often expect solid colors
+    label: styles.label
+  };
+}
+
+// Legacy / Garden Utils (Preserving for phyllotaxis if needed, but updated types might be needed eventually)
+export type OldHealthStatus = 'BLOOMING' | 'NOURISHED' | 'THIRSTY' | 'FADING';
 
 export interface RelationshipHealth {
-  status: HealthStatus;
+  status: OldHealthStatus; // Keeping legacy status for now to avoid breaking other files if they use it
   color: string;
   ratio: number;  // 0 = just contacted, 1 = at target, 2+ = overdue
   daysSince: number;
   targetDays: number;
 }
 
-/**
- * Calculate relationship health based on ratio of days since contact / target frequency
- * 
- * @param lastDate - Last interaction date (string or Date)
- * @param targetDays - User's desired contact frequency in days (default 30)
- * @returns Health status with color, ratio, and metadata
- */
-export function getRelationshipHealth(
-  lastDate: string | Date | null, 
-  targetDays: number = 30
-): RelationshipHealth {
-  // Handle never contacted case
-  if (!lastDate) {
-    return {
-      status: 'FADING',
-      color: '#f97316',
-      ratio: 999,
-      daysSince: 999,
-      targetDays
-    };
-  }
-
-  const lastDateObj = typeof lastDate === 'string' ? new Date(lastDate) : lastDate;
-  const daysSince = Math.floor((Date.now() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24));
-  const ratio = daysSince / targetDays;
-
-  // Health thresholds based on ratio
-  if (ratio <= 0.5) {
-    // Within first half of target period - blooming/thriving
-    return {
-      status: 'BLOOMING',
-      color: '#22c55e',  // green-500
-      ratio,
-      daysSince,
-      targetDays
-    };
-  }
-  
-  if (ratio <= 1.0) {
-    // Within target period but past halfway
-    return {
-      status: 'NOURISHED',
-      color: '#84cc16',  // lime-500
-      ratio,
-      daysSince,
-      targetDays
-    };
-  }
-  
-  if (ratio <= 1.5) {
-    // Past target but within 50% grace period
-    return {
-      status: 'THIRSTY',
-      color: '#eab308',  // yellow-500
-      ratio,
-      daysSince,
-      targetDays
-    };
-  }
-  
-  // Significantly overdue
-  return {
-    status: 'FADING',
-    color: '#f97316',  // orange-500
-    ratio,
-    daysSince,
-    targetDays
-  };
-}
+// ... (keep existing getMyGardenHealth etc if they exist, or just the getPhyllotaxisPosition)
 
 /**
  * Get position for Fibonacci spiral with health-based ring placement
@@ -123,18 +139,12 @@ export const INTERACTION_TYPES: { value: InteractionType; label: string; emoji: 
   { value: 'other', label: 'Other', emoji: '✨' },
 ];
 
-// Target frequency presets
 export const FREQUENCY_PRESETS = [
-  { days: 7, label: 'Weekly' },
-  { days: 14, label: 'Bi-weekly' },
-  { days: 30, label: 'Monthly' },
-  { days: 60, label: 'Every 2 months' },
-  { days: 90, label: 'Quarterly' },
-  { days: 180, label: 'Twice a year' },
-  { days: 365, label: 'Yearly' },
+    { days: 7, label: 'Weekly' },
+    { days: 14, label: 'Bi-weekly' },
+    { days: 30, label: 'Monthly' },
+    { days: 60, label: 'Every 2 months' },
+    { days: 90, label: 'Quarterly' },
+    { days: 180, label: 'Twice a year' },
+    { days: 365, label: 'Yearly' },
 ];
-
-export function getFrequencyLabel(days: number): string {
-  const preset = FREQUENCY_PRESETS.find(p => p.days === days);
-  return preset ? preset.label : 'Custom';
-}

@@ -7,11 +7,11 @@ import { InteractionLogger } from './InteractionLogger';
 import Link from 'next/link';
 
 // 1. Define the Relationship Health Types
-export type HealthState = 'nurtured' | 'drifting' | 'neglected';
+import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
 
 interface ProfileProps {
   contact: any;
-  health: HealthState;
+  health: HealthStatus;
   lastContact: string;
   synopsis: string;
 }
@@ -20,11 +20,8 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
   const [isLogOpen, setIsLogOpen] = useState(false);
 
   // Health Color Logic
-  const healthColor = {
-    nurtured: 'border-green-500',
-    drifting: 'border-orange-500',
-    neglected: 'border-red-500',
-  }[health];
+  const healthStyles = healthColorMap[health];
+  const healthColor = healthStyles.border;
 
   const name = contact.firstName || contact.first_name || contact.name;
   const photoUrl = contact.photo_url || contact.avatar_url;

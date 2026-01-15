@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ErrorFallback } from "@/components/error-fallback";
 import { LinkConnectionModal } from "./components/LinkConnectionModal";
 import ConnectionProfile from "./components/ConnectionProfile";
+import { getRelationshipHealth } from "@/lib/relationship-health";
 
 export default function ContactDetailPage({
   params,
@@ -150,18 +151,13 @@ export default function ContactDetailPage({
   }
 
   // Calculate Health State for UI
-  const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
-  const daysSinceContact = lastContactDate 
-    ? Math.floor((new Date().getTime() - lastContactDate.getTime()) / (1000 * 3600 * 24))
-    : Infinity;
-  
-  const frequency = contact.target_frequency_days || 30;
-  
-  let healthState: 'nurtured' | 'drifting' | 'neglected' = 'drifting';
-  if (daysSinceContact <= frequency * 0.5) healthState = 'nurtured';
-  else if (daysSinceContact > frequency) healthState = 'neglected';
+  const healthState = getRelationshipHealth({
+      lastContactDate: contact.last_interaction_date,
+      cadenceDays: contact.target_frequency_days || 30
+  });
   
   // Format Last Contact
+  const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
   const lastContactFormatted = lastContactDate 
     ? lastContactDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     : 'Never';

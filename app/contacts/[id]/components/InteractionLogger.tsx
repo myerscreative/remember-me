@@ -11,6 +11,7 @@ interface InteractionLoggerProps {
   contactId: string;
   contactName: string;
   className?: string;
+  onSuccess?: () => void;
 }
 
 // Helper function to format time ago
@@ -28,7 +29,7 @@ function getTimeAgo(date: Date): string {
   return date.toLocaleDateString();
 }
 
-export function InteractionLogger({ contactId, contactName, className }: InteractionLoggerProps) {
+export function InteractionLogger({ contactId, contactName, className, onSuccess }: InteractionLoggerProps) {
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
   const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
@@ -63,6 +64,10 @@ export function InteractionLogger({ contactId, contactName, className }: Interac
               setLastError(null); // Clear error
               // Trigger re-fetch of interactions
               setRefreshTrigger(prev => prev + 1);
+              
+              if (onSuccess) {
+                  onSuccess();
+              }
           } else {
               console.error('Log interaction failed:', result.error);
               toast.error(`Failed to log: ${result.error}`);

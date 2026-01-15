@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2, Star } from 'lucide-react';
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
-import { FREQUENCY_PRESETS, getRelationshipHealth } from '@/lib/relationship-health';
+import { FREQUENCY_PRESETS, getDetailedRelationshipHealth as getRelationshipHealth } from '@/lib/relationship-health';
 import { getRelationshipStatus } from '@/app/network/utils/relationshipStatus';
 import { cn } from '@/lib/utils';
 import { InteractionLogger } from './InteractionLogger';

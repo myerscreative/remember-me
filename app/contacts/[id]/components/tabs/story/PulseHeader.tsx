@@ -1,6 +1,6 @@
 'use client';
 
-import { getRelationshipHealth, type HealthStatus } from '@/lib/relationship-health';
+import { getDetailedRelationshipHealth as getRelationshipHealth, type HealthStatus } from '@/lib/relationship-health';
 import { Flower2, Leaf, Droplets, CloudSun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,37 +17,29 @@ const statusConfig: Record<HealthStatus, {
   textClass: string;
   borderClass: string;
 }> = {
-  BLOOMING: {
-    label: 'Blooming',
+  nurtured: {
+    label: 'Nurtured',
     description: 'Your connection is thriving',
-    icon: Flower2,
-    bgClass: 'bg-emerald-50 dark:bg-emerald-950/30',
-    textClass: 'text-emerald-600 dark:text-emerald-400',
-    borderClass: 'border-emerald-200 dark:border-emerald-800',
-  },
-  NOURISHED: {
-    label: 'Nourished',
-    description: 'Connection is healthy',
     icon: Leaf,
-    bgClass: 'bg-lime-50 dark:bg-lime-950/30',
-    textClass: 'text-lime-600 dark:text-lime-400',
-    borderClass: 'border-lime-200 dark:border-lime-800',
+    bgClass: 'bg-green-50 dark:bg-green-950/30',
+    textClass: 'text-green-600 dark:text-green-400',
+    borderClass: 'border-green-200 dark:border-green-800',
   },
-  THIRSTY: {
-    label: 'Thirsty',
+  drifting: {
+    label: 'Drifting',
     description: 'Could use some attention',
-    icon: Droplets,
-    bgClass: 'bg-amber-50 dark:bg-amber-950/30',
-    textClass: 'text-amber-600 dark:text-amber-400',
-    borderClass: 'border-amber-200 dark:border-amber-800',
-  },
-  FADING: {
-    label: 'Fading',
-    description: 'Time to reconnect',
     icon: CloudSun,
     bgClass: 'bg-orange-50 dark:bg-orange-950/30',
     textClass: 'text-orange-600 dark:text-orange-400',
     borderClass: 'border-orange-200 dark:border-orange-800',
+  },
+  neglected: {
+    label: 'Neglected',
+    description: 'Time to reconnect',
+    icon: Droplets,
+    bgClass: 'bg-red-50 dark:bg-red-950/30',
+    textClass: 'text-red-600 dark:text-red-400',
+    borderClass: 'border-red-200 dark:border-red-800',
   },
 };
 

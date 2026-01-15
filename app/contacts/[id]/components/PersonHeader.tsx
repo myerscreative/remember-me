@@ -3,7 +3,7 @@
 import { useState, useOptimistic, useEffect } from 'react';
 import Link from 'next/link';
 import { Person } from '@/types/database.types';
-import { getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
+import { getDetailedRelationshipHealth as getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
 import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { getRecentInteractions } from '@/app/actions/get-recent-interactions';

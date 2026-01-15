@@ -10,7 +10,7 @@ import {
   deleteRelationship
 } from '@/app/actions/relationships';
 import { RELATIONSHIP_LABELS } from '@/lib/relationship-utils';
-import { getRelationshipHealth, type HealthStatus } from '@/lib/relationship-health';
+import { getDetailedRelationshipHealth, type HealthStatus } from '@/lib/relationship-health';
 import type { LinkedContact, RelationshipRole } from '@/types/database.types';
 import { AddRelationshipModal } from './AddRelationshipModal';
 import { GroupInteractionModal } from './GroupInteractionModal';
@@ -34,10 +34,9 @@ interface FamilyTabProps {
 
 // Health status color mapping
 const HEALTH_COLORS: Record<HealthStatus, string> = {
-  BLOOMING: 'bg-green-500',
-  NOURISHED: 'bg-lime-500',
-  THIRSTY: 'bg-yellow-500',
-  FADING: 'bg-orange-500',
+  nurtured: 'bg-green-500',
+  drifting: 'bg-orange-500',
+  neglected: 'bg-red-500',
 };
 
 import { useRouter } from 'next/navigation';
@@ -326,7 +325,7 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
               </h3>
               <div className="space-y-2">
                 {contacts.map((contact) => {
-                  const health = getRelationshipHealth(
+                  const health = getDetailedRelationshipHealth(
                     contact.last_interaction_date,
                     contact.target_frequency_days || 30
                   );
@@ -366,8 +365,8 @@ export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabPr
                       </Link>
 
                       {/* Fading alert */}
-                      {health.status === 'FADING' && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 mr-2">
+                      {health.status === 'neglected' && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 mr-2">
                           Needs attention
                         </span>
                       )}
