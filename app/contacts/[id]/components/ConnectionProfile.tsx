@@ -332,6 +332,8 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
             <InteractionLogger 
                 contactId={contact.id} 
                 contactName={name}
+                photoUrl={contact.photo_url || contact.avatar_url}
+                healthStatus={health || 'drifting'}
                 onSuccess={() => {
                    setIsLogOpen(false);
                    setIsPulseOpen(true); // Trigger the Post-Call Pulse
