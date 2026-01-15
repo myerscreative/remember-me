@@ -25,6 +25,8 @@ export async function updateFamilyMembers(contactId: string, familyMembers: any[
     console.error("Error updating family members:", error);
     return { success: false, error: message };
   }
+  }
+
 
 export async function addFamilyMember(contactId: string, member: any) {
   try {

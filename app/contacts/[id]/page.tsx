@@ -107,7 +107,7 @@ export default function ContactDetailPage({
             lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
             tags: tags,
             shared_memories: sharedMemories || [],
-            shared_memories: sharedMemories || [],
+
             connections: processedConnections, // Add connections to contact object
             gift_ideas: person.gift_ideas || [], // Gift Vault
             story: {

@@ -112,7 +112,7 @@ export function InteractionLogger({ contactId, contactName, className, onSuccess
               });
           } else if (s.type === 'Milestone') {
               // Basic placeholder add
-               toast.promise(addMilestone(contactId, "Detected Event", new Date().toISOString()), {
+               toast.promise(addMilestone(contactId, { title: s.label, date: new Date().toISOString(), type: 'Event' }), {
                   loading: 'Adding milestone...',
                   success: `Milestone "${s.label}" saved!`,
                   error: 'Failed to add milestone'

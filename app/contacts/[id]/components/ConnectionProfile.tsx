@@ -204,7 +204,6 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
                      );
                  }
               })()}
-              })()}
               
               {/* GIFT IDEA NUDGE */}
               {(() => {

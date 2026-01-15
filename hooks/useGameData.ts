@@ -92,7 +92,7 @@ export function useGameData() {
              group: group,
              lastContactDate: p.last_interaction_date,
              family: p.family_members,
-             family: p.family_members,
+
              ai_summary: p.ai_summary,
              milestones: p.milestones || []
            };

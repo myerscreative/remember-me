@@ -130,7 +130,7 @@ export function StoryTab({ contact }: StoryTabProps) {
         </div>
       </div>
 
-      </div>
+
 
       {/* SECTION: GIFT VAULT */}
       <div className="group">
@@ -243,7 +243,7 @@ function GiftVault({ contactId, initialGifts }: { contactId: string, initialGift
     };
 
     const handleToggle = async (id: string, currentStatus: GiftIdea['status']) => {
-        const nextStatus = currentStatus === 'idea' ? 'purchased' : (currentStatus === 'purchased' ? 'given' : 'idea');
+        const nextStatus: GiftIdea['status'] = currentStatus === 'idea' ? 'purchased' : (currentStatus === 'purchased' ? 'given' : 'idea');
         
         const updatedGifts = gifts.map(g => g.id === id ? { ...g, status: nextStatus } : g);
         setGifts(updatedGifts);
