@@ -12,6 +12,8 @@ import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
 import { MemoryCapture } from './MemoryCapture';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
+import { addInterest } from '@/app/actions/story-actions';
+import { toggleTag } from '@/app/actions/toggle-tag';
 
 interface ProfileProps {
   contact: any;
@@ -28,6 +30,12 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPulseOpen, setIsPulseOpen] = useState(false);
+  const [isDraftOpen, setIsDraftOpen] = useState(false);
+  const [draftContext, setDraftContext] = useState<string>('');
+  const [isAddTagOpen, setIsAddTagOpen] = useState(false);
+  const [isAddInterestOpen, setIsAddInterestOpen] = useState(false);
+  const [newTag, setNewTag] = useState('');
+  const [newInterest, setNewInterest] = useState('');
 
   // Health Color Logic
   const healthStyles = healthColorMap[health];
@@ -40,6 +48,56 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
   const handleIntentionallyDrifting = () => {
     // In a real app, this would call an API to update status or pause cadence
     toast.success("Marked as Intentionally Drifting. Cadence paused for 14 days.");
+  };
+
+  // Handler for Draft Message
+  const handleDraftMessage = (context?: string) => {
+    setDraftContext(context || synopsis || 'Start a meaningful reconnection...');
+    setIsDraftOpen(true);
+  };
+
+  // Handler for Adding Tag
+  const handleAddTag = async () => {
+    if (!newTag.trim()) {
+      toast.error('Please enter a tag name');
+      return;
+    }
+
+    try {
+      const result = await toggleTag(contact.id, newTag);
+      if (result.success) {
+        toast.success(`Tag "${newTag}" added!`);
+        setNewTag('');
+        setIsAddTagOpen(false);
+        window.location.reload(); // Refresh to show new tag
+      } else {
+        toast.error(result.error || 'Failed to add tag');
+      }
+    } catch (err) {
+      toast.error('Error adding tag');
+    }
+  };
+
+  // Handler for Adding Interest
+  const handleAddInterest = async () => {
+    if (!newInterest.trim()) {
+      toast.error('Please enter an interest');
+      return;
+    }
+
+    try {
+      const result = await addInterest(contact.id, newInterest);
+      if (result.success) {
+        toast.success(`Interest "${newInterest}" added!`);
+        setNewInterest('');
+        setIsAddInterestOpen(false);
+        window.location.reload(); // Refresh to show new interest
+      } else {
+        toast.error(result.error || 'Failed to add interest');
+      }
+    } catch (err) {
+      toast.error('Error adding interest');
+    }
   };
 
   const daysSince = lastContact === 'Never' ? 999 : 
@@ -151,11 +209,12 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
 
                  if (health === 'neglected') {
                     return (
-                        <RescueCard 
-                        name={contact.first_name || name} 
-                        daysSince={daysSince} 
-                        sharedMemory={sharedMemory || "your last conversation"} 
+                        <RescueCard
+                        name={contact.first_name || name}
+                        daysSince={daysSince}
+                        sharedMemory={sharedMemory || "your last conversation"}
                         onDrift={handleIntentionallyDrifting}
+                        onDraftMessage={handleDraftMessage}
                         />
                     );
                  } else if (upcomingMilestone && diffDays <= 2) {
@@ -196,8 +255,11 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
                                 </div>
                             )}
                             
-                            {/* Draft Reconnection Button - Placeholder functionality or link to page */}
-                            <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
+                            {/* Draft Reconnection Button */}
+                            <button
+                                onClick={() => handleDraftMessage(synopsis)}
+                                className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors"
+                            >
                                 Draft Reconnection
                             </button>
                         </div>
@@ -225,7 +287,10 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
                                   <p className="text-sm text-white font-medium">{giftIdeas[0].item}</p>
                               </div>
                            </div>
-                           <button className="text-xs bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 px-3 py-1.5 rounded-lg border border-pink-600/30 transition-colors">
+                           <button
+                              onClick={() => handleDraftMessage(`Mention: Gift idea for ${upcomingMilestone.title} - ${giftIdeas[0].item}`)}
+                              className="text-xs bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 px-3 py-1.5 rounded-lg border border-pink-600/30 transition-colors"
+                           >
                               Use in Draft
                            </button>
                         </div>
@@ -242,7 +307,10 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
              <h3 className="text-xs font-semibold text-slate-500 uppercase">Context</h3>
              {/* Simple Add Actions - Could open modal or just trigger edit mode */}
              <div className="flex gap-2">
-                <button onClick={() => setIsLogOpen(true)} className="text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors">
+                <button
+                    onClick={() => setIsAddTagOpen(true)}
+                    className="text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
+                >
                     + Tag
                 </button>
              </div>
@@ -250,8 +318,8 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
         
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 mask-linear">
           {/* Add Interest Button in-stream */}
-           <button 
-             onClick={() => setIsLogOpen(true)} // Ideally opens specific add modal, for now re-use log/edit entry point or just placeholder
+           <button
+             onClick={() => setIsAddInterestOpen(true)}
              className="shrink-0 bg-slate-800/50 border border-slate-700 border-dashed px-3 py-1 rounded-full text-xs text-slate-400 hover:text-white hover:border-indigo-500 transition-colors"
            >
              + Interest
@@ -345,12 +413,175 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
 
       {/* POST-CALL PULSE OVERLAY */}
       {isPulseOpen && (
-        <PostCallPulse 
+        <PostCallPulse
           contactId={contact.id}
-          name={contact.first_name || name.split(' ')[0]} 
+          name={contact.first_name || name.split(' ')[0]}
           onClose={() => setIsPulseOpen(false)}
           onComplete={() => setIsPulseOpen(false)}
         />
+      )}
+
+      {/* DRAFT MESSAGE MODAL */}
+      {isDraftOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setIsDraftOpen(false)}>
+          <div
+            className="bg-[#161b22] w-full md:max-w-lg max-h-[85vh] overflow-y-auto p-6 rounded-t-3xl md:rounded-3xl border-t md:border border-slate-700 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-6 md:hidden" />
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold">Draft Message</h2>
+                <button onClick={() => setIsDraftOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
+                    <X size={16} />
+                </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-xl p-4">
+                <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-2">Context</p>
+                <p className="text-sm text-slate-300 leading-relaxed">{draftContext}</p>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                  Your Message
+                </label>
+                <textarea
+                  className="w-full min-h-[200px] bg-slate-900/50 border border-slate-700 rounded-xl p-4 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
+                  placeholder={`Hey ${name.split(' ')[0]},\n\nI've been thinking about you...`}
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsDraftOpen(false)}
+                  className="flex-1 py-3 bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // In real app, this would copy to clipboard or open SMS/email
+                    if (contact.phone) {
+                      window.open(`sms:${contact.phone}`);
+                    } else if (contact.email) {
+                      window.open(`mailto:${contact.email}`);
+                    }
+                    toast.success('Opening messaging app...');
+                    setIsDraftOpen(false);
+                  }}
+                  className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95"
+                >
+                  <MessageSquare size={18} />
+                  Send Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD TAG MODAL */}
+      {isAddTagOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setIsAddTagOpen(false)}>
+          <div
+            className="bg-[#161b22] w-full md:max-w-md p-6 rounded-t-3xl md:rounded-3xl border-t md:border border-slate-700 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-6 md:hidden" />
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold">Add Tag</h2>
+                <button onClick={() => setIsAddTagOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
+                    <X size={16} />
+                </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                  Tag Name
+                </label>
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  placeholder="e.g., Christian, Entrepreneur, College Friend"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsAddTagOpen(false)}
+                  className="flex-1 py-3 bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddTag}
+                  disabled={!newTag.trim()}
+                  className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-transform active:scale-95"
+                >
+                  Add Tag
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD INTEREST MODAL */}
+      {isAddInterestOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setIsAddInterestOpen(false)}>
+          <div
+            className="bg-[#161b22] w-full md:max-w-md p-6 rounded-t-3xl md:rounded-3xl border-t md:border border-slate-700 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-6 md:hidden" />
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold">Add Interest</h2>
+                <button onClick={() => setIsAddInterestOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
+                    <X size={16} />
+                </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+                  Interest
+                </label>
+                <input
+                  type="text"
+                  value={newInterest}
+                  onChange={(e) => setNewInterest(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  placeholder="e.g., Fishing, Golf, Photography, Cooking"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsAddInterestOpen(false)}
+                  className="flex-1 py-3 bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddInterest}
+                  disabled={!newInterest.trim()}
+                  className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-transform active:scale-95"
+                >
+                  Add Interest
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -363,9 +594,10 @@ interface RescuePromptProps {
   daysSince: number;
   sharedMemory: string;
   onDrift: () => void;
+  onDraftMessage: (context: string) => void;
 }
 
-const RescueCard = ({ name, daysSince, sharedMemory, onDrift }: RescuePromptProps) => {
+const RescueCard = ({ name, daysSince, sharedMemory, onDrift, onDraftMessage }: RescuePromptProps) => {
   return (
     <div className="bg-red-950/30 border-2 border-red-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(239,68,68,0.1)] animate-in fade-in duration-500">
       <div className="flex items-center gap-2 mb-3">
@@ -384,7 +616,10 @@ const RescueCard = ({ name, daysSince, sharedMemory, onDrift }: RescuePromptProp
       </p>
 
       <div className="space-y-2">
-        <button className="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-red-900/20">
+        <button
+          onClick={() => onDraftMessage(`RESCUE MODE: It's been ${daysSince} days since we last connected. Time to reach out!`)}
+          className="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-red-900/20"
+        >
           <span className="text-lg">⚡</span> Draft Rescue Message
         </button>
         <button 

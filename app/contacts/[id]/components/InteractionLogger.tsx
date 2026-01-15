@@ -47,6 +47,7 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [frequency, setFrequency] = useState(30); // Default, should fetch from contact if possible or passed in props
+  const [interactionType, setInteractionType] = useState<'call' | 'text' | 'email' | 'review'>('call');
 
   // Health Color Logic (Local map to avoid circular dep if mostly visual)
   const ringColor = healthStatus === 'nurtured' ? 'border-green-500' : (healthStatus === 'neglected' ? 'border-red-500' : 'border-orange-500');
@@ -137,19 +138,30 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
   const handleLogConnection = async () => {
       setIsLogging(true);
       try {
+          console.log('[InteractionLogger] Starting log connection...', { contactId, interactionType, noteLength: note.length });
+
           // Log as "Connection" (Call/Meeting)
           const result = await logHeaderInteraction(contactId, 'connection', note);
-          
+
+          console.log('[InteractionLogger] Log result:', result);
+
           if (result.success) {
               showNurtureToast(contactName);
               setNote("");
               fetchInteractions();
+
+              // Save frequency if changed in settings
+              if (showSettings) {
+                  await updateTargetFrequency(contactId, frequency);
+              }
+
               if (onSuccess) onSuccess();
           } else {
-              toast.error("Failed to log connection");
+              console.error('[InteractionLogger] Failed to log:', result.error);
+              toast.error(result.error || "Failed to log connection");
           }
       } catch (e) {
-          console.error(e);
+          console.error('[InteractionLogger] Exception:', e);
           toast.error("Error logging connection");
       } finally {
           setIsLogging(false);
@@ -197,12 +209,23 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
         <div className="space-y-3 relative z-10">
             {/* Type Selector (Shrunk/Secondary) */}
             <div className="flex items-center justify-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-                {['Call', 'Text', 'Email', 'Review'].map((type) => (
-                    <button 
-                        key={type}
-                        className="px-3 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-[10px] text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30 transition-all uppercase tracking-wider font-medium"
+                {[
+                  { value: 'call', label: 'Call' },
+                  { value: 'text', label: 'Text' },
+                  { value: 'email', label: 'Email' },
+                  { value: 'review', label: 'Review' }
+                ].map((type) => (
+                    <button
+                        key={type.value}
+                        onClick={() => setInteractionType(type.value as 'call' | 'text' | 'email' | 'review')}
+                        className={cn(
+                          "px-3 py-1.5 border rounded-lg text-[10px] transition-all uppercase tracking-wider font-medium",
+                          interactionType === type.value
+                            ? "bg-indigo-500/30 border-indigo-500 text-indigo-200"
+                            : "bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30"
+                        )}
                     >
-                        {type}
+                        {type.label}
                     </button>
                 ))}
             </div>
@@ -245,10 +268,20 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                             <label className="text-xs text-slate-400">Target Frequency</label>
                             <div className="flex items-center gap-2 bg-slate-900 rounded-lg p-1 border border-slate-700">
                                 <Clock size={12} className="text-slate-500 ml-1"/>
-                                <select 
+                                <select
                                 className="bg-transparent text-xs text-slate-300 focus:outline-none py-1 pr-2"
                                 value={frequency}
-                                onChange={(e) => setFrequency(Number(e.target.value))}
+                                onChange={async (e) => {
+                                  const newFreq = Number(e.target.value);
+                                  setFrequency(newFreq);
+                                  // Auto-save on change
+                                  try {
+                                    await updateTargetFrequency(contactId, newFreq);
+                                    toast.success('Frequency updated');
+                                  } catch (err) {
+                                    toast.error('Failed to update frequency');
+                                  }
+                                }}
                                 >
                                     <option value={7}>Weekly</option>
                                     <option value={14}>Bi-Weekly</option>
