@@ -177,6 +177,7 @@ export default function ContactDetailPage({
             health={healthState}
             lastContact={lastContactFormatted}
             synopsis={contact.ai_summary}
+            sharedMemory={contact.deep_lore || contact.interests?.[0]}
         />
       </div>
 

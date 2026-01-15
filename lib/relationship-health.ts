@@ -43,19 +43,22 @@ export const healthColorMap = {
     border: 'border-green-500',
     bg: 'bg-green-500/10',
     text: 'text-green-500',
-    label: 'Nurtured'
+    label: 'Nurtured',
+    shadow: 'shadow-green-500/20'
   },
   drifting: {
     border: 'border-orange-500',
     bg: 'bg-orange-500/10',
     text: 'text-orange-500',
-    label: 'Drifting'
+    label: 'Drifting',
+    shadow: 'shadow-orange-500/20'
   },
   neglected: {
     border: 'border-red-500',
     bg: 'bg-red-500/10',
     text: 'text-red-500',
-    label: 'Neglected'
+    label: 'Neglected',
+    shadow: 'shadow-red-500/20'
   }
 };
 

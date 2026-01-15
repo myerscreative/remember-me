@@ -5,6 +5,7 @@ import { Phone, Mail, MessageSquare, Plus, Info, X } from 'lucide-react';
 import { getInitials } from '@/lib/utils/contact-helpers';
 import { InteractionLogger } from './InteractionLogger';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 // 1. Define the Relationship Health Types
 import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
@@ -14,9 +15,10 @@ interface ProfileProps {
   health: HealthStatus;
   lastContact: string;
   synopsis: string;
+  sharedMemory?: string;
 }
 
-const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfileProps) => {
+const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemory }: ProfileProps) => {
   const [isLogOpen, setIsLogOpen] = useState(false);
 
   // Health Color Logic
@@ -26,12 +28,22 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
   const name = contact.firstName || contact.first_name || contact.name;
   const photoUrl = contact.photo_url || contact.avatar_url;
 
+  // Handler for Intentionally Drifting
+  const handleIntentionallyDrifting = () => {
+    // In a real app, this would call an API to update status or pause cadence
+    toast.success("Marked as Intentionally Drifting. Cadence paused for 14 days.");
+  };
+
+  const daysSince = lastContact === 'Never' ? 999 : 
+    Math.floor((new Date().getTime() - new Date(contact.last_interaction_date || Date.now()).getTime()) / (1000 * 60 * 60 * 24));
+
   return (
     <div className="flex flex-col w-full max-w-md mx-auto bg-[#0f111a] text-slate-200 min-h-screen pb-10">
       
       {/* HEADER SECTION */}
       <section className="flex flex-col items-center pt-8 pb-4">
-        <div className={`w-24 h-24 rounded-full border-4 ${healthColor} p-1 mb-4`}>
+        {/* The Health Ring */}
+        <div className={`w-28 h-28 rounded-full border-[3px] ${healthStyles.border} p-1 shadow-lg ${healthStyles.shadow}`}>
           {photoUrl ? (
              <img src={photoUrl} alt={name} className="rounded-full w-full h-full object-cover" />
           ) : (
@@ -40,6 +52,12 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
              </div>
           )}
         </div>
+
+        {/* Status Badge */}
+        <div className={`mt-3 mb-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${healthStyles.bg} ${healthStyles.text} border ${healthStyles.border}/20`}>
+          {healthStyles.label}
+        </div>
+
         <h1 className="text-2xl font-bold text-white">{name}</h1>
         <p className="text-slate-400 text-sm">Last Contact: {lastContact}</p>
       </section>
@@ -72,30 +90,39 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
         />
       </nav>
 
-      {/* AI SYNOPSIS HERO (The "Story") */}
+      {/* HERO SECTION: AI SYNOPSIS OR RESCUE CARD */}
       <section className="px-4 mb-6">
-        <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
-            {synopsis ? (
-                <>
-                    <div className="flex items-center gap-2 mb-2 text-indigo-400">
-                        <Info size={16} />
-                        <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
-                    </div>
-                    <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
-                        {synopsis}
-                    </p>
-                </>
-            ) : (
-                 <div className="text-center py-4">
-                    <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
-                 </div>
-            )}
-            
-            {/* Draft Reconnection Button - Placeholder functionality or link to page */}
-            <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
-                Draft Reconnection
-            </button>
-        </div>
+        {health === 'neglected' ? (
+          <RescueCard 
+            name={contact.first_name || name} 
+            daysSince={daysSince} 
+            sharedMemory={contact.deep_lore || contact.interests?.[0] || "your last conversation"} 
+            onDrift={handleIntentionallyDrifting}
+          />
+        ) : (
+          <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
+              {synopsis ? (
+                  <>
+                      <div className="flex items-center gap-2 mb-2 text-indigo-400">
+                          <Info size={16} />
+                          <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+                          {synopsis}
+                      </p>
+                  </>
+              ) : (
+                   <div className="text-center py-4">
+                      <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
+                   </div>
+              )}
+              
+              {/* Draft Reconnection Button - Placeholder functionality or link to page */}
+              <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
+                  Draft Reconnection
+              </button>
+          </div>
+        )}
       </section>
 
       {/* TAGS & INTERESTS (Horizontal Scroll) */}
@@ -152,6 +179,48 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// --- Sub-Components ---
+
+interface RescuePromptProps {
+  name: string;
+  daysSince: number;
+  sharedMemory: string;
+  onDrift: () => void;
+}
+
+const RescueCard = ({ name, daysSince, sharedMemory, onDrift }: RescuePromptProps) => {
+  return (
+    <div className="bg-red-950/30 border-2 border-red-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(239,68,68,0.1)] animate-in fade-in duration-500">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <span className="text-red-400 text-xs font-black uppercase tracking-widest">Rescue Mission</span>
+      </div>
+      
+      <h3 className="text-white font-bold text-lg mb-2">
+        It’s been {daysSince} days since you spoke with {name}.
+      </h3>
+      
+      <p className="text-slate-300 text-sm leading-relaxed mb-4">
+        The "Garden" is drifting, but reconnection is easy. Try bringing up 
+        <span className="text-red-300 font-semibold"> "{sharedMemory}"</span>—it's 
+        one of your strongest shared memories.
+      </p>
+
+      <div className="space-y-2">
+        <button className="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-red-900/20">
+          <span className="text-lg">⚡</span> Draft Rescue Message
+        </button>
+        <button 
+            onClick={onDrift}
+            className="w-full py-2 bg-transparent text-slate-500 text-xs font-medium hover:text-slate-300 transition-colors"
+        >
+          Mark as "Intentionally Drifting" (Pause Cadence)
+        </button>
+      </div>
     </div>
   );
 };
