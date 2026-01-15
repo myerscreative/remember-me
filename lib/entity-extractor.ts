@@ -58,3 +58,19 @@ export const extractEntities = (text: string): ExtractedEntity[] => {
     ))
   );
 };
+
+export const extractMilestones = (text: string) => {
+  // Simple NLP logic to find "Next [Day]" or "[Month] [Date]" or "in X weeks"
+  const timeRegex = /(next\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)|in\s+(\d+)\s+(weeks?|days?|months?)|(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(st|nd|rd|th)?)/gi;
+
+  const match = text.match(timeRegex);
+  if (match) {
+    // Return first match for now as the primary candidate
+    return {
+      title: "Potential Milestone",
+      detectedDate: match[0], // pass string for now, UI can parse to real date
+      context: text
+    };
+  }
+  return null;
+};

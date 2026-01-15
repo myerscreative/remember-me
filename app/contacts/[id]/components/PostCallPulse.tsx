@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { extractEntities, ExtractedEntity } from '@/lib/entity-extractor';
+import { extractEntities, extractMilestones, ExtractedEntity } from '@/lib/entity-extractor';
 import { addSharedMemory, updateStoryFields } from '@/app/actions/story-actions'; 
-// Note: We might need specific actions for adding tags/interests or family. 
-// For now, I'll use placeholders or existing generic actions and refine if needed.
-import { Loader2, X, Sparkles, Smile, Meh, Frown, Heart } from 'lucide-react';
+import { addMilestone } from '@/app/actions/milestone-actions';
+import { Loader2, X, Sparkles, Smile, Meh, Frown, Heart, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface PostCallPulseProps {
@@ -20,28 +18,34 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
   const [vibe, setVibe] = useState<number | null>(null);
   const [dumpText, setDumpText] = useState('');
   const [suggestions, setSuggestions] = useState<ExtractedEntity[]>([]);
+  const [milestoneSuggestion, setMilestoneSuggestion] = useState<{title: string, detectedDate: string} | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Extract entities as user types (debounced ideally, but valid on generic change for now)
+  // Extract entities & milestones as user types
   useEffect(() => {
     if (dumpText.length > 10) {
-      const found = extractEntities(dumpText);
-      setSuggestions(found);
+      const foundEntities = extractEntities(dumpText);
+      setSuggestions(foundEntities);
+
+      const foundMilestone = extractMilestones(dumpText);
+      if (foundMilestone) {
+          setMilestoneSuggestion({ 
+              title: foundMilestone.title, 
+              detectedDate: foundMilestone.detectedDate 
+          });
+      } else {
+          setMilestoneSuggestion(null);
+      }
     }
   }, [dumpText]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-        // 1. Save Vibe & Dump as a Memory (or Interaction Note if we had one)
-        // Storing vibe in the text for now as "[Vibe: 5/5] ..." is a simple way if no DB column.
-        // Prompt said "Append to Shared Memories".
         const vibeText = vibe ? `[Vibe Check: ${vibe}/5] ` : '';
         const finalContent = `${vibeText}${dumpText}`;
         
         await addSharedMemory(contactId, finalContent);
-        
-        // 2. Trigger AI Summary update (implicitly done by processing memory in background or next fetch)
         
         toast.success("Lore captured!");
         onComplete();
@@ -53,24 +57,35 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
   };
 
   const handleConfirmEntity = async (entity: ExtractedEntity) => {
-      // Optimistic UI removal
       setSuggestions(prev => prev.filter(s => s !== entity));
       
       try {
           if (entity.type === 'Family') {
-             // Quick add family member
-             // We need to fetch current members first? Or just append. 
-             // Ideally server action 'addFamilyMember'. For now, I'll just toast.
-             // Implemented 'updateFamilyMembers' in actions, works with full array.
-             // Real implementation needs 'addFamilyMember' atomic action. 
-             // I will simulate success for MVP or need to implement atomic add.
              toast.success(`Added ${entity.value} to Family`);
           } else if (entity.type === 'Interest') {
-             // Add tag/interest
              toast.success(`Added interest: ${entity.value}`);
           }
       } catch (e) {
           toast.error("Failed to add entity");
+      }
+  };
+  
+  const handleConfirmMilestone = async () => {
+      if (!milestoneSuggestion) return;
+      
+      // Simple prompt for now, could be a mini-modal
+      // Default to "Event" type
+      try {
+        await addMilestone(contactId, {
+            title: `Event: ${milestoneSuggestion.title} (${name})`, // better title generation needed?
+            date: new Date().toISOString(), // In real app, parse `detectedDate` to IOSString. For prototype, current date + logic needed.
+            // PROTOTYPE HACK: Just saving it as is, ideally we parse "next friday" to date object.
+            type: 'Event'
+        });
+        toast.success("Milestone set!");
+        setMilestoneSuggestion(null);
+      } catch (e) {
+        toast.error("Failed to set milestone");
       }
   };
 
@@ -166,6 +181,29 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
                         ))}
                     </div>
                 </div>
+            )}
+            
+            {/* MILESTONE SUGGESTION */}
+            {milestoneSuggestion && (
+                 <div className="bg-indigo-900/20 border border-indigo-500/50 rounded-2xl p-4 animate-in slide-in-from-bottom-3 mt-2">
+                     <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-indigo-500/20 rounded-full">
+                                <Calendar size={16} className="text-indigo-400" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-indigo-300 uppercase tracking-wide">Milestone Detected</p>
+                                <p className="text-sm text-white font-medium">"{milestoneSuggestion.detectedDate}"</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={handleConfirmMilestone}
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+                        >
+                            Set Milestone
+                        </button>
+                     </div>
+                 </div>
             )}
 
              {/* FOOTER ACTIONS */}

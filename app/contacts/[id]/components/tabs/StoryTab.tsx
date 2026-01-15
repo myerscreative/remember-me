@@ -94,6 +94,41 @@ export function StoryTab({ contact }: StoryTabProps) {
         />
       </div>
 
+      {/* SECTION: MILESTONES */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 block">
+          Key Milestones
+        </label>
+        
+        <div className="space-y-3">
+            {(contact.milestones || []).length > 0 ? (
+                (contact.milestones).map((milestone: any, idx: number) => {
+                    const isUpcoming = new Date(milestone.date) > new Date();
+                    return (
+                        <div key={idx} className="flex gap-4 items-center bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                             <div className={`p-3 rounded-lg flex flex-col items-center justify-center w-14 h-14 ${isUpcoming ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-slate-800 text-slate-500'}`}>
+                                <span className="text-[10px] font-bold uppercase">{new Date(milestone.date).toLocaleString('default', { month: 'short' })}</span>
+                                <span className="text-lg font-black leading-none">{new Date(milestone.date).getDate()}</span>
+                             </div>
+                             
+                             <div className="flex-1">
+                                <h4 className={`text-sm font-bold ${isUpcoming ? 'text-white' : 'text-slate-500'}`}>{milestone.title}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full uppercase tracking-wide">{milestone.type}</span>
+                                    {!isUpcoming && <span className="text-[10px] text-emerald-500 flex items-center gap-1">Occurred</span>}
+                                </div>
+                             </div>
+                        </div>
+                    );
+                })
+            ) : (
+                <div className="text-center py-6 border border-dashed border-slate-800 rounded-xl">
+                    <p className="text-xs text-slate-500 italic">No upcoming milestones.</p>
+                </div>
+            )}
+        </div>
+      </div>
+
       {/* SECTION: THE VAULT (Shared Memories) */}
       <div>
         <div className="flex justify-between items-center mb-4">

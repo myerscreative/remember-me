@@ -62,11 +62,21 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
         </div>
 
         {/* Status Badge */}
-        <div className={`mt-3 mb-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${healthStyles.bg} ${healthStyles.text} border ${healthStyles.border}/20`}>
+        <div className={`mt-3 mb-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${healthStyles.bg} ${healthStyles.text} border ${healthStyles.border}/20 flex items-center gap-1`}>
           {healthStyles.label}
+          {/* Milestone Badge (Star) */}
+          {(contact.milestones || []).some((m: any) => {
+              const d = new Date(m.date);
+              const now = new Date();
+              const diffTime = d.getTime() - now.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+              return diffDays >= 0 && diffDays <= 7;
+          }) && (
+             <span className="ml-1 text-xs">⭐</span>
+          )}
         </div>
 
-        <h1 className="text-2xl font-bold text-white">{name}</h1>
+        <h1 className="text-2xl font-bold text-white mb-0.5">{name}</h1>
         <p className="text-slate-400 text-sm">Last Contact: {lastContact}</p>
       </section>
 
@@ -127,39 +137,73 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
         {activeTab === 'Overview' && (
           // Re-using the existing Overview Logic (Hero + Context + Details)
           <>
-            {/* HERO SECTION: AI SYNOPSIS OR RESCUE CARD */}
+            {/* HERO SECTION: AI SYNOPSIS OR RESCUE CARD OR MILESTONE HERO */}
             <section className="px-4 mb-6">
-              {health === 'neglected' ? (
-                <RescueCard 
-                  name={contact.first_name || name} 
-                  daysSince={daysSince} 
-                  sharedMemory={sharedMemory || "your last conversation"} 
-                  onDrift={handleIntentionallyDrifting}
-                />
-              ) : (
-                <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
-                    {synopsis ? (
-                        <>
-                            <div className="flex items-center gap-2 mb-2 text-indigo-400">
-                                <Info size={16} />
-                                <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
-                            </div>
-                            <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
-                                {synopsis}
-                            </p>
-                        </>
-                    ) : (
-                        <div className="text-center py-4">
-                            <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
+              {(() => {
+                  // Milestone Logic: Find closest upcoming
+                   const upcomingMilestone = (contact.milestones || [])
+                    .filter((m: any) => new Date(m.date) > new Date())
+                    .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+                   
+                   const diffDays = upcomingMilestone 
+                    ? Math.ceil((new Date(upcomingMilestone.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                    : 999;
+
+                 if (health === 'neglected') {
+                    return (
+                        <RescueCard 
+                        name={contact.first_name || name} 
+                        daysSince={daysSince} 
+                        sharedMemory={sharedMemory || "your last conversation"} 
+                        onDrift={handleIntentionallyDrifting}
+                        />
+                    );
+                 } else if (upcomingMilestone && diffDays <= 2) {
+                     // 48h Nudge Hero
+                     return (
+                         <div className="bg-indigo-900/40 border-2 border-indigo-500 rounded-2xl p-5 shadow-[0_0_20px_rgba(99,102,241,0.2)] animate-in fade-in zoom-in-95">
+                             <div className="flex items-center gap-2 mb-3">
+                                <Sparkles size={16} className="text-indigo-300 animate-pulse" />
+                                <span className="text-indigo-300 text-xs font-black uppercase tracking-widest">Big Day Approaching</span>
+                             </div>
+                             <h3 className="text-white font-bold text-lg mb-2">
+                                Today is the day {name} {upcomingMilestone.title.toLowerCase().replace('event: ','')}.
+                             </h3>
+                             <p className="text-indigo-100 text-sm leading-relaxed mb-4">
+                                Send a quick "Good luck!" text to show you remembered. It goes a long way.
+                             </p>
+                             <button onClick={() => window.open(`sms:${contact.phone}`)} className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-transform active:scale-95 shadow-lg shadow-indigo-500/20">
+                                Send Support Text
+                             </button>
+                         </div>
+                     );
+                 } else {
+                     return (
+                        <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
+                            {synopsis ? (
+                                <>
+                                    <div className="flex items-center gap-2 mb-2 text-indigo-400">
+                                        <Info size={16} />
+                                        <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+                                        {synopsis}
+                                    </p>
+                                </>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
+                                </div>
+                            )}
+                            
+                            {/* Draft Reconnection Button - Placeholder functionality or link to page */}
+                            <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
+                                Draft Reconnection
+                            </button>
                         </div>
-                    )}
-                    
-                    {/* Draft Reconnection Button - Placeholder functionality or link to page */}
-                    <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
-                        Draft Reconnection
-                    </button>
-                </div>
-              )}
+                     );
+                 }
+              })()}
             </section>
 
       {/* TAGS & INTERESTS (Horizontal Scroll) */}
