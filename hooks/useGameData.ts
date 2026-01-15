@@ -16,6 +16,8 @@ export interface GameContact {
   group: string; // Derived from tags or 'General'
   lastContactDate?: string | null;
   family?: any; // For fact match
+  ai_summary?: string; // For Garden Tooltips
+  milestones?: any[]; // For Gold Ring logic
 }
 
 export function useGameData() {
@@ -49,12 +51,14 @@ export function useGameData() {
             job_title,
             interests,
             last_interaction_date,
+            ai_summary,
             person_tags (
               tags (
                 name
               )
             ),
-            family_members // For fact match
+            family_members, // For fact match
+            milestones // For Gold Ring logic
           `)
           .eq('user_id', user.id);
 
@@ -87,7 +91,10 @@ export function useGameData() {
              tags: tags,
              group: group,
              lastContactDate: p.last_interaction_date,
-             family: p.family_members
+             family: p.family_members,
+             family: p.family_members,
+             ai_summary: p.ai_summary,
+             milestones: p.milestones || []
            };
         });
 

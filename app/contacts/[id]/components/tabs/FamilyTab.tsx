@@ -18,6 +18,7 @@ interface FamilyMember {
     name: string;
     relationship: 'Spouse' | 'Partner' | 'Child' | 'Parent' | 'Sibling' | 'Other';
     birthday?: string;
+    anniversary?: string; 
     notes?: string; 
     id?: string; // conceptual ID, currently just index in array
 }
@@ -141,6 +142,16 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                                 onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
                             />
                          </div>
+                    </div>
+                    {/* Anniversary Field */}
+                    <div className="mb-2">
+                         <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Anniversary (Yearly Reminder)</label>
+                         <input 
+                             type="date"
+                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                             value={partner.anniversary || ''}
+                             onChange={(e) => handleUpdateMember(realIdx, 'anniversary', e.target.value)}
+                         />
                     </div>
                     {/* Partner Notes */}
                     <div>

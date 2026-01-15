@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { updateStoryFields, addSharedMemory } from '@/app/actions/story-actions';
 import { Plus, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 
 interface StoryTabProps {
   contact: any;
@@ -129,6 +130,17 @@ export function StoryTab({ contact }: StoryTabProps) {
         </div>
       </div>
 
+      </div>
+
+      {/* SECTION: GIFT VAULT */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+           <GiftIcon className="w-3 h-3" /> The Gift Vault
+        </label>
+        
+        <GiftVault contactId={contact.id} initialGifts={contact.gift_ideas || []} />
+      </div>
+
       {/* SECTION: THE VAULT (Shared Memories) */}
       <div>
         <div className="flex justify-between items-center mb-4">
@@ -197,3 +209,94 @@ const MemoryItem = ({ date, text }: { date: string, text: string }) => (
     <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{text}</p>
   </div>
 );
+
+import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle } from 'lucide-react';
+import { addGiftIdea, toggleGiftStatus, GiftIdea } from '@/app/actions/gift-actions';
+
+function GiftVault({ contactId, initialGifts }: { contactId: string, initialGifts: GiftIdea[] }) {
+    const [gifts, setGifts] = useState<GiftIdea[]>(initialGifts);
+    const [newGift, setNewGift] = useState('');
+    const [isAdding, setIsAdding] = useState(false);
+
+    const handleAdd = async () => {
+        if (!newGift.trim()) return;
+        setIsAdding(true);
+        // Optimistic update
+        const tempId = Math.random().toString();
+        const optimisticGift: GiftIdea = {
+            id: tempId,
+            item: newGift,
+            status: 'idea',
+            created_at: new Date().toISOString()
+        };
+        setGifts([...gifts, optimisticGift]);
+
+        const result = await addGiftIdea(contactId, newGift);
+        if (!result.success) {
+            toast.error("Failed to add gift");
+            setGifts(gifts); // Revert
+        } else {
+             // In real app, we might want to replace tempId with real one from server or revalidate
+             setIsAdding(false);
+             setNewGift('');
+        }
+    };
+
+    const handleToggle = async (id: string, currentStatus: GiftIdea['status']) => {
+        const nextStatus = currentStatus === 'idea' ? 'purchased' : (currentStatus === 'purchased' ? 'given' : 'idea');
+        
+        const updatedGifts = gifts.map(g => g.id === id ? { ...g, status: nextStatus } : g);
+        setGifts(updatedGifts);
+
+        await toggleGiftStatus(contactId, id, nextStatus);
+    };
+
+    return (
+        <div className="space-y-4">
+             {/* Add Input */}
+             <div className="flex gap-2">
+                 <input 
+                    className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
+                    placeholder="Add a gift idea (e.g. Vintage Map, Sci-Fi Book)..."
+                    value={newGift}
+                    onChange={(e) => setNewGift(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                 />
+                 <button 
+                    onClick={handleAdd}
+                    disabled={!newGift.trim() || isAdding}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition-colors disabled:opacity-50"
+                 >
+                    {isAdding ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                 </button>
+             </div>
+
+             {/* Gift List */}
+             <div className="space-y-2">
+                 {gifts.length > 0 ? (
+                     gifts.map((gift) => (
+                         <div key={gift.id} className="flex items-center justify-between p-3 bg-slate-900/40 border border-slate-800 rounded-xl group hover:border-slate-700 transition-colors">
+                             <div className="flex items-center gap-3">
+                                 <button onClick={() => handleToggle(gift.id, gift.status)} className="text-slate-500 hover:text-indigo-400 transition-colors">
+                                     {gift.status === 'idea' && <Circle size={18} />}
+                                     {gift.status === 'purchased' && <ShoppingBag size={18} className="text-emerald-500" />}
+                                     {gift.status === 'given' && <CheckCircle size={18} className="text-slate-600" />}
+                                 </button>
+                                 <span className={cn("text-sm font-medium", gift.status === 'given' ? 'text-slate-600 line-through' : 'text-slate-300')}>
+                                     {gift.item}
+                                 </span>
+                             </div>
+                             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-600">
+                                 {gift.status}
+                             </span>
+                         </div>
+                     ))
+                 ) : (
+                    <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl">
+                        <p className="text-xs text-slate-600">No gift ideas yet.</p>
+                    </div>
+                 )}
+             </div>
+        </div>
+    );
+}

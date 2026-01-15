@@ -90,6 +90,18 @@ export default function TreeLeaf({
             style={{ animationDuration: '8s' }}
           />
         )}
+
+        {/* Anniversary Gold Ring */}
+        {contact.isAnniversary && !isSelected && (
+          <circle
+            r="16"
+            fill="none"
+            stroke="#fbbf24" 
+            strokeWidth="1.5"
+            className="animate-pulse"
+            style={{ filter: 'drop-shadow(0 0 2px #f59e0b)' }}
+          />
+        )}
       </g>
 
       {/* Initials (only visible on hover or if very large) */}
@@ -115,12 +127,20 @@ export default function TreeLeaf({
           <foreignObject x="-80" y="-80" width="160" height="60">
              <div className="bg-white rounded-lg shadow-xl border border-gray-100 p-2 text-center transform -translate-y-2">
                <p className="text-xs font-bold text-gray-800 leading-tight">{contact.name}</p>
-               <p className="text-[10px] text-gray-500">{formatRelativeTime(contact.daysAgo)}</p>
-               <div className="flex items-center justify-center gap-1 mt-1">
-                 <span className="text-[10px]">
-                    {HEALTH_LABELS[contact.healthStatus].emoji} {HEALTH_LABELS[contact.healthStatus].label}
-                 </span>
-               </div>
+                <p className="text-[10px] text-gray-500">{formatRelativeTime(contact.daysAgo)}</p>
+               
+               {/* Quick Briefing: AI Synopsis or Status */}
+               {contact.sharedMemory ? (
+                 <p className="text-[9px] text-indigo-600 mt-1 italic leading-relaxed px-1 border-t border-indigo-50 pt-1 line-clamp-3">
+                   "{contact.sharedMemory}"
+                 </p>
+               ) : (
+                 <div className="flex items-center justify-center gap-1 mt-1">
+                   <span className="text-[10px]">
+                      {HEALTH_LABELS[contact.healthStatus].emoji} {HEALTH_LABELS[contact.healthStatus].label}
+                   </span>
+                 </div>
+               )}
                {/* Arrow */}
                <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-100"></div>
              </div>

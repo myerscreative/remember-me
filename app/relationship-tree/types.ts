@@ -21,6 +21,8 @@ export interface ContactHealth {
   position: Position;
   email?: string | null;
   phone?: string | null;
+  sharedMemory?: string; // AI Synopsis or last meaningful note
+  isAnniversary?: boolean;
 }
 
 export interface TreeStats {

@@ -204,6 +204,37 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
                      );
                  }
               })()}
+              })()}
+              
+              {/* GIFT IDEA NUDGE */}
+              {(() => {
+                 const upcomingMilestone = (contact.milestones || [])
+                    .filter((m: any) => new Date(m.date) > new Date())
+                    .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+                 const navCastedContact = contact as any;
+                 const giftIdeas = (navCastedContact.gift_ideas || []).filter((g: any) => g.status === 'idea');
+                 
+                 if (upcomingMilestone && giftIdeas.length > 0) {
+                     return (
+                        <div className="mt-4 bg-pink-900/20 border border-pink-500/30 rounded-xl p-3 flex items-center justify-between animate-in slide-in-from-bottom-2">
+                           <div className="flex items-center gap-3">
+                              <div className="p-2 bg-pink-500/10 rounded-full">
+                                <Sparkles className="text-pink-400" size={16} /> 
+                              </div>
+                              <div>
+                                  <p className="text-[10px] font-bold text-pink-300 uppercase tracking-widest">Gift Idea: {upcomingMilestone.title}</p>
+                                  <p className="text-sm text-white font-medium">{giftIdeas[0].item}</p>
+                              </div>
+                           </div>
+                           <button className="text-xs bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 px-3 py-1.5 rounded-lg border border-pink-600/30 transition-colors">
+                              Use in Draft
+                           </button>
+                        </div>
+                     );
+                 }
+                 return null;
+              })()}
+
             </section>
 
       {/* TAGS & INTERESTS (Horizontal Scroll) */}

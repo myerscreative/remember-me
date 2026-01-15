@@ -238,3 +238,45 @@ export async function addSharedMemory(person_id: string, content: string) {
       return { success: false, error: message };
     }
 }
+
+export async function addInterest(contactId: string, interest: string) {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+  
+      if (!user || !user.id) throw new Error("Unauthorized");
+  
+      // Fetch current interests
+      const { data: contact, error: fetchError } = await (supabase as any)
+        .from('persons')
+        .select('interests')
+        .eq('id', contactId)
+        .eq('user_id', user.id)
+        .single();
+  
+      if (fetchError || !contact) throw fetchError || new Error("Contact not found");
+  
+      const currentInterests = Array.isArray(contact.interests) ? contact.interests : [];
+      // Avoid duplicates
+      if (currentInterests.some((i: string) => i.toLowerCase() === interest.toLowerCase())) {
+          return { success: true, message: "Interest already exists" };
+      }
+
+      const newInterests = [...currentInterests, interest];
+  
+      const { error: updateError } = await (supabase as any)
+        .from('persons')
+        .update({ interests: newInterests }) // Assuming 'interests' is the column name (text array)
+        .eq('id', contactId)
+        .eq('user_id', user.id);
+  
+      if (updateError) throw updateError;
+  
+      revalidatePath(`/contacts/${contactId}`);
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("Error adding interest:", error);
+      return { success: false, error: message };
+    }
+}

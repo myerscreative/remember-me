@@ -1,5 +1,5 @@
 
-export type EntityType = 'Family' | 'Interest' | 'Milestone' | 'Career';
+export type EntityType = 'Family' | 'Interest' | 'Milestone' | 'Career' | 'Gift';
 
 export interface ExtractedEntity {
   type: EntityType;
@@ -49,6 +49,26 @@ export const extractEntities = (text: string): ExtractedEntity[] => {
   // Matches "moving in 2 weeks", "birthday on July 5th" - very basic heuristic
   if (text.match(/\bin \d+ (week|month|day)s?/i) || text.match(/\bon (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w* \d+/i)) {
       entities.push({ type: 'Milestone', value: 'Upcoming Date', context: 'Time-sensitive event detected' });
+  }
+
+  // 5. Anniversary/Wedding Keywords
+  if (text.match(/\b(wedding|anniversary|married)\b/i)) {
+      entities.push({ type: 'Milestone', value: 'Anniversary', context: 'Relationship milestone detected' });
+  }
+
+  // 6. Gift Keywords (The Vault)
+  // Matches "loves dark chocolate", "wants a new bike", "gift for her"
+  const giftRegex = /\b(loves|wants|needs|craves|likes)\s+((?:a|an\s+)?[\w\s]{2,20})\b/gi;
+  let giftMatch;
+  while ((giftMatch = giftRegex.exec(text)) !== null) {
+      // Filter out common false positives if needed (e.g. "likes to")
+      if (giftMatch[2].trim() === 'to') continue; 
+      
+      entities.push({
+          type: 'Gift',
+          value: giftMatch[2].trim(), // The item (e.g. "dark chocolate")
+          context: `Context: ${giftMatch[0]}`
+      });
   }
 
   // Deduplicate entities by value+type

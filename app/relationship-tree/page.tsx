@@ -46,6 +46,25 @@ function transformContactsToTreeFormat(contacts: GameContact[]): ContactHealth[]
       position: { x: 0, y: 0 }, // Will be positioned by the tree
       email: '', // Not in GameContact yet, add if needed or optional
       phone: '', 
+      sharedMemory: contact.ai_summary, // AI Synopsis for Quick Briefing
+      isAnniversary: (contact.milestones || []).some((m: any) => {
+         // Check for Anniversary in title/type
+         if (!/anniversary/i.test(m.title || '') && !/anniversary/i.test(m.type || '')) return false;
+         
+         // Check if within next 7 days (ignoring year, assuming recurring)
+         const date = new Date(m.date);
+         const now = new Date();
+         const currentYearDate = new Date(now.getFullYear(), date.getMonth(), date.getDate());
+         
+         // Handle if date has passed this year, check next year? 
+         // For "Gold Ring", we only care if it's THIS week.
+         // If today is Dec 31 and anniv is Jan 1, we need to handle year wrap.
+         // Simpler: Just check difference in days from now.
+         const diffTime = currentYearDate.getTime() - now.getTime();
+         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+         
+         return diffDays >= -1 && diffDays <= 7; // -1 to handle "today" broadly or timezone edge cases
+      })
     };
   });
 }
