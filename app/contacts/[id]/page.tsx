@@ -72,6 +72,7 @@ export default function ContactDetailPage({
           .select(`
             id,
             relationship_type,
+            context,
             from_person:from_person_id(id, name, photo_url, first_name, last_name),
             to_person:to_person_id(id, name, photo_url, first_name, last_name)
           `)
@@ -87,6 +88,7 @@ export default function ContactDetailPage({
           return {
             id: rel.id,
             relationship_type: rel.relationship_type,
+            context: rel.context,
             person: otherPerson
           };
         });

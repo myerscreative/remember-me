@@ -9,6 +9,10 @@ import toast from 'react-hot-toast';
 
 // 1. Define the Relationship Health Types
 import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
+import { MemoryCapture } from './MemoryCapture';
+import { StoryTab } from './tabs/StoryTab';
+import { FamilyTab } from './tabs/FamilyTab';
+import { Sparkles, Info, X } from 'lucide-react'; // Ensure Sparkles is imported
 
 interface ProfileProps {
   contact: any;
@@ -19,7 +23,9 @@ interface ProfileProps {
 }
 
 const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemory }: ProfileProps) => {
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
   const [isLogOpen, setIsLogOpen] = useState(false);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
 
   // Health Color Logic
   const healthStyles = healthColorMap[health];
@@ -63,7 +69,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
       </section>
 
       {/* QUICK ACTIONS BAR */}
-      <nav className="grid grid-cols-4 gap-2 px-4 mb-6">
+      <nav className="grid grid-cols-5 gap-2 px-4 mb-4">
         <ActionButton 
             icon={<Phone size={20} />} 
             label="Call" 
@@ -88,47 +94,93 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
           highlight 
           onClick={() => setIsLogOpen(true)} 
         />
+        <ActionButton 
+          icon={<Sparkles size={20} />} 
+          label="Capture" 
+          highlight 
+          className="bg-gradient-to-br from-indigo-600 to-purple-600 border-none text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+          onClick={() => setIsCaptureOpen(true)}
+        />
       </nav>
 
-      {/* HERO SECTION: AI SYNOPSIS OR RESCUE CARD */}
-      <section className="px-4 mb-6">
-        {health === 'neglected' ? (
-          <RescueCard 
-            name={contact.first_name || name} 
-            daysSince={daysSince} 
-            sharedMemory={contact.deep_lore || contact.interests?.[0] || "your last conversation"} 
-            onDrift={handleIntentionallyDrifting}
-          />
-        ) : (
-          <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
-              {synopsis ? (
-                  <>
-                      <div className="flex items-center gap-2 mb-2 text-indigo-400">
-                          <Info size={16} />
-                          <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
-                          {synopsis}
-                      </p>
-                  </>
+      {/* TAB NAVIGATION */}
+      <div className="flex justify-center mb-6 border-b border-slate-800 mx-4">
+        {['Overview', 'Story', 'Family'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as any)}
+            className={`px-6 py-2 text-sm font-bold uppercase tracking-wider border-b-2 transition-colors ${
+              activeTab === tab 
+                ? 'border-indigo-500 text-indigo-400' 
+                : 'border-transparent text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* CONTENT AREA */}
+      <div className="min-h-[400px]">
+        {activeTab === 'Overview' && (
+          // Re-using the existing Overview Logic (Hero + Context + Details)
+          <>
+            {/* HERO SECTION: AI SYNOPSIS OR RESCUE CARD */}
+            <section className="px-4 mb-6">
+              {health === 'neglected' ? (
+                <RescueCard 
+                  name={contact.first_name || name} 
+                  daysSince={daysSince} 
+                  sharedMemory={sharedMemory || "your last conversation"} 
+                  onDrift={handleIntentionallyDrifting}
+                />
               ) : (
-                   <div className="text-center py-4">
-                      <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
-                   </div>
+                <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-4">
+                    {synopsis ? (
+                        <>
+                            <div className="flex items-center gap-2 mb-2 text-indigo-400">
+                                <Info size={16} />
+                                <span className="text-xs font-bold uppercase tracking-wider">AI Briefing</span>
+                            </div>
+                            <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+                                {synopsis}
+                            </p>
+                        </>
+                    ) : (
+                        <div className="text-center py-4">
+                            <p className="text-sm text-slate-400 mb-3">Add story details to generate an AI summary.</p>
+                        </div>
+                    )}
+                    
+                    {/* Draft Reconnection Button - Placeholder functionality or link to page */}
+                    <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
+                        Draft Reconnection
+                    </button>
+                </div>
               )}
-              
-              {/* Draft Reconnection Button - Placeholder functionality or link to page */}
-              <button className="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
-                  Draft Reconnection
-              </button>
-          </div>
-        )}
-      </section>
+            </section>
 
       {/* TAGS & INTERESTS (Horizontal Scroll) */}
       <section className="px-4 mb-8">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase mb-3 px-1">Context</h3>
+        <div className="flex justify-between items-center mb-3 px-1">
+             <h3 className="text-xs font-semibold text-slate-500 uppercase">Context</h3>
+             {/* Simple Add Actions - Could open modal or just trigger edit mode */}
+             <div className="flex gap-2">
+                <button onClick={() => setIsLogOpen(true)} className="text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors">
+                    + Tag
+                </button>
+             </div>
+        </div>
+        
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 mask-linear">
+          {/* Add Interest Button in-stream */}
+           <button 
+             onClick={() => setIsLogOpen(true)} // Ideally opens specific add modal, for now re-use log/edit entry point or just placeholder
+             className="shrink-0 bg-slate-800/50 border border-slate-700 border-dashed px-3 py-1 rounded-full text-xs text-slate-400 hover:text-white hover:border-indigo-500 transition-colors"
+           >
+             + Interest
+           </button>
+
           {[...(contact.tags || []), ...(contact.interests || [])].length > 0 ? (
              [...(contact.tags || []), ...(contact.interests || [])].map((tag: string, idx: number) => (
                 <span key={`${tag}-${idx}`} className="bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-xs whitespace-nowrap">
@@ -141,19 +193,49 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, sharedMemor
         </div>
       </section>
 
-      {/* DATA FOOTER (The Details) */}
-      <section className="px-4 space-y-4">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h4 className="text-xs text-slate-500 mb-2">Contact Information</h4>
-          <p className="text-sm">{contact.email || 'No email'}</p>
-          <p className="text-sm mt-2">{contact.phone || 'No phone'}</p>
-          
-           <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center bg-slate-900/50 p-2 rounded-lg">
-                <span className="text-xs text-slate-500">Frequency</span>
-                <span className="text-sm bg-slate-800 px-2 py-1 rounded text-slate-300">{contact.target_frequency_days} Days</span>
+            {/* DATA FOOTER (The Details) */}
+            <section className="px-4 space-y-4">
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+                <h4 className="text-xs text-slate-500 mb-2">Contact Information</h4>
+                <p className="text-sm">{contact.email || 'No email'}</p>
+                <p className="text-sm mt-2">{contact.phone || 'No phone'}</p>
+                
+                  <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center bg-slate-900/50 p-2 rounded-lg">
+                      <span className="text-xs text-slate-500">Frequency</span>
+                      <span className="text-sm bg-slate-800 px-2 py-1 rounded text-slate-300">{contact.target_frequency_days} Days</span>
+                  </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeTab === 'Story' && <StoryTab contact={contact} />}
+        {activeTab === 'Family' && <FamilyTab contact={contact} />}
+      </div>
+
+      {/* MEMORY CAPTURE MODAL */}
+      {isCaptureOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4" onClick={() => setIsCaptureOpen(false)}>
+           <div 
+            className="bg-[#161b22] w-full max-w-lg p-6 rounded-3xl border border-slate-700 shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()} 
+           >
+              <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold text-white">Brain Dump / Quick Capture</h2>
+                  <button onClick={() => setIsCaptureOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
+                      <X size={16} />
+                  </button>
+              </div>
+              <MemoryCapture 
+                  contactId={contact.id} 
+                  onSuccess={(field) => {
+                      setIsCaptureOpen(false);
+                      toast.success(`Captured to ${field}!`);
+                  }} 
+              />
            </div>
         </div>
-      </section>
+      )}
 
       {/* LOG INTERACTION MODAL */}
       {isLogOpen && (
@@ -225,7 +307,7 @@ const RescueCard = ({ name, daysSince, sharedMemory, onDrift }: RescuePromptProp
   );
 };
 
-const ActionButton = ({ icon, label, highlight = false, onClick, href, disabled }: any) => {
+const ActionButton = ({ icon, label, highlight = false, onClick, href, disabled, className }: any) => {
     const Component = href ? 'a' : 'button';
     return (
         <Component 
@@ -233,7 +315,7 @@ const ActionButton = ({ icon, label, highlight = false, onClick, href, disabled 
           onClick={onClick}
           disabled={disabled}
           className={`flex flex-col items-center justify-center py-3 rounded-2xl border transition-all ${
-            highlight ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400'
+            highlight ? className || 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
         >
           {icon}

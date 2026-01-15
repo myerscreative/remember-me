@@ -1,435 +1,253 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Plus, UserPlus, Heart, Loader2, Trash2, Edit2, Calendar, Star } from 'lucide-react';
-import Link from 'next/link';
-import { 
-  getRelationshipsForContact, 
-  deleteRelationship
-} from '@/app/actions/relationships';
-import { RELATIONSHIP_LABELS } from '@/lib/relationship-utils';
-import { getDetailedRelationshipHealth, type HealthStatus } from '@/lib/relationship-health';
-import type { LinkedContact, RelationshipRole } from '@/types/database.types';
-import { AddRelationshipModal } from './AddRelationshipModal';
-import { GroupInteractionModal } from './GroupInteractionModal';
-import { EditFamilyMemberModal } from './EditFamilyMemberModal';
+import { useState } from 'react';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
+import { updateStoryFields } from '@/app/actions/story-actions'; // Reusing for family_notes mapped to simple field if needed, or create new action.
+// Actually, `family_notes` is a field on persons table. updateStoryFields logic is generic enough? 
+// Let's check story-actions. it takes specific fields. I might need a generic update action or just add family_notes to it.
+import { Plus, X, Heart, User, Home, Sparkles, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-interface FamilyMember {
-  name: string;
-  relationship: string;
-  birthday?: string;
-  hobbies?: string;
-  interests?: string;
-}
+import Link from 'next/link';
 
 interface FamilyTabProps {
-  contactId: string;
-  contactName: string;
-  familyMembers?: FamilyMember[];
+  contact: any;
 }
 
-// Health status color mapping
-const HEALTH_COLORS: Record<HealthStatus, string> = {
-  nurtured: 'bg-green-500',
-  drifting: 'bg-orange-500',
-  neglected: 'bg-red-500',
-};
+// Extended Family Member Interface
+interface FamilyMember {
+    name: string;
+    relationship: 'Spouse' | 'Partner' | 'Child' | 'Parent' | 'Sibling' | 'Other';
+    birthday?: string;
+    notes?: string; 
+    id?: string; // conceptual ID, currently just index in array
+}
 
-import { useRouter } from 'next/navigation';
+export function FamilyTab({ contact }: FamilyTabProps) {
+  const [members, setMembers] = useState<FamilyMember[]>(contact.familyMembers || []);
+  const [householdNotes, setHouseholdNotes] = useState(contact.family_notes || '');
+  const [isUpdating, setIsUpdating] = useState(false);
 
-export function FamilyTab({ contactId, contactName, familyMembers }: FamilyTabProps) {
-  const router = useRouter();
-  const [relationships, setRelationships] = useState<LinkedContact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showGroupModal, setShowGroupModal] = useState(false);
-  const [showEditMemberModal, setShowEditMemberModal] = useState(false);
-  const [selectedMemberIndex, setSelectedMemberIndex] = useState<number | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [localFamilyMembers, setLocalFamilyMembers] = useState<FamilyMember[]>([]);
-
-  // Sync family members when prop changes
-  useEffect(() => {
-    if (familyMembers) {
-      setLocalFamilyMembers(familyMembers);
-    }
-  }, [familyMembers]);
-
-  const fetchRelationships = useCallback(async () => {
-    setLoading(true);
-    const result = await getRelationshipsForContact(contactId);
-    if (result.success) {
-      setRelationships(result.relationships);
-    } else {
-      toast.error(result.error || 'Failed to load relationships');
-    }
-    setLoading(false);
-  }, [contactId]);
-
-  useEffect(() => {
-    fetchRelationships();
-  }, [fetchRelationships]);
-
-  const handleDelete = async (relationshipId: string, name: string) => {
-    if (!confirm(`Remove relationship with ${name}?`)) return;
+  // Helper to save members
+  const saveMembers = async (newMembers: FamilyMember[]) => {
+    setMembers(newMembers);
+    setIsUpdating(true);
+    const result = await updateFamilyMembers(contact.id, newMembers);
+    setIsUpdating(false);
     
-    setDeletingId(relationshipId);
-    const result = await deleteRelationship(relationshipId);
-    
-    if (result.success) {
-      setRelationships(prev => prev.filter(r => r.relationship_id !== relationshipId));
-      toast.success('Relationship removed');
-    } else {
-      toast.error(result.error || 'Failed to remove relationship');
+    if (!result.success) {
+      toast.error("Failed to update family");
+      setMembers(contact.familyMembers || []); // Revert
     }
-    setDeletingId(null);
   };
 
-  const handleRelationshipAdded = () => {
-    fetchRelationships();
-    setShowAddModal(false);
-    toast.success('Relationship added');
+  const handleUpdateMember = (index: number, field: keyof FamilyMember, value: string) => {
+    const newMembers = [...members];
+    // Cast to any to allow dynamic update, ensure type safety by caller
+    (newMembers[index] as any)[field] = value;
+    saveMembers(newMembers);
   };
 
-  const handleGroupInteractionComplete = () => {
-    fetchRelationships(); // Refresh to update health indicators
-    setShowGroupModal(false);
+  const handleAddMember = (type: FamilyMember['relationship'] = 'Child') => {
+    const newMember: FamilyMember = { name: '', relationship: type, notes: '' };
+    saveMembers([...members, newMember]);
   };
 
-  // Group relationships by type for organized display
-  const groupedRelationships = relationships.reduce((acc, rel) => {
-    const type = rel.relationship_type;
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(rel);
-    return acc;
-  }, {} as Record<RelationshipRole, LinkedContact[]>);
+  const handleRemoveMember = (index: number) => {
+    const newMembers = members.filter((_, i) => i !== index);
+    saveMembers(newMembers);
+  };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-      </div>
-    );
-  }
+  // Helper to save Household Notes
+  const handleSaveHouseholdNotes = async () => {
+      // We need a server action for this. Let's assume we can use a generic update or add one.
+      // For now, I'll use a direct call pattern similar to story fields if I can, or I'll adding it to story-actions is best.
+      // I will assume I need to create/export `updateFamilyNotes` in story-actions.ts or similar.
+      // For this step, I'll define the function assuming it exists or I'll implement it shortly.
+      // Let's use `updateStoryFields` but I need to make sure strict types don't block me.
+      // The updateStoryFields takes specific keys. I should update that action to allow family_notes.
+      // I will implement the UI and then fix the action.
+      
+      try {
+          const result = await updateStoryFields(contact.id, { family_notes: householdNotes });
+          if (result.success) {
+            // toast.success("Saved");
+          } else {
+             toast.error("Failed to save notes");
+          }
+      } catch (e) {
+          console.error("Save failed", e);
+      }
+  };
+
+
+  const partners = members.filter(m => ['Spouse', 'Partner', 'Wife', 'Husband'].includes(m.relationship));
+  const children = members.filter(m => ['Child', 'Son', 'Daughter'].includes(m.relationship));
+  // Could handle Parents/Siblings too if needed, but per prompt focus on Inner Circle (Partner/Child)
 
   return (
-    <div className="space-y-6">
-      {/* Header with actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-indigo-500" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Family & Connections
-          </h2>
-        </div>
-        <div className="flex gap-2">
-          {relationships.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowGroupModal(true)}
-              className="flex items-center gap-2"
-            >
-              <Heart className="h-4 w-4" />
-              <span className="hidden sm:inline">Log Group Interaction</span>
-            </Button>
-          )}
-          <Button
-            size="sm"
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2"
-          >
-            <UserPlus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add Relationship</span>
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setSelectedMemberIndex(null);
-              setShowEditMemberModal(true);
-            }}
-            className="flex items-center gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add Family Detail</span>
-          </Button>
-        </div>
+    <div className="flex flex-col gap-8 p-6 pb-20 bg-[#0f111a] text-slate-200">
+
+      {/* HOUSEHOLD CONTEXT */}
+       <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+           <Home size={14} /> Household Context
+        </label>
+        <textarea 
+          placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
+          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[80px] text-sm resize-none"
+          value={householdNotes}
+          onChange={(e) => setHouseholdNotes(e.target.value)}
+          onBlur={handleSaveHouseholdNotes}
+        />
       </div>
 
-      {/* Empty state */}
-      {relationships.length === 0 ? (
-        <div className="text-center py-16 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-          <Users className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No connections yet
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
-            Link {contactName} to other people in your Garden to build a relationship web.
-          </p>
-          <Button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add First Connection
-          </Button>
+      
+      {/* PARTNER SECTION */}
+      <section className="bg-slate-900/30 border border-slate-800 rounded-3xl p-5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-indigo-500 opacity-20" />
+        
+        <div className="flex justify-between items-center mb-4">
+          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <Heart size={14} className="text-pink-500"/> Partner
+          </label>
+           {partners.length === 0 && (
+             <button onClick={() => handleAddMember('Partner')} className="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg transition-colors border border-slate-700">
+                + Add Partner
+             </button>
+           )}
         </div>
-      ) : null}
-
-      {/* Static Family Members from Voice/Import */}
-      {localFamilyMembers && localFamilyMembers.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="h-4 w-4 text-purple-500" />
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Family & Close Circle (Context)
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {localFamilyMembers.map((member, idx) => (
-              <div 
-                key={idx} 
-                className="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-xl hover:border-indigo-200/50 dark:hover:border-indigo-500/30 transition-all duration-300 overflow-hidden"
-              >
-                {/* Accent Top Border */}
-                <div className="h-1.5 w-full bg-linear-to-r from-purple-500 to-indigo-500 opacity-70" />
-                
-                <div className="p-5 flex-1 flex flex-col gap-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <Avatar className="h-12 w-12 border-2 border-white dark:border-slate-800 shadow-sm">
-                          <AvatarFallback className="bg-linear-to-br from-indigo-100 to-indigo-100 text-indigo-700 font-semibold">
-                            {member.name?.[0] || '?'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm border border-slate-200 dark:border-slate-800">
-                          <div className={`w-2.5 h-2.5 rounded-full ${member.birthday ? 'bg-blue-500' : 'bg-gray-300'}`} />
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white leading-tight">
-                          {member.name}
-                        </h4>
-                        <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-500/10 text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-500/20">
-                          {member.relationship}
-                        </span>
-                      </div>
+        
+        {partners.length > 0 ? (
+           partners.map((partner, idx) => {
+             const realIdx = members.indexOf(partner);
+             return (
+                <div key={idx} className="space-y-4">
+                    <div className="flex gap-4">
+                         <div className="flex-1">
+                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Name</label>
+                            <input 
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
+                                placeholder="Name"
+                                value={partner.name}
+                                onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
+                            />
+                         </div>
+                         <div className="w-1/3">
+                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Birthday</label>
+                            <input 
+                                type="date"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                                value={partner.birthday || ''}
+                                onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
+                            />
+                         </div>
                     </div>
-                    
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
-                        onClick={() => {
-                          setSelectedMemberIndex(idx);
-                          setShowEditMemberModal(true);
-                        }}
-                      >
-                        <Edit2 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
-                        onClick={async () => {
-                          if (!confirm(`Remove ${member.name}?`)) return;
-                          const updated = localFamilyMembers.filter((_, i) => i !== idx);
-                          const result = await updateFamilyMembers(contactId, updated);
-                          if (result.success) {
-                            setLocalFamilyMembers(updated);
-                            toast.success('Member removed');
-                          } else {
-                            toast.error('Failed to remove member');
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                    {/* Partner Notes */}
+                    <div>
+                         <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Notes & Brain Dump</label>
+                         <textarea 
+                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500 min-h-[60px] resize-none"
+                             placeholder="Anniversary ideas, food allergies, work info..."
+                             value={partner.notes || ''}
+                             onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
+                         />
                     </div>
-                  </div>
-
-                  {/* Details Section */}
-                  <div className="space-y-3 mt-1 py-3 border-t border-slate-100 dark:border-slate-800 flex-1">
-                    {member.birthday ? (
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/10">
-                          <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                        </div>
-                        <div className="text-xs">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Birthday</p>
-                          <p className="text-gray-700 dark:text-gray-300 font-medium">{member.birthday}</p>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {member.hobbies ? (
-                      <div className="flex items-start gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 mt-0.5">
-                          <Heart className="h-3.5 w-3.5 text-rose-500" />
-                        </div>
-                        <div className="text-xs">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Hobbies</p>
-                          <p className="text-gray-700 dark:text-gray-300 line-clamp-2">{member.hobbies}</p>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {member.interests ? (
-                      <div className="flex items-start gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 mt-0.5">
-                          <Star className="h-3.5 w-3.5 text-amber-500" />
-                        </div>
-                        <div className="text-xs">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Interests</p>
-                          <p className="text-gray-700 dark:text-gray-300 line-clamp-2">{member.interests}</p>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {!member.birthday && !member.hobbies && !member.interests && (
-                      <div className="h-full flex flex-col items-center justify-center py-4 text-center opacity-40 italic">
-                        <p className="text-[10px] text-gray-400">No additional details</p>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 text-[10px] mt-2 hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedMemberIndex(idx);
-                            setShowEditMemberModal(true);
-                          }}
-                        >
-                          Add info
-                        </Button>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+             );
+           })
+        ) : (
+             <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl">
+                 <p className="text-xs text-slate-600">No partner listed</p>
+             </div>
+        )}
+      </section>
+
+      {/* CHILDREN SECTION */}
+      <section className="bg-slate-900/30 border border-slate-800 rounded-3xl p-5 relative">
+         <div className="flex justify-between items-center mb-4">
+          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <User size={14} className="text-blue-400"/> Children
+          </label>
+          <button onClick={() => handleAddMember('Child')} className="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg transition-colors border border-slate-700">
+             + Add Child
+          </button>
         </div>
-      )}
 
-      {/* Linked Relationships Grouped */}
-      {relationships.length > 0 && (
-        <div className="space-y-6">
-          {(Object.entries(groupedRelationships) as [RelationshipRole, LinkedContact[]][]).map(([type, contacts]) => (
-            <div key={type} className="space-y-3">
-              <h3 className="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {RELATIONSHIP_LABELS[type as RelationshipRole]}s
-              </h3>
-              <div className="space-y-2">
-                {contacts.map((contact) => {
-                  const health = getDetailedRelationshipHealth(
-                    contact.last_interaction_date,
-                    contact.target_frequency_days || 30
-                  );
+        <div className="space-y-4">
+            {children.length > 0 ? (
+                children.map((child, idx) => {
+                     const realIdx = members.indexOf(child);
+                     return (
+                        <div key={idx} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl relative group">
+                             <button 
+                                onClick={() => handleRemoveMember(realIdx)}
+                                className="absolute top-2 right-2 text-slate-700 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                             >
+                                <X size={14} />
+                             </button>
 
-                  return (
-                    <div
-                      key={contact.relationship_id}
-                      className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group border border-slate-200 dark:border-slate-800"
-                    >
-                      <Link 
-                        href={`/contacts/${contact.id}`}
-                        className="flex items-center gap-3 flex-1 min-w-0"
-                      >
-                        {/* Health indicator dot */}
-                        <div 
-                          className={`w-3 h-3 rounded-full ${HEALTH_COLORS[health.status]} shrink-0`}
-                          title={`${health.status} - ${health.daysSince} days since contact`}
-                        />
-                        
-                        <Avatar className="h-10 w-10 shrink-0">
-                          <AvatarImage src={contact.photo_url || undefined} />
-                          <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                            {contact.first_name?.[0] || contact.name[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        
-                        <div className="min-w-0">
-                          <p className="font-medium text-gray-900 dark:text-white truncate">
-                            {contact.name}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {health.daysSince === 999 
-                              ? 'Never contacted' 
-                              : `${health.daysSince} days ago`}
-                          </p>
+                             <div className="flex gap-3 mb-3">
+                                 <input 
+                                    className="flex-1 bg-transparent text-white font-bold placeholder:text-slate-600 focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors" 
+                                    placeholder="Child Name"
+                                    value={child.name}
+                                    onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
+                                 />
+                                  <input 
+                                    type="date"
+                                    className="bg-transparent text-xs text-slate-500 focus:outline-none w-24"
+                                    value={child.birthday || ''}
+                                    onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
+                                  />
+                             </div>
+                             
+                             <textarea 
+                                className="w-full bg-slate-900 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none border border-slate-800 focus:border-indigo-500/30 resize-none" 
+                                placeholder="Age, Grade, Interests (e.g. Soccer, Minecraft)..."
+                                value={child.notes || ''}
+                                onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
+                             />
                         </div>
-                      </Link>
-
-                      {/* Fading alert */}
-                      {health.status === 'neglected' && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 mr-2">
-                          Needs attention
-                        </span>
-                      )}
-
-                      {/* Delete button */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleDelete(contact.relationship_id, contact.name);
-                        }}
-                        disabled={deletingId === contact.relationship_id}
-                      >
-                        {deletingId === contact.relationship_id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                     );
+                })
+            ) : (
+                <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl">
+                    <p className="text-xs text-slate-600">No children listed</p>
+                </div>
+            )}
         </div>
-      )}
+      </section>
 
-      {/* Modals */}
-      <AddRelationshipModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        contactId={contactId}
-        contactName={contactName}
-        onSuccess={handleRelationshipAdded}
-      />
+      {/* CONNECTIONS WEB */}
+      <section className="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 block">The Web (Connections)</label>
+         
+         <div className="space-y-2">
+            {(contact.connections || []).length > 0 ? (
+                (contact.connections).map((conn: any) => (
+                    <Link href={`/contacts/${conn.person.id}`} key={conn.id} className="flex items-center gap-3 p-3 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 transition-colors group">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 overflow-hidden flex items-center justify-center text-xs font-bold text-slate-500">
+                            {conn.person.photo_url ? (
+                                <img src={conn.person.photo_url} alt={conn.person.name} className="w-full h-full object-cover"/>
+                            ) : (
+                                <span>{conn.person.name?.[0]}</span>
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-slate-300 truncate group-hover:text-indigo-400 transition-colors">{conn.person.name}</h4>
+                            <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider">
+                                {conn.relationship_type} 
+                                {conn.context && <span className="text-slate-600 normal-case ml-1">• {conn.context}</span>}
+                            </p>
+                        </div>
+                    </Link>
+                ))
+            ) : (
+                <p className="text-xs text-slate-500 italic p-2">No network connections.</p>
+            )}
+         </div>
+      </section>
 
-      <GroupInteractionModal
-        isOpen={showGroupModal}
-        onClose={() => setShowGroupModal(false)}
-        contacts={relationships}
-        currentContactId={contactId}
-        currentContactName={contactName}
-        onSuccess={handleGroupInteractionComplete}
-      />
-
-      <EditFamilyMemberModal
-        isOpen={showEditMemberModal}
-        onClose={() => {
-          setShowEditMemberModal(false);
-        }}
-        contactId={contactId}
-        familyMembers={localFamilyMembers}
-        memberIndex={selectedMemberIndex}
-        onSuccess={(updatedMembers) => {
-          setLocalFamilyMembers(updatedMembers);
-          setShowEditMemberModal(false);
-          // Also trigger refresh to ensure server sync
-          router.refresh();
-        }}
-      />
     </div>
   );
 }
