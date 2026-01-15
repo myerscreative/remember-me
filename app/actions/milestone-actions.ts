@@ -1,6 +1,6 @@
-'use client';
+'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export interface Milestone {
@@ -23,7 +23,7 @@ export async function addMilestone(contactId: string, milestone: Omit<Milestone,
 
     // Facade: We are storing milestones in a 'milestones' JSONB column on the persons table.
     // 1. Fetch existing
-    const { data: person, error: fetchError } = await supabase
+    const { data: person, error: fetchError } = await (supabase as any)
       .from('persons')
       .select('milestones')
       .eq('id', contactId)
@@ -31,7 +31,7 @@ export async function addMilestone(contactId: string, milestone: Omit<Milestone,
 
     if (fetchError) throw fetchError;
 
-    const existingMilestones: Milestone[] = (person.milestones as any) || [];
+    const existingMilestones: Milestone[] = ((person as any)?.milestones) || [];
     
     // 2. Add new
     const newMilestone: Milestone = {
@@ -43,7 +43,7 @@ export async function addMilestone(contactId: string, milestone: Omit<Milestone,
     const updatedMilestones = [...existingMilestones, newMilestone];
 
     // 3. Update
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({ milestones: updatedMilestones })
       .eq('id', contactId);

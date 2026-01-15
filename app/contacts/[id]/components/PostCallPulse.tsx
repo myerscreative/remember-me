@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { extractEntities, extractMilestones, ExtractedEntity } from '@/lib/entity-extractor';
 import { addSharedMemory, updateStoryFields } from '@/app/actions/story-actions'; 
 import { addMilestone } from '@/app/actions/milestone-actions';
