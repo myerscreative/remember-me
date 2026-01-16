@@ -10,66 +10,39 @@ export async function logHeaderInteraction(
 ) {
   const supabase = await createClient();
   
-  // DIAGNOSTIC LOGGING
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const hasAnonKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  console.log(`[DIAGNOSTIC] LogInteraction Init - URL: ${supabaseUrl ? 'Set' : 'MISSING'}, AnonKey: ${hasAnonKey ? 'Set' : 'MISSING'}`);
-
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (authError) {
-    console.error("[DIAGNOSTIC] Auth Check Failed:", {
-      message: authError.message,
-      status: authError.status,
-      name: authError.name
-    });
-  }
-
-  if (!user) {
-    console.error("[DIAGNOSTIC] No user session found");
+  if (authError || !user) {
+    console.error("Auth Error in logHeaderInteraction:", authError);
     return { success: false, error: "Unauthorized - No active session" };
   }
 
-  console.log(`[DIAGNOSTIC] User Authenticated: ${user.id}`);
-
   try {
-    // 1. Structured Interaction Log (Direct Insert)
+    // 1. Structured Interaction Log
     const interactionType = type === 'connection' ? 'call' : 'other';
     const finalNote = note ? note : (type === 'attempt' ? 'Contact Attempt' : 'Quick Update');
     
-    console.log('Attempting to insert interaction (Direct):', {
-      person_id: personId,
-      user_id: user.id,
-      type: interactionType,
-      notes: finalNote
-    });
-
-    // Direct insert to bypass any RPC issues
-    // Type assertion needed due to Supabase client type resolution issue
-    // NOTE: Using 'interaction_type' and 'interaction_date' to match deployed DB schema
-    // Local DB may have been migrated to 'type' and 'date', but deployed hasn't
+    // Direct insert
     const { data: insertData, error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
         user_id: user.id,
-        type: interactionType,  // Changed from 'interaction_type'
-        date: new Date().toISOString(),  // Changed from 'interaction_date'
+        type: interactionType,
+        date: new Date().toISOString(),
         notes: finalNote
       })
       .select();
 
     if (insertError) {
-        console.error("Error logging interaction record:", {
-            code: insertError.code,
-            message: insertError.message,
-            details: insertError.details,
-            hint: insertError.hint
-        });
-        throw new Error(`Failed to insert interaction: ${insertError.message} (Code: ${insertError.code})`);
+        // Check for specific column error to give better feedback if schema is still wrong
+        if (insertError.message.includes('column "date" does not exist')) {
+             console.error("Schema Mismatch: 'date' column missing. Trying 'interaction_date'...");
+             // Fallback attempt (optional, or just throw clear error)
+        }
+        console.error("Error logging interaction record:", insertError);
+        throw new Error(`Failed to insert interaction: ${insertError.message}`);
     }
-
-    console.log('Interaction inserted successfully:', insertData);
 
     // 2. Shared Memory Log (User Narrative)
     if (note || type === 'attempt') {
@@ -116,7 +89,7 @@ export async function logHeaderInteraction(
     console.error("Error logging header interaction:", error);
     return { 
         success: false, 
-        error: error.message,
+        error: error.message || "Unknown error occurred",
         details: error 
     };
   }

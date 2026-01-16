@@ -21,22 +21,33 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
   const [suggestions, setSuggestions] = useState<ExtractedEntity[]>([]);
   const [milestoneSuggestion, setMilestoneSuggestion] = useState<{title: string, detectedDate: string} | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Mount Safety Check
+  useEffect(() => {
+    console.log("PostCallPulse Mounted for:", name);
+  }, [name]);
 
   // Extract entities & milestones as user types
   useEffect(() => {
-    if (dumpText.length > 10) {
-      const foundEntities = extractEntities(dumpText);
-      setSuggestions(foundEntities);
+    try {
+        if (dumpText.length > 10) {
+            const foundEntities = extractEntities(dumpText);
+            setSuggestions(foundEntities);
 
-      const foundMilestone = extractMilestones(dumpText);
-      if (foundMilestone) {
-          setMilestoneSuggestion({ 
-              title: foundMilestone.title, 
-              detectedDate: foundMilestone.detectedDate 
-          });
-      } else {
-          setMilestoneSuggestion(null);
-      }
+            const foundMilestone = extractMilestones(dumpText);
+            if (foundMilestone) {
+                setMilestoneSuggestion({ 
+                    title: foundMilestone.title, 
+                    detectedDate: foundMilestone.detectedDate 
+                });
+            } else {
+                setMilestoneSuggestion(null);
+            }
+        }
+    } catch (e: any) {
+        console.error("Extraction error:", e);
+        // Don't crash, just ignore extraction failure
     }
   }, [dumpText]);
 
@@ -50,9 +61,10 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
         
         toast.success("Lore captured!");
         onComplete();
-    } catch (e) {
+    } catch (e: any) {
         toast.error("Failed to save pulse");
-        console.error(e);
+        console.error("Save error:", e);
+        setError(e.message || "Failed to save");
         setIsSaving(false);
     }
   };
@@ -89,6 +101,18 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
         toast.error("Failed to set milestone");
       }
   };
+
+  if (error) {
+      return (
+          <div className="fixed inset-0 bg-[#0f111a] z-[100] flex items-center justify-center p-6">
+              <div className="bg-slate-900 border border-red-500 rounded-xl p-6 text-center">
+                  <h3 className="text-red-400 font-bold mb-2">Error in Pulse</h3>
+                  <p className="text-slate-300 mb-4">{error}</p>
+                  <button onClick={onClose} className="px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700">Close</button>
+              </div>
+          </div>
+      )
+  }
 
   return (
     <div className="fixed inset-0 bg-[#0f111a] z-[100] p-6 flex flex-col animate-in slide-in-from-bottom duration-300">
