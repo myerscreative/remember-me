@@ -54,15 +54,32 @@ export default function ContactDetailPage({
       toast.success('AI summary refreshed!', { id: 'ai-refresh' });
 
       // Update the contact state with all three summary levels
-      setContact((prev: any) => ({
-        ...prev,
-        ai_summary: data.summary_default,
-        relationship_summary: data.summary_default,
-        summary_micro: data.summary_micro,
-        summary_default: data.summary_default,
-        summary_full: data.summary_full,
-        updated_at: new Date().toISOString()
-      }));
+      // Update the contact state with all three summary levels
+      setContact((prev: any) => {
+        // Create a temporary object with the new summaries to calculate the correct display text
+        const updatedFields = {
+            summary_micro: data.summary_micro,
+            summary_default: data.summary_default,
+            summary_full: data.summary_full,
+            relationship_summary: data.summary_default,
+        };
+
+        const tempContactForCalc = { ...prev, ...updatedFields };
+        const summaryText = getSummaryAtLevel(tempContactForCalc, effectiveSummaryLevel);
+
+        // Preserve the memory prefix if it exists
+        const latestMemory = prev.shared_memories?.[0]?.content;
+        const enhancedAiSummary = latestMemory
+            ? `**Most Recent Memory:** ${latestMemory}\n\n${summaryText}`
+            : summaryText;
+
+        return {
+            ...prev,
+            ...updatedFields,
+            ai_summary: enhancedAiSummary,
+            updated_at: new Date().toISOString()
+        };
+      });
     } catch (error) {
       console.error('Error refreshing AI summary:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to refresh AI summary', { id: 'ai-refresh' });
