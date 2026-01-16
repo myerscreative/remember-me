@@ -13,6 +13,8 @@ import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import { PostCallPulse } from './PostCallPulse';
 import { SummaryLevel } from '@/lib/utils/summary-levels';
+import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { updateContact } from '@/app/actions/update-contact';
 
 export interface Contact {
   id: string;
@@ -50,9 +52,21 @@ interface ProfileProps {
 
 const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLevel = 'default', onRefreshAISummary }: ProfileProps) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
-  const [isLogOpen, setIsLogOpen] = useState(false);
+  // const [isLogOpen, setIsLogOpen] = useState(false); // Deprecated modal state
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPulseOpen, setIsPulseOpen] = useState(false);
+  
+  // Inline Logging State
+  const [logNote, setLogNote] = useState("");
+  const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
+  const [isLogging, setIsLogging] = useState(false);
+
+  // Edit Contact Info State
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [editForm, setEditForm] = useState({ 
+      email: contact.email || '', 
+      phone: contact.phone || '' 
+  });
 
   // Health Color Logic
   const healthStyles = healthColorMap[health];
@@ -69,12 +83,54 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
     return Math.floor((renderTime - lastInteraction) / (1000 * 60 * 60 * 24));
   }, [lastContact, contact.last_interaction_date, renderTime]);
 
+  const handleLogInteraction = async () => {
+    if (!logNote.trim()) return;
+    
+    setIsLogging(true);
+    try {
+        const result = await logHeaderInteraction(contact.id, logType, logNote);
+        if (result.success) {
+            toast.success(logType === 'connection' ? 'Connection logged!' : 'Attempt logged');
+            setLogNote("");
+            if (logType === 'connection') {
+                // Ideally refresh stats or open pulse
+                if (onRefreshAISummary) onRefreshAISummary(); // Optional: misuse of refresh to trigger update? better to reload page or use router
+                window.location.reload(); // Simple reload to update stats
+            } else {
+                 setLogNote(""); // Just clear for attempt
+            }
+        } else {
+            toast.error(result.error || 'Failed to log interaction');
+        }
+    } catch (e) {
+        console.error(e);
+        toast.error('An error occurred');
+    } finally {
+        setIsLogging(false);
+    }
+  };
+
+  const handleSaveContactInfo = async () => {
+      try {
+          const result = await updateContact(contact.id, editForm);
+          if (result.success) {
+              toast.success('Contact details updated');
+              setIsEditingInfo(false);
+              window.location.reload(); 
+          } else {
+              toast.error(result.error || 'Failed to update');
+          }
+      } catch (e) {
+          toast.error('An error occurred');
+      }
+  };
+
   return (
     <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 max-w-[1200px]">
       
       {/* TABS - Left Column Top */}
       <div className="lg:col-span-1 sticky top-0 z-100 bg-[#0f1419] border-b border-[#2d3748] lg:static lg:bg-transparent lg:border-none lg:mb-2">
-        <div className="flex w-full lg:w-auto overflow-x-auto justify-start px-4 lg:px-0">
+        <div className="flex w-full lg:w-auto overflow-x-auto justify-start px-4 lg:px-0 gap-6">
           {(['Overview', 'Story', 'Family'] as const).map((tab) => (
             <button
               key={tab}
@@ -151,26 +207,72 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
 
                 {/* Contact Info Inline */}
                 <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
-                    <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2">Contact Information</div>
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">Contact Information</div>
+                        <button 
+                            onClick={() => {
+                                if (isEditingInfo) {
+                                    // Cancel
+                                    setIsEditingInfo(false);
+                                    setEditForm({ email: contact.email || '', phone: contact.phone || '' });
+                                } else {
+                                    setIsEditingInfo(true);
+                                }
+                            }}
+                            className="text-[11px] text-[#60a5fa] hover:text-[#93c5fd] font-medium transition-colors"
+                        >
+                            {isEditingInfo ? 'Cancel' : 'Edit'}
+                        </button>
+                    </div>
+                    
                     <div className="flex flex-col">
                         <div className="flex items-center gap-3 py-3 border-b border-[#2d3748]">
                             <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">✉️</div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Email</div>
-                                <div className={`text-[14px] truncate ${!contact.email ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
-                                    {contact.email || 'No email'}
-                                </div>
+                                {isEditingInfo ? (
+                                    <input 
+                                        type="email"
+                                        className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                        value={editForm.email}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                                        placeholder="email@example.com"
+                                    />
+                                ) : (
+                                    <div className={`text-[14px] truncate ${!contact.email ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
+                                        {contact.email || 'No email'}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-3 py-3">
                             <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">📞</div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Phone</div>
-                                <div className={`text-[14px] truncate ${!contact.phone ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
-                                    {contact.phone || 'No phone'}
-                                </div>
+                                {isEditingInfo ? (
+                                    <input 
+                                        type="tel"
+                                        className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                        value={editForm.phone}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                                        placeholder="+1 234 567 8900"
+                                    />
+                                ) : (
+                                    <div className={`text-[14px] truncate ${!contact.phone ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
+                                        {contact.phone || 'No phone'}
+                                    </div>
+                                )}
                             </div>
                         </div>
+
+                        {isEditingInfo && (
+                            <button 
+                                onClick={handleSaveContactInfo}
+                                className="mt-3 w-full py-2 bg-[#60a5fa] hover:bg-[#3b82f6] text-white rounded-lg text-[13px] font-bold transition-all shadow-lg shadow-blue-900/20"
+                            >
+                                Save Changes
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -203,21 +305,49 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                     <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3">Log Interaction</div>
                     
                     <textarea 
-                        className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b]" 
+                        className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors" 
                         placeholder="What did you discuss?"
-                        onClick={() => setIsLogOpen(true)}
-                        readOnly
+                        value={logNote}
+                        onChange={(e) => setLogNote(e.target.value)}
                     />
                     
-                    <div className="grid grid-cols-2 gap-2.5">
-                        <button onClick={() => setIsLogOpen(true)} className="bg-[#2d3748] hover:bg-[#3d4758] text-[#fbbf24] py-3.5 rounded-xl text-[14px] font-bold transition-all">📝 Attempt</button>
-                        <button onClick={() => setIsLogOpen(true)} className="bg-[#10b981] hover:bg-[#059669] text-white py-3.5 rounded-xl text-[14px] font-bold transition-all">✅ Connected</button>
+                    <div className="grid grid-cols-2 gap-2.5 mb-4">
+                        <button 
+                            onClick={() => setLogType('attempt')}
+                            className={`py-2.5 rounded-xl text-[13px] font-bold transition-all border ${
+                                logType === 'attempt' 
+                                ? 'bg-[#2d3748]/50 border-[#fbbf24] text-[#fbbf24]' 
+                                : 'bg-[#0f1419] border-transparent text-[#64748b] hover:bg-[#2d3748]'
+                            }`}
+                        >
+                            📝 Attempt
+                        </button>
+                        <button 
+                            onClick={() => setLogType('connection')}
+                            className={`py-2.5 rounded-xl text-[13px] font-bold transition-all border ${
+                                logType === 'connection' 
+                                ? 'bg-[#10b981]/10 border-[#10b981] text-[#10b981]' 
+                                : 'bg-[#0f1419] border-transparent text-[#64748b] hover:bg-[#2d3748]'
+                            }`}
+                        >
+                            ✅ Connected
+                        </button>
                     </div>
+
+                    <button 
+                        onClick={handleLogInteraction}
+                        disabled={isLogging || !logNote.trim()}
+                        className="w-full py-3 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-[14px] font-bold transition-all shadow-lg shadow-purple-900/20 active:translate-y-0.5"
+                    >
+                        {isLogging ? 'Saving...' : 'Log Interaction'}
+                    </button>
 
                     <div className="mt-4 pt-4 border-t border-[#2d3748]">
                         <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2.5">Recent Activity ({contact.interactions?.length || 0})</div>
                         {(contact.interactions?.length || 0) > 0 ? (
-                            <p className="text-[#cbd5e1] text-[13px] leading-snug">Last connected {lastContact.toLowerCase()} via phone call</p>
+                            <p className="text-[#cbd5e1] text-[13px] leading-snug">
+                                {new Date(contact.interactions![0].date).toLocaleDateString()} - {contact.interactions![0].notes || 'No notes'}
+                            </p>
                         ) : (
                             <div className="text-[#64748b] text-[13px] italic">No interactions logged yet</div>
                         )}
@@ -319,33 +449,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
         </div>
       )}
 
-      {isLogOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-50 backdrop-blur-sm" onClick={() => setIsLogOpen(false)}>
-          <div 
-            className="bg-[#161b22] w-full md:max-w-lg max-h-[90vh] lg:max-h-[85vh] overflow-y-auto p-6 rounded-t-3xl md:rounded-3xl border border-slate-700 animate-in slide-in-from-bottom md:zoom-in-95 duration-300"
-            onClick={(e) => e.stopPropagation()} 
-          >
-            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-6 md:hidden" />
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold">Log Interaction</h2>
-                <button onClick={() => setIsLogOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
-                    <X size={16} />
-                </button>
-            </div>
-            
-            <InteractionLogger 
-                contactId={contact.id} 
-                contactName={name}
-                photoUrl={contact.photo_url || contact.avatar_url}
-                healthStatus={health || 'drifting'}
-                onSuccess={() => {
-                   setIsLogOpen(false);
-                   setIsPulseOpen(true);
-                }}
-            />
-          </div>
-        </div>
-      )}
+
 
       {isPulseOpen && (
         <PostCallPulse 
