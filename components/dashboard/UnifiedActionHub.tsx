@@ -221,7 +221,6 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
               personId: person.id,
               type: selectedType,
               note: note.trim() || undefined,
-              nextGoal: nextGoal.trim() || undefined // Pass next goal
           });
 
           // 3. Update 'The Story' if note exists (Per user request for unified persistence)
