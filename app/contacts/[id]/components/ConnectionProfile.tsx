@@ -112,7 +112,9 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     } catch (error) {
         console.error('Error logging interaction:', error);
         console.error('Error logging interaction:', error);
-        alert(`Failed to log interaction: ${(error as Error).message}`);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorDetails = error instanceof Error && (error as any).details ? JSON.stringify((error as any).details, null, 2) : '';
+        alert(`Failed to log interaction:\nMessage: ${errorMessage}\nDetails: ${errorDetails}`);
     } finally {
         setIsLogging(false);
     }
