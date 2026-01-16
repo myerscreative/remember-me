@@ -29,6 +29,14 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [headerForm, setHeaderForm] = useState({
+      first_name: contact.first_name || '',
+      last_name: contact.last_name || '',
+      company: contact.company || '',
+      job_title: contact.job_title || '',
+      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+  });
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editForm, setEditForm] = useState({
       email: contact.email || '',
@@ -103,14 +111,32 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         window.location.reload();
     } catch (error) {
         console.error('Error logging interaction:', error);
-        alert('Failed to log interaction. Please try again.');
+        console.error('Error logging interaction:', error);
+        alert(`Failed to log interaction: ${(error as Error).message}`);
     } finally {
         setIsLogging(false);
     }
   };
 
+
+  const handleSaveHeader = async () => {
+    try {
+        const result = await updateContact(contact.id, headerForm);
+        if (result.success) {
+            setIsEditingHeader(false);
+            window.location.reload();
+        } else {
+            alert('Failed to update profile header');
+        }
+    } catch (error) {
+        console.error('Error saving header:', error);
+        alert('An error occurred while saving');
+    }
+  };
+
   const handleSaveContactInfo = async () => {
       try {
+          // Use editForm which contains email/phone
           const result = await updateContact(contact.id, editForm);
 
           if (result.success) {
@@ -125,15 +151,79 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       }
   };
 
+  // Health Score Dates
+  const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
+  const nextDueDate = lastContactDate && contact.target_frequency_days 
+    ? new Date(lastContactDate.getTime() + (contact.target_frequency_days * 24 * 60 * 60 * 1000)) 
+    : null;
+
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
 
       {/* LEFT COLUMN */}
-      <div className="flex flex-col gap-5 px-4 lg:px-0">
+      <div className="flex flex-col gap-8 px-4 lg:px-0">
+        
+        {/* Navigation Tabs - Moved to Top of Main Column */}
+        <div className="bg-[#1a1f2e] rounded-2xl p-1 border border-slate-800/50 flex transition-all shadow-lg shadow-black/20 backdrop-blur-xl gap-2">
+            <button 
+              onClick={() => setActiveTab('Overview')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Overview' 
+                  ? 'bg-[#2d3748] text-white shadow-sm' 
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Overview
+            </button>
+            <button 
+              onClick={() => setActiveTab('Story')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Story' 
+                  ? 'bg-[#2d3748] text-white shadow-sm' 
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Story
+            </button>
+            <button 
+              onClick={() => setActiveTab('Family')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Family' 
+                  ? 'bg-[#2d3748] text-white shadow-sm' 
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Family
+            </button>
+        </div>
+
         {activeTab === 'Overview' && (
-          <div>
+          <div className="flex flex-col gap-6">
             {/* Header Card */}
-            <div className="bg-[#1a1f2e] rounded-2xl p-6 md:p-8 text-center border border-slate-800/50">
+            <div className="bg-[#1a1f2e] rounded-2xl p-6 md:p-8 text-center border border-slate-800/50 relative group">
+                <button 
+                    onClick={() => {
+                        if (isEditingHeader) {
+                            setIsEditingHeader(false);
+                            // Reset form on cancel
+                            setHeaderForm({
+                                first_name: contact.first_name || '',
+                                last_name: contact.last_name || '',
+                                company: contact.company || '',
+                                job_title: contact.job_title || '',
+                                birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+                            });
+                        } else {
+                            setIsEditingHeader(true);
+                        }
+                    }}
+                    className="absolute top-4 right-4 text-[#64748b] hover:text-[#60a5fa] p-2 rounded-lg hover:bg-[#2d3748]/50 transition-all opacity-0 group-hover:opacity-100"
+                    title="Edit Header"
+                >
+                    {isEditingHeader ? <span className="text-[12px] font-semibold text-[#ef4444]">Cancel</span> : '✏️'}
+                </button>
+
                 <div className="inline-block relative mb-4">
                   <div className={`w-[90px] h-[90px] rounded-full bg-[#2d3748] flex items-center justify-center text-4xl font-semibold text-white border-3 ${healthStyles.border}`}>
                      {photoUrl ? (
@@ -152,17 +242,67 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                   <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-3 border-[#1a1f2e] ${healthStyles.bg}`} />
                 </div>
                 
-                <h1 className="text-2xl font-bold text-white mb-1.5">{name}</h1>
-                
-                {(contact.job_title || contact.company) && (
-                  <div className="text-[14px] text-[#60a5fa] font-medium mb-1">
-                    {contact.job_title} {contact.job_title && contact.company && 'at'} {contact.company}
-                  </div>
-                )}
+                {isEditingHeader ? (
+                    <div className="flex flex-col gap-3 max-w-sm mx-auto mb-4">
+                        <div className="flex gap-2">
+                             <input 
+                                className="flex-1 bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[14px] text-white text-center"
+                                value={headerForm.first_name}
+                                onChange={(e) => setHeaderForm({...headerForm, first_name: e.target.value})}
+                                placeholder="First Name"
+                            />
+                             <input 
+                                className="flex-1 bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[14px] text-white text-center"
+                                value={headerForm.last_name}
+                                onChange={(e) => setHeaderForm({...headerForm, last_name: e.target.value})}
+                                placeholder="Last Name"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                             <input 
+                                className="flex-1 bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-[#60a5fa] text-center font-medium"
+                                value={headerForm.job_title}
+                                onChange={(e) => setHeaderForm({...headerForm, job_title: e.target.value})}
+                                placeholder="Job Title"
+                            />
+                             <input 
+                                className="flex-1 bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-[#60a5fa] text-center font-medium"
+                                value={headerForm.company}
+                                onChange={(e) => setHeaderForm({...headerForm, company: e.target.value})}
+                                placeholder="Company"
+                            />
+                        </div>
+                         <div className="flex items-center justify-center gap-2">
+                            <span className="text-[13px] text-[#64748b]">🎂 Birthday:</span>
+                            <input 
+                                type="date"
+                                className="bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white [color-scheme:dark]"
+                                value={headerForm.birthday}
+                                onChange={(e) => setHeaderForm({...headerForm, birthday: e.target.value})}
+                            />
+                        </div>
+                        <button 
+                            onClick={handleSaveHeader}
+                            className="bg-[#60a5fa] hover:bg-[#3b82f6] text-white px-4 py-1.5 rounded-lg text-sm font-medium mt-1"
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <h1 className="text-2xl font-bold text-white mb-1.5">{name}</h1>
+                        
+                        {(contact.job_title || contact.company) && (
+                        <div className="text-[14px] text-[#60a5fa] font-medium mb-1">
+                            {contact.job_title} {contact.job_title && contact.company && 'at'} {contact.company}
+                        </div>
+                        )}
 
-                <div className="text-[#64748b] text-[13px] mb-5">
-                   🎂 Birthday: {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
-                </div>
+                        <div className="text-[#64748b] text-[13px] mb-5">
+                        🎂 Birthday: {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
+                        </div>
+                    </>
+                )}
 
                 <div className="grid grid-cols-3 gap-2.5">
                     <ActionButton icon={<span>📞</span>} label="Call" href={contact.phone ? `tel:${contact.phone}` : undefined} disabled={!contact.phone} />
@@ -382,46 +522,26 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       {/* RIGHT COLUMN - SIDEBAR */}
       <div className="flex flex-col gap-5 px-4 lg:px-0 pb-10 lg:pb-0">
          
-          <div className="bg-linear-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-5 shadow-xl shadow-indigo-900/10 text-white">
-             <div className="flex justify-between items-center mb-1">
+           <div className="bg-linear-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-5 shadow-xl shadow-indigo-900/10 text-white">
+             <div className="flex justify-between items-center mb-3">
                  <h3 className="text-[15px] font-bold">Health Score</h3>
                  <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-medium backdrop-blur-sm">Beta</span>
              </div>
-             <div className="text-3xl font-bold mb-1">85<span className="text-[16px] font-medium opacity-80">/100</span></div>
-             <p className="text-[12px] opacity-80 leading-snug">Based on interaction freq, depth, and memory coverage.</p>
-          </div>
-
-          <div className="bg-[#1a1f2e] rounded-2xl p-1 border border-slate-800/50 flex sticky top-24 z-10 shadow-lg shadow-black/20 backdrop-blur-xl gap-6">
-              <button 
-                onClick={() => setActiveTab('Overview')}
-                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
-                  activeTab === 'Overview' 
-                    ? 'bg-[#2d3748] text-white shadow-sm' 
-                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-                }`}
-              >
-                Overview
-              </button>
-              <button 
-                onClick={() => setActiveTab('Story')}
-                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
-                  activeTab === 'Story' 
-                    ? 'bg-[#2d3748] text-white shadow-sm' 
-                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-                }`}
-              >
-                Story
-              </button>
-              <button 
-                onClick={() => setActiveTab('Family')}
-                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
-                  activeTab === 'Family' 
-                    ? 'bg-[#2d3748] text-white shadow-sm' 
-                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-                }`}
-              >
-                Family
-              </button>
+             
+             <div className="text-4xl font-bold mb-4">85<span className="text-[16px] font-medium opacity-80">/100</span></div>
+             
+             <div className="flex flex-col gap-2 pt-3 border-t border-white/10">
+                <div className="flex justify-between items-center text-[13px]">
+                   <span className="opacity-70">Last Contact</span>
+                   <span className="font-medium">{lastContactDate ? lastContactDate.toLocaleDateString() : 'None'}</span>
+                </div>
+                <div className="flex justify-between items-center text-[13px]">
+                   <span className="opacity-70">Next Due</span>
+                   <span className={`font-medium ${nextDueDate && nextDueDate < new Date() ? 'text-red-200' : 'text-green-200'}`}>
+                       {nextDueDate ? nextDueDate.toLocaleDateString() : 'Not set'}
+                   </span>
+                </div>
+             </div>
           </div>
       </div>
     </div>
