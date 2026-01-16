@@ -108,7 +108,11 @@ export default function ContactDetailPage({
             person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
         ].filter(Boolean).join('\n\n');
 
-        const baseSummary = person.relationship_summary || person.deep_lore || storyFallback || "";
+        // If no high-quality AI summary exists, combine deep_lore with the structured story data
+        // This ensures that even if deep_lore just says "Imported contact", we still show the other fields if they exist.
+        const fallbackContent = [person.deep_lore, storyFallback].filter(Boolean).join('\n\n___\n\n');
+
+        const baseSummary = person.relationship_summary || fallbackContent || "";
         
         const enhancedAiSummary = latestMemory 
             ? `**Most Recent Memory:** ${latestMemory}\n\n${baseSummary}`
