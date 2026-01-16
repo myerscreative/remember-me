@@ -53,8 +53,8 @@ export async function logHeaderInteraction(
       .insert({
         person_id: personId,
         user_id: user.id,
-        interaction_type: interactionType,  // Changed from 'type'
-        interaction_date: new Date().toISOString(),  // Changed from 'date'
+        type: interactionType,  // Changed from 'interaction_type'
+        date: new Date().toISOString(),  // Changed from 'interaction_date'
         notes: finalNote
       })
       .select();

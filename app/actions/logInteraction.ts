@@ -29,15 +29,13 @@ export async function logInteraction({ personId, type, note }: LogInteractionInp
 
   try {
     // Insert interaction record and update person's last_interaction_date in parallel
-    // NOTE: Using 'interaction_type' and 'interaction_date' to match deployed DB schema
-    // Local DB may have been migrated to 'type' and 'date', but deployed hasn't
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [interactionResult, updateResult] = await Promise.all([
       (supabase as any).from('interactions').insert({
         person_id: personId,
         user_id: user.id,
-        interaction_type: type,  // Changed from 'type'
-        interaction_date: now,   // Changed from 'date'
+        type,
+        date: now, // Required: interaction timestamp
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
         // next_goal_note removed - column doesn't exist in database schema
