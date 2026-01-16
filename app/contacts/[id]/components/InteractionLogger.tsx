@@ -138,7 +138,9 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
       setIsLogging(true);
       try {
           // Log as "Connection" (Call/Meeting)
+          console.log("🔍 Logging connection:", { contactId, type: 'connection', noteLength: note.length });
           const result = await logHeaderInteraction(contactId, 'connection', note);
+          console.log("📊 Log result:", result);
           
           if (result.success) {
               showNurtureToast(contactName);
@@ -146,11 +148,19 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
               fetchInteractions();
               if (onSuccess) onSuccess();
           } else {
-              toast.error("Failed to log connection");
+              // Display the actual error message from the server
+              const errorMessage = result.error || "Failed to log connection";
+              console.error("❌ Connection log failed:", {
+                  error: result.error,
+                  details: result.details,
+                  contactId,
+                  noteLength: note.length
+              });
+              toast.error(errorMessage);
           }
       } catch (e) {
-          console.error(e);
-          toast.error("Error logging connection");
+          console.error("❌ Exception logging connection:", e);
+          toast.error(`Error logging connection: ${e instanceof Error ? e.message : 'Unknown error'}`);
       } finally {
           setIsLogging(false);
       }
