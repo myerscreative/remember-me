@@ -46,13 +46,15 @@ export async function logHeaderInteraction(
 
     // Direct insert to bypass any RPC issues
     // Type assertion needed due to Supabase client type resolution issue
+    // NOTE: Using 'interaction_type' and 'interaction_date' to match deployed DB schema
+    // Local DB may have been migrated to 'type' and 'date', but deployed hasn't
     const { data: insertData, error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
         user_id: user.id,
-        type: interactionType,
-        date: new Date().toISOString(),
+        interaction_type: interactionType,  // Changed from 'type'
+        interaction_date: new Date().toISOString(),  // Changed from 'date'
         notes: finalNote
       })
       .select();

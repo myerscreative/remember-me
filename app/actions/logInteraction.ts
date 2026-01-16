@@ -8,7 +8,7 @@ interface LogInteractionInput {
   personId: string;
   type: InteractionType;
   note?: string;
-  nextGoal?: string; // New field
+  // nextGoal removed - column doesn't exist in database
 }
 
 
@@ -16,7 +16,7 @@ export type InteractionResult =
   | { success: true; error?: never }
   | { success: false; error: string; details?: any };
 
-export async function logInteraction({ personId, type, note, nextGoal }: LogInteractionInput): Promise<InteractionResult> {
+export async function logInteraction({ personId, type, note }: LogInteractionInput): Promise<InteractionResult> {
   const supabase = await createClient();
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -29,16 +29,18 @@ export async function logInteraction({ personId, type, note, nextGoal }: LogInte
 
   try {
     // Insert interaction record and update person's last_interaction_date in parallel
+    // NOTE: Using 'interaction_type' and 'interaction_date' to match deployed DB schema
+    // Local DB may have been migrated to 'type' and 'date', but deployed hasn't
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [interactionResult, updateResult] = await Promise.all([
       (supabase as any).from('interactions').insert({
         person_id: personId,
         user_id: user.id,
-        type,
-        date: now, // Required: interaction timestamp
+        interaction_type: type,  // Changed from 'type'
+        interaction_date: now,   // Changed from 'date'
         // Map 'note' input to 'notes' column to match standard schema
         notes: note || null,
-        next_goal_note: nextGoal || null,
+        // next_goal_note removed - column doesn't exist in database schema
       }),
       (supabase as any).from('persons').update({
         last_interaction_date: now,
