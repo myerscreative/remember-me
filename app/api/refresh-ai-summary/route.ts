@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch complete contact data
-    const { data: person, error: personError } = await supabase
+    const { data: person, error: personError } = await (supabase as any)
       .from("persons")
       .select("*")
       .eq("id", contactId)
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const typedPerson = person as any;
 
     // Fetch shared memories
-    const { data: sharedMemories } = await supabase
+    const { data: sharedMemories } = await (supabase as any)
       .from("shared_memories")
       .select("content, created_at")
       .eq("person_id", contactId)
@@ -166,7 +166,7 @@ Return ONLY the formatted markdown summary, nothing else.`;
     }
 
     // Update the person record with the new AI summary
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from("persons")
       .update({
         relationship_summary: aiSummary,
