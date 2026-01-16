@@ -51,10 +51,10 @@ export class NetworkDataService {
     const { data: contactsData, error: contactsError } = await this.supabase
       .from('persons')
       .select(`
-        *, 
+        *,
         person_interests(
           interests(id, name, domain_id)
-        ), 
+        ),
         person_tags(
           tags(id, name, domain_id)
         )

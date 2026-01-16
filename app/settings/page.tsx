@@ -31,29 +31,32 @@ interface UserSettings {
   // Profile
   display_name?: string;
   email?: string;
-  
+
   // Network preferences
   default_network_view?: 'circular' | 'list';
   show_birthdays_on_network?: boolean;
   auto_favorite_new_contacts?: boolean;
   network_zoom_level?: number;
-  
+
   // Notifications
   email_notifications?: boolean;
   birthday_reminders?: boolean;
   birthday_reminder_days?: number;
   contact_reminders?: boolean;
-  
+
   // Reminders
   default_reminder_time?: string;
   reminder_frequency?: 'daily' | 'weekly' | 'monthly';
   quiet_hours_start?: string;
   quiet_hours_end?: string;
-  
+
   // Display
   theme?: 'light' | 'dark' | 'auto';
   compact_mode?: boolean;
   show_last_contact?: boolean;
+
+  // AI Summary
+  summary_level_default?: 'micro' | 'default' | 'full';
 }
 
 export default function SettingsPage() {
@@ -74,6 +77,7 @@ export default function SettingsPage() {
     compact_mode: false,
     show_last_contact: true,
     network_zoom_level: 100,
+    summary_level_default: 'default',
   });
   const [error, setError] = useState<Error | null>(null);
 
@@ -547,6 +551,85 @@ export default function SettingsPage() {
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
+              </div>
+            </div>
+          </section>
+
+          {/* AI Summary Preferences */}
+          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                <span className="text-xl">✨</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">AI Summary Detail</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Choose how much detail you want to see</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Default Summary Level
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  Changes take effect immediately. No new AI generation needed - all summaries are pre-cached.
+                </p>
+                <div className="flex gap-3">
+                  {/* Quick (Micro) Button */}
+                  <button
+                    onClick={() => setSettings({ ...settings, summary_level_default: 'micro' })}
+                    className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
+                      settings.summary_level_default === 'micro'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                    }`}
+                  >
+                    <div className={cn("text-2xl")}>⚡</div>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm uppercase tracking-wider mb-1">Quick</div>
+                      <div className="text-[10px] opacity-80">15-25 words</div>
+                    </div>
+                  </button>
+
+                  {/* Standard (Default) Button */}
+                  <button
+                    onClick={() => setSettings({ ...settings, summary_level_default: 'default' })}
+                    className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
+                      settings.summary_level_default === 'default'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                    }`}
+                  >
+                    <div className={cn("text-2xl")}>📝</div>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm uppercase tracking-wider mb-1">Standard</div>
+                      <div className="text-[10px] opacity-80">50-75 words</div>
+                    </div>
+                  </button>
+
+                  {/* Detailed (Full) Button */}
+                  <button
+                    onClick={() => setSettings({ ...settings, summary_level_default: 'full' })}
+                    className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
+                      settings.summary_level_default === 'full'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                    }`}
+                  >
+                    <div className={cn("text-2xl")}>📖</div>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm uppercase tracking-wider mb-1">Detailed</div>
+                      <div className="text-[10px] opacity-80">150-220 words</div>
+                    </div>
+                  </button>
+                </div>
+
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-xs text-blue-800 dark:text-blue-300">
+                    <strong>Note:</strong> List views always show Quick summaries for fast scanning. Your preference applies to contact detail pages.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
