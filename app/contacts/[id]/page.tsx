@@ -96,10 +96,23 @@ export default function ContactDetailPage({
 
         // 5. Assemble complete object
         const latestMemory = sharedMemories?.[0]?.content;
-        const baseAiSummary = person.ai_summary || "";
+        
+        // Priority for AI Summary:
+        // 1. relationship_summary (AI generated snapshot)
+        // 2. deep_lore (Manual narrative lore)
+        // 3. Story details fallback (The Origin + Philosophy + Priorities)
+        
+        const storyFallback = [
+            person.where_met ? `**Origin:** ${person.where_met}` : null,
+            person.why_stay_in_contact ? `**Philosophy:** ${person.why_stay_in_contact}` : null,
+            person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
+        ].filter(Boolean).join('\n\n');
+
+        const baseSummary = person.relationship_summary || person.deep_lore || storyFallback || "";
+        
         const enhancedAiSummary = latestMemory 
-            ? `Most Recent Memory: ${latestMemory}\n\n${baseAiSummary}`
-            : baseAiSummary;
+            ? `**Most Recent Memory:** ${latestMemory}\n\n${baseSummary}`
+            : baseSummary;
 
         const fullContact = {
             ...person,

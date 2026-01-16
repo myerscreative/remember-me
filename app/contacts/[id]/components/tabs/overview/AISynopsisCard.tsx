@@ -75,7 +75,7 @@ export function AISynopsisCard({
       </div>
 
       <div className="text-[14px] text-[#cbd5e1] leading-relaxed mb-3 md:mb-4 whitespace-pre-wrap">
-        {aiSummary}
+        {aiSummary || deepLore}
       </div>
 
       <div className="pt-3 border-t border-[#2d3748] flex items-center justify-between flex-wrap gap-2">
