@@ -226,7 +226,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
                             <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2">Relationship</div>
                             <div className="flex flex-wrap gap-2">
                                 <span className="bg-[#3b4a6b] px-3.5 py-1.5 rounded-lg text-[12px] text-[#93c5fd] flex items-center gap-1.5 font-medium whitespace-nowrap">
-                                    <span>👥</span> {contact.tier_label || 'Steady Friends'}
+                                    <span>👥</span> {contact.importance ? (contact.importance === 'high' ? 'Core Circle' : contact.importance === 'medium' ? 'Steady Friends' : 'Acquaintance') : 'Steady Friends'}
                                 </span>
                                 <span className="bg-[#2d3748] px-3.5 py-1.5 rounded-lg text-[12px] text-[#cbd5e1] flex items-center gap-1.5 font-medium whitespace-nowrap">
                                     <span>📅</span> {contact.target_frequency_days === 7 ? 'Weekly' : contact.target_frequency_days === 30 ? 'Monthly' : `${contact.target_frequency_days} Days`}
