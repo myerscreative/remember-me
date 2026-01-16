@@ -89,9 +89,12 @@ export async function processMemory(contactId: string, text: string) {
          
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
+
+      4. BUSINESS: Use this for career, job titles, or company names.
+         Data Format: { job_title: string, company: string }.
          
-      4. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above. 
-         IMPORTANT: Pass the entire multi-paragraph markdown string as the value here.
+      5. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above. 
+         IMPORTANT: Pass the entire multi-paragraph markdown string as the value here. This will be the high-quality snapshot shown to the user.
          Data Format: { value: string }.
       
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
