@@ -43,9 +43,10 @@ interface ProfileProps {
   lastContact: string;
   synopsis: string;
   sharedMemory?: string;
+  onRefreshAISummary?: () => void;
 }
 
-const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfileProps) => {
+const ConnectionProfile = ({ contact, health, lastContact, synopsis, onRefreshAISummary }: ProfileProps) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
@@ -133,7 +134,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
             </div>
 
                 {/* AI Synopsis */}
-                <AISynopsisCard 
+                <AISynopsisCard
                     contactId={contact.id}
                     contactName={name}
                     aiSummary={synopsis || (contact as any).relationship_summary}
@@ -142,6 +143,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
                     lastUpdated={contact.updated_at}
                     isInline={true}
                     onNavigateToStory={() => setActiveTab('Story')}
+                    onRefresh={onRefreshAISummary}
                 />
 
                 {/* Contact Info Inline */}

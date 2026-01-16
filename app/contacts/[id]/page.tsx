@@ -28,8 +28,39 @@ export default function ContactDetailPage({
   const searchParams = useSearchParams();
 
   const handleRefresh = async () => {
-    window.location.reload(); 
+    window.location.reload();
     // Ideally we would re-fetch here instead of reload to hold state, but for MVP speed reload is reliable
+  };
+
+  const handleRefreshAISummary = async () => {
+    try {
+      toast.loading('Refreshing AI summary...', { id: 'ai-refresh' });
+
+      const response = await fetch('/api/refresh-ai-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to refresh AI summary');
+      }
+
+      toast.success('AI summary refreshed!', { id: 'ai-refresh' });
+
+      // Update the contact state with new summary
+      setContact((prev: any) => ({
+        ...prev,
+        ai_summary: data.summary,
+        relationship_summary: data.summary,
+        updated_at: new Date().toISOString()
+      }));
+    } catch (error) {
+      console.error('Error refreshing AI summary:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to refresh AI summary', { id: 'ai-refresh' });
+    }
   };
 
   // Fetch Data
@@ -196,6 +227,7 @@ export default function ContactDetailPage({
             lastContact={lastContactFormatted}
             synopsis={contact.ai_summary}
             sharedMemory={contact.deep_lore || contact.interests?.[0]}
+            onRefreshAISummary={handleRefreshAISummary}
         />
       </div>
 
