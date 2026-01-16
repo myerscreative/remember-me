@@ -1,111 +1,109 @@
-import React, { useState, useMemo } from 'react';
-import { X } from 'lucide-react';
-import { getInitials } from '@/lib/utils/contact-helpers';
-import { InteractionLogger } from './InteractionLogger';
-import toast from 'react-hot-toast';
-import Image from 'next/image';
 
-// 1. Define the Relationship Health Types
-import { HealthStatus, healthColorMap } from '@/lib/relationship-health';
-import { MemoryCapture } from './MemoryCapture';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { useMemo } from 'react';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
-import { PostCallPulse } from './PostCallPulse';
-import { SummaryLevel } from '@/lib/utils/summary-levels';
-import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { updateContact } from '@/app/actions/update-contact';
+import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
+import { UserSettings } from '@/lib/utils/summary-levels';
 
-export interface Contact {
-  id: string;
-  name: string;
-  first_name?: string;
-  firstName?: string;
-  photo_url?: string;
-  avatar_url?: string;
-  birthday?: string;
-  phone?: string;
-  email?: string;
-  deep_lore?: string;
-  where_met?: string;
-  updated_at?: string;
-  tags?: string[];
-  interests?: string[];
-  interactions?: any[];
-  connections?: any[];
-  importance?: string;
-  target_frequency_days?: number;
-  last_interaction_date?: string;
-  company?: string;
-  job_title?: string;
+interface ConnectionProfileProps {
+  contact: any;
+  synopsis: string | null;
+  userSettings?: UserSettings; // Pass user settings for default preference
+  health?: any;
+  lastContact?: string;
+  summaryLevel?: any;
+  sharedMemory?: any;
+  onRefreshAISummary?: () => Promise<void>;
 }
 
-interface ProfileProps {
-  contact: Contact;
-  health: HealthStatus;
-  lastContact: string;
-  synopsis: string;
-  summaryLevel?: SummaryLevel;
-  sharedMemory?: string;
-  onRefreshAISummary?: () => void;
-}
-
-const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLevel = 'default', onRefreshAISummary }: ProfileProps) => {
+export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
-  // const [isLogOpen, setIsLogOpen] = useState(false); // Deprecated modal state
-  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
-  const [isPulseOpen, setIsPulseOpen] = useState(false);
-  
-  // Inline Logging State
-  const [logNote, setLogNote] = useState("");
-  const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
   const [isLogging, setIsLogging] = useState(false);
-
-  // Edit Contact Info State
+  const [logNote, setLogNote] = useState('');
+  const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [editForm, setEditForm] = useState({ 
-      email: contact.email || '', 
-      phone: contact.phone || '' ,
+  const [editForm, setEditForm] = useState({
+      email: contact.email || '',
+      phone: contact.phone || '',
       birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
   });
 
-  // Health Color Logic
-  const healthStyles = healthColorMap[health];
+  // Calculate the effective summary level
+  const summaryLevel: SummaryLevel = useMemo(() => {
+    return getEffectiveSummaryLevel(contact, userSettings);
+  }, [contact, userSettings]);
 
-  const name = contact.firstName || contact.first_name || contact.name;
-  const photoUrl = contact.photo_url || contact.avatar_url;
+  const handleRefreshAISummary = async () => {
+    try {
+        const response = await fetch('/api/refresh-ai-summary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                contactId: contact.id,
+                force: true 
+            }),
+        });
 
-  // Use a stable reference for current time to fix purity warning
-  const [renderTime] = useState(() => Date.now());
+        if (!response.ok) throw new Error('Failed to refresh summary');
+        
+        // Refresh the page data
+        router.refresh();
+        
+    } catch (error) {
+        console.error('Error refreshing summary:', error);
+    }
+  };
 
-  const daysSince = useMemo(() => {
-    if (lastContact === 'Never') return 999;
-    const lastInteraction = contact.last_interaction_date ? new Date(contact.last_interaction_date).getTime() : renderTime;
-    return Math.floor((renderTime - lastInteraction) / (1000 * 60 * 60 * 24));
-  }, [lastContact, contact.last_interaction_date, renderTime]);
+  const name = `${contact.first_name} ${contact.last_name || ''}`.trim();
+  const photoUrl = contact.avatar_url;
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getHealthColor = (days: number) => {
+    if (days <= 7) return { border: 'border-green-500', bg: 'bg-green-500' };
+    if (days <= 14) return { border: 'border-yellow-500', bg: 'bg-yellow-500' };
+    return { border: 'border-red-500', bg: 'bg-red-500' };
+  };
+
+  // Safe fallback for days_since_last_interaction
+  const daysSince = contact.days_since_last_interaction || 0;
+  const healthStyles = getHealthColor(daysSince);
 
   const handleLogInteraction = async () => {
     if (!logNote.trim()) return;
     
     setIsLogging(true);
     try {
-        const result = await logHeaderInteraction(contact.id, logType, logNote);
-        if (result.success) {
-            toast.success(logType === 'connection' ? 'Connection logged!' : 'Attempt logged');
-            setLogNote("");
-            if (logType === 'connection') {
-                // Ideally refresh stats or open pulse
-                if (onRefreshAISummary) onRefreshAISummary(); // Optional: misuse of refresh to trigger update? better to reload page or use router
-                window.location.reload(); // Simple reload to update stats
-            } else {
-                 setLogNote(""); // Just clear for attempt
-            }
-        } else {
-            toast.error(result.error || 'Failed to log interaction');
-        }
-    } catch (e) {
-        console.error(e);
-        toast.error('An error occurred');
+        await logHeaderInteraction(
+            contact.id,
+            logType,
+            logNote
+        );
+        
+        setLogNote('');
+        setLogType('connection');
+        // Ideally use optimistic update, for now refresh
+        window.location.reload();
+    } catch (error) {
+        console.error('Error logging interaction:', error);
+        alert('Failed to log interaction. Please try again.');
     } finally {
         setIsLogging(false);
     }
@@ -114,45 +112,28 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
   const handleSaveContactInfo = async () => {
       try {
           const result = await updateContact(contact.id, editForm);
+
           if (result.success) {
-              toast.success('Contact details updated');
               setIsEditingInfo(false);
-              window.location.reload(); 
+              window.location.reload();
           } else {
-              toast.error(result.error || 'Failed to update');
+              alert('Failed to update contact info');
           }
-      } catch (e) {
-          toast.error('An error occurred');
+      } catch (error) {
+          console.error('Error saving contact info:', error);
+          alert('An error occurred while saving');
       }
   };
 
   return (
-    <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 max-w-[1200px]">
-      
-      {/* TABS - Left Column Top */}
-      <div className="lg:col-span-1 sticky top-0 z-100 bg-[#0f1419] border-b border-[#2d3748] lg:static lg:bg-transparent lg:border-none lg:mb-2">
-        <div className="flex w-full lg:w-auto overflow-x-auto justify-start px-4 lg:px-0 gap-6">
-          {(['Overview', 'Story', 'Family'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 lg:flex-none py-4 lg:pb-3 text-[15px] font-medium border-b-2 transition-all whitespace-nowrap text-center ${
-                activeTab === tab 
-                  ? 'border-[#60a5fa] text-[#60a5fa]' 
-                  : 'border-transparent text-[#94a3b8] hover:text-slate-300'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="hidden lg:block"></div> {/* Spacer for grid */}
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
+      {/* Spacer for grid */}
+      <div className="hidden lg:block"></div> 
 
       {/* LEFT COLUMN */}
       <div className="flex flex-col gap-5 px-4 lg:px-0">
-        {activeTab === 'Overview' ? (
-          <>
+        {activeTab === 'Overview' && (
+          <div>
             {/* Header Card */}
             <div className="bg-[#1a1f2e] rounded-2xl p-6 md:p-8 text-center border border-slate-800/50">
                 <div className="inline-block relative mb-4">
@@ -203,7 +184,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                     lastUpdated={contact.updated_at}
                     isInline={true}
                     onNavigateToStory={() => setActiveTab('Story')}
-                    onRefresh={onRefreshAISummary}
+                    onRefresh={handleRefreshAISummary}
                 />
 
                 {/* Contact Info Inline */}
@@ -215,7 +196,11 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                                 if (isEditingInfo) {
                                     // Cancel
                                     setIsEditingInfo(false);
-                                    setEditForm({ email: contact.email || '', phone: contact.phone || '' });
+                                    setEditForm({ 
+                                        email: contact.email || '', 
+                                        phone: contact.phone || '',
+                                        birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+                                    });
                                 } else {
                                     setIsEditingInfo(true);
                                 }
@@ -264,6 +249,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                                     </div>
                                 )}
                             </div>
+                        </div>
                         <div className="flex items-center gap-3 py-3">
                             <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">🎂</div>
                             <div className="flex-1 min-w-0">
@@ -389,94 +375,57 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                         <button className="text-[#94a3b8] border border-[#3d4758] hover:border-[#7c3aed] px-4 py-2 rounded-lg text-[13px] font-medium transition-colors shrink-0">Edit</button>
                     </div>
                 </div>
-          </>
-        ) : activeTab === 'Story' ? (
-            <StoryTab contact={contact} />
-        ) : (
-            <FamilyTab contact={contact} />
+          </div>
         )}
+        {activeTab === 'Story' && <StoryTab contact={contact} />}
+        {activeTab === 'Family' && <FamilyTab contact={contact} />}
       </div>
 
       {/* RIGHT COLUMN - SIDEBAR */}
       <div className="flex flex-col gap-5 px-4 lg:px-0 pb-10 lg:pb-0">
          
           <div className="bg-linear-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-5 shadow-xl shadow-indigo-900/10 text-white">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider mb-2 opacity-90">Ready to Connect?</h3>
-              <p className="text-[13px] opacity-80 mb-3.5 leading-normal">Generate a personalized script based on your memories.</p>
-              <button className="w-full py-3.5 bg-white text-[#7c3aed] rounded-xl font-bold text-[15px] hover:-translate-y-px transition-transform flex items-center justify-center gap-2">
-                 <span>💬</span> Draft Reconnection
+             <div className="flex justify-between items-center mb-1">
+                 <h3 className="text-[15px] font-bold">Health Score</h3>
+                 <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-medium backdrop-blur-sm">Beta</span>
+             </div>
+             <div className="text-3xl font-bold mb-1">85<span className="text-[16px] font-medium opacity-80">/100</span></div>
+             <p className="text-[12px] opacity-80 leading-snug">Based on interaction freq, depth, and memory coverage.</p>
+          </div>
+
+          <div className="bg-[#1a1f2e] rounded-2xl p-1 border border-slate-800/50 flex sticky top-24 z-10 shadow-lg shadow-black/20 backdrop-blur-xl gap-6">
+              <button 
+                onClick={() => setActiveTab('Overview')}
+                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                  activeTab === 'Overview' 
+                    ? 'bg-[#2d3748] text-white shadow-sm' 
+                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+                }`}
+              >
+                Overview
+              </button>
+              <button 
+                onClick={() => setActiveTab('Story')}
+                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                  activeTab === 'Story' 
+                    ? 'bg-[#2d3748] text-white shadow-sm' 
+                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+                }`}
+              >
+                Story
+              </button>
+              <button 
+                onClick={() => setActiveTab('Family')}
+                className={`flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                  activeTab === 'Family' 
+                    ? 'bg-[#2d3748] text-white shadow-sm' 
+                    : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+                }`}
+              >
+                Family
               </button>
           </div>
-
-          {/* QUICK STATS */}
-          <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8] mb-4">Quick Stats</h3>
-              <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-[#0f1419] rounded-xl p-3 text-center">
-                      <div className="text-[18px] text-[#e2e8f0] font-bold mb-1">{lastContact === 'Never' ? '—' : lastContact}</div>
-                      <div className="text-[10px] text-[#64748b] uppercase tracking-wider font-semibold">Last Contact</div>
-                  </div>
-                  <div className="bg-[#0f1419] rounded-xl p-3 text-center">
-                      <div className="text-[18px] text-[#e2e8f0] font-bold mb-1">{contact.interactions?.length || 0}</div>
-                      <div className="text-[10px] text-[#64748b] uppercase tracking-wider font-semibold">Interactions</div>
-                  </div>
-                  <div className="bg-[#0f1419] rounded-xl p-3 text-center">
-                      <div className="text-[18px] font-bold mb-1 text-[#e2e8f0]">
-                        {daysSince === 999 ? '—' : `${daysSince}d`}
-                      </div>
-                      <div className="text-[10px] text-[#64748b] uppercase tracking-wider font-semibold">Days Since</div>
-                  </div>
-              </div>
-          </div>
-
-          {/* CONNECTIONS NOTICE */}
-          <div className="bg-[#1a1f2e] rounded-2xl p-6 border border-slate-800/50 text-center">
-              <p className="text-[#64748b] text-[12px] mb-3">
-                {(contact.connections?.length || 0) > 0 
-                  ? `Connected to ${contact.connections?.length} people` 
-                  : 'No connections yet'}
-              </p>
-              <button className="inline-flex items-center gap-1.5 text-[#94a3b8] hover:text-[#a78bfa] border border-[#3d4758] hover:border-[#7c3aed] px-4 py-2 rounded-lg text-xs font-semibold transition-all">
-                  <span>🔗</span> {(contact.connections?.length || 0) > 0 ? 'View Connections' : 'Link a Connection'}
-              </button>
-          </div>
-
       </div>
-
-      {/* MODALS */}
-      {isCaptureOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4" onClick={() => setIsCaptureOpen(false)}>
-           <div 
-            className="bg-[#161b22] w-full max-w-lg p-6 rounded-3xl border border-slate-700 shadow-2xl animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()} 
-           >
-              <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-white">Brain Dump / Quick Capture</h2>
-                  <button onClick={() => setIsCaptureOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
-                      <X size={16} />
-                  </button>
-              </div>
-              <MemoryCapture 
-                  contactId={contact.id} 
-                  onSuccess={(field) => {
-                      setIsCaptureOpen(false);
-                      toast.success(`Captured to ${field}!`);
-                  }} 
-              />
-           </div>
-        </div>
-      )}
-
-
-
-      {isPulseOpen && (
-        <PostCallPulse 
-          contactId={contact.id}
-          name={contact.first_name || name.split(' ')[0]} 
-          onClose={() => setIsPulseOpen(false)}
-          onComplete={() => setIsPulseOpen(false)}
-        />
-      )}
     </div>
   );
 };
@@ -491,18 +440,34 @@ interface ActionButtonProps {
 }
 
 const ActionButton = ({ icon, label, onClick, href, disabled }: ActionButtonProps) => {
-    const Component = href ? 'a' : 'button';
-    const componentProps = href ? { href, onClick } : { onClick, disabled };
-
+  if (href) {
+    if (disabled) {
+        return (
+            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/30 border border-[#2d3748] opacity-50 cursor-not-allowed">
+                <div className="text-xl grayscale">{icon}</div>
+                <span className="text-[11px] text-[#64748b] font-medium">{label}</span>
+            </div>
+        );
+    }
     return (
-        <Component 
-          {...componentProps}
-          className={`flex flex-col items-center gap-1.5 px-4 py-3.5 rounded-xl bg-[#2d3748] hover:bg-[#3d4758] text-[#e2e8f0] font-medium transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
-        >
-          <span className="text-xl leading-none">{icon}</span>
-          <span className="text-[13px]">{label}</span>
-        </Component>
-      );
-}
+      <a 
+        href={href}
+        className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group"
+      >
+        <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
+        <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>
+      </a>
+    );
+  }
 
-export default ConnectionProfile;
+  return (
+    <button 
+      onClick={onClick}
+      disabled={disabled}
+      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[#3d4758]"
+    >
+      <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
+      <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>
+    </button>
+  );
+};
