@@ -16,7 +16,7 @@ export async function getRecentInteractions(personId: string, limit: number = 5)
       .select('*')
       .eq('person_id', personId)
       .eq('user_id', user.id)
-      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) throw error;

@@ -299,7 +299,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                         )}
 
                         <div className="text-[#64748b] text-[13px] mb-5">
-                        🎂 Birthday: {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
+                        🎂 Birthday: {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) : 'Not set'}
                         </div>
                     </>
                 )}
@@ -401,7 +401,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                     />
                                 ) : (
                                     <div className={`text-[14px] truncate ${!contact.birthday ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
-                                        {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
+                                        {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) : 'Not set'}
                                     </div>
                                 )}
                             </div>

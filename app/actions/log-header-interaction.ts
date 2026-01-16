@@ -38,10 +38,26 @@ export async function logHeaderInteraction(
         // Check for specific column error to give better feedback if schema is still wrong
         if (insertError.message.includes('column "date" does not exist')) {
              console.error("Schema Mismatch: 'date' column missing. Trying 'interaction_date'...");
-             // Fallback attempt (optional, or just throw clear error)
+             // Fallback attempt
+             const { error: fallbackError } = await (supabase as any)
+              .from('interactions')
+              .insert({
+                person_id: personId,
+                user_id: user.id,
+                type: interactionType,
+                interaction_date: new Date().toISOString(),
+                notes: finalNote
+              })
+              .select();
+              
+              if (fallbackError) {
+                console.error("Fallback Log Error:", fallbackError);
+                throw new Error(`Failed to insert interaction (Fallback): ${fallbackError.message}`);
+              }
+        } else {
+             console.error("Error logging interaction record:", insertError);
+             throw new Error(`Failed to insert interaction: ${insertError.message}`);
         }
-        console.error("Error logging interaction record:", insertError);
-        throw new Error(`Failed to insert interaction: ${insertError.message}`);
     }
 
     // 2. Shared Memory Log (User Narrative)
