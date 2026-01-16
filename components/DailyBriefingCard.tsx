@@ -27,8 +27,8 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
   
   const totalActions = milestones.length + thirstyTribes.length + priorityNurtures.length;
 
-  if (totalActions === 0) return null;
-
+  // Always show the greeting section, even with no actions
+  
   const handleNurture = (id: string, name: string, template: string) => {
     setSelectedContact({ id, name, template });
     setIsModalOpen(true);
@@ -47,14 +47,20 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                     Good Morning, Robert.
                  </h2>
                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-                    You have <span className="text-primary font-bold">{totalActions} priority actions</span> today.
+                    {totalActions > 0 ? (
+                      <>You have <span className="text-primary font-bold">{totalActions} priority actions</span> today.</>
+                    ) : (
+                      <>Your garden is <span className="text-emerald-600 font-bold">blooming</span> — all connections are nurtured!</>
+                    )}
                  </p>
             </div>
             
-            <div className="flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/20 px-3 py-1.5 rounded-full">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span className="text-primary text-[10px] font-black uppercase tracking-widest">{totalActions} Actions</span>
-            </div>
+            {totalActions > 0 && (
+              <div className="flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/20 px-3 py-1.5 rounded-full">
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-primary text-[10px] font-black uppercase tracking-widest">{totalActions} Actions</span>
+              </div>
+            )}
           </div>
         </CardHeader>
         

@@ -127,6 +127,15 @@ export default function DashboardPage() {
       setTopContacts(topResult.data || []);
       setBriefing(briefingResult.data);
 
+      // Debug logging for deployment diagnosis
+      console.log('📊 Dashboard Data Loaded:', {
+        briefing: briefingResult.data,
+        priorityNurtures: briefingResult.data?.priorityNurtures?.length || 0,
+        milestones: briefingResult.data?.milestones?.length || 0,
+        thirstyTribes: briefingResult.data?.thirstyTribes?.length || 0,
+        needingAttention: attentionResult.data?.length || 0
+      });
+
       // Generate Narrative if briefing exists (lightweight fetch)
       if (briefingResult.data) {
           // Optional: Fetch narrative here if we want it on dashboard too, 
@@ -317,7 +326,10 @@ export default function DashboardPage() {
                   <WeeklyBriefing />
 
                   {/* Daily Briefing Card (Collapsible/Dynamic) */}
-                  {briefing && <DailyBriefingCard briefing={briefing} onActionComplete={loadDashboardData} />}
+                  <DailyBriefingCard 
+                    briefing={briefing || { milestones: [], thirstyTribes: [], priorityNurtures: [] }} 
+                    onActionComplete={loadDashboardData} 
+                  />
 
                   {/* Needs Nurture List (Redesigned & Compact with Filter) */}
                   <NeedsNurtureList contacts={needingAttention} />

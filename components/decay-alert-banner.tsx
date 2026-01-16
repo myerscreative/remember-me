@@ -56,9 +56,12 @@ export function DecayAlertBanner() {
     fetchDecayingRelationships();
   }, []);
 
-  if (loading || dismissed || decayingRelationships.length === 0) {
+  // Only hide if dismissed or still loading
+  if (loading || dismissed) {
     return null;
   }
+
+  const hasDecayingRelationships = decayingRelationships.length > 0;
 
   const severeCount = decayingRelationships.filter((r) => r.decay_severity === "severe").length;
   const moderateCount = decayingRelationships.filter((r) => r.decay_severity === "moderate").length;
@@ -99,7 +102,7 @@ export function DecayAlertBanner() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-base md:text-lg font-bold text-[var(--nurture-banner-text)]">
-                Time to Reconnect
+                {hasDecayingRelationships ? "Time to Reconnect" : "Garden Status"}
               </h3>
               <Button
                 variant="ghost"
@@ -112,55 +115,68 @@ export function DecayAlertBanner() {
             </div>
  
             <p className="text-sm text-[var(--nurture-banner-text)] opacity-80 mb-4 leading-relaxed">
-              {severeCount > 0 && (
-                <span key="severe-count" className="font-medium">
-                  {severeCount} relationship{severeCount > 1 ? "s" : ""} haven't been contacted in over a year.
+              {hasDecayingRelationships ? (
+                <>
+                  {severeCount > 0 && (
+                    <span key="severe-count" className="font-medium">
+                      {severeCount} relationship{severeCount > 1 ? "s" : ""} haven't been contacted in over a year.
+                    </span>
+                  )}
+                  {severeCount === 0 && moderateCount > 0 && (
+                    <span key="moderate-count" className="font-medium">
+                      {moderateCount} relationship{moderateCount > 1 ? "s" : ""} haven't been contacted in 6+ months.
+                    </span>
+                  )}
+                  {" "}Nurture your network to keep it healthy. 🌱
+                </>
+              ) : (
+                <span className="font-medium">
+                  All your relationships are healthy and well-nurtured! Keep up the great work. 🌟
                 </span>
               )}
-              {severeCount === 0 && moderateCount > 0 && (
-                <span key="moderate-count" className="font-medium">
-                  {moderateCount} relationship{moderateCount > 1 ? "s" : ""} haven't been contacted in 6+ months.
-                </span>
-              )}
-              {" "}Nurture your network to keep it healthy. 🌱
             </p>
 
-            {/* Show top decaying relationships */}
-            <div className="space-y-2 mb-4">
-              {decayingRelationships.slice(0, 3).map((relationship) => (
-                <Link key={relationship.person_id} href={`/contacts/${relationship.person_id}`}>
-                  <div className="flex items-center justify-between p-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg hover:border-indigo-500/50 hover:bg-slate-800 transition-all cursor-pointer group">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="h-2 w-2 rounded-full bg-indigo-500 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.6)] transition-shadow" />
-                      <span className="text-sm font-medium text-slate-200 group-hover:text-white truncate">
-                        {relationship.name}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <Badge className={cn("text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/20")}>
-                        {getSeverityText(relationship.last_contact_days)} {relationship.last_contact_days ? 'ago' : ''}
-                      </Badge>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
 
-            <div className="flex flex-wrap gap-3 pt-1">
-              <Link href="/insights">
-                <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
-                  View All
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDismissed(true)}
-                className="text-slate-400 hover:text-white hover:bg-white/5"
-              >
-                Dismiss
-              </Button>
-            </div>
+            {/* Show top decaying relationships - only if there are any */}
+            {hasDecayingRelationships && (
+              <>
+                <div className="space-y-2 mb-4">
+                  {decayingRelationships.slice(0, 3).map((relationship) => (
+                    <Link key={relationship.person_id} href={`/contacts/${relationship.person_id}`}>
+                      <div className="flex items-center justify-between p-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg hover:border-indigo-500/50 hover:bg-slate-800 transition-all cursor-pointer group">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="h-2 w-2 rounded-full bg-indigo-500 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.6)] transition-shadow" />
+                          <span className="text-sm font-medium text-slate-200 group-hover:text-white truncate">
+                            {relationship.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Badge className={cn("text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/20")}>
+                            {getSeverityText(relationship.last_contact_days)} {relationship.last_contact_days ? 'ago' : ''}
+                          </Badge>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-1">
+                  <Link href="/insights">
+                    <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
+                      View All
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDismissed(true)}
+                    className="text-slate-400 hover:text-white hover:bg-white/5"
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </CardContent>
