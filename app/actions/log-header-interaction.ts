@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function logHeaderInteraction(
   personId: string, 
-  type: 'connection' | 'attempt',
+  interactionType: 'connection' | 'attempt',
   note?: string
 ) {
   const supabase = await createClient();
@@ -76,7 +76,7 @@ export async function logHeaderInteraction(
     if (note || interactionType === 'attempt') {
         const memoryContent = interactionType === 'attempt' && !note
           ? `[Attempted Contact] No note left.` 
-          : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
+          : (interactionType === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
         if (memoryContent) {
              const { error: memoryError } = await (supabase as any)
@@ -91,8 +91,8 @@ export async function logHeaderInteraction(
         }
     }
 
-    // 3. Update Person Status (Only for connections)
-    if (type === 'connection') {
+        // 3. Update Person Status (Only for connections)
+    if (interactionType === 'connection') {
       const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
