@@ -57,6 +57,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Type assertion for person - Supabase returns any, but we know the shape
+    const typedPerson = person as any;
+
     // Fetch shared memories
     const { data: sharedMemories } = await supabase
       .from("shared_memories")
@@ -65,33 +68,33 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     // Build comprehensive context for AI
-    const personName = person.name || `${person.first_name || ''} ${person.last_name || ''}`.trim() || 'this person';
+    const personName = typedPerson.name || `${typedPerson.first_name || ''} ${typedPerson.last_name || ''}`.trim() || 'this person';
 
     const contextParts: string[] = [];
     contextParts.push(`Name: ${personName}`);
 
-    if (person.email) contextParts.push(`Email: ${person.email}`);
-    if (person.phone) contextParts.push(`Phone: ${person.phone}`);
-    if (person.company) contextParts.push(`Company: ${person.company}`);
-    if (person.job_title) contextParts.push(`Job Title: ${person.job_title}`);
-    if (person.where_met) contextParts.push(`Where We Met: ${person.where_met}`);
-    if (person.why_stay_in_contact) contextParts.push(`Why We Stay in Contact: ${person.why_stay_in_contact}`);
-    if (person.most_important_to_them) contextParts.push(`What's Important to Them: ${person.most_important_to_them}`);
-    if (person.birthday) contextParts.push(`Birthday: ${person.birthday}`);
+    if (typedPerson.email) contextParts.push(`Email: ${typedPerson.email}`);
+    if (typedPerson.phone) contextParts.push(`Phone: ${typedPerson.phone}`);
+    if (typedPerson.company) contextParts.push(`Company: ${typedPerson.company}`);
+    if (typedPerson.job_title) contextParts.push(`Job Title: ${typedPerson.job_title}`);
+    if (typedPerson.where_met) contextParts.push(`Where We Met: ${typedPerson.where_met}`);
+    if (typedPerson.why_stay_in_contact) contextParts.push(`Why We Stay in Contact: ${typedPerson.why_stay_in_contact}`);
+    if (typedPerson.most_important_to_them) contextParts.push(`What's Important to Them: ${typedPerson.most_important_to_them}`);
+    if (typedPerson.birthday) contextParts.push(`Birthday: ${typedPerson.birthday}`);
 
-    if (person.interests && person.interests.length > 0) {
-      contextParts.push(`Interests: ${person.interests.join(', ')}`);
+    if (typedPerson.interests && typedPerson.interests.length > 0) {
+      contextParts.push(`Interests: ${typedPerson.interests.join(', ')}`);
     }
 
-    if (person.family_members && person.family_members.length > 0) {
-      const familyInfo = person.family_members.map((m: any) =>
+    if (typedPerson.family_members && typedPerson.family_members.length > 0) {
+      const familyInfo = typedPerson.family_members.map((m: any) =>
         `${m.name} (${m.relationship || 'family member'})`
       ).join(', ');
       contextParts.push(`Family: ${familyInfo}`);
     }
 
-    if (person.deep_lore) {
-      contextParts.push(`Previous Notes: ${person.deep_lore}`);
+    if (typedPerson.deep_lore) {
+      contextParts.push(`Previous Notes: ${typedPerson.deep_lore}`);
     }
 
     if (sharedMemories && sharedMemories.length > 0) {
