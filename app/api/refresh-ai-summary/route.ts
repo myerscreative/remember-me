@@ -104,41 +104,74 @@ export async function POST(request: NextRequest) {
 
     const context = contextParts.join('\n');
 
-    // Generate comprehensive AI summary
-    const systemPrompt = `You are the Personal Relationship Intelligence Engine for the app "Remember Me."
+    // Generate three-tier AI summary
+    const systemPrompt = `You generate human-memory summaries for a relationship-memory app.
 
-Your task is to create a comprehensive, natural-sounding AI summary of a contact based on all available information.
+Your job is to help the user instantly remember:
+1) who this person is
+2) how they know them
+3) why the relationship matters
 
-CRITICAL INSTRUCTIONS:
-1. The summary MUST be between 75-200 words
-2. Use the person's name "${personName}" exactly as provided - do not change, shorten, or modify it
-3. Write in a warm, human, perceptive tone - not robotic
-4. Organize the summary with clear markdown headers (###) for different sections
-5. Include the most meaningful and memorable details that help the user remember this person
-6. Focus on: who they are, their role/profession, relationship context, personality traits, interests, and why they matter
+Rules:
+- Do NOT invent facts.
+- If something is missing, omit it.
+- Avoid generic praise and LinkedIn tone.
+- Use concrete anchors (where met, role, family basics, standout hobby/value).
+- Output must be valid JSON only (no markdown, no commentary).
 
-REQUIRED STRUCTURE (Use markdown formatting):
+Generate the following three summaries for the person described below.
 
-### Person Snapshot
-A short, natural paragraph: Who is this person? Why do they matter? What defines them at a glance?
+1) Micro Summary (Quick Glance)
 
-### Relationship Context
-How do you know each other? What's the nature and depth of the relationship?
+Purpose: Instant recognition
+Rules:
+- 1 sentence only
+- 15–25 words
+- Include: name + relationship/context + 1 memorable anchor
+- No adjectives unless concrete
 
-### Key Details
-Important facts: career, interests, family, personality traits, communication style
+Example:
+Bryan Clay — faith-driven entrepreneur you met in Washington; family-first, outdoorsy, and someone you respect and stay in touch with.
 
-### Why They Matter
-Why the user values this relationship and wants to stay connected
+2) Default Summary (Everyday)
 
-Guidelines:
-- Be specific and meaningful, not generic
-- Capture personality and essence, not just facts
-- Make it personal and memorable
-- Use past tense for how you met, present tense for current state
-- If information is limited, work with what you have and don't invent details
+Purpose: Fast emotional + contextual recall
+Rules:
+- 2–4 sentences
+- 50–75 words (hard max 85)
+- No headings
+- Use plain, human language (not LinkedIn tone)
+- Required order:
+  1. Identity / role
+  2. How you know them (where/how met)
+  3. 1–2 concrete anchors (family, work focus, hobby, values)
+  4. Why they matter / why you keep in touch
 
-Return ONLY the formatted markdown summary, nothing else.`;
+Example:
+Bryan Clay is a faith-driven entrepreneur and family man you met in Washington. He runs his own business, values health and fitness, and is deeply committed to his wife and two daughters. You admire the balance he maintains between work, family, and faith, and you stay connected as both friends and respected business peers.
+
+3) Full Summary (Deep Context)
+
+Purpose: Full relationship understanding
+Rules:
+- 150–220 words (max 260)
+- May use short paragraphs or headings
+- Warm, reflective, but still factual
+- Expand on meaning, not just details
+
+Example structure (not required wording):
+- Snapshot
+- Relationship Context
+- Key Details
+- Why They Matter
+
+OUTPUT FORMAT (STRICT):
+Return valid JSON only:
+{
+  "summary_micro": "",
+  "summary_default": "",
+  "summary_full": ""
+}`;
 
     const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o",
@@ -149,27 +182,49 @@ Return ONLY the formatted markdown summary, nothing else.`;
         },
         {
           role: "user",
-          content: `Generate a comprehensive AI summary from this contact information:\n\n${context}`,
+          content: `PERSON DATA:\n\n${context}`,
         },
       ],
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 800,
+      response_format: { type: "json_object" },
     });
 
-    const aiSummary = completion.choices[0]?.message?.content?.trim();
+    const aiResponse = completion.choices[0]?.message?.content?.trim();
 
-    if (!aiSummary) {
+    if (!aiResponse) {
       return NextResponse.json(
         { error: "Failed to generate AI summary" },
         { status: 500 }
       );
     }
 
-    // Update the person record with the new AI summary
+    // Parse the JSON response
+    let summaries;
+    try {
+      summaries = JSON.parse(aiResponse);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", parseError);
+      return NextResponse.json(
+        { error: "Failed to parse AI summary response" },
+        { status: 500 }
+      );
+    }
+
+    // Validate that we have all three summaries
+    if (!summaries.summary_micro || !summaries.summary_default || !summaries.summary_full) {
+      return NextResponse.json(
+        { error: "AI did not generate all required summaries" },
+        { status: 500 }
+      );
+    }
+
+    // Update the person record with the default summary
+    // (Store in relationship_summary field - the primary summary field used throughout the app)
     const { error: updateError } = await (supabase as any)
       .from("persons")
       .update({
-        relationship_summary: aiSummary,
+        relationship_summary: summaries.summary_default,
         updated_at: new Date().toISOString()
       })
       .eq("id", contactId)
@@ -185,7 +240,10 @@ Return ONLY the formatted markdown summary, nothing else.`;
 
     return NextResponse.json({
       success: true,
-      summary: aiSummary,
+      summary: summaries.summary_default, // Primary summary for backward compatibility
+      summary_micro: summaries.summary_micro,
+      summary_default: summaries.summary_default,
+      summary_full: summaries.summary_full,
       usage: completion.usage,
     });
   } catch (error: any) {
