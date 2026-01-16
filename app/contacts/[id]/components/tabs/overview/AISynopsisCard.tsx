@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useState } from 'react';
+import { SummaryLevel } from '@/lib/utils/summary-levels';
 
 interface AISynopsisCardProps {
   contactId: string;
@@ -12,6 +13,7 @@ interface AISynopsisCardProps {
   deepLore?: string | null;
   whereMet?: string | null;
   aiSummary?: string | null;
+  summaryLevel?: SummaryLevel; // The effective summary level being displayed
   lastUpdated?: string;
   onNavigateToStory?: () => void;
   onRefresh?: () => void;
@@ -24,6 +26,7 @@ export function AISynopsisCard({
   deepLore,
   whereMet,
   aiSummary,
+  summaryLevel = 'default',
   lastUpdated,
   onNavigateToStory,
   onRefresh,
@@ -69,12 +72,21 @@ export function AISynopsisCard({
     return null;
   }
 
+  const levelLabels = {
+    micro: 'Quick',
+    default: 'Standard',
+    full: 'Detailed'
+  };
+
   return (
     <div className={cn("bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-5 md:p-6", !isInline && "shadow-sm")}>
       <div className="flex items-center justify-between mb-3.5">
-        <div className="flex items-center gap-1.5 text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
             <span>✨</span>
             <span>AI Summary</span>
+            <span className="px-1.5 py-0.5 bg-[#2d3748] rounded text-[#7c3aed] text-[10px] font-medium">
+              {levelLabels[summaryLevel]}
+            </span>
         </div>
         <div className="flex items-center gap-2">
             <button

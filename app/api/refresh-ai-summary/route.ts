@@ -175,12 +175,16 @@ Output must be VALID JSON ONLY, no markdown, no extra commentary:
       );
     }
 
-    // Update the person record with the default summary
-    // (Store in relationship_summary field - the primary summary field used throughout the app)
+    // Update the person record with all three summary levels
+    // Store in dedicated fields: summary_micro, summary_default, summary_full
+    // Also update relationship_summary for backward compatibility
     const { error: updateError } = await (supabase as any)
       .from("persons")
       .update({
-        relationship_summary: summaries.summary_default,
+        summary_micro: summaries.summary_micro,
+        summary_default: summaries.summary_default,
+        summary_full: summaries.summary_full,
+        relationship_summary: summaries.summary_default, // Backward compatibility
         updated_at: new Date().toISOString()
       })
       .eq("id", contactId)

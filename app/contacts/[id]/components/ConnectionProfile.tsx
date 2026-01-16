@@ -12,6 +12,7 @@ import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import { PostCallPulse } from './PostCallPulse';
+import { SummaryLevel } from '@/lib/utils/summary-levels';
 
 export interface Contact {
   id: string;
@@ -42,11 +43,12 @@ interface ProfileProps {
   health: HealthStatus;
   lastContact: string;
   synopsis: string;
+  summaryLevel?: SummaryLevel;
   sharedMemory?: string;
   onRefreshAISummary?: () => void;
 }
 
-const ConnectionProfile = ({ contact, health, lastContact, synopsis, onRefreshAISummary }: ProfileProps) => {
+const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLevel = 'default', onRefreshAISummary }: ProfileProps) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
@@ -138,6 +140,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, onRefreshAI
                     contactId={contact.id}
                     contactName={name}
                     aiSummary={synopsis || (contact as any).relationship_summary}
+                    summaryLevel={summaryLevel}
                     deepLore={contact.deep_lore}
                     whereMet={contact.where_met}
                     lastUpdated={contact.updated_at}

@@ -8,6 +8,7 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { LinkConnectionModal } from "./components/LinkConnectionModal";
 import ConnectionProfile from "./components/ConnectionProfile";
 import { getRelationshipHealth } from "@/lib/relationship-health";
+import { getEffectiveSummaryLevel, getSummaryAtLevel } from "@/lib/utils/summary-levels";
 
 export default function ContactDetailPage({
   params,
@@ -20,7 +21,9 @@ export default function ContactDetailPage({
   const [contact, setContact] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [userSettings, setUserSettings] = useState<any>(null);
+  const [effectiveSummaryLevel, setEffectiveSummaryLevel] = useState<'micro' | 'default' | 'full'>('default');
+
   // Modal States
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   
@@ -84,6 +87,13 @@ export default function ContactDetailPage({
 
         if (personError) throw personError;
 
+        // 1b. Fetch User Settings for summary level preference
+        const { data: userSettings } = await (supabase as any)
+          .from("user_settings")
+          .select("summary_level_default")
+          .eq("user_id", user.id)
+          .single();
+
         // 2. Fetch Tags
         const { data: tagData } = await (supabase as any)
           .from("person_tags")
@@ -128,27 +138,28 @@ export default function ContactDetailPage({
         });
 
 
-        // 5. Assemble complete object
+        // 5. Compute effective summary level
+        const effectiveLevel = getEffectiveSummaryLevel(person, userSettings);
+        setEffectiveSummaryLevel(effectiveLevel);
+        setUserSettings(userSettings);
+
+        // Get the appropriate summary at the effective level
+        const summaryAtLevel = getSummaryAtLevel(person, effectiveLevel);
+
+        // Fallback logic for when no summaries exist yet
         const latestMemory = sharedMemories?.[0]?.content;
-        
-        // Priority for AI Summary:
-        // 1. relationship_summary (AI generated snapshot)
-        // 2. deep_lore (Manual narrative lore)
-        // 3. Story details fallback (The Origin + Philosophy + Priorities)
-        
         const storyFallback = [
             person.where_met ? `**Origin:** ${person.where_met}` : null,
             person.why_stay_in_contact ? `**Philosophy:** ${person.why_stay_in_contact}` : null,
             person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
         ].filter(Boolean).join('\n\n');
 
-        // If no high-quality AI summary exists, combine deep_lore with the structured story data
-        // This ensures that even if deep_lore just says "Imported contact", we still show the other fields if they exist.
         const fallbackContent = [person.deep_lore, storyFallback].filter(Boolean).join('\n\n___\n\n');
 
-        const baseSummary = person.relationship_summary || fallbackContent || "";
-        
-        const enhancedAiSummary = latestMemory 
+        // Use the level-specific summary, or fall back to relationship_summary, or finally to fallback content
+        const baseSummary = summaryAtLevel || person.relationship_summary || fallbackContent || "";
+
+        const enhancedAiSummary = latestMemory
             ? `**Most Recent Memory:** ${latestMemory}\n\n${baseSummary}`
             : baseSummary;
 
@@ -229,6 +240,7 @@ export default function ContactDetailPage({
             health={healthState}
             lastContact={lastContactFormatted}
             synopsis={contact.ai_summary}
+            summaryLevel={effectiveSummaryLevel}
             sharedMemory={contact.deep_lore || contact.interests?.[0]}
             onRefreshAISummary={handleRefreshAISummary}
         />
