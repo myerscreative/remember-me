@@ -64,7 +64,7 @@ export function ImportProgress({
       <div className="space-y-3">
         {stage === 'parsing' && (
           <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <Loader2 className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-spin flex-shrink-0" />
+            <Loader2 className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-spin shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 Reading file...
@@ -78,7 +78,7 @@ export function ImportProgress({
 
         {stage === 'importing' && currentContact && (
           <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-            <Loader2 className="h-5 w-5 text-purple-600 dark:text-purple-400 animate-spin flex-shrink-0" />
+            <Loader2 className="h-5 w-5 text-purple-600 dark:text-purple-400 animate-spin shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-purple-900 dark:text-purple-100">
                 Importing contacts...
@@ -92,7 +92,7 @@ export function ImportProgress({
 
         {stage === 'complete' && (
           <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-semibold text-green-900 dark:text-green-100">
                 Successfully imported {imported} contact{imported !== 1 ? 's' : ''}!
@@ -111,7 +111,7 @@ export function ImportProgress({
 
         {stage === 'error' && errorMessage && (
           <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-semibold text-red-900 dark:text-red-100">
                 Import failed

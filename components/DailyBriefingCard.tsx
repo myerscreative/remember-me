@@ -38,7 +38,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
     <>
       <Card className="border border-border bg-card shadow-xl relative overflow-hidden group">
         {/* Glass Header */}
-        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-16 bg-linear-to-b from-primary/10 to-transparent pointer-events-none" />
         
         <CardHeader className="relative pb-2 z-10">
           <div className="flex items-center justify-between">
@@ -73,7 +73,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                       <div 
                         key={p.id} 
                         className={`
-                            flex-shrink-0 w-40 flex flex-col items-center group relative
+                            shrink-0 w-40 flex flex-col items-center group relative
                             ${idx === 0 ? 'opacity-100' : 'opacity-90'}
                         `}
                       >

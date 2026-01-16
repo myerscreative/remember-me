@@ -39,7 +39,7 @@ export function StoryCompletenessIndicator({
 
   if (completeness >= 80) {
     return (
-      <Card className="border-2 border-green-200 dark:border-green-800 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
+      <Card className="border-2 border-green-200 dark:border-green-800 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

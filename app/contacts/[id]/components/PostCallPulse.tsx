@@ -104,7 +104,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
 
   if (error) {
       return (
-          <div className="fixed inset-0 bg-[#0f111a] z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 bg-[#0f111a] z-100 flex items-center justify-center p-6">
               <div className="bg-slate-900 border border-red-500 rounded-xl p-6 text-center">
                   <h3 className="text-red-400 font-bold mb-2">Error in Pulse</h3>
                   <p className="text-slate-300 mb-4">{error}</p>
@@ -115,7 +115,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
   }
 
   return (
-    <div className="fixed inset-0 bg-[#0f111a] z-[100] p-6 flex flex-col animate-in slide-in-from-bottom duration-300">
+    <div className="fixed inset-0 bg-[#0f111a] z-100 p-6 flex flex-col animate-in slide-in-from-bottom duration-300">
       
       {/* HEADER / NAV */}
       <div className="flex justify-between items-start mb-6">
@@ -239,7 +239,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
                 <button 
                     onClick={handleSave}
                     disabled={!dumpText.trim() || isSaving}
-                    className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100"
+                    className="flex-2 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100"
                 >
                     {isSaving ? <Loader2 className="animate-spin"/> : 'Save to Garden'}
                 </button>

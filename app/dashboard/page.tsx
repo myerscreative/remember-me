@@ -296,19 +296,19 @@ export default function DashboardPage() {
 
                   {/* Mobile Quick Stats - Only visible on mobile */}
                   <div className="lg:hidden grid grid-cols-3 gap-3">
-                      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+                      <Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
                           <CardContent className="p-3 text-center">
                               <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Total</div>
                               <div className="text-2xl font-black text-purple-900 dark:text-purple-100">{stats?.totalContacts || 0}</div>
                           </CardContent>
                       </Card>
-                      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+                      <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
                           <CardContent className="p-3 text-center">
                               <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Context</div>
                               <div className="text-2xl font-black text-blue-900 dark:text-blue-100">{stats?.withContext || 0}</div>
                           </CardContent>
                       </Card>
-                      <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
+                      <Card className="bg-linear-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
                           <CardContent className="p-3 text-center">
                               <div className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">Neglected</div>
                               <div className="text-2xl font-black text-red-900 dark:text-red-100">{stats?.needingAttention || 0}</div>

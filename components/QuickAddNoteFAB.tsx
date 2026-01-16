@@ -56,7 +56,7 @@ export function QuickAddNoteFAB() {
           aria-label="Quick add story note"
         >
           <BookOpen className="h-6 w-6 group-hover:scale-110 transition-transform" />
-          <div className="absolute -top-1 -right-1 h-5 w-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-md">
+          <div className="absolute -top-1 -right-1 h-5 w-5 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-md">
             <Plus className="h-3 w-3 text-white stroke-[3px]" />
           </div>
         </button>

@@ -127,7 +127,7 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
             >
               <div className="flex-1 w-0 p-4">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 pt-0.5">
+                  <div className="shrink-0 pt-0.5">
                     <Sprout className="h-10 w-10 text-emerald-500" />
                   </div>
                   <div className="ml-3 flex-1">

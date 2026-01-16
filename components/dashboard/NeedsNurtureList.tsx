@@ -73,7 +73,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                     key={tribe}
                     onClick={() => setActiveTribe(tribe)}
                     className={cn(
-                        "flex-shrink-0 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all",
+                        "shrink-0 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all",
                         activeTribe === tribe
                             ? "bg-[#6366f1] text-white shadow-md shadow-indigo-500/20"
                             : "bg-transparent border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900"

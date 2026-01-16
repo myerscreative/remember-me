@@ -44,8 +44,8 @@ export function HistoryTimeline({ history, onCopy, isLoading }: HistoryTimelineP
   return (
     <div className="relative h-[300px] flex flex-col">
         {/* Fade Masks */}
-        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-4 bg-linear-to-b from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-linear-to-t from-background to-transparent z-10 pointer-events-none" />
 
         <ScrollArea className="flex-1 -mx-2 px-2">
             <div className="space-y-4 py-2 pl-2 border-l-2 border-border ml-3">

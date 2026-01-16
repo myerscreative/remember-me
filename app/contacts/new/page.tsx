@@ -323,7 +323,7 @@ export default function NewContactPage() {
             <Button
               type="button"
               onClick={handleVoiceEntry}
-              className="w-full h-14 md:h-16 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold text-base md:text-lg shadow-lg"
+              className="w-full h-14 md:h-16 rounded-xl bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold text-base md:text-lg shadow-lg"
             >
               <div className="flex items-center justify-between w-full px-4">
                 <div className="flex items-center gap-2">

@@ -167,15 +167,10 @@ export default function ContactDetailPage({
     : 'Never';
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0a0e1a]">
+    <div className="flex flex-col items-center md:items-start min-h-screen bg-[#0a0e1a]">
       <Toaster position="top-center" />
       
-      <div className="w-full max-w-md">
-        <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
-            ⚠️ Verifying Deployment v3.1 (Redesign) ⚠️<br/>
-            {new Date().toLocaleTimeString()}
-        </div>
-
+    <div className="w-full max-w-[1200px] mx-auto">
         <ConnectionProfile
             contact={contact}
             health={healthState}

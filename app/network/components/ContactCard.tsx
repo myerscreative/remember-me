@@ -37,11 +37,11 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
     avatarBg = '#6366f1'; // Blue
   } else if (isStrong) {
     borderColor = 'border-[#10b981] border-2'; // Green
-    bgColor = 'bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7]'; // Green Gradient
+    bgColor = 'bg-linear-to-br from-[#f0fdf4] to-[#dcfce7]'; // Green Gradient
     avatarBg = '#10b981'; // Green
   } else if (isMedium) {
     borderColor = 'border-[#fbbf24] border-2'; // Yellow
-    bgColor = 'bg-gradient-to-br from-[#fef3c7] to-[#fde68a]'; // Yellow Gradient
+    bgColor = 'bg-linear-to-br from-[#fef3c7] to-[#fde68a]'; // Yellow Gradient
     avatarBg = '#fbbf24'; // Yellow
   }
 

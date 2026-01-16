@@ -62,7 +62,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
 
   return (
-    <div className="relative w-full bg-gradient-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
+    <div className="relative w-full bg-linear-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
       
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center px-6 mb-6">
@@ -94,7 +94,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                {/* Active Ring Segment */}
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
-               <Avatar className="w-[124px] h-[124px] border-[4px] border-[#1a1b2e]">
+               <Avatar className="w-[124px] h-[124px] border-4 border-[#1a1b2e]">
                  <AvatarImage src={optimisticPhotoUrl || contact.photo_url || ''} className="object-cover" />
                  <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
                    {getInitials(contact.first_name, contact.last_name)}
@@ -103,7 +103,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
                {/* Status Dot */}
                <div 
-                    className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
+                    className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e]" 
                     style={{ backgroundColor: health.color }} 
                />
                

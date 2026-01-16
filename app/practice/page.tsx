@@ -285,7 +285,7 @@ export default function GameCenterPage() {
             </div>
             <div className="relative h-4 bg-gray-100 dark:bg-gray-900/50 rounded-full overflow-hidden shadow-inner">
               <div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
+                className="absolute top-0 left-0 h-full bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
                 style={{ width: `${xpProgress}%` }}
               >
                  <div className="absolute inset-0 bg-white/20 animate-pulse" />

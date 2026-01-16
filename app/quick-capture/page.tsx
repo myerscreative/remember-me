@@ -130,13 +130,13 @@ export default function QuickCapturePage() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex flex-col h-screen bg-gradient-to-br from-cyan-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
+      <div className="flex flex-col h-screen bg-linear-to-br from-cyan-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
         <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-linear-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
                 <Zap className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -151,7 +151,7 @@ export default function QuickCapturePage() {
           </div>
 
           {/* Quick capture tips */}
-          <Card className="mb-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-blue-200 dark:border-blue-800">
+          <Card className="mb-6 bg-linear-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-blue-200 dark:border-blue-800">
             <CardContent className="p-4">
               <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-2">
                 💡 Quick Tips:
@@ -208,7 +208,7 @@ export default function QuickCapturePage() {
             <Button
               onClick={handleQuickSave}
               disabled={isSaving || (!notes.trim() && !contactName.trim())}
-              className="flex-1 h-14 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 h-14 rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>

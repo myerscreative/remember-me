@@ -18,7 +18,7 @@ export function ContactInfoGrid({ email, phone }: ContactInfoGridProps) {
       <div className="grid grid-cols-2 gap-4">
         {/* Email */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
             <Mail className="w-4 h-4 text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
@@ -36,7 +36,7 @@ export function ContactInfoGrid({ email, phone }: ContactInfoGridProps) {
 
         {/* Phone */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
             <Phone className="w-4 h-4 text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">

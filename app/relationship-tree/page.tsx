@@ -122,7 +122,7 @@ export default function RelationshipTreePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-green-50">
+    <div className="min-h-screen bg-linear-to-br from-amber-50 via-white to-green-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">

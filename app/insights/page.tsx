@@ -281,7 +281,7 @@ export default function InsightsPage() {
                     >
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={contact.avatar || ""} />
-                        <AvatarFallback className="bg-gradient-to-br text-white font-semibold from-purple-500 to-blue-500">
+                        <AvatarFallback className="bg-linear-to-br text-white font-semibold from-purple-500 to-blue-500">
                           {contact.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -316,7 +316,7 @@ export default function InsightsPage() {
 
             {/* Decaying Relationships */}
             {decayingRelationships.length > 0 && (
-              <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 p-6 rounded-xl border-2 border-orange-200 dark:border-orange-800 shadow-sm">
+              <Card className="bg-linear-to-br from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 p-6 rounded-xl border-2 border-orange-200 dark:border-orange-800 shadow-sm">
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -353,7 +353,7 @@ export default function InsightsPage() {
                       >
                         <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all border-2 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md cursor-pointer">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-base font-semibold text-gray-900 dark:text-white truncate">
                                 {relationship.name}
@@ -363,7 +363,7 @@ export default function InsightsPage() {
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 flex-shrink-0">
+                          <div className="flex items-center gap-3 shrink-0">
                             <Badge className={cn("text-xs font-medium", getSeverityColor(relationship.decay_severity))}>
                               {getSeverityText(relationship.last_contact_days)} ago
                             </Badge>
@@ -405,15 +405,15 @@ export default function InsightsPage() {
                         <span className="text-base font-semibold text-gray-400 dark:text-gray-500 w-[30px]">{index + 1}.</span>
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={connection.avatar || ""} />
-                          <AvatarFallback className="bg-gradient-to-br text-white font-semibold from-green-500 to-blue-500">
+                          <AvatarFallback className="bg-linear-to-br text-white font-semibold from-green-500 to-blue-500">
                             {connection.name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-[15px] font-medium text-gray-900 dark:text-white flex-1">{connection.name}</span>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           <div className="w-[120px] h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500"
+                              className="h-full rounded-full bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -524,9 +524,9 @@ export default function InsightsPage() {
             </Card>
 
             {/* Insights Summary */}
-            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 p-5 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
+            <Card className="bg-linear-to-br from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 p-5 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center shrink-0 mt-0.5">
                   <Lightbulb className="h-4 w-4 text-white" />
                 </div>
                 <div>

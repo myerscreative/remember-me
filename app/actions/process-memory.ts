@@ -63,7 +63,7 @@ export async function processMemory(contactId: string, text: string) {
       Identify and classify the relationship (Family, Friend, Work, etc.). Include how they know each other and depth of relationship.
 
       ### Key Roles & Identities
-      Extract meaningful roles (Parent, Professional, Social role). Do not invent facts.
+      Extract meaningful roles (Parent, Professional, Social role). Do not invent facts. Format as bullet points if multiple.
 
       ### Personal Interests & Passions
       Group interests into Hobbies, Intellectual, Values, Lifestyle. Capture patterns.
@@ -72,7 +72,7 @@ export async function processMemory(contactId: string, text: string) {
       Identify temperament and communication preferences.
 
       ### Important Facts & Details
-      Extract concrete details (Family members, Dates, Locations, Career).
+      Extract concrete details (Family members, Dates, Locations, Career). Format as bullet points.
 
       ### Relationship Notes
       Why the user wants to remember this person.
@@ -90,7 +90,8 @@ export async function processMemory(contactId: string, text: string) {
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
          
-      4. SYNOPSIS: The full formatted text content generated based on the "REQUIRED STRUCTURE" above.
+      4. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above. 
+         IMPORTANT: Pass the entire multi-paragraph markdown string as the value here.
          Data Format: { value: string }.
       
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }

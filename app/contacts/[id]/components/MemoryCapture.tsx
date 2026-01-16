@@ -123,7 +123,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
               ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
               : isProcessing
               ? "bg-indigo-400 text-white cursor-not-allowed"
-              : "bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+              : "bg-linear-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
           )}
         >
           {isProcessing ? (

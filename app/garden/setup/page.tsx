@@ -107,7 +107,7 @@ export default function GardenSetupPage() {
         </Link>
 
         <div className="mb-12">
-          <h1 className="text-4xl font-extrabold mb-2 bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-extrabold mb-2 bg-linear-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
             Nurturing your Garden...
           </h1>
           <p className="text-slate-400">
@@ -123,7 +123,7 @@ export default function GardenSetupPage() {
           </div>
           <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500"
+              className="h-full bg-linear-to-r from-indigo-500 to-emerald-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ type: "spring", stiffness: 50, damping: 20 }}
@@ -142,7 +142,7 @@ export default function GardenSetupPage() {
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
               className="absolute inset-0 bg-[#1E293B]/50 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-2xl"
             >
-              <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg shadow-indigo-500/20">
+              <div className="w-24 h-24 bg-linear-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg shadow-indigo-500/20">
                 {currentContact.initials}
               </div>
               <h2 className="text-3xl font-bold mb-2">{currentContact.name}</h2>

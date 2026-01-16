@@ -91,7 +91,7 @@ export function ConnectionDiscoverySection() {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950 p-6 rounded-xl border-2 border-purple-200 dark:border-purple-800 shadow-sm">
+    <Card className="bg-linear-to-br from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950 p-6 rounded-xl border-2 border-purple-200 dark:border-purple-800 shadow-sm">
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
           <Lightbulb className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -115,7 +115,7 @@ export function ConnectionDiscoverySection() {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2 flex-1">
-                  <Icon className={cn("h-5 w-5 flex-shrink-0", typeInfo.iconColor)} />
+                  <Icon className={cn("h-5 w-5 shrink-0", typeInfo.iconColor)} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {typeInfo.label} <span className="font-bold">{discovery.commonValue}</span>
@@ -138,7 +138,7 @@ export function ConnectionDiscoverySection() {
                           <AvatarImage src={person.photo_url || undefined} />
                           <AvatarFallback
                             className={cn(
-                              "bg-gradient-to-br text-white text-xs font-semibold",
+                              "bg-linear-to-br text-white text-xs font-semibold",
                               getGradient(fullName)
                             )}
                           >

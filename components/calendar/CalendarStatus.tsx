@@ -119,7 +119,7 @@ export function CalendarStatus() {
                 key={event.id} 
                 className="group flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
               >
-                <div className="flex-shrink-0 w-14 text-center">
+                <div className="shrink-0 w-14 text-center">
                   <span className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                     {getEventDate(event.start.dateTime)}
                   </span>

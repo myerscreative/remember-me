@@ -270,9 +270,9 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
         <DialogTitle className="sr-only">Unified Action Hub for {person.name}</DialogTitle>
         
         {/* Header / Banner */}
-        <div className="relative h-32 bg-gradient-to-r from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
+        <div className="relative h-32 bg-linear-to-r from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
              <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.png')] opacity-20 pointer-events-none mix-blend-overlay" />
-             <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent" />
+             <div className="absolute inset-0 bg-linear-to-t from-[#0F172A] via-transparent to-transparent" />
              
              <Button 
                 variant="ghost" 
@@ -538,8 +538,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     </div>
                     
                     {/* AI Status Banner */}
-                    <div className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 shrink-0 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 opacity-50" />
+                    <div className="bg-linear-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 shrink-0 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 via-purple-500 to-indigo-500 opacity-50" />
                         <div className="flex gap-2">
                              <div className="mt-0.5">
                                 {isGeneratingStatus ? (

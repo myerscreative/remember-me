@@ -175,7 +175,7 @@ export function WateringEffect({ className = '' }: { className?: string }) {
   return (
     <div className={`relative ${className}`}>
       <div className="absolute inset-0 flex justify-center">
-        <div className="w-1 h-8 bg-gradient-to-b from-blue-400 to-transparent rounded-full animate-bounce" />
+        <div className="w-1 h-8 bg-linear-to-b from-blue-400 to-transparent rounded-full animate-bounce" />
       </div>
       <div className="absolute inset-0 flex justify-center gap-1 mt-2">
         <div 

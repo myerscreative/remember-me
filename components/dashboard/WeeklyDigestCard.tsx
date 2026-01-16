@@ -80,7 +80,7 @@ export function WeeklyDigestCard() {
 
     return (
         <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+            <div className="absolute -inset-0.5 bg-linear-to-r from-indigo-500 to-purple-600 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
             <div className="relative bg-card rounded-xl border border-border overflow-hidden">
                 
             {/* Header */}

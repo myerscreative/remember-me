@@ -1,13 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import { updateStoryFields, addSharedMemory } from '@/app/actions/story-actions';
-import { Plus, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 
+interface Milestone {
+  date: string;
+  title: string;
+  type: string;
+}
+
+interface SharedMemory {
+  created_at: string;
+  content: string;
+}
+
+import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle, Plus, Loader2 } from 'lucide-react';
+import { addGiftIdea, toggleGiftStatus, type GiftIdea } from '@/app/actions/gift-actions';
+import { updateStoryFields, addSharedMemory } from '@/app/actions/story-actions';
+
 interface StoryTabProps {
-  contact: any;
+  contact: {
+    id: string;
+    story?: {
+      whereWeMet?: string;
+      whyStayInContact?: string;
+      whatsImportant?: string;
+    };
+    milestones?: Milestone[];
+    gift_ideas?: GiftIdea[];
+    shared_memories?: SharedMemory[];
+  };
 }
 
 export function StoryTab({ contact }: StoryTabProps) {
@@ -23,7 +46,7 @@ export function StoryTab({ contact }: StoryTabProps) {
 
   // Auto-Save Handlers
   const handleBlur = async (field: string, value: string) => {
-    let update: any = {};
+    const update: Record<string, string> = {};
     if (field === 'where_met') update.where_met = value;
     if (field === 'why_stay_in_contact') update.why_stay_in_contact = value;
     if (field === 'most_important_to_them') update.most_important_to_them = value;
@@ -51,7 +74,7 @@ export function StoryTab({ contact }: StoryTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 p-6 pb-20 bg-[#0f111a] text-slate-200">
+    <div className="flex flex-col gap-8 pb-20 text-slate-200">
       
       {/* SECTION: THE ORIGIN */}
       <div className="group">
@@ -103,13 +126,14 @@ export function StoryTab({ contact }: StoryTabProps) {
         
         <div className="space-y-3">
             {(contact.milestones || []).length > 0 ? (
-                (contact.milestones).map((milestone: any, idx: number) => {
-                    const isUpcoming = new Date(milestone.date) > new Date();
+                (contact.milestones || []).map((milestone, idx) => {
+                    const milestoneDate = milestone.date ? new Date(milestone.date) : new Date();
+                    const isUpcoming = milestoneDate > new Date();
                     return (
                         <div key={idx} className="flex gap-4 items-center bg-slate-900/50 p-3 rounded-xl border border-slate-800">
                              <div className={`p-3 rounded-lg flex flex-col items-center justify-center w-14 h-14 ${isUpcoming ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-slate-800 text-slate-500'}`}>
-                                <span className="text-[10px] font-bold uppercase">{new Date(milestone.date).toLocaleString('default', { month: 'short' })}</span>
-                                <span className="text-lg font-black leading-none">{new Date(milestone.date).getDate()}</span>
+                                <span className="text-[10px] font-bold uppercase">{milestoneDate.toLocaleString('default', { month: 'short' })}</span>
+                                <span className="text-lg font-black leading-none">{milestoneDate.getDate()}</span>
                              </div>
                              
                              <div className="flex-1">
@@ -183,13 +207,20 @@ export function StoryTab({ contact }: StoryTabProps) {
 
         <div className="space-y-3">
           {(contact.shared_memories || []).length > 0 ? (
-            (contact.shared_memories).map((memory: any, idx: number) => (
-               <MemoryItem 
-                 key={idx} 
-                 date={new Date(memory.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                 text={memory.content} 
-               />
-            ))
+            (contact.shared_memories || []).map((memory, idx) => {
+               const createdAt = memory.created_at ? new Date(memory.created_at) : null;
+               const formattedDate = createdAt 
+                 ? createdAt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                 : 'Recent';
+               
+               return (
+                 <MemoryItem 
+                   key={idx} 
+                   date={formattedDate}
+                   text={memory.content} 
+                 />
+               );
+            })
           ) : (
             <div className="text-center py-8 bg-slate-900/30 rounded-2xl border border-slate-800 border-dashed">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Vault is Empty</p>
@@ -210,8 +241,7 @@ const MemoryItem = ({ date, text }: { date: string, text: string }) => (
   </div>
 );
 
-import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle } from 'lucide-react';
-import { addGiftIdea, toggleGiftStatus, GiftIdea } from '@/app/actions/gift-actions';
+
 
 function GiftVault({ contactId, initialGifts }: { contactId: string, initialGifts: GiftIdea[] }) {
     const [gifts, setGifts] = useState<GiftIdea[]>(initialGifts);

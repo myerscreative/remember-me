@@ -5,35 +5,48 @@ import { updateFamilyMembers } from '@/app/actions/update-family-members';
 import { updateStoryFields } from '@/app/actions/story-actions'; // Reusing for family_notes mapped to simple field if needed, or create new action.
 // Actually, `family_notes` is a field on persons table. updateStoryFields logic is generic enough? 
 // Let's check story-actions. it takes specific fields. I might need a generic update action or just add family_notes to it.
-import { Plus, X, Heart, User, Home, Sparkles, Loader2 } from 'lucide-react';
+import { X, Heart, User, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import Image from "next/image";
+
+interface FamilyMember {
+  name: string;
+  relationship: 'Spouse' | 'Partner' | 'Child' | 'Parent' | 'Sibling' | 'Other';
+  birthday?: string;
+  anniversary?: string; 
+  notes?: string; 
+  id?: string;
+}
 
 interface FamilyTabProps {
-  contact: any;
+  contact: {
+    id: string;
+    name: string;
+    familyMembers?: FamilyMember[];
+    family_notes?: string;
+    connections?: Array<{
+      id: string;
+      relationship_type: string;
+      context?: string;
+      person: {
+        id: string;
+        name: string;
+        photo_url?: string;
+      };
+    }>;
+  };
 }
 
-// Extended Family Member Interface
-interface FamilyMember {
-    name: string;
-    relationship: 'Spouse' | 'Partner' | 'Child' | 'Parent' | 'Sibling' | 'Other';
-    birthday?: string;
-    anniversary?: string; 
-    notes?: string; 
-    id?: string; // conceptual ID, currently just index in array
-}
 
 export function FamilyTab({ contact }: FamilyTabProps) {
   const [members, setMembers] = useState<FamilyMember[]>(contact.familyMembers || []);
   const [householdNotes, setHouseholdNotes] = useState(contact.family_notes || '');
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Helper to save members
   const saveMembers = async (newMembers: FamilyMember[]) => {
     setMembers(newMembers);
-    setIsUpdating(true);
     const result = await updateFamilyMembers(contact.id, newMembers);
-    setIsUpdating(false);
     
     if (!result.success) {
       toast.error("Failed to update family");
@@ -43,7 +56,6 @@ export function FamilyTab({ contact }: FamilyTabProps) {
 
   const handleUpdateMember = (index: number, field: keyof FamilyMember, value: string) => {
     const newMembers = [...members];
-    // Cast to any to allow dynamic update, ensure type safety by caller
     (newMembers[index] as any)[field] = value;
     saveMembers(newMembers);
   };
@@ -86,7 +98,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
   // Could handle Parents/Siblings too if needed, but per prompt focus on Inner Circle (Partner/Child)
 
   return (
-    <div className="flex flex-col gap-8 p-6 pb-20 bg-[#0f111a] text-slate-200">
+    <div className="flex flex-col gap-8 pb-20 text-slate-200">
 
       {/* HOUSEHOLD CONTEXT */}
        <div className="group">
@@ -105,7 +117,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
       
       {/* PARTNER SECTION */}
       <section className="bg-slate-900/30 border border-slate-800 rounded-3xl p-5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-indigo-500 opacity-20" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-pink-500 to-indigo-500 opacity-20" />
         
         <div className="flex justify-between items-center mb-4">
           <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
@@ -235,11 +247,16 @@ export function FamilyTab({ contact }: FamilyTabProps) {
          
          <div className="space-y-2">
             {(contact.connections || []).length > 0 ? (
-                (contact.connections).map((conn: any) => (
+                (contact.connections || []).map((conn) => (
                     <Link href={`/contacts/${conn.person.id}`} key={conn.id} className="flex items-center gap-3 p-3 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 transition-colors group">
-                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 overflow-hidden flex items-center justify-center text-xs font-bold text-slate-500">
+                        <div className="relative w-8 h-8 rounded-full bg-slate-900 border border-slate-700 overflow-hidden flex items-center justify-center text-xs font-bold text-slate-500">
                             {conn.person.photo_url ? (
-                                <img src={conn.person.photo_url} alt={conn.person.name} className="w-full h-full object-cover"/>
+                                <Image 
+                                  src={conn.person.photo_url} 
+                                  alt={conn.person.name} 
+                                  fill
+                                  className="object-cover"
+                                />
                             ) : (
                                 <span>{conn.person.name?.[0]}</span>
                             )}

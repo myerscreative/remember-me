@@ -145,7 +145,7 @@ export default function BriefingPage({
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={contact.photo_url || undefined} />
-                  <AvatarFallback className={cn("bg-gradient-to-br text-white text-2xl font-semibold", getGradient(fullName))}>
+                  <AvatarFallback className={cn("bg-linear-to-br text-white text-2xl font-semibold", getGradient(fullName))}>
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -206,7 +206,7 @@ export default function BriefingPage({
                 <div className="space-y-2">
                   {contact.interests.slice(0, 3).map((interest: string, index: number) => (
                     <div key={index} className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
                       <p className="text-sm text-gray-700 dark:text-gray-300">Ask about their interest in {interest}</p>
                     </div>
                   ))}

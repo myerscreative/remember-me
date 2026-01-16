@@ -151,7 +151,7 @@ export function RelationshipPatternsSection() {
               )}
             >
               <div className="flex items-start gap-3">
-                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", colors.iconBg)}>
+                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center shrink-0", colors.iconBg)}>
                   <Icon className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">

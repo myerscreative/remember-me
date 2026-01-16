@@ -481,7 +481,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
 
       {/* Garden Canvas */}
       <div 
-        className="relative w-full h-[85vh] md:h-[90vh] bg-gradient-to-b from-white to-slate-50 dark:from-[#111827] dark:to-[#0f172a] rounded-xl overflow-hidden shadow-inner border border-slate-100 dark:border-gray-800" 
+        className="relative w-full h-[85vh] md:h-[90vh] bg-linear-to-b from-white to-slate-50 dark:from-[#111827] dark:to-[#0f172a] rounded-xl overflow-hidden shadow-inner border border-slate-100 dark:border-gray-800" 
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -492,7 +492,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
 
 
         {/* Info Badge - Desktop Only */}
-        <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-[2rem] shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
+        <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-4xl shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
           <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
           <div className="text-2xl font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm">
             {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}

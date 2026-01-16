@@ -25,9 +25,9 @@ export default function NurtureSidebar({ contacts, onQuickLog, onHover }: Nurtur
   // So we render the container regardless.
 
   return (
-    <div className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 z-10 h-[600px] max-h-[80vh]">
+    <div className="w-full lg:w-80 shrink-0 flex flex-col gap-4 z-10 h-[600px] max-h-[80vh]">
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col h-full">
-        <div className="flex items-center justify-between mb-3 flex-shrink-0">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
              🍂 Needs Nurture
           </h3>
@@ -53,7 +53,7 @@ export default function NurtureSidebar({ contacts, onQuickLog, onHover }: Nurtur
                 className="group flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-orange-200 dark:hover:border-orange-900/50 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0">
                     <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 text-xs font-bold border border-orange-200 dark:border-orange-800 shadow-[0_0_10px_-2px_rgba(249,115,22,0.3)]">
                       {contact.initials}
                     </div>
@@ -79,7 +79,7 @@ export default function NurtureSidebar({ contacts, onQuickLog, onHover }: Nurtur
 
                 <button
                   onClick={() => onQuickLog(contact)}
-                  className="flex-shrink-0 p-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border border-slate-200 dark:border-slate-600 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all shadow-sm"
+                  className="shrink-0 p-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border border-slate-200 dark:border-slate-600 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all shadow-sm"
                   title="Quick Log Connection"
                 >
                   <Zap className="w-3.5 h-3.5 fill-current" />

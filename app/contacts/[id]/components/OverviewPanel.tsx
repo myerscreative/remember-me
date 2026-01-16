@@ -127,7 +127,7 @@ export function OverviewPanel({
                             />
                          ) : (
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 md:w-11 md:h-11 rounded-[10px] bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] flex items-center justify-center text-xl shrink-0">
+                                <div className="w-10 h-10 md:w-11 md:h-11 rounded-[10px] bg-linear-to-br from-[#7c3aed] to-[#5b21b6] flex items-center justify-center text-xl shrink-0">
                                     ✨
                                 </div>
                                 <div className="flex-1">
@@ -146,7 +146,7 @@ export function OverviewPanel({
                     </div>
 
                     {/* Reconnect Card */}
-                    <div className="bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-6 shadow-lg">
+                    <div className="bg-linear-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-6 shadow-lg text-white">
                         <h3 className="text-[13px] font-bold uppercase tracking-[0.5px] text-white/90 mb-2">
                             Ready to Connect?
                         </h3>

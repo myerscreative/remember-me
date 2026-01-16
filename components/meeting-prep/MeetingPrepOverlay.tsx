@@ -184,7 +184,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
         {/* --- Content (Desktop View) --- */}
         <div className="hidden md:block">
           {/* Meeting Info Banner */}
-          <div className="px-8 py-8 bg-gradient-to-br from-blue-50 to-blue-100 border-b-2 border-indigo-500 flex gap-6 items-center">
+          <div className="px-8 py-8 bg-linear-to-br from-blue-50 to-blue-100 border-b-2 border-indigo-500 flex gap-6 items-center">
             <div className="w-20 h-20 rounded-full bg-indigo-500 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-500/30">
               {contact.initials}
             </div>
@@ -309,7 +309,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
           </div>
 
           {/* Conversation Starters */}
-          <div className="px-8 py-8 mx-8 my-4 bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-300 rounded-2xl">
+          <div className="px-8 py-8 mx-8 my-4 bg-linear-to-br from-amber-50 to-amber-100 border-2 border-amber-300 rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 🎯 Conversation Starters
@@ -334,7 +334,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
               <div className="space-y-4">
                 {conversationStarters.map((starter, i) => (
                   <div key={i} className="flex gap-4 items-start p-4 bg-white rounded-xl shadow-sm border border-amber-100">
-                    <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-amber-400 text-white font-bold rounded-full">
+                    <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-amber-400 text-white font-bold rounded-full">
                       {i + 1}
                     </span>
                     <p className="text-gray-900 pt-1 text-lg">{starter}</p>
@@ -369,7 +369,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                              </Button>
                          </div>
                      </div>
-                     <div className="flex-shrink-0">
+                     <div className="shrink-0">
                          <Button 
                             onClick={() => {
                                 onClose();
@@ -544,7 +544,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                ) : (
                  conversationStarters.slice(0, 3).map((starter, i) => (
                    <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-left flex gap-3">
-                     <span className="w-6 h-6 bg-amber-400 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                     <span className="w-6 h-6 bg-amber-400 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
                      <p className="text-gray-900 leading-relaxed font-medium text-sm">"{starter}"</p>
                    </div>
                  ))

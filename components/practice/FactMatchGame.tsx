@@ -186,7 +186,7 @@ export function FactMatchGame({ onBack }: FactMatchGameProps) {
       <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
 
         {/* Question Header */}
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-8 md:p-12 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-8 md:p-12 flex flex-col items-center text-center relative overflow-hidden">
              
              {/* Background Decoration */}
              <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">

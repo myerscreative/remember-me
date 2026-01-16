@@ -105,7 +105,7 @@ function MeetingCard({ meeting, onClick }: { meeting: MockMeeting; onClick: () =
 
   const containerClasses = cn(
     "flex flex-col sm:flex-row gap-4 p-5 bg-gray-50 dark:bg-gray-800/50 border-2 rounded-2xl cursor-pointer transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5",
-    isFirstMeeting ? "border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50" : "border-gray-200 dark:border-gray-700"
+    isFirstMeeting ? "border-amber-200 bg-linear-to-br from-amber-50 to-amber-100/50" : "border-gray-200 dark:border-gray-700"
   );
 
   const hoverBorderColor = "hover:border-indigo-500 dark:hover:border-indigo-400";

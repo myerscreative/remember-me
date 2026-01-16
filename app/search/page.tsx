@@ -317,11 +317,11 @@ export default function SearchPage() {
                       <Card className="hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer border border-gray-200 dark:border-gray-700">
                         <CardContent className="p-4">
                           <div className="flex items-start gap-4">
-                            <Avatar className="h-12 w-12 flex-shrink-0">
+                            <Avatar className="h-12 w-12 shrink-0">
                               <AvatarImage src={contact.photo_url || undefined} />
                               <AvatarFallback
                                 className={cn(
-                                  "bg-gradient-to-br text-white font-semibold",
+                                  "bg-linear-to-br text-white font-semibold",
                                   getGradient(contact.name)
                                 )}
                               >

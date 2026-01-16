@@ -95,7 +95,7 @@ export function GroupInteractionModal({
       {/* Modal */}
       <div className="relative bg-white dark:bg-[#1a1d24] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2d333b] flex-shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2d333b] shrink-0">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-indigo-500" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -132,7 +132,7 @@ export function GroupInteractionModal({
                         : 'bg-gray-50 dark:bg-[#252931] border-2 border-transparent hover:bg-gray-100 dark:hover:bg-[#2d333b]'
                     }`}
                   >
-                    <Avatar className="h-7 w-7 flex-shrink-0">
+                    <Avatar className="h-7 w-7 shrink-0">
                       <AvatarImage src={contact.photo_url || undefined} />
                       <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs">
                         {contact.first_name?.[0] || contact.name[0]}
@@ -142,7 +142,7 @@ export function GroupInteractionModal({
                       {contact.first_name || contact.name.split(' ')[0]}
                     </span>
                     {isSelected && (
-                      <Check className="h-4 w-4 text-indigo-600 ml-auto flex-shrink-0" />
+                      <Check className="h-4 w-4 text-indigo-600 ml-auto shrink-0" />
                     )}
                   </button>
                 );
@@ -187,7 +187,7 @@ export function GroupInteractionModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-5 border-t border-gray-100 dark:border-[#2d333b] flex-shrink-0">
+        <div className="flex justify-end gap-3 p-5 border-t border-gray-100 dark:border-[#2d333b] shrink-0">
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>

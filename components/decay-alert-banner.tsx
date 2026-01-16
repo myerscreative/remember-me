@@ -92,7 +92,7 @@ export function DecayAlertBanner() {
         
       <CardContent className="p-4 md:p-5 relative z-10">
         <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
                {/* Leaf icon for "Garden/Growth" metaphor */}
               <Users className="h-5 w-5 text-[var(--nurture-banner-text)]" />
@@ -150,7 +150,7 @@ export function DecayAlertBanner() {
                             {relationship.name}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           <Badge className={cn("text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/20")}>
                             {getSeverityText(relationship.last_contact_days)} {relationship.last_contact_days ? 'ago' : ''}
                           </Badge>
@@ -162,7 +162,7 @@ export function DecayAlertBanner() {
 
                 <div className="flex flex-wrap gap-3 pt-1">
                   <Link href="/insights">
-                    <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
+                    <Button size="sm" className="bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
                       View All
                     </Button>
                   </Link>

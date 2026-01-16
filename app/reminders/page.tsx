@@ -398,7 +398,7 @@ export default function RemindersPage() {
                           {/* Checkbox */}
                           <button
                             onClick={() => toggleComplete(reminder.id, reminder.completed)}
-                            className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                            className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
                                       ${reminder.completed
                                         ? 'bg-green-500 border-green-500'
                                         : 'border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-400'

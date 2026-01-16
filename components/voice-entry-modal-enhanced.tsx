@@ -280,7 +280,7 @@ export function VoiceEntryModalEnhanced({
                   You can say things like:
                 </p>
 
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 text-left space-y-2 mb-4">
+                <div className="bg-linear-to-r from-blue-50 to-purple-50 rounded-lg p-4 text-left space-y-2 mb-4">
                   <p className="text-sm text-gray-700">
                     📝 <span className="font-medium">"I just met Sarah Johnson at the AI Summit.
                     She's a product manager at Tesla working on autonomous driving.
@@ -361,7 +361,7 @@ export function VoiceEntryModalEnhanced({
                     onClick={() => handleSelectSimilar(contact.id)}
                   >
                     <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12 bg-gradient-to-br from-blue-400 to-purple-500 text-white flex items-center justify-center">
+                      <Avatar className="h-12 w-12 bg-linear-to-br from-blue-400 to-purple-500 text-white flex items-center justify-center">
                         {contact.photo_url ? (
                           <img src={contact.photo_url} alt={contact.name} className="h-full w-full object-cover" />
                         ) : (
@@ -530,7 +530,7 @@ export function VoiceEntryModalEnhanced({
                 <Button variant="outline" onClick={handleRecordAnother} className="flex-1">
                   Record Again
                 </Button>
-                <Button onClick={handleApply} className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                <Button onClick={handleApply} className="flex-1 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                   Apply to Form
                 </Button>
               </div>

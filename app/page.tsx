@@ -390,7 +390,7 @@ export default function HomePage() {
                {/* RIGHT: Actions */}
                <div className="flex items-center gap-2 shrink-0">
                   <Link href="/contacts/new" className="hidden lg:block">
-                     <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
+                     <Button className="bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
                        <Plus className="h-4 w-4 mr-2" />
                        Add Contact
                      </Button>
@@ -518,7 +518,7 @@ export default function HomePage() {
           <div className="group relative">
             <Button
               size="icon"
-              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
+              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
             >
               <Zap className="h-6 w-6 md:h-7 md:w-7 text-white" />
             </Button>

@@ -347,7 +347,7 @@ export function OverviewTab({ contact, onFrequencyChange, onImportanceChange, on
       <div className="w-full xl:w-80 space-y-6">
            
            {/* Ready to Connect */}
-           <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 shadow-lg">
+           <div className="bg-linear-to-br from-purple-600 to-purple-700 rounded-2xl p-6 shadow-lg">
                <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-white/90">Ready to connect?</h3>
                <p className="text-xs text-white/70 mb-4">Generate a personalized script based on your memories.</p>
                <Button 

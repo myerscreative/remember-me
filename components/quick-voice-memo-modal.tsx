@@ -135,7 +135,7 @@ export function QuickVoiceMemoModal({
           {/* Error Display */}
           {error && (
             <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0" />
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
@@ -143,7 +143,7 @@ export function QuickVoiceMemoModal({
           {/* Success Display */}
           {isSaved && (
             <div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
               <p className="text-sm text-green-600 dark:text-green-400">
                 Voice memo saved successfully!
               </p>

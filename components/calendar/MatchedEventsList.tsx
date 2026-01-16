@@ -106,7 +106,7 @@ export function MatchedEventsList() {
               {meetings.map((meeting) => (
                 <div
                   key={meeting.calendarEvent.id}
-                  className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-indigo-200 dark:border-indigo-800 rounded-lg"
+                  className="p-4 bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-indigo-200 dark:border-indigo-800 rounded-lg"
                 >
                   {/* Meeting Title */}
                   <div className="flex items-start justify-between mb-2">

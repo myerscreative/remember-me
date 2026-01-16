@@ -97,7 +97,7 @@ interface GameOverProps {
 export function GameOverScreen({ score, bestScore, streak, xpEarned, onPlayAgain, onExit }: GameOverProps) {
     return (
         <div className="max-w-md mx-auto bg-white dark:bg-[#1f2937] rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 mt-12 animate-in slide-in-from-bottom-8 fade-in duration-700">
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-10 text-center text-white">
+            <div className="bg-linear-to-br from-indigo-600 to-purple-700 p-10 text-center text-white">
                 <div className="inline-flex items-center justify-center p-4 bg-white/20 rounded-full mb-6 backdrop-blur-md">
                    <Trophy size={48} className="text-yellow-300 drop-shadow-md" />
                 </div>

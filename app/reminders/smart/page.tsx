@@ -274,13 +274,13 @@ export default function SmartRemindersPage() {
                       <div className="flex items-start gap-4">
                         {/* Avatar */}
                         <Avatar
-                          className="h-14 w-14 flex-shrink-0 cursor-pointer"
+                          className="h-14 w-14 shrink-0 cursor-pointer"
                           onClick={() => router.push(`/contacts/${reminder.id}`)}
                         >
                           <AvatarImage src={reminder.photo_url || undefined} />
                           <AvatarFallback
                             className={cn(
-                              "bg-gradient-to-br text-white font-semibold",
+                              "bg-linear-to-br text-white font-semibold",
                               getGradient(reminder.name)
                             )}
                           >
@@ -322,7 +322,7 @@ export default function SmartRemindersPage() {
                             urgencyColors.bg
                           )}>
                             <div className="flex items-start gap-2">
-                              <AlertCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", urgencyColors.text)} />
+                              <AlertCircle className={cn("h-5 w-5 shrink-0 mt-0.5", urgencyColors.text)} />
                               <div>
                                 <p className={cn("text-sm font-medium", urgencyColors.text)}>
                                   {reminder.reminderReason}
@@ -395,7 +395,7 @@ export default function SmartRemindersPage() {
           <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <div className="space-y-2">
                   <h3 className="font-semibold text-blue-900 dark:text-blue-200">
                     How Smart Reminders Work

@@ -21,7 +21,7 @@ export function TribeSection({ tribe, onNurtureTribe, searchTerm }: TribeSection
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-3xl p-6 border backdrop-blur-sm bg-gradient-to-br ${gradient} mb-8`}
+      className={`rounded-3xl p-6 border backdrop-blur-sm bg-linear-to-br ${gradient} mb-8`}
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

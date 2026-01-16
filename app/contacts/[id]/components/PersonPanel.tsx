@@ -35,12 +35,7 @@ export function PersonPanel({ contact }: PersonPanelProps) {
   const healthStatus = isOverdue ? 'neglected' : (isHealthy ? 'nurtured' : 'drifting');
 
   return (
-    <div className="w-full md:w-[420px] bg-[#0f1419] border-b md:border-b-0 md:border-r border-[#1a1f2e] flex flex-col overflow-y-auto flex-shrink-0 h-auto md:h-full">
-      {/* DEPLOYMENT CHECK BANNER */}
-      <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
-        ⚠️ Verifying Deployment v3.1 ⚠️<br/>
-        {new Date().toLocaleTimeString()}
-      </div>
+    <div className="w-full md:w-[420px] bg-[#0f1419] border-b md:border-b-0 md:border-r border-[#1a1f2e] flex flex-col overflow-y-auto shrink-0 h-auto md:h-full">
 
       <div className="flex-1 p-6 md:p-8 flex flex-col">
           <InteractionLogger 

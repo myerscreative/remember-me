@@ -1,0 +1,137 @@
+import { format, differenceInDays, addDays, isSameDay } from 'date-fns';
+
+
+
+
+  id: string;
+  name: string;
+  avatar_url?: string | null;
+  relationship_level: 'favorites' | 'friends' | 'contacts';
+  birthday?: string | null;
+  last_contact_date?: string | null;
+  contact_frequency: 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'biannual';
+}
+
+const FREQUENCY_DAYS_MAP = {
+  weekly: 7,
+  biweekly: 14,
+  monthly: 30,
+  quarterly: 90,
+  biannual: 182,
+};
+
+const FREQUENCY_LABELS = {
+  weekly: 'Weekly',
+  biweekly: 'Bi-weekly',
+  monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  biannual: 'Twice a year',
+};
+
+/**
+ * Calculate birthday display logic:
+ * - If birthday is TODAY: "Today!" (Red)
+ * - If birthday is within 30 days: "Jan 15" (Orange)
+ * - If birthday is > 30 days: "Mar 15" (Gray, under name)
+ */
+function getBirthdayInfo(birthdayStr: string | null | undefined) {
+  if (!birthdayStr) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const bday = new Date(birthdayStr);
+  const thisYear = today.getFullYear();
+  let bdayThisYear = new Date(thisYear, bday.getMonth(), bday.getDate());
+
+  if (bdayThisYear < today && !isSameDay(bdayThisYear, today)) {
+    bdayThisYear = new Date(thisYear + 1, bday.getMonth(), bday.getDate());
+  }
+
+  const daysUntil = Math.ceil((bdayThisYear.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (isSameDay(bdayThisYear, today)) {
+    return {
+      type: 'today' as const,
+      label: '🎂 Today!',
+      color: '#ef4444',
+      dateLabel: format(bdayThisYear, 'MMM d'),
+    };
+  } else if (daysUntil <= 30) {
+    return {
+      type: 'upcoming' as const,
+      label: `🎂 ${format(bdayThisYear, 'MMM d')}`,
+      color: '#f59e0b',
+      dateLabel: format(bdayThisYear, 'MMM d'),
+    };
+  } else {
+    return {
+      type: 'distant' as const,
+      label: `🎂 ${format(bdayThisYear, 'MMM d')}`,
+      color: '#64748b',
+      dateLabel: format(bdayThisYear, 'MMM d'),
+    };
+  }
+}
+
+/**
+ * Calculate status based on last_contact_date + frequency
+ */
+function getRelationshipStatus(
+  lastContactDate: string | null | undefined,
+  frequency: Contact['contact_frequency']
+): { status: RelationshipStatus; label: string; color: string; daysRemaining?: number } {
+  if (!lastContactDate) {
+    return { status: 'never', label: 'Never', color: '#64748b' };
+  }
+
+  const last = new Date(lastContactDate);
+  const now = new Date();
+  const targetDays = FREQUENCY_DAYS_MAP[frequency];
+  const nextContactDate = addDays(last, targetDays);
+  
+  const diff = differenceInDays(nextContactDate, now);
+
+  if (diff < 0) {
+    return { 
+      status: 'overdue', 
+      label: `${Math.abs(diff)}d overdue`, 
+      color: '#ef4444',
+      daysRemaining: diff 
+    };
+  } else if (diff <= 7) {
+    return { 
+      status: 'due-soon', 
+      label: `Due in ${diff}d`, 
+      color: '#f59e0b',
+      daysRemaining: diff 
+    };
+  } else {
+    return { 
+      status: 'on-track', 
+      label: 'On track', 
+      color: '#10b981',
+      daysRemaining: diff 
+    };
+  }
+}
+
+function getRelationshipEmoji(level: Contact['relationship_level']) {
+  switch (level) {
+    case 'favorites': return '⭐';
+    case 'friends': return '👤';
+    case 'contacts': return '🪪';
+    default: return '👤';
+  }
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+module.exports = { getBirthdayInfo, getRelationshipStatus, getRelationshipEmoji, getInitials };

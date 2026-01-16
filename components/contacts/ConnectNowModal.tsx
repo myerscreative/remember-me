@@ -118,7 +118,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                                  <Button 
                                     size="sm"
                                     onClick={() => handleUseStarter(starter.text)}
-                                    className="flex-1 h-8 text-xs bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0"
+                                    className="flex-1 h-8 text-xs bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0"
                                  >
                                     Use This <ArrowRight className="w-3 h-3 ml-1" />
                                  </Button>

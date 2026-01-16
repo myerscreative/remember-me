@@ -36,93 +36,56 @@ export function AISynopsisCard({
   // We'll just ensure it fills the space correctly.
 
   if (!hasContent) {
-    if (isInline) return null; // Let the parent handle the empty state for inline
-    return (
-      <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-2xl p-6 border border-indigo-500/20">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-indigo-500/20 rounded-xl">
-            <Sparkles className="w-6 h-6 text-indigo-400" />
+    if (isInline) return (
+      <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-4 md:px-6 md:py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-linear-to-br from-[#7c3aed] to-[#5b21b6] flex items-center justify-center text-lg shrink-0">
+            ✨
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-indigo-300 mb-1">
-              Start Your Story with {contactName}
-            </h3>
-            <p className="text-xs text-gray-400 mb-4">
-              Add details about how you met and your shared history to generate an AI summary.
+            <p className="text-[13px] text-[#64748b] leading-relaxed">
+              Add story details to generate an AI summary. 
+              <button 
+                  onClick={onNavigateToStory}
+                  className="ml-1 text-[#7c3aed] font-medium cursor-pointer hover:underline bg-transparent border-none p-0 inline"
+              >
+                  Go to Story →
+              </button>
             </p>
-            <Button 
-                onClick={onNavigateToStory}
-                size="sm" 
-                className="bg-indigo-600 hover:bg-indigo-700 text-white border-0"
-            >
-              Go to Story <ArrowRight className="w-3 h-3 ml-2" />
-            </Button>
           </div>
         </div>
       </div>
     );
+    return null;
   }
 
   return (
-    <div className={cn("space-y-4", !isInline && "bg-card border border-border rounded-2xl p-5 shadow-sm")}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">AI Summary</span>
+    <div className={cn("bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-5 md:p-6", !isInline && "shadow-sm")}>
+      <div className="flex items-center justify-between mb-3.5">
+        <div className="flex items-center gap-1.5 text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
+            <span>✨</span>
+            <span>AI Summary</span>
         </div>
-        {!isInline && (
-            <span className="text-[10px] text-gray-500 bg-secondary/50 px-2 py-0.5 rounded-full">
-            Beta
-            </span>
-        )}
         <button 
             onClick={onNavigateToStory}
-            className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+            className="text-[12px] text-[#60a5fa] hover:text-[#93c5fd] font-medium flex items-center gap-1 transition-all"
         >
-            View Full Story <ArrowRight className="w-3 h-3" />
+            View Full →
         </button>
       </div>
 
-      <div className="space-y-3">
-        {aiSummary ? (
-            <div className="prose prose-invert prose-sm max-w-none">
-                <div className="text-[13px] md:text-sm text-gray-300 leading-relaxed">
-                    {isExpanded ? aiSummary : (aiSummary.length > 500 ? aiSummary.slice(0, 500) + '...' : aiSummary)}
-                    {aiSummary.length > 500 && (
-                        <button 
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="ml-1 text-[#60a5fa] hover:text-[#93c5fd] font-medium text-xs bg-transparent border-none cursor-pointer inline-flex items-center gap-0.5"
-                        >
-                            {isExpanded ? 'Show less' : 'Read more'}
-                        </button>
-                    )}
-                </div>
-            </div>
-        ) : (
-            <div className="space-y-2">
-                {whereMet && (
-                    <div className="flex gap-2 text-sm">
-                        <span className="text-gray-500 font-medium">Met:</span>
-                        <span className="text-gray-300">{whereMet}</span>
-                    </div>
-                )}
-                {deepLore && (
-                    <div className="bg-secondary/30 rounded-lg p-3 text-sm text-gray-300 italic border border-white/5">
-                        "{deepLore}"
-                    </div>
-                )}
-            </div>
-        )}
+      <div className="text-[14px] text-[#cbd5e1] leading-relaxed mb-3 md:mb-4 whitespace-pre-wrap">
+        {aiSummary}
       </div>
 
-      <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500">
-         <span>
+      <div className="pt-3 border-t border-[#2d3748] flex items-center justify-between flex-wrap gap-2">
+         <span className="text-[11px] text-[#64748b]">
             {lastUpdated ? `Updated ${new Date(lastUpdated).toLocaleDateString()}` : 'Recently updated'}
          </span>
-         <div className="flex gap-1">
+         <div className="flex gap-1.5 flex-wrap">
             {whereMet && (
-                <span className="bg-[#2d3748] px-2 py-1 rounded-[6px] flex items-center gap-1 text-[#94a3b8]">
-                    <MapPin className="w-3 h-3" /> {whereMet.split(' ')[0]}...
+                <span className="bg-[#2d3748] px-2 py-1 rounded-md text-[10px] text-[#94a3b8] flex items-center gap-1.5 uppercase tracking-wider font-semibold">
+                    📍 {whereMet}
                 </span>
             )}
          </div>

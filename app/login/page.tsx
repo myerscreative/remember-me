@@ -228,7 +228,7 @@ function LoginForm() {
                     <span className="w-full border-t border-gray-300 dark:border-gray-600" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 text-muted-foreground">
+                    <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">
                       Or continue with
                     </span>
                   </div>

@@ -158,7 +158,7 @@ export default function AIBatchPage() {
             <Card className="border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-red-900 dark:text-red-200 mb-1">
                       Error
@@ -438,7 +438,7 @@ export default function AIBatchPage() {
           <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <div className="space-y-2">
                   <h3 className="font-semibold text-blue-900 dark:text-blue-200">
                     How AI Batch Processing Works

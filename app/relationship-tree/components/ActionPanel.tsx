@@ -29,7 +29,7 @@ export default function ActionPanel({
 
   if (contactsNeedingAttention.length === 0) {
     return (
-      <div className={`bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border border-green-200 p-5 ${className}`}>
+      <div className={`bg-linear-to-br from-green-50 to-emerald-100 rounded-2xl border border-green-200 p-5 ${className}`}>
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">🌳</span>
           <div>
@@ -84,7 +84,7 @@ export default function ActionPanel({
       {contactsNeedingAttention.length > 1 && (
         <button
           onClick={onWaterAll}
-          className="w-full mt-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full mt-4 py-2.5 bg-linear-to-r from-blue-500 to-cyan-500 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         >
           💧 Water All ({contactsNeedingAttention.length} contacts)
         </button>

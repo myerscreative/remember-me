@@ -64,7 +64,7 @@ export function DailyPracticeWidget() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-4 text-white shadow-lg relative overflow-hidden group">
+    <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-xl p-4 text-white shadow-lg relative overflow-hidden group">
       {/* Background Decor */}
       <div className="absolute -top-4 -right-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-700 pointer-events-none">
         <Brain size={80} />

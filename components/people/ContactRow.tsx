@@ -57,7 +57,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] bg-[#0a0e1a] rounded-full flex items-center justify-center text-[11px] border-[2px] border-[#0a0e1a]">
+          <div className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] bg-[#0a0e1a] rounded-full flex items-center justify-center text-[11px] border-2 border-[#0a0e1a]">
             {getRelationshipBadge()}
           </div>
         </div>
@@ -114,7 +114,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#1a1f2e] rounded-full flex items-center justify-center text-[10px] border-[2px] border-[#1a1f2e]">
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#1a1f2e] rounded-full flex items-center justify-center text-[10px] border-2 border-[#1a1f2e]">
                 {getRelationshipBadge()}
               </div>
            </div>
