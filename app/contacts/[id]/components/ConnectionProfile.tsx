@@ -65,7 +65,8 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editForm, setEditForm] = useState({ 
       email: contact.email || '', 
-      phone: contact.phone || '' 
+      phone: contact.phone || '' ,
+      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
   });
 
   // Health Color Logic
@@ -260,6 +261,23 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis, summaryLeve
                                 ) : (
                                     <div className={`text-[14px] truncate ${!contact.phone ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
                                         {contact.phone || 'No phone'}
+                                    </div>
+                                )}
+                            </div>
+                        <div className="flex items-center gap-3 py-3">
+                            <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">🎂</div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Birthday</div>
+                                {isEditingInfo ? (
+                                    <input 
+                                        type="date"
+                                        className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white focus:border-[#60a5fa] outline-none [color-scheme:dark]"
+                                        value={editForm.birthday}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, birthday: e.target.value }))}
+                                    />
+                                ) : (
+                                    <div className={`text-[14px] truncate ${!contact.birthday ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
+                                        {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
                                     </div>
                                 )}
                             </div>
