@@ -38,6 +38,8 @@ export function StoryTab({ contact }: StoryTabProps) {
   const [whereMet, setWhereMet] = useState(contact.story?.whereWeMet || '');
   const [whyStay, setWhyStay] = useState(contact.story?.whyStayInContact || '');
   const [whatMatters, setWhatMatters] = useState(contact.story?.whatsImportant || '');
+  const [company, setCompany] = useState((contact as any).company || '');
+  const [jobTitle, setJobTitle] = useState((contact as any).job_title || '');
   
   // Memory Input State
   const [newMemory, setNewMemory] = useState('');
@@ -50,6 +52,8 @@ export function StoryTab({ contact }: StoryTabProps) {
     if (field === 'where_met') update.where_met = value;
     if (field === 'why_stay_in_contact') update.why_stay_in_contact = value;
     if (field === 'most_important_to_them') update.most_important_to_them = value;
+    if (field === 'company') update.company = value;
+    if (field === 'job_title') update.job_title = value;
 
     const result = await updateStoryFields(contact.id, update);
     if (!result.success) {
@@ -116,6 +120,31 @@ export function StoryTab({ contact }: StoryTabProps) {
           onChange={(e) => setWhatMatters(e.target.value)}
           onBlur={() => handleBlur('most_important_to_them', whatMatters)}
         />
+      </div>
+
+      {/* SECTION: CAREER & BUSINESS */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
+          Career & Business
+        </label>
+        <div className="flex flex-col md:flex-row gap-4">
+          <input 
+            type="text"
+            placeholder="Job Title (e.g. Founder, Architect)"
+            className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
+            onBlur={() => handleBlur('job_title', jobTitle)}
+          />
+          <input 
+            type="text"
+            placeholder="Company (e.g. Kalon Project, Apple)"
+            className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            onBlur={() => handleBlur('company', company)}
+          />
+        </div>
       </div>
 
       {/* SECTION: MILESTONES */}

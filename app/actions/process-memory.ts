@@ -119,6 +119,9 @@ export async function processMemory(contactId: string, text: string) {
     let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];
     let where_met: string | null = person.where_met;
     let deep_lore: string | null = person.deep_lore;
+    let relationship_summary: string | null = person.relationship_summary;
+    let company: string | null = person.company;
+    let job_title: string | null = person.job_title;
 
     // 3. Process extractions
     for (const item of extractions) {
@@ -143,14 +146,25 @@ export async function processMemory(contactId: string, text: string) {
                 where_met = data.value;
                 fieldsUpdated.push('Where We Met');
                 break;
+            case 'BUSINESS':
+                if (data.company) {
+                    company = data.company;
+                    fieldsUpdated.push('Company');
+                }
+                if (data.job_title) {
+                    job_title = data.job_title;
+                    fieldsUpdated.push('Job Title');
+                }
+                break;
             case 'SYNOPSIS': 
             case 'STORY': // Handle legacy or fallback
-                // Append this new narrative to existing deep_lore to preserve history, 
-                // but if deep_lore is empty, just set it.
-                // We add a double newline for paragraph separation.
+                // relationship_summary is the LATEST high-quality summary
+                relationship_summary = data.value;
+                
+                // Append this new narrative to existing deep_lore to preserve history
                 const newStory = data.value;
                 deep_lore = deep_lore ? `${deep_lore}\n\n${newStory}` : newStory;
-                fieldsUpdated.push('Story');
+                fieldsUpdated.push('Summary');
                 break;
         }
     }
@@ -167,6 +181,9 @@ export async function processMemory(contactId: string, text: string) {
             interests: currentInterests,
             where_met: where_met,
             deep_lore: deep_lore,
+            relationship_summary: relationship_summary,
+            company: company,
+            job_title: job_title
         })
         .eq('id', contactId)
         .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS

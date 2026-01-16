@@ -136,9 +136,11 @@ export default function ContactDetailPage({
             ai_summary: enhancedAiSummary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
-            last_interaction_date: person.last_interaction_date, // Ensuring this field flows through
+            last_interaction_date: person.last_interaction_date, 
             importance: person.importance,
-            target_frequency_days: person.target_frequency_days
+            target_frequency_days: person.target_frequency_days,
+            company: person.company,
+            job_title: person.job_title
         };
 
         setContact(fullContact);

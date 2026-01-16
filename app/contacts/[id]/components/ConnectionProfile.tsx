@@ -30,9 +30,11 @@ export interface Contact {
   interests?: string[];
   interactions?: any[];
   connections?: any[];
-  tier_label?: string;
+  importance?: string;
   target_frequency_days?: number;
   last_interaction_date?: string;
+  company?: string;
+  job_title?: string;
 }
 
 interface ProfileProps {
@@ -112,6 +114,13 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
                 </div>
                 
                 <h1 className="text-2xl font-bold text-white mb-1.5">{name}</h1>
+                
+                {(contact.job_title || contact.company) && (
+                  <div className="text-[14px] text-[#60a5fa] font-medium mb-1">
+                    {contact.job_title} {contact.job_title && contact.company && 'at'} {contact.company}
+                  </div>
+                )}
+
                 <div className="text-[#64748b] text-[13px] mb-5">
                    🎂 Birthday: {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : 'Not set'}
                 </div>
@@ -127,7 +136,7 @@ const ConnectionProfile = ({ contact, health, lastContact, synopsis }: ProfilePr
                 <AISynopsisCard 
                     contactId={contact.id}
                     contactName={name}
-                    aiSummary={synopsis}
+                    aiSummary={synopsis || (contact as any).relationship_summary}
                     deepLore={contact.deep_lore}
                     whereMet={contact.where_met}
                     lastUpdated={contact.updated_at}
