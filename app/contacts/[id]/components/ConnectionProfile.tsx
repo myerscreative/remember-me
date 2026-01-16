@@ -127,8 +127,6 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
-      {/* Spacer for grid */}
-      <div className="hidden lg:block"></div> 
 
       {/* LEFT COLUMN */}
       <div className="flex flex-col gap-5 px-4 lg:px-0">
