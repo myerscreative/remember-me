@@ -50,7 +50,7 @@ export default function ContactDetailPage({
 
       toast.success('AI summary refreshed!', { id: 'ai-refresh' });
 
-      // Update the contact state with new summaries (all three tiers)
+      // Update the contact state with all three summary levels
       setContact((prev: any) => ({
         ...prev,
         ai_summary: data.summary_default,

@@ -104,69 +104,25 @@ export async function POST(request: NextRequest) {
 
     const context = contextParts.join('\n');
 
-    // Generate three-tier AI summary
-    const systemPrompt = `You generate human-memory summaries for a relationship-memory app.
+    // Generate three aligned zoom levels from the same facts
+    const systemPrompt = `You generate relationship-memory summaries for a contact app.
 
-Your job is to help the user instantly remember:
+You MUST create three aligned "zoom levels" from the same facts:
+- MICRO: 1 sentence, 15–25 words
+- DEFAULT: 2–4 sentences, 50–75 words (hard max 85), NO headings
+- FULL: 150–220 words (max 260), may use short paragraphs or headings
+
+Purpose: help the user instantly remember:
 1) who this person is
 2) how they know them
 3) why the relationship matters
 
-Rules:
-- Do NOT invent facts.
-- If something is missing, omit it.
-- Avoid generic praise and LinkedIn tone.
-- Use concrete anchors (where met, role, family basics, standout hobby/value).
-- Output must be valid JSON only (no markdown, no commentary).
+Hard rules:
+- Do NOT invent facts. If a field is missing or uncertain, omit it.
+- Avoid generic praise / LinkedIn tone. Prefer concrete anchors (where met, role, family basics, notable interest/value).
+- The three levels must be consistent but NOT repetitive (each level adds depth; micro is recognition, default is recall, full is context).
 
-Generate the following three summaries for the person described below.
-
-1) Micro Summary (Quick Glance)
-
-Purpose: Instant recognition
-Rules:
-- 1 sentence only
-- 15–25 words
-- Include: name + relationship/context + 1 memorable anchor
-- No adjectives unless concrete
-
-Example:
-Bryan Clay — faith-driven entrepreneur you met in Washington; family-first, outdoorsy, and someone you respect and stay in touch with.
-
-2) Default Summary (Everyday)
-
-Purpose: Fast emotional + contextual recall
-Rules:
-- 2–4 sentences
-- 50–75 words (hard max 85)
-- No headings
-- Use plain, human language (not LinkedIn tone)
-- Required order:
-  1. Identity / role
-  2. How you know them (where/how met)
-  3. 1–2 concrete anchors (family, work focus, hobby, values)
-  4. Why they matter / why you keep in touch
-
-Example:
-Bryan Clay is a faith-driven entrepreneur and family man you met in Washington. He runs his own business, values health and fitness, and is deeply committed to his wife and two daughters. You admire the balance he maintains between work, family, and faith, and you stay connected as both friends and respected business peers.
-
-3) Full Summary (Deep Context)
-
-Purpose: Full relationship understanding
-Rules:
-- 150–220 words (max 260)
-- May use short paragraphs or headings
-- Warm, reflective, but still factual
-- Expand on meaning, not just details
-
-Example structure (not required wording):
-- Snapshot
-- Relationship Context
-- Key Details
-- Why They Matter
-
-OUTPUT FORMAT (STRICT):
-Return valid JSON only:
+Output must be VALID JSON ONLY, no markdown, no extra commentary:
 {
   "summary_micro": "",
   "summary_default": "",
@@ -182,7 +138,7 @@ Return valid JSON only:
         },
         {
           role: "user",
-          content: `PERSON DATA:\n\n${context}`,
+          content: `PERSON DATA:\n${context}`,
         },
       ],
       temperature: 0.7,
