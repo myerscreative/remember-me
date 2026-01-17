@@ -157,7 +157,7 @@ export function StoryTab({ contact }: StoryTabProps) {
         </div>
       </div>
 
-      {/* SECTION: WHAT THEY'RE WORKING THROUGH */}
+      {/* SECTION: CURRENT CHALLENGES */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
           💪 What They're Working Through
@@ -171,7 +171,7 @@ export function StoryTab({ contact }: StoryTabProps) {
         />
       </div>
 
-      {/* SECTION: WHAT THEY'RE WORKING TOWARD */}
+      {/* SECTION: GOALS & ASPIRATIONS */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
           ✨ What They're Working Toward
