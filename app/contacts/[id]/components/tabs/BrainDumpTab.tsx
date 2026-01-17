@@ -6,6 +6,9 @@ import toast from 'react-hot-toast';
 import { PostCallPulse } from '../PostCallPulse';
 import { Mic, Plus, Loader2 } from 'lucide-react';
 import { addSharedMemory } from '@/app/actions/story-actions';
+import { ReviewChangesModal } from '../ReviewChangesModal';
+import { updateStoryFields } from '@/app/actions/story-actions';
+import { updateFamilyMembers } from '@/app/actions/update-family-members';
 
 interface SharedMemory {
   created_at: string;
@@ -28,6 +31,8 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [optimisticMemories, setOptimisticMemories] = useState<SharedMemory[]>([]);
   const [isReprocessing, setIsReprocessing] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<any>(null);
 
   const contactName = `${contact.first_name} ${contact.last_name || ''}`.trim();
 
@@ -66,22 +71,58 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const handleReprocessMemories = async () => {
     setIsReprocessing(true);
     try {
+      // Step 1: Get preview of changes
       const response = await fetch('/api/reprocess-memories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ personId: contact.id })
+        body: JSON.stringify({ personId: contact.id, preview: true })
       });
 
       if (!response.ok) throw new Error('Failed to reprocess');
 
       const result = await response.json();
-      toast.success(`Reprocessed ${result.processed} memories!`);
-      router.refresh();
+      
+      // Step 2: Show review modal with extracted changes
+      if (result.preview) {
+        setPendingChanges(result.preview);
+        setShowReviewModal(true);
+      } else {
+        toast.success('No changes detected');
+      }
     } catch (error) {
       console.error('Reprocess error:', error);
       toast.error('Failed to reprocess memories');
     } finally {
       setIsReprocessing(false);
+    }
+  };
+
+  const handleAcceptChanges = async (editedChanges: any) => {
+    try {
+      // Save all the edited changes
+      const storyFields: any = {};
+      if (editedChanges.company) storyFields.company = editedChanges.company;
+      if (editedChanges.job_title) storyFields.job_title = editedChanges.job_title;
+      if (editedChanges.most_important_to_them) storyFields.most_important_to_them = editedChanges.most_important_to_them;
+      if (editedChanges.current_challenges) storyFields.current_challenges = editedChanges.current_challenges;
+      if (editedChanges.goals_aspirations) storyFields.goals_aspirations = editedChanges.goals_aspirations;
+      if (editedChanges.where_met) storyFields.where_met = editedChanges.where_met;
+
+      if (Object.keys(storyFields).length > 0) {
+        await updateStoryFields(contact.id, storyFields);
+      }
+
+      if (editedChanges.family_members && editedChanges.family_members.length > 0) {
+        await updateFamilyMembers(contact.id, editedChanges.family_members);
+      }
+
+      setShowReviewModal(false);
+      setPendingChanges(null);
+      toast.success('Changes saved successfully!');
+      router.refresh();
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save changes');
     }
   };
 
@@ -212,6 +253,19 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
             toast.success("Brain dump saved! AI summary updating...", { duration: 2000 });
             router.refresh();
           }}
+        />
+      )}
+
+      {/* Review Changes Modal */}
+      {showReviewModal && pendingChanges && (
+        <ReviewChangesModal
+          isOpen={showReviewModal}
+          onClose={() => {
+            setShowReviewModal(false);
+            setPendingChanges(null);
+          }}
+          changes={pendingChanges}
+          onAccept={handleAcceptChanges}
         />
       )}
     </div>
