@@ -96,21 +96,27 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
   const handleLogInteraction = async () => {
     if (!logNote.trim()) return;
-    
+
     setIsLogging(true);
     try {
-        await logHeaderInteraction(
+        const result = await logHeaderInteraction(
             contact.id,
             logType,
             logNote
         );
-        
+
+        if (!result.success) {
+            console.error('Error logging interaction:', result.error);
+            const errorDetails = result.details ? JSON.stringify(result.details, null, 2) : '';
+            alert(`Failed to log interaction:\nMessage: ${result.error}\nDetails: ${errorDetails}`);
+            return;
+        }
+
         setLogNote('');
         setLogType('connection');
         // Ideally use optimistic update, for now refresh
         window.location.reload();
     } catch (error) {
-        console.error('Error logging interaction:', error);
         console.error('Error logging interaction:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorDetails = error instanceof Error && (error as any).details ? JSON.stringify((error as any).details, null, 2) : '';
