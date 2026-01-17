@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
@@ -144,21 +145,34 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   const handleDeleteInteraction = async (interactionId: string) => {
     if (!confirm('Are you sure you want to delete this interaction?')) return;
 
+    console.log('Deleting interaction:', interactionId);
     setDeletingInteractionId(interactionId);
+
     try {
         const result = await deleteInteraction(interactionId, contact.id);
+        console.log('Delete result:', result);
 
         if (!result.success) {
-            alert(`Failed to delete interaction: ${result.error}`);
+            console.error('Delete failed:', result.error);
+            toast.error(`Failed to delete: ${result.error}`);
+            setDeletingInteractionId(null);
             return;
         }
 
-        // Refresh to show updated interactions
+        // Success - show toast and refresh
+        toast.success('Interaction deleted!');
+        setDeletingInteractionId(null);
+
+        // Force a hard refresh to ensure UI updates
         router.refresh();
+
+        // Additional refresh after a short delay to ensure data is updated
+        setTimeout(() => {
+            router.refresh();
+        }, 100);
     } catch (error) {
         console.error('Error deleting interaction:', error);
-        alert('An error occurred while deleting the interaction');
-    } finally {
+        toast.error('An error occurred while deleting');
         setDeletingInteractionId(null);
     }
   };
