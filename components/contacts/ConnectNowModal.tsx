@@ -10,6 +10,8 @@ import { MessageSquare, Mail, Phone, Heart, Sparkles, Copy, ExternalLink, ArrowR
 import { useState, useMemo } from "react";
 import { getInitialsFromFullName, getGradient } from "@/lib/utils/contact-helpers";
 import toast from "react-hot-toast";
+import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { showNurtureToast } from '@/components/ui/nurture-toast';
 
 interface ConnectNowModalProps {
   person: Person;
@@ -20,6 +22,8 @@ interface ConnectNowModalProps {
 export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModalProps) {
   const starters = useMemo(() => generateConversationStarters(person), [person]);
   const [selectedMethod, setSelectedMethod] = useState<'text' | 'email' | 'call' | 'whatsapp' | null>(null);
+  const [quickNote, setQuickNote] = useState("");
+  const [isLogging, setIsLogging] = useState(false);
 
   const handleCopyStarter = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -33,6 +37,27 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
       if (person.phone) {
            window.location.href = `sms:${person.phone}?body=${encodeURIComponent(text)}`;
       }
+  };
+
+  const handleLogInteraction = async (type: 'connection' | 'attempt') => {
+    setIsLogging(true);
+    try {
+        const result = await logHeaderInteraction(person.id, type, quickNote);
+        if (result.success) {
+            if (type === 'connection') {
+                showNurtureToast(person.name);
+            } else {
+                toast.success("Interaction logged");
+            }
+            setQuickNote("");
+        } else {
+            toast.error(result.error || "Failed to log interaction");
+        }
+    } catch (error) {
+        toast.error("Something went wrong");
+    } finally {
+        setIsLogging(false);
+    }
   };
 
   return (
@@ -125,6 +150,40 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                              </div>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            {/* Connection Logging */}
+            <section>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Log Interaction</h4>
+                <div className="space-y-3">
+                    {/* Note Input */}
+                    <input
+                        type="text"
+                        placeholder="Add a quick note..."
+                        value={quickNote}
+                        onChange={(e) => setQuickNote(e.target.value)}
+                        className="w-full bg-[#1e1e2d]/60 border border-gray-700/30 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                    />
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() => handleLogInteraction('attempt')}
+                            disabled={isLogging}
+                            className="h-10 border-amber-500/20 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30"
+                        >
+                            Log Attempt
+                        </Button>
+                        <Button
+                            onClick={() => handleLogInteraction('connection')}
+                            disabled={isLogging}
+                            className="h-10 bg-indigo-600 hover:bg-indigo-500 text-white border-0"
+                        >
+                            Log Connection
+                        </Button>
+                    </div>
                 </div>
             </section>
         </div>
