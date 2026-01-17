@@ -232,6 +232,8 @@ export async function addSharedMemory(person_id: string, content: string) {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user || !user.id) throw new Error("Unauthorized");
+      
+      console.log('📝 [DEBUG] addSharedMemory: Adding for person', person_id, 'User:', user.id);
 
       const { error } = await (supabase as any)
         .from('shared_memories')
@@ -258,6 +260,7 @@ export async function addSharedMemory(person_id: string, content: string) {
       revalidatePath(`/contacts/${person_id}`);
       return { success: true };
     } catch (error: unknown) {
+      console.error('❌ [DEBUG] addSharedMemory Error:', error);
       const message = error instanceof Error ? error.message : "Unknown error";
       console.error("Error adding shared memory:", error);
       return { success: false, error: message };

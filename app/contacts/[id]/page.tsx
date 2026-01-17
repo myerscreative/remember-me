@@ -122,9 +122,13 @@ export default function ContactDetailPage({
         // 3. Fetch Shared Memories
         const { data: sharedMemories } = await (supabase as any)
           .from("shared_memories")
-          .select("content, created_at")
+          .select("id, content, created_at")
+          .eq("person_id", id)
           .eq("person_id", id)
           .order('created_at', { ascending: false });
+
+        console.log('📖 [DEBUG] page.tsx: Fetched shared memories for', id, 'Count:', sharedMemories?.length);
+        if (sharedMemories?.length === 0) console.log('⚠️ [DEBUG] No memories found! User:', user.id);
 
         // 3b. Fetch Interactions
         const { data: interactions } = await (supabase as any)
