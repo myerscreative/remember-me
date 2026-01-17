@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PostCallPulse } from '../PostCallPulse';
 import { Mic, Plus, Loader2 } from 'lucide-react';
@@ -21,6 +22,7 @@ interface BrainDumpTabProps {
 }
 
 export function BrainDumpTab({ contact }: BrainDumpTabProps) {
+  const router = useRouter();
   const [showPostCallPulse, setShowPostCallPulse] = useState(false);
   const [newMemory, setNewMemory] = useState('');
   const [isAddingMemory, setIsAddingMemory] = useState(false);
@@ -35,9 +37,9 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
     setIsAddingMemory(false);
 
     if (result.success) {
-      toast.success("Memory added!");
+      toast.success("Memory added! AI summary updating in background...", { duration: 2000 });
       setNewMemory('');
-      window.location.reload();
+      router.refresh();
     } else {
       toast.error("Failed to add memory");
     }
@@ -130,7 +132,8 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           onClose={() => setShowPostCallPulse(false)}
           onComplete={() => {
             setShowPostCallPulse(false);
-            window.location.reload();
+            toast.success("Brain dump saved! AI summary updating...", { duration: 2000 });
+            router.refresh();
           }}
         />
       )}

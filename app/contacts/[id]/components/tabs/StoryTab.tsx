@@ -58,6 +58,9 @@ export function StoryTab({ contact }: StoryTabProps) {
     const result = await updateStoryFields(contact.id, update);
     if (!result.success) {
       toast.error("Failed to save");
+    } else {
+      // Notify user that AI summary is being generated
+      toast.success("Saved! AI summary updating in background...", { duration: 2000 });
     }
   };
 
