@@ -58,11 +58,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
     '/quick-capture',
   ];
 
-  // Also hide on individual contact profile pages (has its own integrated mic in memory bar)
-  // Handle both /contacts/[id] and /contacts/[id]/ (with trailing slash)
-  const isContactProfilePage = /^\/contacts\/[^/]+\/?$/.test(pathname) && !pathname.startsWith('/contacts/new');
-
-  if (hideOnPages.includes(pathname) || isContactProfilePage) {
+  if (hideOnPages.includes(pathname)) {
     return null;
   }
 

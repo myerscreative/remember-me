@@ -8,6 +8,7 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { LinkConnectionModal } from "./components/LinkConnectionModal";
 import ConnectionProfile from "./components/ConnectionProfile";
 import { getRelationshipHealth } from "@/lib/relationship-health";
+import { getEffectiveSummaryLevel, getSummaryAtLevel } from "@/lib/utils/summary-levels";
 
 export default function ContactDetailPage({
   params,
@@ -20,7 +21,9 @@ export default function ContactDetailPage({
   const [contact, setContact] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [userSettings, setUserSettings] = useState<any>(null);
+  const [effectiveSummaryLevel, setEffectiveSummaryLevel] = useState<'micro' | 'default' | 'full'>('default');
+
   // Modal States
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   
@@ -28,8 +31,59 @@ export default function ContactDetailPage({
   const searchParams = useSearchParams();
 
   const handleRefresh = async () => {
-    window.location.reload(); 
+    window.location.reload();
     // Ideally we would re-fetch here instead of reload to hold state, but for MVP speed reload is reliable
+  };
+
+  const handleRefreshAISummary = async () => {
+    try {
+      toast.loading('Refreshing AI summary...', { id: 'ai-refresh' });
+
+      const response = await fetch('/api/refresh-ai-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to refresh AI summary');
+      }
+
+      toast.success('AI summary refreshed!', { id: 'ai-refresh' });
+
+      // Update the contact state with all three summary levels
+      // Update the contact state with all three summary levels
+      setContact((prev: any) => {
+        // Create a temporary object with the new summaries to calculate the correct display text
+        const updatedFields = {
+            summary_micro: data.summary_micro,
+            summary_default: data.summary_default,
+            summary_full: data.summary_full,
+            relationship_summary: data.summary_default,
+        };
+
+        const tempContactForCalc = { ...prev, ...updatedFields };
+        const summaryText = getSummaryAtLevel(tempContactForCalc, effectiveSummaryLevel);
+
+        // Preserve the memory prefix if it exists
+        const latestMemory = prev.shared_memories?.[0]?.content;
+        const enhancedAiSummary = latestMemory
+            ? `**Most Recent Memory:** ${latestMemory}\n\n${summaryText}`
+            : summaryText;
+
+        return {
+            ...prev,
+            ...updatedFields,
+            ai_summary: enhancedAiSummary,
+            updated_at: new Date().toISOString()
+        };
+      });
+    } catch (error) {
+      console.error('Error refreshing AI summary:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to refresh AI summary', { id: 'ai-refresh' });
+    }
   };
 
   // Fetch Data
@@ -50,6 +104,13 @@ export default function ContactDetailPage({
 
         if (personError) throw personError;
 
+        // 1b. Fetch User Settings for summary level preference
+        const { data: userSettings } = await (supabase as any)
+          .from("user_settings")
+          .select("summary_level_default")
+          .eq("user_id", user.id)
+          .single();
+
         // 2. Fetch Tags
         const { data: tagData } = await (supabase as any)
           .from("person_tags")
@@ -61,9 +122,20 @@ export default function ContactDetailPage({
         // 3. Fetch Shared Memories
         const { data: sharedMemories } = await (supabase as any)
           .from("shared_memories")
-          .select("content, created_at")
+          .select("id, content, created_at")
           .eq("person_id", id)
           .order('created_at', { ascending: false });
+
+        console.log('📖 [DEBUG] page.tsx: Fetched shared memories for', id, 'Count:', sharedMemories?.length);
+        if (sharedMemories?.length === 0) console.log('⚠️ [DEBUG] No memories found! User:', user.id);
+
+        // 3b. Fetch Interactions
+        const { data: interactions } = await (supabase as any)
+          .from("interactions")
+          .select("*")
+          .eq("person_id", id)
+          .order('date', { ascending: false })
+          .limit(10);
 
         // 4. Fetch Connections (Relationships)
         // We need both directions: where this person is 'from' OR 'to'
@@ -94,27 +166,28 @@ export default function ContactDetailPage({
         });
 
 
-        // 5. Assemble complete object
+        // 5. Compute effective summary level
+        const effectiveLevel = getEffectiveSummaryLevel(person, userSettings);
+        setEffectiveSummaryLevel(effectiveLevel);
+        setUserSettings(userSettings);
+
+        // Get the appropriate summary at the effective level
+        const summaryAtLevel = getSummaryAtLevel(person, effectiveLevel);
+
+        // Fallback logic for when no summaries exist yet
         const latestMemory = sharedMemories?.[0]?.content;
-        
-        // Priority for AI Summary:
-        // 1. relationship_summary (AI generated snapshot)
-        // 2. deep_lore (Manual narrative lore)
-        // 3. Story details fallback (The Origin + Philosophy + Priorities)
-        
         const storyFallback = [
             person.where_met ? `**Origin:** ${person.where_met}` : null,
             person.why_stay_in_contact ? `**Philosophy:** ${person.why_stay_in_contact}` : null,
             person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
         ].filter(Boolean).join('\n\n');
 
-        // If no high-quality AI summary exists, combine deep_lore with the structured story data
-        // This ensures that even if deep_lore just says "Imported contact", we still show the other fields if they exist.
         const fallbackContent = [person.deep_lore, storyFallback].filter(Boolean).join('\n\n___\n\n');
 
-        const baseSummary = person.relationship_summary || fallbackContent || "";
-        
-        const enhancedAiSummary = latestMemory 
+        // Use the level-specific summary, or fall back to relationship_summary, or finally to fallback content
+        const baseSummary = summaryAtLevel || person.relationship_summary || fallbackContent || "";
+
+        const enhancedAiSummary = latestMemory
             ? `**Most Recent Memory:** ${latestMemory}\n\n${baseSummary}`
             : baseSummary;
 
@@ -124,6 +197,7 @@ export default function ContactDetailPage({
             lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
             tags: tags,
             shared_memories: sharedMemories || [],
+            interactions: interactions || [],
 
             connections: processedConnections, // Add connections to contact object
             gift_ideas: person.gift_ideas || [], // Gift Vault
@@ -144,7 +218,9 @@ export default function ContactDetailPage({
             importance: person.importance,
             target_frequency_days: person.target_frequency_days,
             company: person.company,
-            job_title: person.job_title
+            job_title: person.job_title,
+            current_challenges: person.current_challenges,
+            goals_aspirations: person.goals_aspirations
         };
 
         setContact(fullContact);
@@ -195,7 +271,9 @@ export default function ContactDetailPage({
             health={healthState}
             lastContact={lastContactFormatted}
             synopsis={contact.ai_summary}
+            summaryLevel={effectiveSummaryLevel}
             sharedMemory={contact.deep_lore || contact.interests?.[0]}
+            onRefreshAISummary={handleRefreshAISummary}
         />
       </div>
 

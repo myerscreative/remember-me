@@ -11,6 +11,7 @@ import { getGradient, getInitials, formatBirthday } from "@/lib/utils/contact-he
 import { getMethodIcon, getLastSeenText } from "@/lib/utils/interaction-utils";
 import { UnifiedActionHub } from "@/components/dashboard/UnifiedActionHub";
 import { getRelationshipStatus } from "@/app/network/utils/relationshipStatus";
+import { getMicroSummaryForList } from "@/lib/utils/summary-levels";
 
 interface NeedsNurtureListProps {
   contacts: any[]; // Using any to accommodate the supabase join structure broadly for now
@@ -107,6 +108,17 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-xs text-foreground leading-tight truncate">{contact.name}</p>
+                    {(() => {
+                      const microSummary = getMicroSummaryForList(contact);
+                      if (microSummary) {
+                        return (
+                          <p className="text-[10px] text-muted-foreground/80 truncate mt-0.5 italic">
+                            {microSummary}
+                          </p>
+                        );
+                      }
+                      return null;
+                    })()}
                     <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1 opacity-75">
                         {getMethodIcon(contact.last_interaction_method)}

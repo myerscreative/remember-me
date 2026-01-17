@@ -4,6 +4,7 @@ import { Contact } from '../mockContacts';
 import { MatchLevel } from '../utils/matchUtils';
 import { Plus, Info } from 'lucide-react';
 import { calculateDaysAgo, getContactStatus, formatRelativeTime, getShortRelativeTime, getMethodIcon, getMethodLabel } from '../utils/dateUtils';
+import { getMicroSummaryForList } from '@/lib/utils/summary-levels';
 
 interface ContactCardProps {
   contact: Contact;
@@ -103,6 +104,19 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
           {contact.role}
         </div>
       )}
+
+      {/* Micro Summary - Always use micro level for list views */}
+      {(viewMode === 'standard' || viewMode === 'detailed') && (() => {
+        const microSummary = getMicroSummaryForList(contact as any);
+        if (microSummary) {
+          return (
+            <div className="mt-2 text-center text-[11px] text-[#6b7280] line-clamp-2 px-1" title={microSummary}>
+              {microSummary}
+            </div>
+          );
+        }
+        return null;
+      })()}
       
       {/* Compact/Standard Last Contact Info */}
       {viewMode === 'compact' && (

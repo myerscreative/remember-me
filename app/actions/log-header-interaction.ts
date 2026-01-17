@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function logHeaderInteraction(
   personId: string, 
-  type: 'connection' | 'attempt',
+  interactionType: 'connection' | 'attempt',
   note?: string
 ) {
   const supabase = await createClient();
@@ -13,42 +13,79 @@ export async function logHeaderInteraction(
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    console.error("Auth Error in logHeaderInteraction:", authError);
-    return { success: false, error: "Unauthorized - No active session" };
+    console.error('[logHeaderInteraction] Auth Failed:', authError);
+    // Original code returned an object, new code throws an error.
+    // Adjusting to throw an error as per the provided change.
+    throw new Error('Not authenticated');
   }
+  console.log(`[logHeaderInteraction] User Authenticated: ${user.id}`);
 
   try {
     // 1. Structured Interaction Log
-    const interactionType = type === 'connection' ? 'call' : 'other';
-    const finalNote = note ? note : (type === 'attempt' ? 'Contact Attempt' : 'Quick Update');
+    // The 'interactionType' parameter is now used directly.
+    // The 'finalNote' calculation is simplified as per the provided change.
+    const finalNote = note?.trim() || '';
     
+    // Map internal types to DB allowed enum types:
+    // ('call', 'email', 'text', 'meeting', 'other', 'in-person', 'social')
+    const dbType = interactionType === 'connection' ? 'other' : 'other';
+    
+    // For attempts, we might want to flag it in the notes since the type 'attempt' doesn't exist
+    const dbNotes = interactionType === 'attempt' 
+        ? `[Attempt] ${finalNote}`.trim()
+        : finalNote;
+
     // Direct insert
     const { data: insertData, error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
         user_id: user.id,
-        type: interactionType,
+        type: dbType, 
         date: new Date().toISOString(),
-        notes: finalNote
+        notes: dbNotes
       })
       .select();
 
     if (insertError) {
+        console.error('[logHeaderInteraction] Insert Primary Failed:', insertError.message);
+        
         // Check for specific column error to give better feedback if schema is still wrong
         if (insertError.message.includes('column "date" does not exist')) {
-             console.error("Schema Mismatch: 'date' column missing. Trying 'interaction_date'...");
-             // Fallback attempt (optional, or just throw clear error)
+             console.log("[logHeaderInteraction] Schema Mismatch detected. Trying fallback to 'interaction_date'...");
+             // Fallback attempt
+             const { data: fallbackData, error: fallbackError } = await (supabase as any)
+              .from('interactions')
+              .insert({
+                person_id: personId,
+                user_id: user.id,
+                type: dbType,
+                interaction_date: new Date().toISOString(),
+                notes: dbNotes
+              })
+              .select();
+              
+              if (fallbackError) {
+                console.error("[logHeaderInteraction] Fallback Insert Failed:", fallbackError);
+                throw new Error(`Failed to insert interaction (Fallback): ${fallbackError.message}`);
+              }
+              console.log('[logHeaderInteraction] Fallback Insert SUCCESS:', fallbackData);
+        } else {
+             console.error("[logHeaderInteraction] Critical Insert Error:", insertError);
+             throw new Error(`Failed to insert interaction: ${insertError.message}`);
         }
-        console.error("Error logging interaction record:", insertError);
-        throw new Error(`Failed to insert interaction: ${insertError.message}`);
+    } else {
+        console.log('[logHeaderInteraction] Insert Primary SUCCESS:', insertData);
     }
 
     // 2. Shared Memory Log (User Narrative)
-    if (note || type === 'attempt') {
-        const memoryContent = type === 'attempt' && !note
+    // The original 'type' parameter is no longer available.
+    // Assuming 'interactionType' from the new signature can be used for this logic.
+    // The original logic used 'type === "attempt"'. We'll use 'interactionType === "attempt"' here.
+    if (note || interactionType === 'attempt') {
+        const memoryContent = interactionType === 'attempt' && !note
           ? `[Attempted Contact] No note left.` 
-          : (type === 'attempt' ? `[Attempted Contact] ${note}` : note);
+          : (interactionType === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
         if (memoryContent) {
              const { error: memoryError } = await (supabase as any)
@@ -63,8 +100,8 @@ export async function logHeaderInteraction(
         }
     }
 
-    // 3. Update Person Status (Only for connections)
-    if (type === 'connection') {
+        // 3. Update Person Status (Only for connections)
+    if (interactionType === 'connection') {
       const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
@@ -81,8 +118,10 @@ export async function logHeaderInteraction(
     }
 
     revalidatePath('/dashboard');
+    revalidatePath('/contacts');
     revalidatePath(`/contacts/${personId}`);
     revalidatePath('/garden');
+    revalidatePath('/'); // Revalidate home page
 
     return { success: true };
   } catch (error: any) {

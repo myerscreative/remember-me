@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function processMemory(contactId: string, text: string) {
+export async function processMemory(contactId: string, text: string, autoSave = true) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -125,6 +125,7 @@ export async function processMemory(contactId: string, text: string) {
     let relationship_summary: string | null = person.relationship_summary;
     let company: string | null = person.company;
     let job_title: string | null = person.job_title;
+    let most_important_to_them: string | null = person.most_important_to_them;
 
     // 3. Process extractions
     for (const item of extractions) {
@@ -132,17 +133,32 @@ export async function processMemory(contactId: string, text: string) {
         
         switch (category) {
             case 'FAMILY':
-                // Check if member already exists (simple name check)
-                const exists = currentFamily.some((m: any) => m.name?.toLowerCase() === data.name?.toLowerCase());
-                if (!exists) {
-                    currentFamily.push(data);
-                    fieldsUpdated.push('Family');
+                const existingIndex = currentFamily.findIndex((m: any) => m.name?.toLowerCase() === data.name?.toLowerCase());
+                
+                if (data.action === 'update' && existingIndex !== -1) {
+                    // Update existing family member with new information
+                    currentFamily[existingIndex] = {
+                        ...currentFamily[existingIndex],
+                        ...data,
+                        action: undefined // Remove action field before saving
+                    };
+                    fieldsUpdated.push('Family (Updated)');
+                } else if (existingIndex === -1) {
+                    // Add new family member
+                    const { action, ...memberData } = data; // Remove action field
+                    currentFamily.push(memberData);
+                    fieldsUpdated.push('Family (Added)');
                 }
                 break;
             case 'INTEREST':
-                if (data.value && !currentInterests.includes(data.value)) {
+                if (data.action === 'remove') {
+                    // Remove interest
+                    currentInterests = currentInterests.filter(i => i.toLowerCase() !== data.value?.toLowerCase());
+                    fieldsUpdated.push('Interests (Removed)');
+                } else if (data.value && !currentInterests.some(i => i.toLowerCase() === data.value.toLowerCase())) {
+                    // Add new interest
                     currentInterests.push(data.value);
-                    fieldsUpdated.push('Interests');
+                    fieldsUpdated.push('Interests (Added)');
                 }
                 break;
             case 'WHERE_WE_MET':
@@ -159,6 +175,11 @@ export async function processMemory(contactId: string, text: string) {
                     fieldsUpdated.push('Job Title');
                 }
                 break;
+            case 'PRIORITIES':
+            case 'WHAT_MATTERS':
+                most_important_to_them = data.value;
+                fieldsUpdated.push('Priorities');
+                break;
             case 'SYNOPSIS': 
             case 'STORY': // Handle legacy or fallback
                 // relationship_summary is the LATEST high-quality summary
@@ -173,27 +194,33 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     if (fieldsUpdated.length === 0) {
-        return { success: true, field: 'No changes', value: '' };
+        return { success: true, field: 'No changes', value: '', extracted: null };
     }
 
-    // 4. Update Person
-    const { error } = await (supabase as any)
-        .from('persons')
-        .update({
-            family_members: currentFamily,
-            interests: currentInterests,
-            where_met: where_met,
-            deep_lore: deep_lore,
-            relationship_summary: relationship_summary,
-            company: company,
-            job_title: job_title
-        })
-        .eq('id', contactId)
-        .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
+    const extractedData = {
+        family_members: currentFamily,
+        interests: currentInterests,
+        where_met: where_met,
+        deep_lore: deep_lore,
+        relationship_summary: relationship_summary,
+        company: company,
+        job_title: job_title,
+        most_important_to_them: most_important_to_them
+    };
 
-    if (error) {
-        console.error('Error updating person:', error);
-        throw error;
+    // Only save to database if autoSave is true
+    if (autoSave) {
+        // 4. Update Person
+        const { error } = await (supabase as any)
+            .from('persons')
+            .update(extractedData)
+            .eq('id', contactId)
+            .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
+
+        if (error) {
+            console.error('Error updating person:', error);
+            throw error;
+        }
     }
 
     // 5. Also save to shared_memories table so it appears in "The Vault"
@@ -213,7 +240,8 @@ export async function processMemory(contactId: string, text: string) {
     return {
         success: true,
         field: fieldsUpdated.join(', '),
-        value: extractions.map((e: any) => e.data.value || e.data.name).join(', ')
+        value: extractions.map((e: any) => e.data.value || e.data.name).join(', '),
+        extracted: extractedData
     };
 
   } catch (error) {

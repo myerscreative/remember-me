@@ -40,11 +40,16 @@ export function StoryTab({ contact }: StoryTabProps) {
   const [whatMatters, setWhatMatters] = useState(contact.story?.whatsImportant || '');
   const [company, setCompany] = useState((contact as any).company || '');
   const [jobTitle, setJobTitle] = useState((contact as any).job_title || '');
+  const [challenges, setChallenges] = useState((contact as any).current_challenges || '');
+  const [aspirations, setAspirations] = useState((contact as any).goals_aspirations || '');
   
   // Memory Input State
   const [newMemory, setNewMemory] = useState('');
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [isExpandedMemoryInput, setIsExpandedMemoryInput] = useState(false);
+
+  console.log('🔍 [DEBUG] StoryTab - Company:', (contact as any).company, 'Job Title:', (contact as any).job_title);
+  console.log('🔍 [DEBUG] StoryTab - Full contact keys:', Object.keys(contact));
 
   // Auto-Save Handlers
   const handleBlur = async (field: string, value: string) => {
@@ -54,10 +59,15 @@ export function StoryTab({ contact }: StoryTabProps) {
     if (field === 'most_important_to_them') update.most_important_to_them = value;
     if (field === 'company') update.company = value;
     if (field === 'job_title') update.job_title = value;
+    if (field === 'current_challenges') update.current_challenges = value;
+    if (field === 'goals_aspirations') update.goals_aspirations = value;
 
     const result = await updateStoryFields(contact.id, update);
     if (!result.success) {
       toast.error("Failed to save");
+    } else {
+      // Notify user that AI summary is being generated
+      toast.success("Saved! AI summary updating in background...", { duration: 2000 });
     }
   };
 
@@ -145,6 +155,34 @@ export function StoryTab({ contact }: StoryTabProps) {
             onBlur={() => handleBlur('company', company)}
           />
         </div>
+      </div>
+
+      {/* SECTION: WHAT THEY'RE WORKING THROUGH */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
+          💪 What They're Working Through
+        </label>
+        <textarea 
+          placeholder="Current challenges, obstacles, what they're navigating right now..."
+          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
+          value={challenges}
+          onChange={(e) => setChallenges(e.target.value)}
+          onBlur={() => handleBlur('current_challenges', challenges)}
+        />
+      </div>
+
+      {/* SECTION: WHAT THEY'RE WORKING TOWARD */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
+          ✨ What They're Working Toward
+        </label>
+        <textarea 
+          placeholder="Goals, dreams, aspirations, what drives them forward..."
+          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
+          value={aspirations}
+          onChange={(e) => setAspirations(e.target.value)}
+          onBlur={() => handleBlur('goals_aspirations', aspirations)}
+        />
       </div>
 
       {/* SECTION: MILESTONES */}

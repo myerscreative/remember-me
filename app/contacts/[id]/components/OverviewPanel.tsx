@@ -22,16 +22,18 @@ interface OverviewPanelProps {
   onUnlinkConnection?: (connectionId: string) => void;
   onFrequencyChange?: (days: number) => void;
   onImportanceChange?: (importance: 'high' | 'medium' | 'low') => void;
+  onRefreshAISummary?: () => void;
 }
 
-export function OverviewPanel({ 
-  contact, 
-  onNavigateToTab, 
-  onEdit, 
-  onLinkConnection, 
+export function OverviewPanel({
+  contact,
+  onNavigateToTab,
+  onEdit,
+  onLinkConnection,
   onUnlinkConnection,
   onFrequencyChange,
-  onImportanceChange
+  onImportanceChange,
+  onRefreshAISummary
 }: OverviewPanelProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('Overview');
@@ -116,7 +118,7 @@ export function OverviewPanel({
                         contact.ai_summary ? "p-5 md:p-6" : "p-4 md:px-6 md:py-4"
                     )}>
                          {contact.ai_summary ? (
-                            <AISynopsisCard 
+                            <AISynopsisCard
                                 contactId={contact.id}
                                 contactName={contact.name}
                                 aiSummary={contact.ai_summary}
@@ -124,6 +126,7 @@ export function OverviewPanel({
                                 whereMet={contact.where_met}
                                 lastUpdated={contact.updated_at}
                                 isInline={true}
+                                onRefresh={onRefreshAISummary}
                             />
                          ) : (
                             <div className="flex items-center gap-3">
