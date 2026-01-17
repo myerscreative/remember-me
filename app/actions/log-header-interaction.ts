@@ -26,15 +26,24 @@ export async function logHeaderInteraction(
     // The 'finalNote' calculation is simplified as per the provided change.
     const finalNote = note?.trim() || '';
     
+    // Map internal types to DB allowed enum types:
+    // ('call', 'email', 'text', 'meeting', 'other', 'in-person', 'social')
+    const dbType = interactionType === 'connection' ? 'other' : 'other';
+    
+    // For attempts, we might want to flag it in the notes since the type 'attempt' doesn't exist
+    const dbNotes = interactionType === 'attempt' 
+        ? `[Attempt] ${finalNote}`.trim()
+        : finalNote;
+
     // Direct insert
     const { data: insertData, error: insertError } = await (supabase as any)
       .from('interactions')
       .insert({
         person_id: personId,
         user_id: user.id,
-        type: interactionType, // Using the parameter 'interactionType'
+        type: dbType, 
         date: new Date().toISOString(),
-        notes: finalNote
+        notes: dbNotes
       })
       .select();
 
@@ -50,9 +59,9 @@ export async function logHeaderInteraction(
               .insert({
                 person_id: personId,
                 user_id: user.id,
-                type: interactionType, // Using the parameter 'interactionType'
+                type: dbType,
                 interaction_date: new Date().toISOString(),
-                notes: finalNote
+                notes: dbNotes
               })
               .select();
               
@@ -109,8 +118,10 @@ export async function logHeaderInteraction(
     }
 
     revalidatePath('/dashboard');
+    revalidatePath('/contacts');
     revalidatePath(`/contacts/${personId}`);
     revalidatePath('/garden');
+    revalidatePath('/'); // Revalidate home page
 
     return { success: true };
   } catch (error: any) {

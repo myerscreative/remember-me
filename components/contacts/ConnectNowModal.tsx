@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
   const [selectedMethod, setSelectedMethod] = useState<'text' | 'email' | 'call' | 'whatsapp' | null>(null);
   const [quickNote, setQuickNote] = useState("");
   const [isLogging, setIsLogging] = useState(false);
+  const router = useRouter();
 
   const handleCopyStarter = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -50,6 +52,8 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                 toast.success("Interaction logged");
             }
             setQuickNote("");
+            onOpenChange(false); // Close modal
+            router.refresh(); // Refresh client data
         } else {
             toast.error(result.error || "Failed to log interaction");
         }
