@@ -125,6 +125,7 @@ export async function processMemory(contactId: string, text: string) {
     let relationship_summary: string | null = person.relationship_summary;
     let company: string | null = person.company;
     let job_title: string | null = person.job_title;
+    let most_important_to_them: string | null = person.most_important_to_them;
 
     // 3. Process extractions
     for (const item of extractions) {
@@ -174,6 +175,11 @@ export async function processMemory(contactId: string, text: string) {
                     fieldsUpdated.push('Job Title');
                 }
                 break;
+            case 'PRIORITIES':
+            case 'WHAT_MATTERS':
+                most_important_to_them = data.value;
+                fieldsUpdated.push('Priorities');
+                break;
             case 'SYNOPSIS': 
             case 'STORY': // Handle legacy or fallback
                 // relationship_summary is the LATEST high-quality summary
@@ -201,7 +207,8 @@ export async function processMemory(contactId: string, text: string) {
             deep_lore: deep_lore,
             relationship_summary: relationship_summary,
             company: company,
-            job_title: job_title
+            job_title: job_title,
+            most_important_to_them: most_important_to_them
         })
         .eq('id', contactId)
         .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
