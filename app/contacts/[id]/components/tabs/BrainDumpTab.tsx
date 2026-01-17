@@ -27,6 +27,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const [newMemory, setNewMemory] = useState('');
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [optimisticMemories, setOptimisticMemories] = useState<SharedMemory[]>([]);
+  const [isReprocessing, setIsReprocessing] = useState(false);
 
   const contactName = `${contact.first_name} ${contact.last_name || ''}`.trim();
 
@@ -59,6 +60,28 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       // Remove the optimistic memory on failure
       setOptimisticMemories(prev => prev.filter(m => m !== optimisticMemory));
       setNewMemory(optimisticMemory.content); // Restore the text
+    }
+  };
+
+  const handleReprocessMemories = async () => {
+    setIsReprocessing(true);
+    try {
+      const response = await fetch('/api/reprocess-memories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personId: contact.id })
+      });
+
+      if (!response.ok) throw new Error('Failed to reprocess');
+
+      const result = await response.json();
+      toast.success(`Reprocessed ${result.processed} memories!`);
+      router.refresh();
+    } catch (error) {
+      console.error('Reprocess error:', error);
+      toast.error('Failed to reprocess memories');
+    } finally {
+      setIsReprocessing(false);
     }
   };
 
@@ -118,6 +141,22 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           <h3 className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
             💭 Memory Vault ({allMemories.length})
           </h3>
+          <button
+            onClick={handleReprocessMemories}
+            disabled={isReprocessing || allMemories.length === 0}
+            className="text-[10px] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            {isReprocessing ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                🤖 Reprocess All
+              </>
+            )}
+          </button>
           {optimisticMemories.length > 0 && (
             <span className="text-[#fbbf24] text-[10px] font-medium animate-pulse">
               Saving...
