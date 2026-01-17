@@ -126,6 +126,14 @@ export default function ContactDetailPage({
           .eq("person_id", id)
           .order('created_at', { ascending: false });
 
+        // 3b. Fetch Interactions
+        const { data: interactions } = await (supabase as any)
+          .from("interactions")
+          .select("*")
+          .eq("person_id", id)
+          .order('date', { ascending: false })
+          .limit(10);
+
         // 4. Fetch Connections (Relationships)
         // We need both directions: where this person is 'from' OR 'to'
         const { data: rawRelationships, error: relError } = await (supabase as any)
@@ -186,6 +194,7 @@ export default function ContactDetailPage({
             lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
             tags: tags,
             shared_memories: sharedMemories || [],
+            interactions: interactions || [],
 
             connections: processedConnections, // Add connections to contact object
             gift_ideas: person.gift_ideas || [], // Gift Vault
