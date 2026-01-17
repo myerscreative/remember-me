@@ -49,10 +49,37 @@ export async function reprocessExistingMemories(personId: string, preview = fals
           mergedData = {
             ...mergedData,
             ...result.extracted,
-            // For arrays, concatenate and dedupe
-            family_members: [...(mergedData.family_members || []), ...(result.extracted.family_members || [])],
-            interests: [...new Set([...(mergedData.interests || []), ...(result.extracted.interests || [])])]
           };
+          
+          // For family_members, deduplicate by name (case-insensitive)
+          if (result.extracted.family_members && result.extracted.family_members.length > 0) {
+            const existingFamily = mergedData.family_members || [];
+            const newMembers = result.extracted.family_members;
+            
+            for (const newMember of newMembers) {
+              const existingIndex = existingFamily.findIndex(
+                (m: any) => m.name.toLowerCase() === newMember.name.toLowerCase()
+              );
+              
+              if (existingIndex === -1) {
+                // Add new member
+                existingFamily.push(newMember);
+              } else {
+                // Update existing member with new info (merge)
+                existingFamily[existingIndex] = {
+                  ...existingFamily[existingIndex],
+                  ...newMember
+                };
+              }
+            }
+            
+            mergedData.family_members = existingFamily;
+          }
+          
+          // For interests, deduplicate
+          if (result.extracted.interests) {
+            mergedData.interests = [...new Set([...(mergedData.interests || []), ...(result.extracted.interests || [])])];
+          }
         }
         
         successCount++;
