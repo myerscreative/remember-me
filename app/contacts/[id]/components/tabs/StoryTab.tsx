@@ -93,7 +93,7 @@ export function StoryTab({ contact }: StoryTabProps) {
       {/* SECTION: THE ORIGIN */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          The Origin Story
+          How We Met
         </label>
         <textarea 
           placeholder="Where did you meet? What was your first impression?"
@@ -107,7 +107,7 @@ export function StoryTab({ contact }: StoryTabProps) {
       {/* SECTION: THE PHILOSOPHY */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          Connection Philosophy
+          Why We Stay Connected
         </label>
         <textarea 
           placeholder="Why do we stay in touch? What value does this connection bring?"
@@ -121,7 +121,7 @@ export function StoryTab({ contact }: StoryTabProps) {
       {/* SECTION: WHAT MATTERS MOST */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          Current Priorities & Hobbies
+          What Matters to Them
         </label>
         <textarea 
           placeholder="What are they working on? (e.g., The Kalon Project, fishing trips, business scaling)"
@@ -160,7 +160,7 @@ export function StoryTab({ contact }: StoryTabProps) {
       {/* SECTION: CURRENT CHALLENGES */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          💪 What They're Working Through
+          💪 Current Challenges
         </label>
         <textarea 
           placeholder="Current challenges, obstacles, what they're navigating right now..."
@@ -174,7 +174,7 @@ export function StoryTab({ contact }: StoryTabProps) {
       {/* SECTION: GOALS & ASPIRATIONS */}
       <div className="group">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          ✨ What They're Working Toward
+          ✨ Goals & Aspirations
         </label>
         <textarea 
           placeholder="Goals, dreams, aspirations, what drives them forward..."
