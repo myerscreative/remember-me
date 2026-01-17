@@ -10,6 +10,8 @@ import { MessageSquare, Mail, Phone, Heart, Sparkles, Copy, ExternalLink, ArrowR
 import { useState, useMemo } from "react";
 import { getInitialsFromFullName, getGradient } from "@/lib/utils/contact-helpers";
 import toast from "react-hot-toast";
+import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { showNurtureToast } from '@/components/ui/nurture-toast';
 
 interface ConnectNowModalProps {
   person: Person;
@@ -20,12 +22,14 @@ interface ConnectNowModalProps {
 export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModalProps) {
   const starters = useMemo(() => generateConversationStarters(person), [person]);
   const [selectedMethod, setSelectedMethod] = useState<'text' | 'email' | 'call' | 'whatsapp' | null>(null);
+  const [quickNote, setQuickNote] = useState("");
+  const [isLogging, setIsLogging] = useState(false);
 
   const handleCopyStarter = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
   };
-  
+
   const handleUseStarter = (text: string) => {
       // Logic to open respective app with text if possible, for now copy + toast
       handleCopyStarter(text);
@@ -33,6 +37,33 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
       if (person.phone) {
            window.location.href = `sms:${person.phone}?body=${encodeURIComponent(text)}`;
       }
+  };
+
+  const handleLogInteraction = async (type: 'connection' | 'attempt') => {
+    console.log('Starting interaction log...', { type, contactId: person.id });
+    setIsLogging(true);
+    try {
+      const result = await logHeaderInteraction(person.id, type, quickNote);
+      console.log('Interaction log result:', result);
+
+      if (result.success) {
+        // Show appropriate feedback based on action type
+        if (type === 'connection') {
+          showNurtureToast(person.name);
+        } else {
+          toast.success('Attempt logged successfully');
+        }
+        setQuickNote(""); // Clear note
+      } else {
+        console.error('Log interaction failed:', result.error);
+        toast.error(`Failed to log: ${result.error}`);
+      }
+    } catch (err: any) {
+      console.error('Unexpected error in handleLogInteraction:', err);
+      toast.error(`Error logging interaction: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsLogging(false);
+    }
   };
 
   return (
@@ -127,8 +158,46 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                     ))}
                 </div>
             </section>
+
+            {/* Connection Logging */}
+            <section>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Log Interaction</h4>
+                <div className="space-y-3">
+                    {/* Note Input */}
+                    <input
+                        type="text"
+                        placeholder="Add a quick note..."
+                        value={quickNote}
+                        onChange={(e) => setQuickNote(e.target.value)}
+                        className="w-full bg-[#1e1e2d]/60 border border-gray-700/30 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                    />
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            onClick={() => handleLogInteraction('attempt')}
+                            disabled={isLogging}
+                            className="flex items-center justify-center py-2.5 rounded-lg border border-orange-500/20 bg-orange-500/10 hover:bg-orange-500/20 active:scale-95 transition-all disabled:opacity-50"
+                        >
+                            <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider">
+                                {isLogging ? 'Saving...' : 'Log Attempt'}
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={() => handleLogInteraction('connection')}
+                            disabled={isLogging}
+                            className="flex items-center justify-center py-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 transition-all disabled:opacity-50"
+                        >
+                            <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                                {isLogging ? 'Saving...' : 'Log Connection'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
-        
+
         <div className="p-4 border-t border-gray-800 bg-[#1a1a24]">
              <Button 
                 variant="ghost" 
