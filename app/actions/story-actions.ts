@@ -273,8 +273,18 @@ export async function addSharedMemory(person_id: string, content: string) {
       return { success: true };
     } catch (error: unknown) {
       console.error('❌ [DEBUG] addSharedMemory Error:', error);
-      const message = error instanceof Error ? error.message : "Unknown error";
-      console.error("Error adding shared memory:", error);
+      console.error('❌ [DEBUG] Error type:', typeof error);
+      console.error('❌ [DEBUG] Error details:', JSON.stringify(error, null, 2));
+      
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+        console.error('❌ [DEBUG] Error message:', error.message);
+        console.error('❌ [DEBUG] Error stack:', error.stack);
+      } else if (typeof error === 'object' && error !== null) {
+        message = JSON.stringify(error);
+      }
+      
       return { success: false, error: message };
     }
 }
