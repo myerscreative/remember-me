@@ -26,22 +26,39 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const [showPostCallPulse, setShowPostCallPulse] = useState(false);
   const [newMemory, setNewMemory] = useState('');
   const [isAddingMemory, setIsAddingMemory] = useState(false);
+  const [optimisticMemories, setOptimisticMemories] = useState<SharedMemory[]>([]);
 
   const contactName = `${contact.first_name} ${contact.last_name || ''}`.trim();
+
+  // Combine optimistic memories with real ones
+  const allMemories = [...optimisticMemories, ...(contact.shared_memories || [])];
 
   const handleAddMemory = async () => {
     if (!newMemory.trim()) return;
 
+    // Add optimistic memory immediately
+    const optimisticMemory: SharedMemory = {
+      content: newMemory.trim(),
+      created_at: new Date().toISOString()
+    };
+    setOptimisticMemories(prev => [optimisticMemory, ...prev]);
+
     setIsAddingMemory(true);
-    const result = await addSharedMemory(contact.id, newMemory.trim());
+    setNewMemory(''); // Clear input immediately
+
+    const result = await addSharedMemory(contact.id, optimisticMemory.content);
     setIsAddingMemory(false);
 
     if (result.success) {
-      toast.success("Memory added! AI summary updating in background...", { duration: 2000 });
-      setNewMemory('');
+      toast.success("✅ Memory saved! AI summary updating in background...", { duration: 3000 });
+      // Clear optimistic memory and refresh to get real data
+      setOptimisticMemories([]);
       router.refresh();
     } else {
       toast.error("Failed to add memory");
+      // Remove the optimistic memory on failure
+      setOptimisticMemories(prev => prev.filter(m => m !== optimisticMemory));
+      setNewMemory(optimisticMemory.content); // Restore the text
     }
   };
 
@@ -97,25 +114,46 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
 
       {/* Recent Memories */}
       <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
-        <h3 className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3">
-          💭 Memory Vault ({contact.shared_memories?.length || 0})
-        </h3>
-        {(contact.shared_memories?.length || 0) > 0 ? (
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
+            💭 Memory Vault ({allMemories.length})
+          </h3>
+          {optimisticMemories.length > 0 && (
+            <span className="text-[#fbbf24] text-[10px] font-medium animate-pulse">
+              Saving...
+            </span>
+          )}
+        </div>
+        {allMemories.length > 0 ? (
           <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto">
-            {contact.shared_memories!.map((memory, index) => (
-              <div key={index} className="bg-[#0f1419] p-4 rounded-lg border border-[#2d3748]">
-                <div className="text-[#64748b] text-[11px] mb-2">
-                  {new Date(memory.created_at).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
+            {allMemories.map((memory, index) => {
+              const isOptimistic = optimisticMemories.includes(memory);
+              return (
+                <div key={index} className={`bg-[#0f1419] p-4 rounded-lg border transition-all ${
+                  isOptimistic ? 'border-[#fbbf24] animate-pulse' : 'border-[#2d3748]'
+                }`}>
+                  <div className="text-[#64748b] text-[11px] mb-2 flex items-center justify-between">
+                    <span>
+                      {new Date(memory.created_at).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                    {isOptimistic && (
+                      <span className="text-[#fbbf24] text-[10px] font-medium">
+                        Saving...
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[#cbd5e1] text-[14px] leading-relaxed whitespace-pre-wrap">
+                    {memory.content}
+                  </div>
                 </div>
-                <div className="text-[#cbd5e1] text-[14px] leading-relaxed whitespace-pre-wrap">
-                  {memory.content}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-[#64748b] text-[13px] italic text-center py-8">
