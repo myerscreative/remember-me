@@ -10,6 +10,7 @@ import { FamilyTab } from './tabs/FamilyTab';
 import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { deleteInteraction } from '@/app/actions/delete-interaction';
+import { updateInteraction } from '@/app/actions/update-interaction';
 import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
 import { UserSettings } from '@/lib/utils/summary-levels';
 
@@ -31,6 +32,11 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
+  const [editingInteractionId, setEditingInteractionId] = useState<string | null>(null);
+  const [editInteractionForm, setEditInteractionForm] = useState({
+    date: '',
+    notes: ''
+  });
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [headerForm, setHeaderForm] = useState({
       first_name: contact.first_name || '',
@@ -151,6 +157,48 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     }
   };
 
+  const handleStartEditInteraction = (interaction: any) => {
+    setEditingInteractionId(interaction.id);
+    // Convert ISO date to datetime-local format (YYYY-MM-DDTHH:mm)
+    const date = new Date(interaction.date);
+    const localDatetime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+      .toISOString()
+      .slice(0, 16);
+
+    setEditInteractionForm({
+      date: localDatetime,
+      notes: interaction.notes || ''
+    });
+  };
+
+  const handleCancelEditInteraction = () => {
+    setEditingInteractionId(null);
+    setEditInteractionForm({ date: '', notes: '' });
+  };
+
+  const handleSaveInteraction = async (interactionId: string) => {
+    try {
+        // Convert local datetime back to ISO string
+        const isoDate = new Date(editInteractionForm.date).toISOString();
+
+        const result = await updateInteraction(interactionId, contact.id, {
+            date: isoDate,
+            notes: editInteractionForm.notes
+        });
+
+        if (!result.success) {
+            alert(`Failed to update interaction: ${result.error}`);
+            return;
+        }
+
+        // Refresh the page to show updated interactions
+        window.location.reload();
+    } catch (error) {
+        console.error('Error updating interaction:', error);
+        alert('An error occurred while updating the interaction');
+    }
+  };
+
   const handleSaveHeader = async () => {
     try {
         const result = await updateContact(contact.id, headerForm);
@@ -194,7 +242,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
 
       {/* LEFT COLUMN */}
-      <div className="flex flex-col gap-8 px-4 lg:px-0">
+      <div className="flex flex-col gap-8 px-4 lg:px-0 pb-24 lg:pb-0">
         
         {/* Navigation Tabs - Moved to Top of Main Column */}
         <div className="bg-[#1a1f2e] rounded-2xl p-1 border border-slate-800/50 flex transition-all shadow-lg shadow-black/20 backdrop-blur-xl gap-2">
@@ -530,29 +578,77 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     <div className="mt-4 pt-4 border-t border-[#2d3748]">
                         <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2.5">Recent Activity ({contact.interactions?.length || 0})</div>
                         {(contact.interactions?.length || 0) > 0 ? (
-                            <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
+                            <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto">
                                 {contact.interactions!.map((interaction: any) => (
                                     <div key={interaction.id} className="bg-[#0f1419] p-3 rounded-lg border border-[#2d3748] group hover:border-[#3d4758] transition-colors">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[#cbd5e1] text-[12px] font-medium mb-1">
-                                                    {new Date(interaction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                    {interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#fbbf24]">📝 Attempt</span>}
-                                                    {!interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#10b981]">✅ Connected</span>}
+                                        {editingInteractionId === interaction.id ? (
+                                            <div className="flex flex-col gap-2">
+                                                <div>
+                                                    <label className="text-[#94a3b8] text-[11px] font-medium mb-1 block">Date & Time</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        className="w-full bg-[#0a0e1a] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white [color-scheme:dark]"
+                                                        value={editInteractionForm.date}
+                                                        onChange={(e) => setEditInteractionForm({...editInteractionForm, date: e.target.value})}
+                                                    />
                                                 </div>
-                                                <div className="text-[#94a3b8] text-[13px] leading-snug break-words">
-                                                    {interaction.notes?.replace('[Attempt] ', '') || 'No notes'}
+                                                <div>
+                                                    <label className="text-[#94a3b8] text-[11px] font-medium mb-1 block">Notes</label>
+                                                    <textarea
+                                                        className="w-full bg-[#0a0e1a] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white resize-none"
+                                                        rows={2}
+                                                        value={editInteractionForm.notes}
+                                                        onChange={(e) => setEditInteractionForm({...editInteractionForm, notes: e.target.value})}
+                                                    />
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleSaveInteraction(interaction.id)}
+                                                        className="flex-1 bg-[#60a5fa] hover:bg-[#3b82f6] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCancelEditInteraction}
+                                                        className="flex-1 bg-[#2d3748] hover:bg-[#3d4758] text-[#94a3b8] px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
+                                                    >
+                                                        Cancel
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => handleDeleteInteraction(interaction.id)}
-                                                disabled={deletingInteractionId === interaction.id}
-                                                className="text-[#64748b] hover:text-[#ef4444] p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 shrink-0"
-                                                title="Delete interaction"
-                                            >
-                                                {deletingInteractionId === interaction.id ? '⏳' : '🗑️'}
-                                            </button>
-                                        </div>
+                                        ) : (
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[#cbd5e1] text-[12px] font-medium mb-1">
+                                                        {new Date(interaction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                        {' at '}
+                                                        {new Date(interaction.date).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true })}
+                                                        {interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#fbbf24]">📝 Attempt</span>}
+                                                        {!interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#10b981]">✅ Connected</span>}
+                                                    </div>
+                                                    <div className="text-[#94a3b8] text-[13px] leading-snug break-words">
+                                                        {interaction.notes?.replace('[Attempt] ', '') || 'No notes'}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                                    <button
+                                                        onClick={() => handleStartEditInteraction(interaction)}
+                                                        className="text-[#64748b] hover:text-[#60a5fa] p-1 rounded transition-colors"
+                                                        title="Edit interaction"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteInteraction(interaction.id)}
+                                                        disabled={deletingInteractionId === interaction.id}
+                                                        className="text-[#64748b] hover:text-[#ef4444] p-1 rounded transition-colors disabled:opacity-50"
+                                                        title="Delete interaction"
+                                                    >
+                                                        {deletingInteractionId === interaction.id ? '⏳' : '🗑️'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -586,7 +682,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       </div>
 
       {/* RIGHT COLUMN - SIDEBAR */}
-      <div className="flex flex-col gap-5 px-4 lg:px-0 pb-10 lg:pb-0">
+      <div className="flex flex-col gap-5 px-4 lg:px-0 pb-24 lg:pb-0">
          
            <div className="bg-linear-to-br from-[#7c3aed] to-[#5b21b6] rounded-2xl p-5 shadow-xl shadow-indigo-900/10 text-white">
              <div className="flex justify-between items-center mb-3">
