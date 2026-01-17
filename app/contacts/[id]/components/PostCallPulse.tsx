@@ -15,8 +15,7 @@ interface PostCallPulseProps {
 }
 
 export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCallPulseProps) {
-  const [step, setStep] = useState(1); // 1: Vibe, 2: Dump & Extract
-  const [vibe, setVibe] = useState<number | null>(null);
+  // Removed vibe check - go directly to brain dump
   const [dumpText, setDumpText] = useState('');
   const [suggestions, setSuggestions] = useState<ExtractedEntity[]>([]);
   const [milestoneSuggestion, setMilestoneSuggestion] = useState<{title: string, detectedDate: string} | null>(null);
@@ -55,8 +54,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
     console.log('🔵 [PostCallPulse] Starting save for contact:', contactId);
     setIsSaving(true);
     try {
-        const vibeText = vibe ? `[Vibe Check: ${vibe}/5] ` : '';
-        const finalContent = `${vibeText}${dumpText}`;
+        const finalContent = dumpText; // No vibe check prefix
         
         console.log('🔵 [PostCallPulse] Calling addSharedMemory with content:', finalContent.substring(0, 50));
         const result = await addSharedMemory(contactId, finalContent);
@@ -129,10 +127,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
       
       {/* HEADER / NAV */}
       <div className="flex justify-between items-start mb-6">
-          <div className="flex gap-1 flex-1 max-w-[200px]">
-            <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-indigo-500' : 'bg-indigo-500/20'}`} />
-            <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-indigo-500' : 'bg-indigo-500/20'}`} />
-          </div>
+          {/* Progress indicator removed - single step now */}
           <button onClick={onClose} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
               <X size={20} />
           </button>
