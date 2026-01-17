@@ -35,7 +35,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       last_name: contact.last_name || '',
       company: contact.company || '',
       job_title: contact.job_title || '',
-      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : '',
+      photo_url: contact.photo_url || ''
   });
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -73,7 +74,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   };
 
   const name = `${contact.first_name} ${contact.last_name || ''}`.trim();
-  const photoUrl = contact.avatar_url;
+  const photoUrl = contact.photo_url;
 
   const getInitials = (name: string) => {
     return name
@@ -220,7 +221,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                 last_name: contact.last_name || '',
                                 company: contact.company || '',
                                 job_title: contact.job_title || '',
-                                birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+                                birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : '',
+                                photo_url: contact.photo_url || ''
                             });
                         } else {
                             setIsEditingHeader(true);
@@ -282,14 +284,24 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                         </div>
                          <div className="flex items-center justify-center gap-2">
                             <span className="text-[13px] text-[#64748b]">🎂 Birthday:</span>
-                            <input 
+                            <input
                                 type="date"
                                 className="bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white [color-scheme:dark]"
                                 value={headerForm.birthday}
                                 onChange={(e) => setHeaderForm({...headerForm, birthday: e.target.value})}
                             />
                         </div>
-                        <button 
+                         <div className="flex flex-col gap-1">
+                            <span className="text-[13px] text-[#64748b] text-center">📷 Photo URL:</span>
+                            <input
+                                type="text"
+                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white text-center"
+                                value={headerForm.photo_url}
+                                onChange={(e) => setHeaderForm({...headerForm, photo_url: e.target.value})}
+                                placeholder="https://example.com/photo.jpg"
+                            />
+                        </div>
+                        <button
                             onClick={handleSaveHeader}
                             className="bg-[#60a5fa] hover:bg-[#3b82f6] text-white px-4 py-1.5 rounded-lg text-sm font-medium mt-1"
                         >

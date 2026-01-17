@@ -10,6 +10,9 @@ interface UpdateContactData {
   company?: string;
   job_title?: string;
   where_met?: string;
+  first_name?: string;
+  last_name?: string;
+  photo_url?: string;
 }
 
 export async function updateContact(personId: string, data: UpdateContactData) {
