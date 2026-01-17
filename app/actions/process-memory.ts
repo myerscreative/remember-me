@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function processMemory(contactId: string, text: string) {
+export async function processMemory(contactId: string, text: string, autoSave = true) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -194,34 +194,40 @@ export async function processMemory(contactId: string, text: string) {
     }
 
     if (fieldsUpdated.length === 0) {
-        return { success: true, field: 'No changes', value: '' };
+        return { success: true, field: 'No changes', value: '', extracted: null };
     }
 
-    // 4. Update Person
-    const { error } = await (supabase as any)
-        .from('persons')
-        .update({
-            family_members: currentFamily,
-            interests: currentInterests,
-            where_met: where_met,
-            deep_lore: deep_lore,
-            relationship_summary: relationship_summary,
-            company: company,
-            job_title: job_title,
-            most_important_to_them: most_important_to_them
-        })
-        .eq('id', contactId)
-        .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
+    const extractedData = {
+        family_members: currentFamily,
+        interests: currentInterests,
+        where_met: where_met,
+        deep_lore: deep_lore,
+        relationship_summary: relationship_summary,
+        company: company,
+        job_title: job_title,
+        most_important_to_them: most_important_to_them
+    };
 
-    if (error) {
-        console.error('Error updating person:', error);
-        throw error;
+    // Only save to database if autoSave is true
+    if (autoSave) {
+        // 4. Update Person
+        const { error } = await (supabase as any)
+            .from('persons')
+            .update(extractedData)
+            .eq('id', contactId)
+            .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
+
+        if (error) {
+            console.error('Error updating person:', error);
+            throw error;
+        }
     }
 
     return { 
         success: true, 
         field: fieldsUpdated.join(', '), 
-        value: extractions.map((e: any) => e.data.value || e.data.name).join(', ') 
+        value: extractions.map((e: any) => e.data.value || e.data.name).join(', '),
+        extracted: extractedData
     };
 
   } catch (error) {

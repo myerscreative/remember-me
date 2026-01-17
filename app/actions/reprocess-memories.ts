@@ -6,7 +6,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { processMemory } from './process-memory';
 
-export async function reprocessExistingMemories(personId: string) {
+export async function reprocessExistingMemories(personId: string, preview = false) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -37,11 +37,24 @@ export async function reprocessExistingMemories(personId: string) {
     // Process each memory
     let successCount = 0;
     let errorCount = 0;
+    let mergedData: any = {};
 
     for (const memory of memories) {
       try {
         console.log(`Processing memory ${memory.id}: "${memory.content.substring(0, 50)}..."`);
-        await processMemory(personId, memory.content);
+        const result = await processMemory(personId, memory.content, !preview);
+        
+        if (preview && result.extracted) {
+          // Merge extracted data (later values override earlier ones)
+          mergedData = {
+            ...mergedData,
+            ...result.extracted,
+            // For arrays, concatenate and dedupe
+            family_members: [...(mergedData.family_members || []), ...(result.extracted.family_members || [])],
+            interests: [...new Set([...(mergedData.interests || []), ...(result.extracted.interests || [])])]
+          };
+        }
+        
         successCount++;
       } catch (err) {
         console.error(`Failed to process memory ${memory.id}:`, err);
@@ -55,7 +68,8 @@ export async function reprocessExistingMemories(personId: string) {
       success: true,
       processed: successCount,
       failed: errorCount,
-      total: memories.length
+      total: memories.length,
+      preview: preview ? mergedData : null
     };
 
   } catch (error) {
