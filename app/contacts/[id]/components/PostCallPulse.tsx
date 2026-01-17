@@ -138,44 +138,8 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
         <p className="text-slate-400 text-sm mt-1">Capture the lore while it's fresh.</p>
       </header>
 
-      {/* STEP 1: VIBE CHECK */}
-      {step === 1 && (
-          <div className="flex-1 flex flex-col justify-center items-center space-y-8 animate-in fade-in slide-in-from-right-4">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-widest">Vibe Check</h3>
-              <div className="flex gap-4">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                      <button 
-                        key={rating}
-                        onClick={() => setVibe(rating)}
-                        className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 transition-all ${
-                            vibe === rating 
-                            ? 'bg-indigo-600 border-indigo-400 scale-110 shadow-[0_0_15px_rgba(99,102,241,0.5)]' 
-                            : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800 hover:scale-105'
-                        }`}
-                      >
-                         {rating === 1 && '😤'}
-                         {rating === 2 && '😕'}
-                         {rating === 3 && '😐'}
-                         {rating === 4 && '🙂'}
-                         {rating === 5 && '🤩'}
-                      </button>
-                  ))}
-              </div>
-              
-              {vibe !== null && (
-                  <button 
-                    onClick={() => setStep(2)}
-                    className="w-full max-w-xs py-4 bg-white text-black rounded-2xl font-bold hover:scale-105 transition-transform"
-                  >
-                      Next: Brain Dump
-                  </button>
-              )}
-          </div>
-      )}
-
-      {/* STEP 2: RAW BRAIN DUMP & EXTRACTION */}
-      {step === 2 && (
-        <div className="flex-1 flex flex-col space-y-6 animate-in fade-in slide-in-from-right-4">
+      {/* BRAIN DUMP - Direct entry */}
+      <div className="flex-1 flex flex-col space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col">
             <label className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-2 block">
                 The Interaction Dump
