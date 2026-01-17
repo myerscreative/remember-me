@@ -196,10 +196,24 @@ export async function processMemory(contactId: string, text: string) {
         throw error;
     }
 
-    return { 
-        success: true, 
-        field: fieldsUpdated.join(', '), 
-        value: extractions.map((e: any) => e.data.value || e.data.name).join(', ') 
+    // 5. Also save to shared_memories table so it appears in "The Vault"
+    const { error: memoryError } = await (supabase as any)
+        .from('shared_memories')
+        .insert({
+            user_id: user.id,
+            person_id: contactId,
+            content: text
+        });
+
+    if (memoryError) {
+        console.error('Error saving shared memory:', memoryError);
+        // Don't fail the whole operation if this fails, just log it
+    }
+
+    return {
+        success: true,
+        field: fieldsUpdated.join(', '),
+        value: extractions.map((e: any) => e.data.value || e.data.name).join(', ')
     };
 
   } catch (error) {

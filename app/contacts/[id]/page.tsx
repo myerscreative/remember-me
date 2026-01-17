@@ -61,7 +61,7 @@ export default function ContactDetailPage({
         // 3. Fetch Shared Memories
         const { data: sharedMemories } = await (supabase as any)
           .from("shared_memories")
-          .select("content")
+          .select("content, created_at")
           .eq("person_id", id)
           .order('created_at', { ascending: false });
 
