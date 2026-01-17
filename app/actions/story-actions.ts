@@ -189,7 +189,7 @@ export async function upsertSharedMemory(person_id: string, content: string) {
   }
 }
 
-export async function updateStoryFields(contactId: string, fields: { where_met?: string; why_stay_in_contact?: string; most_important_to_them?: string; family_notes?: string }) {
+export async function updateStoryFields(contactId: string, fields: { where_met?: string; why_stay_in_contact?: string; most_important_to_them?: string; family_notes?: string; company?: string; job_title?: string }) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -204,6 +204,19 @@ export async function updateStoryFields(contactId: string, fields: { where_met?:
 
     if (error) throw error;
 
+    // Auto-trigger AI summary refresh when story fields are updated
+    // This runs in the background, don't await it
+    try {
+      const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      fetch(`${origin}/api/refresh-ai-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId }),
+      }).catch(err => console.error('Background AI refresh failed:', err));
+    } catch (refreshError) {
+      console.log('Could not trigger background AI refresh');
+    }
+
     revalidatePath(`/contacts/${contactId}`);
     return { success: true };
   } catch (error: unknown) {
@@ -217,19 +230,31 @@ export async function addSharedMemory(person_id: string, content: string) {
     try {
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
-  
+
       if (!user || !user.id) throw new Error("Unauthorized");
-  
+
       const { error } = await (supabase as any)
         .from('shared_memories')
-        .insert({ 
-          person_id, 
-          user_id: user.id, 
-          content 
+        .insert({
+          person_id,
+          user_id: user.id,
+          content
         });
-  
+
       if (error) throw error;
-  
+
+      // Auto-trigger AI summary refresh when memories are added
+      try {
+        const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        fetch(`${origin}/api/refresh-ai-summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contactId: person_id }),
+        }).catch(err => console.error('Background AI refresh failed:', err));
+      } catch (refreshError) {
+        console.log('Could not trigger background AI refresh');
+      }
+
       revalidatePath(`/contacts/${person_id}`);
       return { success: true };
     } catch (error: unknown) {
