@@ -18,6 +18,18 @@ export async function updateFamilyMembers(contactId: string, familyMembers: any[
 
     if (error) throw error;
 
+    // Auto-trigger AI summary refresh when family members change
+    try {
+      const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      fetch(`${origin}/api/refresh-ai-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId }),
+      }).catch(err => console.error('Background AI refresh failed:', err));
+    } catch (refreshError) {
+      console.log('Could not trigger background AI refresh');
+    }
+
     revalidatePath(`/contacts/${contactId}`);
     return { success: true };
   } catch (error: unknown) {
@@ -55,6 +67,18 @@ export async function addFamilyMember(contactId: string, member: any) {
       .eq('user_id', user.id);
 
     if (updateError) throw updateError;
+
+    // Auto-trigger AI summary refresh when family members change
+    try {
+      const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      fetch(`${origin}/api/refresh-ai-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId }),
+      }).catch(err => console.error('Background AI refresh failed:', err));
+    } catch (refreshError) {
+      console.log('Could not trigger background AI refresh');
+    }
 
     revalidatePath(`/contacts/${contactId}`);
     return { success: true };
