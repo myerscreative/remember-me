@@ -9,6 +9,7 @@ import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
+import { deleteInteraction } from '@/app/actions/delete-interaction';
 import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
 import { UserSettings } from '@/lib/utils/summary-levels';
 
@@ -29,6 +30,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
+  const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [headerForm, setHeaderForm] = useState({
       first_name: contact.first_name || '',
@@ -127,6 +129,27 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     }
   };
 
+  const handleDeleteInteraction = async (interactionId: string) => {
+    if (!confirm('Are you sure you want to delete this interaction?')) return;
+
+    setDeletingInteractionId(interactionId);
+    try {
+        const result = await deleteInteraction(interactionId, contact.id);
+
+        if (!result.success) {
+            alert(`Failed to delete interaction: ${result.error}`);
+            return;
+        }
+
+        // Refresh the page to show updated interactions
+        window.location.reload();
+    } catch (error) {
+        console.error('Error deleting interaction:', error);
+        alert('An error occurred while deleting the interaction');
+    } finally {
+        setDeletingInteractionId(null);
+    }
+  };
 
   const handleSaveHeader = async () => {
     try {
@@ -507,9 +530,32 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     <div className="mt-4 pt-4 border-t border-[#2d3748]">
                         <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2.5">Recent Activity ({contact.interactions?.length || 0})</div>
                         {(contact.interactions?.length || 0) > 0 ? (
-                            <p className="text-[#cbd5e1] text-[13px] leading-snug">
-                                {new Date(contact.interactions![0].date).toLocaleDateString()} - {contact.interactions![0].notes || 'No notes'}
-                            </p>
+                            <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
+                                {contact.interactions!.map((interaction: any) => (
+                                    <div key={interaction.id} className="bg-[#0f1419] p-3 rounded-lg border border-[#2d3748] group hover:border-[#3d4758] transition-colors">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[#cbd5e1] text-[12px] font-medium mb-1">
+                                                    {new Date(interaction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    {interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#fbbf24]">📝 Attempt</span>}
+                                                    {!interaction.notes?.startsWith('[Attempt]') && <span className="ml-2 text-[#10b981]">✅ Connected</span>}
+                                                </div>
+                                                <div className="text-[#94a3b8] text-[13px] leading-snug break-words">
+                                                    {interaction.notes?.replace('[Attempt] ', '') || 'No notes'}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteInteraction(interaction.id)}
+                                                disabled={deletingInteractionId === interaction.id}
+                                                className="text-[#64748b] hover:text-[#ef4444] p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50 shrink-0"
+                                                title="Delete interaction"
+                                            >
+                                                {deletingInteractionId === interaction.id ? '⏳' : '🗑️'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         ) : (
                             <div className="text-[#64748b] text-[13px] italic">No interactions logged yet</div>
                         )}
