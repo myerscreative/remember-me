@@ -107,27 +107,35 @@ export async function POST(request: NextRequest) {
     const context = contextParts.join('\n');
 
     // Generate three aligned zoom levels from the same facts
-    const systemPrompt = `You generate relationship-memory summaries for a contact app.
+    const systemPrompt = `You are a professional relationship manager creating concise summaries.
 
-You MUST create three aligned "zoom levels" from the same facts:
-- MICRO: 1 sentence, 15–25 words
-- DEFAULT: 2–4 sentences, 50–75 words (hard max 85), NO headings
-- FULL: 150–220 words (max 260), may use short paragraphs or headings
+CRITICAL INSTRUCTIONS:
+1. **NEVER copy or quote the user's notes directly**
+2. **SYNTHESIZE** information into a polished, third-person narrative
+3. Transform casual brain dumps into professional summaries
+4. Extract only the key facts and present them cohesively
+
+You MUST create three aligned "zoom levels":
+- MICRO: 1 sentence, 15–25 words (quick recognition)
+- DEFAULT: 2–4 sentences, 50–75 words (hard max 85), NO headings (recall context)
+- FULL: 150–220 words (max 260), may use short paragraphs (deep context)
 
 Purpose: help the user instantly remember:
 1) who this person is
-2) how they know them
+2) how they know them  
 3) why the relationship matters
 
-Hard rules:
-- **SYNTHESIZE AND SUMMARIZE** the information. Do NOT copy brain dump text verbatim.
-- Extract key facts from memories and present them as a cohesive narrative.
-- Do NOT invent facts. If a field is missing or uncertain, omit it.
-- Avoid generic praise / LinkedIn tone. Prefer concrete anchors (where met, role, family basics, notable interest/value).
-- The three levels must be consistent but NOT repetitive (each level adds depth; micro is recognition, default is recall, full is context).
-- **CRITICAL**: Transform raw brain dump notes into polished, third-person summaries. Never quote or copy the user's notes directly.
+Example transformation:
+❌ BAD (copying): "[Vibe Check: 4/5] I spoke with Bryan last night for probably 45 minutes. He is no longer working at Eat the Frog Fitness..."
+✅ GOOD (synthesized): "Bryan is a former Eat the Frog Fitness employee now working in product development for a gas station cleaner company. He's passionate about building teams and has a TV show concept similar to Survivor for athletes."
 
-Output must be VALID JSON ONLY, no markdown, no extra commentary:
+Hard rules:
+- Do NOT invent facts. If uncertain, omit it.
+- Avoid generic praise / LinkedIn tone
+- Use concrete anchors (where met, role, family, interests)
+- The three levels must be consistent but NOT repetitive
+
+Output must be VALID JSON ONLY:
 {
   "summary_micro": "",
   "summary_default": "",
@@ -143,10 +151,10 @@ Output must be VALID JSON ONLY, no markdown, no extra commentary:
         },
         {
           role: "user",
-          content: `PERSON DATA:\n${context}`,
+          content: `PERSON DATA:\n${context}\n\nRemember: SYNTHESIZE this information into a professional summary. Do NOT copy the brain dump text.`,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.3, // Lower temperature for more consistent, less creative output
       max_tokens: 800,
       response_format: { type: "json_object" },
     });
