@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { Database } from "@/types/database.types";
+import { processMemory } from './process-memory';
 
 type Person = Database['public']['Tables']['persons']['Row'];
 
@@ -244,6 +245,16 @@ export async function addSharedMemory(person_id: string, content: string) {
         });
 
       if (error) throw error;
+
+      // Auto-trigger AI processing to extract structured data from the brain dump
+      try {
+        console.log('🤖 [DEBUG] addSharedMemory: Triggering AI processing for:', person_id);
+        await processMemory(person_id, content);
+        console.log('✅ [DEBUG] addSharedMemory: AI processing complete');
+      } catch (processError) {
+        console.error('⚠️ [DEBUG] addSharedMemory: AI processing failed (non-fatal):', processError);
+        // Don't fail the whole operation if AI processing fails
+      }
 
       // Auto-trigger AI summary refresh when memories are added
       try {
