@@ -120,9 +120,12 @@ Purpose: help the user instantly remember:
 3) why the relationship matters
 
 Hard rules:
+- **SYNTHESIZE AND SUMMARIZE** the information. Do NOT copy brain dump text verbatim.
+- Extract key facts from memories and present them as a cohesive narrative.
 - Do NOT invent facts. If a field is missing or uncertain, omit it.
 - Avoid generic praise / LinkedIn tone. Prefer concrete anchors (where met, role, family basics, notable interest/value).
 - The three levels must be consistent but NOT repetitive (each level adds depth; micro is recognition, default is recall, full is context).
+- **CRITICAL**: Transform raw brain dump notes into polished, third-person summaries. Never quote or copy the user's notes directly.
 
 Output must be VALID JSON ONLY, no markdown, no extra commentary:
 {
