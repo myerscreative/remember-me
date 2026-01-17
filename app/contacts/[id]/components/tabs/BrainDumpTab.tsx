@@ -146,7 +146,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           Voice Brain Dump
         </h3>
         <p className="text-indigo-100 text-sm mb-4">
-          Capture what you just discussed with {contactName} while it's fresh in your mind.
+          Capture what you just discussed with {contactName} while it&apos;s fresh in your mind.
         </p>
         <button
           onClick={() => setShowPostCallPulse(true)}
