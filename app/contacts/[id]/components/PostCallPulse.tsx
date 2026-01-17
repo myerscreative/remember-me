@@ -52,18 +52,28 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
   }, [dumpText]);
 
   const handleSave = async () => {
+    console.log('🔵 [PostCallPulse] Starting save for contact:', contactId);
     setIsSaving(true);
     try {
         const vibeText = vibe ? `[Vibe Check: ${vibe}/5] ` : '';
         const finalContent = `${vibeText}${dumpText}`;
         
-        await addSharedMemory(contactId, finalContent);
+        console.log('🔵 [PostCallPulse] Calling addSharedMemory with content:', finalContent.substring(0, 50));
+        const result = await addSharedMemory(contactId, finalContent);
+        console.log('🔵 [PostCallPulse] addSharedMemory result:', result);
         
-        toast.success("Lore captured!");
-        onComplete();
+        if (result.success) {
+          console.log('✅ [PostCallPulse] Save successful, calling onComplete');
+          toast.success("Lore captured!");
+          onComplete();
+        } else {
+          console.error('❌ [PostCallPulse] Save failed:', result.error);
+          toast.error(result.error || "Failed to save pulse");
+          setIsSaving(false);
+        }
     } catch (e: any) {
+        console.error('❌ [PostCallPulse] Save error:', e);
         toast.error("Failed to save pulse");
-        console.error("Save error:", e);
         setError(e.message || "Failed to save");
         setIsSaving(false);
     }
