@@ -219,7 +219,9 @@ export default function ContactDetailPage({
             importance: person.importance,
             target_frequency_days: person.target_frequency_days,
             company: person.company,
-            job_title: person.job_title
+            job_title: person.job_title,
+            current_challenges: person.current_challenges,
+            goals_aspirations: person.goals_aspirations
         };
 
         setContact(fullContact);

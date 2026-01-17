@@ -57,7 +57,17 @@ export function FamilyTab({ contact }: FamilyTabProps) {
   const handleUpdateMember = (index: number, field: keyof FamilyMember, value: string) => {
     const newMembers = [...members];
     (newMembers[index] as any)[field] = value;
-    saveMembers(newMembers);
+    setMembers(newMembers); // Update local state immediately
+  };
+
+  const handleSaveMember = async (index: number) => {
+    // Save on blur
+    const result = await updateFamilyMembers(contact.id, members);
+    if (result.success) {
+      toast.success('Saved');
+    } else {
+      toast.error('Failed to save');
+    }
   };
 
   const handleAddMember = (type: FamilyMember['relationship'] = 'Child') => {
