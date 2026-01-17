@@ -132,17 +132,32 @@ export async function processMemory(contactId: string, text: string) {
         
         switch (category) {
             case 'FAMILY':
-                // Check if member already exists (simple name check)
-                const exists = currentFamily.some((m: any) => m.name?.toLowerCase() === data.name?.toLowerCase());
-                if (!exists) {
-                    currentFamily.push(data);
-                    fieldsUpdated.push('Family');
+                const existingIndex = currentFamily.findIndex((m: any) => m.name?.toLowerCase() === data.name?.toLowerCase());
+                
+                if (data.action === 'update' && existingIndex !== -1) {
+                    // Update existing family member with new information
+                    currentFamily[existingIndex] = {
+                        ...currentFamily[existingIndex],
+                        ...data,
+                        action: undefined // Remove action field before saving
+                    };
+                    fieldsUpdated.push('Family (Updated)');
+                } else if (existingIndex === -1) {
+                    // Add new family member
+                    const { action, ...memberData } = data; // Remove action field
+                    currentFamily.push(memberData);
+                    fieldsUpdated.push('Family (Added)');
                 }
                 break;
             case 'INTEREST':
-                if (data.value && !currentInterests.includes(data.value)) {
+                if (data.action === 'remove') {
+                    // Remove interest
+                    currentInterests = currentInterests.filter(i => i.toLowerCase() !== data.value?.toLowerCase());
+                    fieldsUpdated.push('Interests (Removed)');
+                } else if (data.value && !currentInterests.some(i => i.toLowerCase() === data.value.toLowerCase())) {
+                    // Add new interest
                     currentInterests.push(data.value);
-                    fieldsUpdated.push('Interests');
+                    fieldsUpdated.push('Interests (Added)');
                 }
                 break;
             case 'WHERE_WE_MET':
