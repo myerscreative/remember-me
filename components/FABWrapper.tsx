@@ -6,14 +6,8 @@ import { QuickAddNoteFAB } from "@/components/QuickAddNoteFAB";
 
 export function FABWrapper() {
   const pathname = usePathname();
-  
-  // Hide both FABs on contact profile pages
-  const isContactProfilePage = /^\/contacts\/[^/]+\/?$/.test(pathname) && !pathname.startsWith('/contacts/new');
-  
-  if (isContactProfilePage) {
-    return null;
-  }
 
+  // Show FABs on all pages including contact profile pages
   return (
     <>
       <FloatingVoiceButton />
