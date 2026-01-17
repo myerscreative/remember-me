@@ -22,12 +22,12 @@ export async function updateInteraction(
 
   try {
     // Update the interaction (RLS policies will ensure user can only update their own)
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('interactions')
       .update({
         ...data,
         updated_at: new Date().toISOString()
-      })
+      } as any)
       .eq('id', interactionId)
       .eq('user_id', user.id);
 

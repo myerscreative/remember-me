@@ -13,7 +13,7 @@ export async function deleteInteraction(interactionId: string, personId: string)
 
   try {
     // Delete the interaction (RLS policies will ensure user can only delete their own)
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('interactions')
       .delete()
       .eq('id', interactionId)
