@@ -13,6 +13,8 @@ interface UpdateContactData {
   first_name?: string;
   last_name?: string;
   photo_url?: string;
+  importance?: string;
+  target_frequency_days?: number;
 }
 
 export async function updateContact(personId: string, data: UpdateContactData) {

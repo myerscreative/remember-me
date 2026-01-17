@@ -38,6 +38,11 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     date: '',
     notes: ''
   });
+  const [isEditingRelationship, setIsEditingRelationship] = useState(false);
+  const [relationshipForm, setRelationshipForm] = useState({
+    importance: contact.importance || 'medium',
+    target_frequency_days: contact.target_frequency_days || 30
+  });
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [headerForm, setHeaderForm] = useState({
       first_name: contact.first_name || '',
@@ -124,8 +129,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
         setLogNote('');
         setLogType('connection');
-        // Ideally use optimistic update, for now refresh
-        window.location.reload();
+        // Refresh to show new interaction
+        router.refresh();
     } catch (error) {
         console.error('Error logging interaction:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -148,8 +153,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
             return;
         }
 
-        // Refresh the page to show updated interactions
-        window.location.reload();
+        // Refresh to show updated interactions
+        router.refresh();
     } catch (error) {
         console.error('Error deleting interaction:', error);
         alert('An error occurred while deleting the interaction');
@@ -192,8 +197,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
             return;
         }
 
-        // Refresh the page to show updated interactions
-        window.location.reload();
+        // Refresh to show updated interactions
+        router.refresh();
     } catch (error) {
         console.error('Error updating interaction:', error);
         alert('An error occurred while updating the interaction');
@@ -205,7 +210,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         const result = await updateContact(contact.id, headerForm);
         if (result.success) {
             setIsEditingHeader(false);
-            window.location.reload();
+            router.refresh();
         } else {
             alert('Failed to update profile header');
         }
@@ -222,12 +227,28 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
           if (result.success) {
               setIsEditingInfo(false);
-              window.location.reload();
+              router.refresh();
           } else {
               alert('Failed to update contact info');
           }
       } catch (error) {
           console.error('Error saving contact info:', error);
+          alert('An error occurred while saving');
+      }
+  };
+
+  const handleSaveRelationship = async () => {
+      try {
+          const result = await updateContact(contact.id, relationshipForm);
+
+          if (result.success) {
+              setIsEditingRelationship(false);
+              router.refresh();
+          } else {
+              alert('Failed to update relationship settings');
+          }
+      } catch (error) {
+          console.error('Error saving relationship:', error);
           alert('An error occurred while saving');
       }
   };
@@ -641,7 +662,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                                         {interaction.notes?.replace('[Attempt] ', '') || 'No notes'}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
                                                     <button
                                                         onClick={() => handleStartEditInteraction(interaction)}
                                                         className="text-[#64748b] hover:text-[#60a5fa] p-1 rounded transition-colors"
@@ -669,22 +690,73 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     </div>
                 </div>
 
-                {/* Relationship Settings - Collapsed */}
+                {/* Relationship Settings */}
                 <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                            <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2">Relationship</div>
-                            <div className="flex flex-wrap gap-2">
-                                <span className="bg-[#3b4a6b] px-3.5 py-1.5 rounded-lg text-[12px] text-[#93c5fd] flex items-center gap-1.5 font-medium whitespace-nowrap">
-                                    <span>👥</span> {contact.importance ? (contact.importance === 'high' ? 'Core Circle' : contact.importance === 'medium' ? 'Steady Friends' : 'Acquaintance') : 'Steady Friends'}
-                                </span>
-                                <span className="bg-[#2d3748] px-3.5 py-1.5 rounded-lg text-[12px] text-[#cbd5e1] flex items-center gap-1.5 font-medium whitespace-nowrap">
-                                    <span>📅</span> {contact.target_frequency_days === 7 ? 'Weekly' : contact.target_frequency_days === 30 ? 'Monthly' : `${contact.target_frequency_days} Days`}
-                                </span>
-                            </div>
-                        </div>
-                        <button className="text-[#94a3b8] border border-[#3d4758] hover:border-[#7c3aed] px-4 py-2 rounded-lg text-[13px] font-medium transition-colors shrink-0">Edit</button>
+                    <div className="flex items-center justify-between gap-4 mb-3">
+                        <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">Relationship</div>
+                        <button
+                            onClick={() => {
+                                if (isEditingRelationship) {
+                                    setIsEditingRelationship(false);
+                                    setRelationshipForm({
+                                        importance: contact.importance || 'medium',
+                                        target_frequency_days: contact.target_frequency_days || 30
+                                    });
+                                } else {
+                                    setIsEditingRelationship(true);
+                                }
+                            }}
+                            className="text-[#94a3b8] border border-[#3d4758] hover:border-[#7c3aed] px-4 py-2 rounded-lg text-[13px] font-medium transition-colors shrink-0"
+                        >
+                            {isEditingRelationship ? 'Cancel' : 'Edit'}
+                        </button>
                     </div>
+
+                    {isEditingRelationship ? (
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="text-[#94a3b8] text-[11px] font-medium mb-2 block">Circle Level</label>
+                                <select
+                                    className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-3 py-2 text-white text-[13px] focus:border-[#7c3aed] outline-none"
+                                    value={relationshipForm.importance}
+                                    onChange={(e) => setRelationshipForm({...relationshipForm, importance: e.target.value})}
+                                >
+                                    <option value="high">Core Circle</option>
+                                    <option value="medium">Steady Friends</option>
+                                    <option value="low">Acquaintance</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[#94a3b8] text-[11px] font-medium mb-2 block">Contact Frequency</label>
+                                <select
+                                    className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-3 py-2 text-white text-[13px] focus:border-[#7c3aed] outline-none"
+                                    value={relationshipForm.target_frequency_days}
+                                    onChange={(e) => setRelationshipForm({...relationshipForm, target_frequency_days: parseInt(e.target.value)})}
+                                >
+                                    <option value="7">Weekly</option>
+                                    <option value="14">Bi-weekly</option>
+                                    <option value="30">Monthly</option>
+                                    <option value="60">Every 2 Months</option>
+                                    <option value="90">Quarterly</option>
+                                </select>
+                            </div>
+                            <button
+                                onClick={handleSaveRelationship}
+                                className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white px-4 py-2 rounded-lg text-[13px] font-bold transition-all shadow-lg shadow-blue-900/20"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            <span className="bg-[#3b4a6b] px-3.5 py-1.5 rounded-lg text-[12px] text-[#93c5fd] flex items-center gap-1.5 font-medium whitespace-nowrap">
+                                <span>👥</span> {contact.importance ? (contact.importance === 'high' ? 'Core Circle' : contact.importance === 'medium' ? 'Steady Friends' : 'Acquaintance') : 'Steady Friends'}
+                            </span>
+                            <span className="bg-[#2d3748] px-3.5 py-1.5 rounded-lg text-[12px] text-[#cbd5e1] flex items-center gap-1.5 font-medium whitespace-nowrap">
+                                <span>📅</span> {contact.target_frequency_days === 7 ? 'Weekly' : contact.target_frequency_days === 30 ? 'Monthly' : `${contact.target_frequency_days} Days`}
+                            </span>
+                        </div>
+                    )}
                 </div>
           </div>
         )}
