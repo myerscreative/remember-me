@@ -3,7 +3,7 @@ import { reprocessExistingMemories } from '@/app/actions/reprocess-memories';
 
 export async function POST(request: NextRequest) {
   try {
-    const { personId } = await request.json();
+    const { personId, preview = false } = await request.json();
 
     if (!personId) {
       return NextResponse.json(
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await reprocessExistingMemories(personId);
+    const result = await reprocessExistingMemories(personId, preview);
 
     if (!result.success) {
       return NextResponse.json(
