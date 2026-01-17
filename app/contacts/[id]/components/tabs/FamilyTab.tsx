@@ -93,9 +93,12 @@ export function FamilyTab({ contact }: FamilyTabProps) {
   };
 
 
-  const partners = members.filter(m => ['Spouse', 'Partner', 'Wife', 'Husband'].includes(m.relationship));
-  const children = members.filter(m => ['Child', 'Son', 'Daughter'].includes(m.relationship));
+  const partners = members.filter(m => ['Spouse', 'Partner', 'Wife', 'Husband'].map(r => r.toLowerCase()).includes(m.relationship.toLowerCase()));
+  const children = members.filter(m => ['Child', 'Son', 'Daughter', 'Kid', 'Children'].map(r => r.toLowerCase()).includes(m.relationship.toLowerCase()));
   // Could handle Parents/Siblings too if needed, but per prompt focus on Inner Circle (Partner/Child)
+
+  console.log('🔍 [DEBUG] FamilyTab - Total members:', members.length, 'Partners:', partners.length, 'Children:', children.length);
+  console.log('🔍 [DEBUG] FamilyTab - Raw members:', JSON.stringify(members, null, 2));
 
   return (
     <div className="flex flex-col gap-8 pb-20 text-slate-200">

@@ -46,6 +46,9 @@ export function StoryTab({ contact }: StoryTabProps) {
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [isExpandedMemoryInput, setIsExpandedMemoryInput] = useState(false);
 
+  console.log('🔍 [DEBUG] StoryTab - Company:', (contact as any).company, 'Job Title:', (contact as any).job_title);
+  console.log('🔍 [DEBUG] StoryTab - Full contact keys:', Object.keys(contact));
+
   // Auto-Save Handlers
   const handleBlur = async (field: string, value: string) => {
     const update: Record<string, string> = {};
