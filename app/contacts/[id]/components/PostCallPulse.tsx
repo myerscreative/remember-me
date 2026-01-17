@@ -214,7 +214,6 @@ export function PostCallPulse({ contactId, name, onClose, onComplete }: PostCall
                 </button>
             </footer>
         </div>
-      )}
 
     </div>
   );
