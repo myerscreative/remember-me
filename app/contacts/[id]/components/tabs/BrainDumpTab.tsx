@@ -40,7 +40,12 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const allMemories = [...optimisticMemories, ...(contact.shared_memories || [])];
 
   const handleAddMemory = async () => {
-    if (!newMemory.trim()) return;
+    if (!newMemory.trim()) {
+      toast.error('Please enter some text');
+      return;
+    }
+
+    console.log('🔵 [BrainDumpTab] Starting to add memory:', newMemory.substring(0, 50));
 
     // Add optimistic memory immediately
     const optimisticMemory: SharedMemory = {
@@ -50,21 +55,27 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
     setOptimisticMemories(prev => [optimisticMemory, ...prev]);
 
     setIsAddingMemory(true);
+    const contentToSave = newMemory.trim();
     setNewMemory(''); // Clear input immediately
 
-    const result = await addSharedMemory(contact.id, optimisticMemory.content);
+    console.log('🔵 [BrainDumpTab] Calling addSharedMemory for contact:', contact.id);
+    const result = await addSharedMemory(contact.id, contentToSave);
     setIsAddingMemory(false);
 
+    console.log('🔵 [BrainDumpTab] addSharedMemory result:', result);
+
     if (result.success) {
-      toast.success("✅ Memory saved! AI summary updating in background...", { duration: 3000 });
+      console.log('✅ [BrainDumpTab] Memory saved successfully');
+      toast.success('Memory saved!');
       // Clear optimistic memory and refresh to get real data
       setOptimisticMemories([]);
       router.refresh();
     } else {
-      toast.error("Failed to add memory");
+      console.error('❌ [BrainDumpTab] Failed to save memory:', result.error);
+      toast.error(result.error || "Failed to add memory");
       // Remove the optimistic memory on failure
       setOptimisticMemories(prev => prev.filter(m => m !== optimisticMemory));
-      setNewMemory(optimisticMemory.content); // Restore the text
+      setNewMemory(contentToSave); // Restore the text
     }
   };
 
