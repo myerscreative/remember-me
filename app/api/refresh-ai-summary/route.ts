@@ -99,10 +99,12 @@ export async function POST(request: NextRequest) {
       contextParts.push(`Previous Notes: ${typedPerson.deep_lore}`);
     }
 
-    if (sharedMemories && sharedMemories.length > 0) {
-      const memoriesText = sharedMemories.slice(0, 5).map((m: any) => m.content).join('\n- ');
-      contextParts.push(`Recent Memories:\n- ${memoriesText}`);
-    }
+    // DO NOT include raw brain dump memories - they cause verbatim copying
+    // The AI should only use the structured, extracted fields above
+    // if (sharedMemories && sharedMemories.length > 0) {
+    //   const memoriesText = sharedMemories.slice(0, 5).map((m: any) => m.content).join('\n- ');
+    //   contextParts.push(`Recent Memories:\n- ${memoriesText}`);
+    // }
 
     const context = contextParts.join('\n');
 
