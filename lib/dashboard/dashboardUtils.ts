@@ -310,9 +310,12 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
             const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
             const importance = contact.importance;
-            let threshold = 30; // Medium/Default
-            if (importance === 'high') threshold = 14;
-            else if (importance === 'low') threshold = 90;
+            let threshold = contact.target_frequency_days || 30; // Default to target frequency or 30 days
+            
+            if (!contact.target_frequency_days) {
+                 if (importance === 'high') threshold = 14;
+                 else if (importance === 'low') threshold = 90;
+            }
 
             return daysAgo >= threshold;
         })
