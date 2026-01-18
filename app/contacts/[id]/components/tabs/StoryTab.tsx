@@ -15,7 +15,7 @@ interface SharedMemory {
   content: string;
 }
 
-import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle, Plus, Loader2 } from 'lucide-react';
+import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle, Plus, Loader2, Heart, MessageCircle, Target, Sparkles, Handshake, ArrowLeftRight, Users, Lightbulb } from 'lucide-react';
 import { addGiftIdea, toggleGiftStatus, type GiftIdea } from '@/app/actions/gift-actions';
 import { updateStoryFields, addSharedMemory } from '@/app/actions/story-actions';
 
@@ -42,7 +42,16 @@ export function StoryTab({ contact }: StoryTabProps) {
   const [jobTitle, setJobTitle] = useState((contact as any).job_title || '');
   const [challenges, setChallenges] = useState((contact as any).current_challenges || '');
   const [aspirations, setAspirations] = useState((contact as any).goals_aspirations || '');
-  
+
+  // Values fields
+  const [coreValues, setCoreValues] = useState<string[]>((contact as any).core_values || []);
+  const [communicationStyle, setCommunicationStyle] = useState((contact as any).communication_style || '');
+  const [personalityNotes, setPersonalityNotes] = useState((contact as any).personality_notes || '');
+  const [valuesPersonality, setValuesPersonality] = useState((contact as any).values_personality || '');
+
+  // Mutual Value field
+  const [mutualValueIntroductions, setMutualValueIntroductions] = useState((contact as any).mutual_value_introductions || '');
+
   // Memory Input State
   const [newMemory, setNewMemory] = useState('');
   const [isAddingMemory, setIsAddingMemory] = useState(false);
@@ -52,8 +61,8 @@ export function StoryTab({ contact }: StoryTabProps) {
   console.log('🔍 [DEBUG] StoryTab - Full contact keys:', Object.keys(contact));
 
   // Auto-Save Handlers
-  const handleBlur = async (field: string, value: string) => {
-    const update: Record<string, string> = {};
+  const handleBlur = async (field: string, value: any) => {
+    const update: Record<string, any> = {};
     if (field === 'where_met') update.where_met = value;
     if (field === 'why_stay_in_contact') update.why_stay_in_contact = value;
     if (field === 'most_important_to_them') update.most_important_to_them = value;
@@ -61,6 +70,10 @@ export function StoryTab({ contact }: StoryTabProps) {
     if (field === 'job_title') update.job_title = value;
     if (field === 'current_challenges') update.current_challenges = value;
     if (field === 'goals_aspirations') update.goals_aspirations = value;
+    if (field === 'core_values') update.core_values = value;
+    if (field === 'communication_style') update.communication_style = value;
+    if (field === 'personality_notes') update.personality_notes = value;
+    if (field === 'mutual_value_introductions') update.mutual_value_introductions = value;
 
     const result = await updateStoryFields(contact.id, update);
     if (!result.success) {
@@ -70,6 +83,20 @@ export function StoryTab({ contact }: StoryTabProps) {
       toast.success("Saved! AI summary updating in background...", { duration: 2000 });
     }
   };
+
+  const toggleValue = (value: string) => {
+    const newValues = coreValues.includes(value)
+      ? coreValues.filter(v => v !== value)
+      : [...coreValues, value];
+    setCoreValues(newValues);
+    handleBlur('core_values', newValues);
+  };
+
+  const commonValues = [
+    'Security', 'Freedom', 'Recognition', 'Contribution',
+    'Growth', 'Family', 'Achievement', 'Authenticity',
+    'Innovation', 'Stability', 'Adventure', 'Connection'
+  ];
 
   const handleAddMemory = async () => {
     if (!newMemory.trim()) return;
@@ -176,12 +203,108 @@ export function StoryTab({ contact }: StoryTabProps) {
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
           ✨ Goals & Aspirations
         </label>
-        <textarea 
+        <textarea
           placeholder="Goals, dreams, aspirations, what drives them forward..."
           className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
           value={aspirations}
           onChange={(e) => setAspirations(e.target.value)}
           onBlur={() => handleBlur('goals_aspirations', aspirations)}
+        />
+      </div>
+
+      {/* AI-Generated Values & Personality Summary */}
+      {valuesPersonality && (
+        <div className="bg-gradient-to-br from-purple-900/20 to-indigo-900/20 border border-purple-500/30 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="text-purple-400" size={16} />
+            <label className="text-purple-400 text-xs font-black uppercase tracking-[0.2em]">
+              AI Insights - Values & Personality
+            </label>
+          </div>
+          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{valuesPersonality}</p>
+        </div>
+      )}
+
+      {/* Core Values */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+          <Heart size={14} className="text-pink-500" /> Core Values
+        </label>
+        <p className="text-slate-400 text-sm mb-3">What seems most important to them</p>
+
+        <div className="flex flex-wrap gap-2">
+          {commonValues.map(value => (
+            <button
+              key={value}
+              onClick={() => toggleValue(value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                coreValues.includes(value)
+                  ? 'bg-indigo-600 text-white border-2 border-indigo-400'
+                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-indigo-500/50'
+              }`}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Communication Style */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+          <MessageCircle size={14} className="text-blue-500" /> Communication Style
+        </label>
+        <p className="text-slate-400 text-sm mb-3">How they prefer to communicate and make decisions</p>
+
+        <div className="flex gap-3">
+          {['Direct', 'Cautious', 'Relational', 'Analytical'].map(style => (
+            <button
+              key={style}
+              onClick={() => {
+                setCommunicationStyle(style);
+                handleBlur('communication_style', style);
+              }}
+              className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+                communicationStyle === style
+                  ? 'bg-blue-600 text-white border-2 border-blue-400'
+                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-blue-500/50'
+              }`}
+            >
+              {style}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Personality & Motivations */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+          <Target size={14} className="text-green-500" /> Personality & Motivations
+        </label>
+        <p className="text-slate-400 text-sm mb-3">Decision-making style, motivations, sensitivities</p>
+
+        <textarea
+          placeholder="What drives them? How do they make decisions? Any sensitivities to be aware of?"
+          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[120px] resize-none leading-relaxed"
+          value={personalityNotes}
+          onChange={(e) => setPersonalityNotes(e.target.value)}
+          onBlur={() => handleBlur('personality_notes', personalityNotes)}
+        />
+      </div>
+
+      {/* Mutual Value Section */}
+      <div className="group">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+          <Handshake size={14} className="text-green-500" /> Mutual Value & Collaboration
+        </label>
+        <p className="text-slate-400 text-sm mb-3">How you can help each other, introductions, and collaboration opportunities</p>
+
+        <textarea
+          placeholder="How can you help them? How can they help you? Potential introductions and collaboration opportunities..."
+          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[150px] resize-none leading-relaxed"
+          value={mutualValueIntroductions}
+          onChange={(e) => setMutualValueIntroductions(e.target.value)}
+          onBlur={() => handleBlur('mutual_value_introductions', mutualValueIntroductions)}
         />
       </div>
 

@@ -32,7 +32,7 @@ interface ConnectionProfileProps {
 
 export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Values' | 'Mutual Value' | 'Brain Dump'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
@@ -314,36 +314,6 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
               }`}
             >
               Family
-            </button>
-            <button
-              onClick={() => setActiveTab('Values')}
-              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
-                activeTab === 'Values'
-                  ? 'bg-[#2d3748] text-white shadow-sm'
-                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-              }`}
-            >
-              Values
-            </button>
-            <button
-              onClick={() => setActiveTab('Mutual Value')}
-              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
-                activeTab === 'Mutual Value'
-                  ? 'bg-[#2d3748] text-white shadow-sm'
-                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-              }`}
-            >
-              Mutual Value
-            </button>
-            <button
-              onClick={() => setActiveTab('Brain Dump')}
-              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
-                activeTab === 'Brain Dump'
-                  ? 'bg-[#2d3748] text-white shadow-sm'
-                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
-              }`}
-            >
-              Brain Dump
             </button>
         </div>
 
@@ -816,13 +786,15 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                         </div>
                     )}
                 </div>
+
+            {/* Brain Dump Section - Memories & Notes */}
+            <div className="mt-6">
+              <BrainDumpTab contact={contact} />
+            </div>
           </div>
         )}
         {activeTab === 'Story' && <StoryTab contact={contact} />}
         {activeTab === 'Family' && <FamilyTab contact={contact} />}
-        {activeTab === 'Values' && <ValuesTab contact={contact} />}
-        {activeTab === 'Mutual Value' && <MutualValueTab contact={contact} />}
-        {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
       </div>
 
       {/* RIGHT COLUMN - SIDEBAR */}
