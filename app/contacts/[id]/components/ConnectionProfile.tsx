@@ -32,7 +32,7 @@ interface ConnectionProfileProps {
 
 export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Brain Dump'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
@@ -314,6 +314,16 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
               }`}
             >
               Family
+            </button>
+            <button
+              onClick={() => setActiveTab('Brain Dump')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Brain Dump'
+                  ? 'bg-[#2d3748] text-white shadow-sm'
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Brain Dump
             </button>
         </div>
 
@@ -786,15 +796,11 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                         </div>
                     )}
                 </div>
-
-            {/* Brain Dump Section - Memories & Notes */}
-            <div className="mt-6">
-              <BrainDumpTab contact={contact} />
-            </div>
           </div>
         )}
         {activeTab === 'Story' && <StoryTab contact={contact} />}
         {activeTab === 'Family' && <FamilyTab contact={contact} />}
+        {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
       </div>
 
       {/* RIGHT COLUMN - SIDEBAR */}
