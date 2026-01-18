@@ -497,7 +497,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                 const result = await deleteContact(contact.id);
                                 if (result.success) {
                                     toast.success('Contact deleted (recoverable for 30 days)');
-                                    router.push('/contacts');
+                                    router.push('/garden');
                                 } else {
                                     toast.error(result.error || 'Failed to delete contact');
                                 }
