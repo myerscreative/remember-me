@@ -43,7 +43,7 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* How I Can Help Them */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Handshake size={14} className="text-blue-500" /> How I Can Help Them
         </label>
         <p className="text-slate-400 text-sm mb-4">Ways you can provide value or assistance</p>
@@ -63,7 +63,7 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* How They Can Help Me */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <ArrowLeftRight size={14} className="text-purple-500" /> How They Can Help Me
         </label>
         <p className="text-slate-400 text-sm mb-4">Ways they can provide value or assistance</p>
@@ -83,7 +83,7 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* Introductions & Connections */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Users size={14} className="text-cyan-500" /> Introductions & Connections
         </label>
         <p className="text-slate-400 text-sm mb-4">People to introduce, connections to make</p>
@@ -103,7 +103,7 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* Collaboration Opportunities */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Lightbulb size={14} className="text-yellow-500" /> Collaboration Opportunities
         </label>
         <p className="text-slate-400 text-sm mb-4">Projects, partnerships, or ways to work together</p>
