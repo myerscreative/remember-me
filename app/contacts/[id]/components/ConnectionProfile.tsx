@@ -368,29 +368,9 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                             setIsEditingHeader(true);
                         }
                     }}
-                    className="absolute top-4 right-4 text-[#64748b] hover:text-[#60a5fa] p-2 rounded-lg hover:bg-[#2d3748]/50 transition-all opacity-0 group-hover:opacity-100"
-                    title="Edit Header"
+                    className="absolute top-4 right-4 text-sm text-[#60a5fa] hover:text-[#93c5fd] transition-colors"
                 >
-                    {isEditingHeader ? <span className="text-[12px] font-semibold text-[#ef4444]">Cancel</span> : '✏️'}
-                </button>
-
-                {/* Delete Contact Button */}
-                <button
-                    onClick={async () => {
-                        if (confirm(`Are you sure you want to delete ${contact.first_name} ${contact.last_name || ''}? This cannot be undone.`)) {
-                            const result = await deleteContact(contact.id);
-                            if (result.success) {
-                                toast.success('Contact deleted');
-                                router.push('/contacts');
-                            } else {
-                                toast.error(result.error || 'Failed to delete contact');
-                            }
-                        }
-                    }}
-                    className="absolute top-4 right-16 text-[#64748b] hover:text-[#ef4444] p-2 rounded-lg hover:bg-[#2d3748]/50 transition-all opacity-0 group-hover:opacity-100"
-                    title="Delete Contact"
-                >
-                    🗑️
+                    {isEditingHeader ? 'Cancel' : '✏️ Edit'}
                 </button>
 
                 <div className="inline-block relative mb-4">
