@@ -53,12 +53,8 @@ export async function getDailyBriefing(options: { expanded?: boolean } = {}): Pr
 
     const now = new Date();
     const needsNurture = (contacts || []).filter((c: any) => {
-        // If never contacted, it depends on creation date? 
-        // For now, let's assume 'New' contacts (null date) are NOT fading unless explicitly marked.
-        // Actually, if last_interaction_date is null, let's treat as 'needs nurture' if it's been a while since creation?
-        // To coincide with dashboardUtils, dashboardUtils includes them if sorted nullsFirst.
-        // Let's stick to explicit Overdue for the Briefing (since it's high priority).
-        if (!c.last_interaction_date) return false; 
+        // Include contacts that have never been contacted (null date) as needing nurture
+        if (!c.last_interaction_date) return true; 
 
         const lastDate = new Date(c.last_interaction_date);
         const diffTime = Math.abs(now.getTime() - lastDate.getTime());

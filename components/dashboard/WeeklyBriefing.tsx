@@ -101,15 +101,6 @@ export function WeeklyBriefing() {
           </Card>
         ))}
       </div>
-      
-      {/* View All Neglected Button */}
-      <Button 
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 shadow-sm"
-        onClick={() => router.push('/triage')} // Assuming triage is the place for neglected
-      >
-        <Activity className="w-4 h-4 mr-2" />
-        View All Neglected
-      </Button>
     </div>
   );
 }
