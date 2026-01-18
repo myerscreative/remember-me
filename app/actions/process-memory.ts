@@ -93,8 +93,14 @@ export async function processMemory(contactId: string, text: string, autoSave = 
 
       4. BUSINESS: Use this for career, job titles, or company names.
          Data Format: { job_title: string, company: string }.
-         
-      5. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above. 
+
+      5. CURRENT_CHALLENGES: Use this for challenges, struggles, or difficulties they're facing.
+         Data Format: { value: string }.
+
+      6. GOALS_ASPIRATIONS: Use this for goals, dreams, aspirations, or what they're working toward.
+         Data Format: { value: string }.
+
+      7. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above.
          IMPORTANT: Pass the entire multi-paragraph markdown string as the value here. This will be the high-quality snapshot shown to the user.
          Data Format: { value: string }.
       
@@ -135,6 +141,8 @@ export async function processMemory(contactId: string, text: string, autoSave = 
     let company: string | null = person.company;
     let job_title: string | null = person.job_title;
     let most_important_to_them: string | null = person.most_important_to_them;
+    let current_challenges: string | null = person.current_challenges;
+    let goals_aspirations: string | null = person.goals_aspirations;
 
     // 3. Process extractions
     for (const item of extractions) {
@@ -189,7 +197,15 @@ export async function processMemory(contactId: string, text: string, autoSave = 
                 most_important_to_them = data.value;
                 fieldsUpdated.push('Priorities');
                 break;
-            case 'SYNOPSIS': 
+            case 'CURRENT_CHALLENGES':
+                current_challenges = data.value;
+                fieldsUpdated.push('Challenges');
+                break;
+            case 'GOALS_ASPIRATIONS':
+                goals_aspirations = data.value;
+                fieldsUpdated.push('Goals');
+                break;
+            case 'SYNOPSIS':
             case 'STORY': // Handle legacy or fallback
                 // relationship_summary is the LATEST high-quality summary
                 relationship_summary = data.value;
@@ -206,24 +222,40 @@ export async function processMemory(contactId: string, text: string, autoSave = 
         return { success: true, field: 'No changes', value: '', extracted: null };
     }
 
-    const extractedData = {
+    // Build extractedData with only the fields that were actually updated
+    // This prevents null/unchanged values from overwriting previously extracted values during merge
+    const extractedData: any = {
+        // Always include family and interests as they accumulate across memories
         family_members: currentFamily,
         interests: currentInterests,
-        where_met: where_met,
-        deep_lore: deep_lore,
-        relationship_summary: relationship_summary,
-        company: company,
-        job_title: job_title,
-        most_important_to_them: most_important_to_them,
-        // 6-Block structured data
-        identity_context: sixBlockData.identity_context,
-        family_personal: sixBlockData.family_personal,
-        career_craft: sixBlockData.career_craft,
-        interests_hobbies: sixBlockData.interests_hobbies,
-        values_personality: sixBlockData.values_personality,
-        history_touchpoints: sixBlockData.history_touchpoints,
-        mutual_value_introductions: sixBlockData.mutual_value_introductions
     };
+
+    // Only include fields that were actually extracted/updated in this pass
+    const fieldMap: Record<string, any> = {
+        'Where We Met': { where_met },
+        'Company': { company },
+        'Job Title': { job_title },
+        'Priorities': { most_important_to_them },
+        'Challenges': { current_challenges },
+        'Goals': { goals_aspirations },
+        'Summary': { deep_lore, relationship_summary },
+    };
+
+    for (const field of fieldsUpdated) {
+        // Check if this field has a mapping
+        if (fieldMap[field]) {
+            Object.assign(extractedData, fieldMap[field]);
+        }
+    }
+
+    // Always include 6-Block structured data if it has content
+    if (sixBlockData.identity_context) extractedData.identity_context = sixBlockData.identity_context;
+    if (sixBlockData.family_personal) extractedData.family_personal = sixBlockData.family_personal;
+    if (sixBlockData.career_craft) extractedData.career_craft = sixBlockData.career_craft;
+    if (sixBlockData.interests_hobbies) extractedData.interests_hobbies = sixBlockData.interests_hobbies;
+    if (sixBlockData.values_personality) extractedData.values_personality = sixBlockData.values_personality;
+    if (sixBlockData.history_touchpoints) extractedData.history_touchpoints = sixBlockData.history_touchpoints;
+    if (sixBlockData.mutual_value_introductions) extractedData.mutual_value_introductions = sixBlockData.mutual_value_introductions;
 
     // Only save to database if autoSave is true
     if (autoSave) {
