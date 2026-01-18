@@ -250,14 +250,20 @@ export function mergeSixBlocks(
     const newText = newData[key] || '';
 
     if (!existingText) {
-      merged[key] = newText;
+      (merged as any)[key] = newText;
     } else if (!newText) {
-      merged[key] = existingText;
+      (merged as any)[key] = existingText;
     } else {
       // Both exist - append new info
-      merged[key] = `${existingText}\n\n${newText}`;
+      (merged as any)[key] = `${existingText}\n\n${newText}`;
     }
   }
+
+  // Handle boolean and special fields separately
+  merged.open_loop = newData.open_loop || existing.open_loop || false;
+  merged.loop_direction = newData.loop_direction || existing.loop_direction || '';
+  merged.loop_confidence = newData.loop_confidence || existing.loop_confidence || '';
+  merged.suggested_reminder = newData.suggested_reminder || existing.suggested_reminder || '';
 
   return merged;
 }
