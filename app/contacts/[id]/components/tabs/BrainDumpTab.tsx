@@ -46,36 +46,46 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
     }
 
     console.log('🔵 [BrainDumpTab] Starting to add memory:', newMemory.substring(0, 50));
-
-    // Add optimistic memory immediately
+    
+    // Optimistically add to UI
     const optimisticMemory: SharedMemory = {
-      content: newMemory.trim(),
-      created_at: new Date().toISOString()
+      id: `temp-${Date.now()}`,
+      content: newMemory,
+      created_at: new Date().toISOString(),
+      person_id: contact.id,
+      user_id: ''
     };
+    
     setOptimisticMemories(prev => [optimisticMemory, ...prev]);
+    setNewMemory('');
+    setIsAddingMemory(true); // Using existing state variable name
 
-    setIsAddingMemory(true);
-    const contentToSave = newMemory.trim();
-    setNewMemory(''); // Clear input immediately
-
-    console.log('🔵 [BrainDumpTab] Calling addSharedMemory for contact:', contact.id);
-    const result = await addSharedMemory(contact.id, contentToSave);
-    setIsAddingMemory(false);
-
-    console.log('🔵 [BrainDumpTab] addSharedMemory result:', result);
-
-    if (result.success) {
-      console.log('✅ [BrainDumpTab] Memory saved successfully');
-      toast.success('Memory saved!');
-      // Clear optimistic memory and refresh to get real data
+    try {
+      console.log('🔵 [BrainDumpTab] Calling addSharedMemory for contact:', contact.id);
+      const result = await addSharedMemory(contact.id, newMemory);
+      
+      console.log('🔵 [BrainDumpTab] addSharedMemory result:', result);
+      
+      if (result.success) {
+        console.log('✅ [BrainDumpTab] Memory saved successfully');
+        toast.success('Memory saved!');
+        // Clear optimistic update and refresh to get real data
+        setOptimisticMemories([]);
+        router.refresh(); // Refresh the page data to show the new memory
+      } else {
+        console.error('❌ [BrainDumpTab] Failed to save memory:', result.error);
+        toast.error(result.error || 'Failed to save memory');
+        // Remove optimistic update on error
+        setOptimisticMemories([]);
+        setNewMemory(newMemory); // Restore the text
+      }
+    } catch (error) {
+      console.error('❌ [BrainDumpTab] Exception:', error);
+      toast.error('Failed to save memory');
       setOptimisticMemories([]);
-      router.refresh();
-    } else {
-      console.error('❌ [BrainDumpTab] Failed to save memory:', result.error);
-      toast.error(result.error || "Failed to add memory");
-      // Remove the optimistic memory on failure
-      setOptimisticMemories(prev => prev.filter(m => m !== optimisticMemory));
-      setNewMemory(contentToSave); // Restore the text
+      setNewMemory(newMemory);
+    } finally {
+      setIsAddingMemory(false); // Using existing state variable name
     }
   };
 
