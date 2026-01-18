@@ -191,7 +191,7 @@ export async function upsertSharedMemory(person_id: string, content: string) {
 }
 
 
-export async function updateStoryFields(contactId: string, fields: { where_met?: string; why_stay_in_contact?: string; most_important_to_them?: string; family_notes?: string; company?: string; job_title?: string; current_challenges?: string; goals_aspirations?: string; mutual_value_introductions?: string }) {
+export async function updateStoryFields(contactId: string, fields: { where_met?: string; why_stay_in_contact?: string; most_important_to_them?: string; family_notes?: string; company?: string; job_title?: string; current_challenges?: string; goals_aspirations?: string; mutual_value_introductions?: string; core_values?: string[]; communication_style?: string; personality_notes?: string }) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
