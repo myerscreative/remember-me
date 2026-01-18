@@ -202,7 +202,7 @@ export default function ContactDetailPage({
             photo_url: person.photo_url || person.avatar_url, 
             familyMembers: person.family_members || [],
             interests: person.interests || [],
-            ai_summary: enhancedAiSummary,
+            ai_summary: baseSummary,
             next_contact_date: person.next_contact_date,
             last_contact_date: person.last_contacted_date,
             last_interaction_date: person.last_interaction_date, 
