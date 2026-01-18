@@ -75,7 +75,7 @@ export function StoryTab({ contact }: StoryTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-5 pb-20 text-slate-200">
+    <div className="flex flex-col gap-6 pb-20 text-slate-200">
 
       {/* HOW WE MET */}
       <DisplaySection
@@ -91,6 +91,8 @@ export function StoryTab({ contact }: StoryTabProps) {
         placeholder="Where did you meet? What was your first impression?"
       />
 
+      <div className="border-b border-slate-800/30" />
+
       {/* WHY WE STAY CONNECTED */}
       <DisplaySection
         emoji="💭"
@@ -104,6 +106,8 @@ export function StoryTab({ contact }: StoryTabProps) {
         onChange={(val) => setEditValues({ why_stay_in_contact: val })}
         placeholder="Why do we stay in touch? What value does this connection bring?"
       />
+
+      <div className="border-b border-slate-800/30" />
 
       {/* WHAT MATTERS TO THEM */}
       <DisplaySection
@@ -119,6 +123,8 @@ export function StoryTab({ contact }: StoryTabProps) {
         placeholder="What are they working on? Family, business, hobbies, health, faith..."
         multiline
       />
+
+      <div className="border-b border-slate-800/30" />
 
       {/* CAREER & BUSINESS */}
       <div className="group">
@@ -138,97 +144,117 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* CHALLENGES */}
       {contact.current_challenges && (
-        <DisplaySection
-          emoji="💪"
-          title="CURRENT CHALLENGES"
-          content={contact.current_challenges}
-          isEditing={editingSection === 'current_challenges'}
-          editValue={editValues['current_challenges']}
-          onEdit={() => startEdit('current_challenges', contact.current_challenges || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('current_challenges')}
-          onChange={(val) => setEditValues({ current_challenges: val })}
-          placeholder="Current challenges, obstacles, what they're navigating..."
-          multiline
-        />
+        <>
+          <div className="border-b border-slate-800/30" />
+          <DisplaySection
+            emoji="💪"
+            title="CURRENT CHALLENGES"
+            content={contact.current_challenges}
+            isEditing={editingSection === 'current_challenges'}
+            editValue={editValues['current_challenges']}
+            onEdit={() => startEdit('current_challenges', contact.current_challenges || '')}
+            onCancel={cancelEdit}
+            onSave={() => saveEdit('current_challenges')}
+            onChange={(val) => setEditValues({ current_challenges: val })}
+            placeholder="Current challenges, obstacles, what they're navigating..."
+            multiline
+          />
+        </>
       )}
 
       {/* GOALS & ASPIRATIONS */}
       {contact.goals_aspirations && (
-        <DisplaySection
-          emoji="✨"
-          title="GOALS & ASPIRATIONS"
-          content={contact.goals_aspirations}
-          isEditing={editingSection === 'goals_aspirations'}
-          editValue={editValues['goals_aspirations']}
-          onEdit={() => startEdit('goals_aspirations', contact.goals_aspirations || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('goals_aspirations')}
-          onChange={(val) => setEditValues({ goals_aspirations: val })}
-          placeholder="Goals, dreams, aspirations, what drives them forward..."
-          multiline
-        />
+        <>
+          <div className="border-b border-slate-800/30" />
+          <DisplaySection
+            emoji="✨"
+            title="GOALS & ASPIRATIONS"
+            content={contact.goals_aspirations}
+            isEditing={editingSection === 'goals_aspirations'}
+            editValue={editValues['goals_aspirations']}
+            onEdit={() => startEdit('goals_aspirations', contact.goals_aspirations || '')}
+            onCancel={cancelEdit}
+            onSave={() => saveEdit('goals_aspirations')}
+            onChange={(val) => setEditValues({ goals_aspirations: val })}
+            placeholder="Goals, dreams, aspirations, what drives them forward..."
+            multiline
+          />
+        </>
       )}
 
       {/* CORE VALUES */}
       {coreValues.length > 0 && (
-        <div className="group">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-            <Heart size={13} className="text-pink-500" /> CORE VALUES
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {coreValues.map(value => (
-              <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
-                {value}
-              </span>
-            ))}
+        <>
+          <div className="border-b border-slate-800/30" />
+          <div className="group">
+            <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+              <Heart size={13} className="text-pink-500" /> CORE VALUES
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {coreValues.map(value => (
+                <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  {value}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* COMMUNICATION STYLE */}
       {communicationStyle && (
-        <div className="group">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-            <MessageCircle size={13} className="text-blue-500" /> COMMUNICATION STYLE
-          </label>
-          <p className="text-slate-300 text-sm">{communicationStyle}</p>
-        </div>
+        <>
+          <div className="border-b border-slate-800/30" />
+          <div className="group">
+            <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+              <MessageCircle size={13} className="text-blue-500" /> COMMUNICATION STYLE
+            </label>
+            <p className="text-slate-300 text-sm">{communicationStyle}</p>
+          </div>
+        </>
       )}
 
       {/* PERSONALITY & MOTIVATIONS */}
       {contact.personality_notes && (
-        <DisplaySection
-          emoji="🎯"
-          title="PERSONALITY & MOTIVATIONS"
-          content={contact.personality_notes}
-          isEditing={editingSection === 'personality_notes'}
-          editValue={editValues['personality_notes']}
-          onEdit={() => startEdit('personality_notes', contact.personality_notes || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('personality_notes')}
-          onChange={(val) => setEditValues({ personality_notes: val })}
-          placeholder="What drives them? How do they make decisions?"
-          multiline
-        />
+        <>
+          <div className="border-b border-slate-800/30" />
+          <DisplaySection
+            emoji="🎯"
+            title="PERSONALITY & MOTIVATIONS"
+            content={contact.personality_notes}
+            isEditing={editingSection === 'personality_notes'}
+            editValue={editValues['personality_notes']}
+            onEdit={() => startEdit('personality_notes', contact.personality_notes || '')}
+            onCancel={cancelEdit}
+            onSave={() => saveEdit('personality_notes')}
+            onChange={(val) => setEditValues({ personality_notes: val })}
+            placeholder="What drives them? How do they make decisions?"
+            multiline
+          />
+        </>
       )}
 
       {/* MUTUAL VALUE */}
       {contact.mutual_value_introductions && (
-        <DisplaySection
-          emoji="🤝"
-          title="MUTUAL VALUE & COLLABORATION"
-          content={contact.mutual_value_introductions}
-          isEditing={editingSection === 'mutual_value_introductions'}
-          editValue={editValues['mutual_value_introductions']}
-          onEdit={() => startEdit('mutual_value_introductions', contact.mutual_value_introductions || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('mutual_value_introductions')}
-          onChange={(val) => setEditValues({ mutual_value_introductions: val })}
-          placeholder="How you can help each other, introductions, collaboration opportunities..."
-          multiline
-        />
+        <>
+          <div className="border-b border-slate-800/30" />
+          <DisplaySection
+            emoji="🤝"
+            title="MUTUAL VALUE & COLLABORATION"
+            content={contact.mutual_value_introductions}
+            isEditing={editingSection === 'mutual_value_introductions'}
+            editValue={editValues['mutual_value_introductions']}
+            onEdit={() => startEdit('mutual_value_introductions', contact.mutual_value_introductions || '')}
+            onCancel={cancelEdit}
+            onSave={() => saveEdit('mutual_value_introductions')}
+            onChange={(val) => setEditValues({ mutual_value_introductions: val })}
+            placeholder="How you can help each other, introductions, collaboration opportunities..."
+            multiline
+          />
+        </>
       )}
+
+      <div className="border-b border-slate-800/30" />
 
       {/* GIFT VAULT */}
       <div className="group">
