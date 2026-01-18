@@ -10,9 +10,21 @@ export async function updateFamilyMembers(contactId: string, familyMembers: any[
 
     if (!user || !user.id) throw new Error("Unauthorized");
 
+    // Deduplicate family members by name (case-insensitive)
+    const deduplicatedMembers: any[] = [];
+    const seenNames = new Set<string>();
+    
+    for (const member of familyMembers) {
+      const nameLower = member.name?.toLowerCase();
+      if (nameLower && !seenNames.has(nameLower)) {
+        deduplicatedMembers.push(member);
+        seenNames.add(nameLower);
+      }
+    }
+
     const { error } = await (supabase as any)
       .from('persons')
-      .update({ family_members: familyMembers })
+      .update({ family_members: deduplicatedMembers })
       .eq('id', contactId)
       .eq('user_id', user.id);
 
