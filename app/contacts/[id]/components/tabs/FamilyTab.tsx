@@ -147,9 +147,9 @@ export function FamilyTab({ contact }: FamilyTabProps) {
            partners.map((partner, idx) => {
              const realIdx = members.indexOf(partner);
              return (
-                <div key={idx} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                 <div key={idx} className="space-y-4">
+                    <div className="flex gap-4">
+                         <div className="flex-1">
                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Name</label>
                             <input 
                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
@@ -158,35 +158,36 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                                 onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
                                 onBlur={() => handleSaveMember(realIdx)}
                             />
-                        </div>
-                        <div>
+                         </div>
+                         <div className="w-1/3">
                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Relationship</label>
                             <select
                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
-                value={partner?.name || ''}
-                onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
-                onBlur={() => handleSaveMember(realIdx)}
-              />
-            </div>
-            <div>
-              <label className="text-slate-400 text-xs mb-2 block">RELATIONSHIP</label>
-              <select
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500"
-                value={partner?.relationship || 'Partner'}
-                onChange={(e) => handleUpdateMember(realIdx, 'relationship', e.target.value)}
-                onBlur={() => handleSaveMember(realIdx)}
-              >
-                <option value="Partner">Partner</option>
-                <option value="Husband">Husband</option>
-                <option value="Wife">Wife</option>
-                <option value="Boyfriend">Boyfriend</option>
-                <option value="Girlfriend">Girlfriend</option>
-                <option value="Spouse">Spouse</option>
-                <option value="Fiancé">Fiancé</option>
-                <option value="Fiancée">Fiancée</option>
-              </select>
-            </div>
-          </div>
+                                value={partner.relationship || 'Partner'}
+                                onChange={(e) => handleUpdateMember(realIdx, 'relationship', e.target.value)}
+                                onBlur={() => handleSaveMember(realIdx)}
+                            >
+                                <option value="Partner">Partner</option>
+                                <option value="Husband">Husband</option>
+                                <option value="Wife">Wife</option>
+                                <option value="Boyfriend">Boyfriend</option>
+                                <option value="Girlfriend">Girlfriend</option>
+                                <option value="Spouse">Spouse</option>
+                                <option value="Fiancé">Fiancé</option>
+                                <option value="Fiancée">Fiancée</option>
+                            </select>
+                         </div>
+                         <div className="w-1/3">
+                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Birthday</label>
+                            <input 
+                                type="date"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                                value={partner.birthday || ''}
+                                onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
+                                onBlur={() => handleSaveMember(realIdx)}
+                            />
+                         </div>
+                    </div>
                     {/* Anniversary Field */}
                     <div className="mb-2">
                          <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Anniversary (Yearly Reminder)</label>
