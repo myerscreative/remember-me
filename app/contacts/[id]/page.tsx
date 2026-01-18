@@ -211,7 +211,23 @@ export default function ContactDetailPage({
             company: person.company,
             job_title: person.job_title,
             current_challenges: person.current_challenges,
-            goals_aspirations: person.goals_aspirations
+            goals_aspirations: person.goals_aspirations,
+            // 6-Block Structured Data
+            identity_context: person.identity_context,
+            family_personal: person.family_personal,
+            career_craft: person.career_craft,
+            interests_hobbies: person.interests_hobbies,
+            values_personality: person.values_personality,
+            history_touchpoints: person.history_touchpoints,
+            // Additional 6-Block Fields
+            relationship_type: person.relationship_type,
+            life_stage: person.life_stage,
+            career_trajectory: person.career_trajectory,
+            pain_points: person.pain_points,
+            career_goals: person.career_goals,
+            core_values: person.core_values,
+            communication_style: person.communication_style,
+            personality_notes: person.personality_notes
         };
 
         setContact(fullContact);
