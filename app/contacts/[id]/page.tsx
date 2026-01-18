@@ -67,16 +67,10 @@ export default function ContactDetailPage({
         const tempContactForCalc = { ...prev, ...updatedFields };
         const summaryText = getSummaryAtLevel(tempContactForCalc, effectiveSummaryLevel);
 
-        // Preserve the memory prefix if it exists
-        const latestMemory = prev.shared_memories?.[0]?.content;
-        const enhancedAiSummary = latestMemory
-            ? `**Most Recent Memory:** ${latestMemory}\n\n${summaryText}`
-            : summaryText;
-
         return {
             ...prev,
             ...updatedFields,
-            ai_summary: enhancedAiSummary,
+            ai_summary: summaryText,
             updated_at: new Date().toISOString()
         };
       });
@@ -187,10 +181,6 @@ export default function ContactDetailPage({
 
         // Use the level-specific summary, or fall back to relationship_summary, or finally to fallback content
         const baseSummary = summaryAtLevel || person.relationship_summary || fallbackContent || "";
-
-        const enhancedAiSummary = latestMemory
-            ? `**Most Recent Memory:** ${latestMemory}\n\n${baseSummary}`
-            : baseSummary;
 
         const fullContact = {
             ...person,
