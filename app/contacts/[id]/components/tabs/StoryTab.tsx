@@ -75,59 +75,59 @@ export function StoryTab({ contact }: StoryTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-20 text-slate-200">
+    <div className="flex flex-col gap-3 pb-20 text-slate-200">
 
       {/* HOW WE MET */}
-      <DisplaySection
-        emoji="📍"
-        title="HOW WE MET"
-        content={contact.where_met}
-        isEditing={editingSection === 'where_met'}
-        editValue={editValues['where_met']}
-        onEdit={() => startEdit('where_met', contact.where_met || '')}
-        onCancel={cancelEdit}
-        onSave={() => saveEdit('where_met')}
-        onChange={(val) => setEditValues({ where_met: val })}
-        placeholder="Where did you meet? What was your first impression?"
-      />
-
-      <div className="border-b border-slate-800/30" />
+      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+        <DisplaySection
+          emoji="📍"
+          title="HOW WE MET"
+          content={contact.where_met}
+          isEditing={editingSection === 'where_met'}
+          editValue={editValues['where_met']}
+          onEdit={() => startEdit('where_met', contact.where_met || '')}
+          onCancel={cancelEdit}
+          onSave={() => saveEdit('where_met')}
+          onChange={(val) => setEditValues({ where_met: val })}
+          placeholder="Where did you meet? What was your first impression?"
+        />
+      </div>
 
       {/* WHY WE STAY CONNECTED */}
-      <DisplaySection
-        emoji="💭"
-        title="WHY WE STAY CONNECTED"
-        content={contact.why_stay_in_contact}
-        isEditing={editingSection === 'why_stay_in_contact'}
-        editValue={editValues['why_stay_in_contact']}
-        onEdit={() => startEdit('why_stay_in_contact', contact.why_stay_in_contact || '')}
-        onCancel={cancelEdit}
-        onSave={() => saveEdit('why_stay_in_contact')}
-        onChange={(val) => setEditValues({ why_stay_in_contact: val })}
-        placeholder="Why do we stay in touch? What value does this connection bring?"
-      />
-
-      <div className="border-b border-slate-800/30" />
+      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+        <DisplaySection
+          emoji="💭"
+          title="WHY WE STAY CONNECTED"
+          content={contact.why_stay_in_contact}
+          isEditing={editingSection === 'why_stay_in_contact'}
+          editValue={editValues['why_stay_in_contact']}
+          onEdit={() => startEdit('why_stay_in_contact', contact.why_stay_in_contact || '')}
+          onCancel={cancelEdit}
+          onSave={() => saveEdit('why_stay_in_contact')}
+          onChange={(val) => setEditValues({ why_stay_in_contact: val })}
+          placeholder="Why do we stay in touch? What value does this connection bring?"
+        />
+      </div>
 
       {/* WHAT MATTERS TO THEM */}
-      <DisplaySection
-        emoji="💎"
-        title="WHAT MATTERS TO THEM"
-        content={contact.most_important_to_them}
-        isEditing={editingSection === 'most_important_to_them'}
-        editValue={editValues['most_important_to_them']}
-        onEdit={() => startEdit('most_important_to_them', contact.most_important_to_them || '')}
-        onCancel={cancelEdit}
-        onSave={() => saveEdit('most_important_to_them')}
-        onChange={(val) => setEditValues({ most_important_to_them: val })}
-        placeholder="What are they working on? Family, business, hobbies, health, faith..."
-        multiline
-      />
-
-      <div className="border-b border-slate-800/30" />
+      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+        <DisplaySection
+          emoji="💎"
+          title="WHAT MATTERS TO THEM"
+          content={contact.most_important_to_them}
+          isEditing={editingSection === 'most_important_to_them'}
+          editValue={editValues['most_important_to_them']}
+          onEdit={() => startEdit('most_important_to_them', contact.most_important_to_them || '')}
+          onCancel={cancelEdit}
+          onSave={() => saveEdit('most_important_to_them')}
+          onChange={(val) => setEditValues({ most_important_to_them: val })}
+          placeholder="What are they working on? Family, business, hobbies, health, faith..."
+          multiline
+        />
+      </div>
 
       {/* CAREER & BUSINESS */}
-      <div className="group">
+      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
           💼 CAREER & BUSINESS
         </label>
@@ -144,8 +144,7 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* CHALLENGES */}
       {contact.current_challenges && (
-        <>
-          <div className="border-b border-slate-800/30" />
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
           <DisplaySection
             emoji="💪"
             title="CURRENT CHALLENGES"
@@ -159,13 +158,12 @@ export function StoryTab({ contact }: StoryTabProps) {
             placeholder="Current challenges, obstacles, what they're navigating..."
             multiline
           />
-        </>
+        </div>
       )}
 
       {/* GOALS & ASPIRATIONS */}
       {contact.goals_aspirations && (
-        <>
-          <div className="border-b border-slate-800/30" />
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
           <DisplaySection
             emoji="✨"
             title="GOALS & ASPIRATIONS"
@@ -179,45 +177,38 @@ export function StoryTab({ contact }: StoryTabProps) {
             placeholder="Goals, dreams, aspirations, what drives them forward..."
             multiline
           />
-        </>
+        </div>
       )}
 
       {/* CORE VALUES */}
       {coreValues.length > 0 && (
-        <>
-          <div className="border-b border-slate-800/30" />
-          <div className="group">
-            <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-              <Heart size={13} className="text-pink-500" /> CORE VALUES
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {coreValues.map(value => (
-                <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
-                  {value}
-                </span>
-              ))}
-            </div>
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+            <Heart size={13} className="text-pink-500" /> CORE VALUES
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {coreValues.map(value => (
+              <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                {value}
+              </span>
+            ))}
           </div>
-        </>
+        </div>
       )}
 
       {/* COMMUNICATION STYLE */}
       {communicationStyle && (
-        <>
-          <div className="border-b border-slate-800/30" />
-          <div className="group">
-            <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-              <MessageCircle size={13} className="text-blue-500" /> COMMUNICATION STYLE
-            </label>
-            <p className="text-slate-300 text-sm">{communicationStyle}</p>
-          </div>
-        </>
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+            <MessageCircle size={13} className="text-blue-500" /> COMMUNICATION STYLE
+          </label>
+          <p className="text-slate-300 text-sm">{communicationStyle}</p>
+        </div>
       )}
 
       {/* PERSONALITY & MOTIVATIONS */}
       {contact.personality_notes && (
-        <>
-          <div className="border-b border-slate-800/30" />
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
           <DisplaySection
             emoji="🎯"
             title="PERSONALITY & MOTIVATIONS"
@@ -231,13 +222,12 @@ export function StoryTab({ contact }: StoryTabProps) {
             placeholder="What drives them? How do they make decisions?"
             multiline
           />
-        </>
+        </div>
       )}
 
       {/* MUTUAL VALUE */}
       {contact.mutual_value_introductions && (
-        <>
-          <div className="border-b border-slate-800/30" />
+        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
           <DisplaySection
             emoji="🤝"
             title="MUTUAL VALUE & COLLABORATION"
@@ -251,13 +241,11 @@ export function StoryTab({ contact }: StoryTabProps) {
             placeholder="How you can help each other, introductions, collaboration opportunities..."
             multiline
           />
-        </>
+        </div>
       )}
 
-      <div className="border-b border-slate-800/30" />
-
       {/* GIFT VAULT */}
-      <div className="group">
+      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
           <GiftIcon className="w-3 h-3" /> GIFT VAULT
         </label>
