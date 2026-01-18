@@ -115,16 +115,16 @@ export function StoryTab({ contact }: StoryTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-20 text-slate-200">
-      
+    <div className="flex flex-col gap-6 pb-20 text-slate-200">
+
       {/* SECTION: THE ORIGIN */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          How We Met
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+          📍 How We Met
         </label>
-        <textarea 
+        <textarea
           placeholder="Where did you meet? What was your first impression?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[100px] resize-none leading-relaxed"
           value={whereMet}
           onChange={(e) => setWhereMet(e.target.value)}
           onBlur={() => handleBlur('where_met', whereMet)}
@@ -133,12 +133,12 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* SECTION: THE PHILOSOPHY */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          Why We Stay Connected
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+          💭 Why We Stay Connected
         </label>
-        <textarea 
+        <textarea
           placeholder="Why do we stay in touch? What value does this connection bring?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[90px] resize-none leading-relaxed"
           value={whyStay}
           onChange={(e) => setWhyStay(e.target.value)}
           onBlur={() => handleBlur('why_stay_in_contact', whyStay)}
@@ -147,12 +147,12 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* SECTION: WHAT MATTERS MOST */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          What Matters to Them
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+          💎 What Matters to Them
         </label>
-        <textarea 
+        <textarea
           placeholder="What are they working on? (e.g., The Kalon Project, fishing trips, business scaling)"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[120px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[100px] resize-none leading-relaxed"
           value={whatMatters}
           onChange={(e) => setWhatMatters(e.target.value)}
           onBlur={() => handleBlur('most_important_to_them', whatMatters)}
@@ -161,22 +161,22 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* SECTION: CAREER & BUSINESS */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
-          Career & Business
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+          💼 Career & Business
         </label>
-        <div className="flex flex-col md:flex-row gap-4">
-          <input 
+        <div className="flex flex-col md:flex-row gap-3">
+          <input
             type="text"
             placeholder="Job Title (e.g. Founder, Architect)"
-            className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+            className="flex-1 bg-slate-900/30 border border-slate-800/50 rounded-lg p-3 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70"
             value={jobTitle}
             onChange={(e) => setJobTitle(e.target.value)}
             onBlur={() => handleBlur('job_title', jobTitle)}
           />
-          <input 
+          <input
             type="text"
             placeholder="Company (e.g. Kalon Project, Apple)"
-            className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+            className="flex-1 bg-slate-900/30 border border-slate-800/50 rounded-lg p-3 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             onBlur={() => handleBlur('company', company)}
@@ -186,12 +186,12 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* SECTION: CURRENT CHALLENGES */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
           💪 Current Challenges
         </label>
-        <textarea 
+        <textarea
           placeholder="Current challenges, obstacles, what they're navigating right now..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[90px] resize-none leading-relaxed"
           value={challenges}
           onChange={(e) => setChallenges(e.target.value)}
           onBlur={() => handleBlur('current_challenges', challenges)}
@@ -200,12 +200,12 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* SECTION: GOALS & ASPIRATIONS */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 block">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
           ✨ Goals & Aspirations
         </label>
         <textarea
           placeholder="Goals, dreams, aspirations, what drives them forward..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[90px] resize-none leading-relaxed"
           value={aspirations}
           onChange={(e) => setAspirations(e.target.value)}
           onBlur={() => handleBlur('goals_aspirations', aspirations)}
@@ -214,33 +214,33 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* AI-Generated Values & Personality Summary */}
       {valuesPersonality && (
-        <div className="bg-gradient-to-br from-purple-900/20 to-indigo-900/20 border border-purple-500/30 rounded-2xl p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="text-purple-400" size={16} />
-            <label className="text-purple-400 text-xs font-black uppercase tracking-[0.2em]">
+        <div className="bg-gradient-to-br from-purple-900/15 to-indigo-900/15 border border-purple-500/20 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2.5">
+            <Sparkles className="text-purple-400" size={14} />
+            <label className="text-purple-400 text-xs font-bold uppercase tracking-[0.1em]">
               AI Insights - Values & Personality
             </label>
           </div>
-          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{valuesPersonality}</p>
+          <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{valuesPersonality}</p>
         </div>
       )}
 
       {/* Core Values */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-          <Heart size={14} className="text-pink-500" /> Core Values
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+          <Heart size={13} className="text-pink-500" /> Core Values
         </label>
-        <p className="text-slate-400 text-sm mb-3">What seems most important to them</p>
+        <p className="text-slate-400 text-xs mb-3">What seems most important to them</p>
 
         <div className="flex flex-wrap gap-2">
           {commonValues.map(value => (
             <button
               key={value}
               onClick={() => toggleValue(value)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 coreValues.includes(value)
-                  ? 'bg-indigo-600 text-white border-2 border-indigo-400'
-                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-indigo-500/50'
+                  ? 'bg-indigo-600 text-white border border-indigo-400'
+                  : 'bg-slate-900/50 text-slate-400 border border-slate-800/50 hover:border-indigo-500/50'
               }`}
             >
               {value}
@@ -251,12 +251,12 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* Communication Style */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-          <MessageCircle size={14} className="text-blue-500" /> Communication Style
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+          <MessageCircle size={13} className="text-blue-500" /> Communication Style
         </label>
-        <p className="text-slate-400 text-sm mb-3">How they prefer to communicate and make decisions</p>
+        <p className="text-slate-400 text-xs mb-3">How they prefer to communicate</p>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {['Direct', 'Cautious', 'Relational', 'Analytical'].map(style => (
             <button
               key={style}
@@ -264,10 +264,10 @@ export function StoryTab({ contact }: StoryTabProps) {
                 setCommunicationStyle(style);
                 handleBlur('communication_style', style);
               }}
-              className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`py-2 rounded-lg text-xs font-medium transition-all ${
                 communicationStyle === style
-                  ? 'bg-blue-600 text-white border-2 border-blue-400'
-                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-blue-500/50'
+                  ? 'bg-blue-600 text-white border border-blue-400'
+                  : 'bg-slate-900/50 text-slate-400 border border-slate-800/50 hover:border-blue-500/50'
               }`}
             >
               {style}
@@ -278,14 +278,14 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* Personality & Motivations */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-          <Target size={14} className="text-green-500" /> Personality & Motivations
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+          <Target size={13} className="text-green-500" /> Personality & Motivations
         </label>
-        <p className="text-slate-400 text-sm mb-3">Decision-making style, motivations, sensitivities</p>
+        <p className="text-slate-400 text-xs mb-3">Decision-making style, motivations, sensitivities</p>
 
         <textarea
           placeholder="What drives them? How do they make decisions? Any sensitivities to be aware of?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[120px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[100px] resize-none leading-relaxed"
           value={personalityNotes}
           onChange={(e) => setPersonalityNotes(e.target.value)}
           onBlur={() => handleBlur('personality_notes', personalityNotes)}
@@ -294,14 +294,14 @@ export function StoryTab({ contact }: StoryTabProps) {
 
       {/* Mutual Value Section */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-          <Handshake size={14} className="text-green-500" /> Mutual Value & Collaboration
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+          <Handshake size={13} className="text-green-500" /> Mutual Value & Collaboration
         </label>
-        <p className="text-slate-400 text-sm mb-3">How you can help each other, introductions, and collaboration opportunities</p>
+        <p className="text-slate-400 text-xs mb-3">How you can help each other, introductions, and collaboration opportunities</p>
 
         <textarea
           placeholder="How can you help them? How can they help you? Potential introductions and collaboration opportunities..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[150px] resize-none leading-relaxed"
+          className="w-full bg-slate-900/30 border border-slate-800/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500/70 transition-all min-h-[120px] resize-none leading-relaxed"
           value={mutualValueIntroductions}
           onChange={(e) => setMutualValueIntroductions(e.target.value)}
           onBlur={() => handleBlur('mutual_value_introductions', mutualValueIntroductions)}
