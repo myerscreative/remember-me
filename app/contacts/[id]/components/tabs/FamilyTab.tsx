@@ -276,7 +276,15 @@ export function FamilyTab({ contact }: FamilyTabProps) {
 
       {/* CONNECTIONS WEB */}
       <section className="bg-slate-900 border border-slate-800 rounded-3xl p-5">
-         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 block">The Web (Connections)</label>
+         <div className="flex justify-between items-center mb-4">
+           <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em]">The Web (Connections)</label>
+           <button 
+             onClick={() => handleAddMember('Connection')}
+             className="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg transition-colors border border-slate-700"
+           >
+             + Add Connection
+           </button>
+         </div>
          
          <div className="space-y-2">
             {(contact.connections || []).length > 0 ? (
