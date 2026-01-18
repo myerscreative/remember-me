@@ -327,7 +327,7 @@ function DisplaySection({
 
   return (
     <div className="group relative">
-      <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+      <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-1 block">
         {emoji} {title}
       </label>
       {content ? (
