@@ -47,7 +47,7 @@ export async function getDailyBriefing(options: { expanded?: boolean } = {}): Pr
       .from('persons')
       .select('id, name, first_name, last_name, importance, last_interaction_date, last_contact_method, photo_url, target_frequency_days, deep_lore, relationship_summary')
       .eq('user_id', user.id)
-      .eq('archived', false);
+      .or('archived.is.null,archived.eq.false,archive_status.is.null,archive_status.eq.false');
 
     if (contactsError) throw contactsError;
 
