@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
+import ValuesTab from './tabs/ValuesTab';
 import { BrainDumpTab } from './tabs/BrainDumpTab';
 import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
@@ -29,7 +30,7 @@ interface ConnectionProfileProps {
 
 export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Brain Dump'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Values' | 'Brain Dump'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
@@ -311,6 +312,16 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
               }`}
             >
               Family
+            </button>
+            <button
+              onClick={() => setActiveTab('Values')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Values'
+                  ? 'bg-[#2d3748] text-white shadow-sm'
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Values
             </button>
             <button
               onClick={() => setActiveTab('Brain Dump')}
@@ -776,6 +787,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         )}
         {activeTab === 'Story' && <StoryTab contact={contact} />}
         {activeTab === 'Family' && <FamilyTab contact={contact} />}
+        {activeTab === 'Values' && <ValuesTab contact={contact} />}
         {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
       </div>
 
