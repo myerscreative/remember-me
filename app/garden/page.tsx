@@ -647,7 +647,10 @@ export default function GardenPage() {
               <NetworkGraphView
                 contacts={filteredContacts}
                 relationships={relationships}
-                onNodeClick={(id) => window.location.href = `/contacts/${id}`}
+                onNodeClick={(id) => {
+                  // Preserve the graph view state in URL
+                  window.location.href = `/contacts/${id}?returnTo=garden&view=graph`;
+                }}
               />
             </div>
           )}
@@ -935,7 +938,10 @@ export default function GardenPage() {
                 <NetworkGraphView
                   contacts={filteredContacts}
                   relationships={relationships}
-                  onNodeClick={(id) => window.location.href = `/contacts/${id}`}
+                  onNodeClick={(id) => {
+                    // Preserve the graph view state in URL
+                    window.location.href = `/contacts/${id}?returnTo=garden&view=graph`;
+                  }}
                 />
               </div>
             )}
