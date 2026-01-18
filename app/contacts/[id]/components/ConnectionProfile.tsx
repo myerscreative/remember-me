@@ -488,6 +488,26 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     <ActionButton icon={<span>✉️</span>} label="Email" href={contact.email ? `mailto:${contact.email}` : undefined} disabled={!contact.email} />
                     <ActionButton icon={<span>💬</span>} label="Text" href={contact.phone ? `sms:${contact.phone}` : undefined} disabled={!contact.phone} />
                 </div>
+
+                {/* Delete Button */}
+                <div className="flex justify-center mt-4">
+                    <button
+                        onClick={async () => {
+                            if (confirm(`Are you sure you want to delete ${contact.first_name} ${contact.last_name || ''}? They can be recovered within 30 days.`)) {
+                                const result = await deleteContact(contact.id);
+                                if (result.success) {
+                                    toast.success('Contact deleted (recoverable for 30 days)');
+                                    router.push('/contacts');
+                                } else {
+                                    toast.error(result.error || 'Failed to delete contact');
+                                }
+                            }
+                        }}
+                        className="text-xs text-red-400 hover:text-red-300 hover:underline transition-colors"
+                    >
+                        🗑️ Delete Contact
+                    </button>
+                </div>
             </div>
 
                 {/* AI Synopsis */}
