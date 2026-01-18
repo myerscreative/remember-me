@@ -221,7 +221,8 @@ export async function processMemory(contactId: string, text: string, autoSave = 
         career_craft: sixBlockData.career_craft,
         interests_hobbies: sixBlockData.interests_hobbies,
         values_personality: sixBlockData.values_personality,
-        history_touchpoints: sixBlockData.history_touchpoints
+        history_touchpoints: sixBlockData.history_touchpoints,
+        mutual_value_introductions: sixBlockData.mutual_value_introductions
     };
 
     // Only save to database if autoSave is true

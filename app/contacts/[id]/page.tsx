@@ -227,7 +227,8 @@ export default function ContactDetailPage({
             career_goals: person.career_goals,
             core_values: person.core_values,
             communication_style: person.communication_style,
-            personality_notes: person.personality_notes
+            personality_notes: person.personality_notes,
+            mutual_value_introductions: person.mutual_value_introductions
         };
 
         setContact(fullContact);

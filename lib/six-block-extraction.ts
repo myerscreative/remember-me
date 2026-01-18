@@ -23,6 +23,7 @@ export interface SixBlockExtraction {
   interests_hobbies: string;
   values_personality: string;
   history_touchpoints: string;
+  mutual_value_introductions: string;
 }
 
 const SIX_BLOCK_SYSTEM_PROMPT = `You are the information-structuring engine for an app called "Remember Me."
@@ -76,6 +77,13 @@ Information Blocks:
 - Commitments, promises, or follow-ups
 - Shared experiences
 
+7. Mutual Value & Introductions
+- Ways the user can help this person
+- Ways this person can help the user
+- Introductions discussed or promised
+- Collaboration or assistance opportunities
+- Open loops related to mutual benefit
+
 Output Format:
 Return a structured JSON object using the following schema:
 
@@ -85,7 +93,8 @@ Return a structured JSON object using the following schema:
   "career_craft": "",
   "interests_hobbies": "",
   "values_personality": "",
-  "history_touchpoints": ""
+  "history_touchpoints": "",
+  "mutual_value_introductions": ""
 }
 
 Additional Rules:
@@ -120,7 +129,8 @@ export async function extractSixBlocks(brainDump: string): Promise<SixBlockExtra
       'career_craft',
       'interests_hobbies',
       'values_personality',
-      'history_touchpoints'
+      'history_touchpoints',
+      'mutual_value_introductions'
     ];
 
     for (const key of requiredKeys) {
@@ -150,7 +160,8 @@ export function mergeSixBlocks(
     career_craft: '',
     interests_hobbies: '',
     values_personality: '',
-    history_touchpoints: ''
+    history_touchpoints: '',
+    mutual_value_introductions: ''
   };
 
   const keys: (keyof SixBlockExtraction)[] = [
@@ -159,7 +170,8 @@ export function mergeSixBlocks(
     'career_craft',
     'interests_hobbies',
     'values_personality',
-    'history_touchpoints'
+    'history_touchpoints',
+    'mutual_value_introductions'
   ];
 
   for (const key of keys) {
