@@ -104,9 +104,13 @@ interface ExtendedContact extends Contact {
 }
 
 export default function GardenPage() {
+  // Read view mode from URL if present
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const initialView = (searchParams?.get('view') as 'garden' | 'list' | 'graph') || 'garden';
+  
   const [categoryFilter, setCategoryFilter] = useState<FilterType>('all');
   const [healthFilter, setHealthFilter] = useState<HealthStatus>('all');
-  const [viewMode, setViewMode] = useState<'garden' | 'list' | 'graph'>('garden');
+  const [viewMode, setViewMode] = useState<'garden' | 'list' | 'graph'>(initialView);
   const [contacts, setContacts] = useState<ExtendedContact[]>([]);
   const [relationships, setRelationships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
