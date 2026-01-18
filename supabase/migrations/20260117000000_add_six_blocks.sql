@@ -4,43 +4,75 @@
 -- Add new columns for the 6 blocks
 ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 1: Identity & Context (existing fields enhanced)
-  relationship_type TEXT, -- 'friend', 'client', 'vendor', 'family', 'acquaintance'
-  
+  relationship_type TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 2: Family & Personal Life (existing fields enhanced)
-  life_stage TEXT, -- 'new_parent', 'empty_nester', 'caretaker', etc.
-  family_dynamics TEXT, -- Additional family context
-  
+  life_stage TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  family_dynamics TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 3: Career & Craft (existing fields enhanced)
-  career_trajectory TEXT, -- Past → Present → Desired
-  pain_points TEXT[], -- Work frustrations/challenges
-  career_goals TEXT[], -- Professional aspirations
-  
+  career_trajectory TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  pain_points TEXT[];
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  career_goals TEXT[];
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 4: Interests & Hobbies (existing fields enhanced)
-  side_projects JSONB DEFAULT '[]', -- [{name, description, status}]
-  
+  side_projects JSONB DEFAULT '[]';
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 5: Values & Motivations (NEW - completely missing)
-  core_values TEXT[], -- ['security', 'freedom', 'recognition', 'contribution']
-  motivators TEXT[], -- What drives them
-  communication_style TEXT, -- 'direct', 'cautious', 'relational'
-  personality_notes TEXT, -- Decision-making style, sensitivities
-  
+  core_values TEXT[];
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  motivators TEXT[];
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  communication_style TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  personality_notes TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- Block 6: History & Touchpoints (existing shared_memories enhanced)
-  promises JSONB DEFAULT '[]', -- [{promise, date, status}]
-  wins_losses JSONB DEFAULT '[]', -- [{type, description, date}]
-  open_loops JSONB DEFAULT '[]', -- [{item, date_created, priority}]
-  
+  promises JSONB DEFAULT '[]';
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  wins_losses JSONB DEFAULT '[]';
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  open_loops JSONB DEFAULT '[]';
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   -- 6-Block Structured Summaries (for AI extraction)
-  identity_context TEXT,
-  family_personal TEXT,
-  career_craft TEXT,
-  interests_hobbies TEXT,
-  values_personality TEXT,
+  identity_context TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  family_personal TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  career_craft TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  interests_hobbies TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
+  values_personality TEXT;
+
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS
   history_touchpoints TEXT;
 
 -- Add comments for documentation
 COMMENT ON COLUMN persons.relationship_type IS 'Type of relationship: friend, client, vendor, family, acquaintance';
 COMMENT ON COLUMN persons.life_stage IS 'Current life stage: new_parent, empty_nester, caretaker, career_builder, retired';
-COMMENT ON COLUMN persons.career_trajectory IS 'Career path: past → present → desired future';
+COMMENT ON COLUMN persons.career_trajectory IS 'Career path: past to present to desired future';
 COMMENT ON COLUMN persons.pain_points IS 'Work-related frustrations and challenges';
 COMMENT ON COLUMN persons.career_goals IS 'Professional goals and aspirations';
 COMMENT ON COLUMN persons.core_values IS 'Core values: security, freedom, recognition, contribution, etc.';
