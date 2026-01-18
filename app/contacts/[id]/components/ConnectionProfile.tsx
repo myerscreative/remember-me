@@ -9,6 +9,7 @@ import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import ValuesTab from './tabs/ValuesTab';
+import MutualValueTab from './tabs/MutualValueTab';
 import { BrainDumpTab } from './tabs/BrainDumpTab';
 import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
@@ -30,7 +31,7 @@ interface ConnectionProfileProps {
 
 export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Values' | 'Brain Dump'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Values' | 'Mutual Value' | 'Brain Dump'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
@@ -322,6 +323,16 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
               }`}
             >
               Values
+            </button>
+            <button
+              onClick={() => setActiveTab('Mutual Value')}
+              className={`flex-1 py-3 rounded-xl text-[14px] font-medium transition-all ${
+                activeTab === 'Mutual Value'
+                  ? 'bg-[#2d3748] text-white shadow-sm'
+                  : 'text-[#94a3b8] hover:text-[#cbd5e1] hover:bg-[#2d3748]/50'
+              }`}
+            >
+              Mutual Value
             </button>
             <button
               onClick={() => setActiveTab('Brain Dump')}
@@ -788,6 +799,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         {activeTab === 'Story' && <StoryTab contact={contact} />}
         {activeTab === 'Family' && <FamilyTab contact={contact} />}
         {activeTab === 'Values' && <ValuesTab contact={contact} />}
+        {activeTab === 'Mutual Value' && <MutualValueTab contact={contact} />}
         {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
       </div>
 
