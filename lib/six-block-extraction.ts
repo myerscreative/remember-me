@@ -24,23 +24,34 @@ export interface SixBlockExtraction {
   values_personality: string;
   history_touchpoints: string;
   mutual_value_introductions: string;
+  // Open Loop Detection
+  open_loop: boolean;
+  loop_direction: 'outbound' | 'inbound' | 'mutual' | '';
+  loop_confidence: 'explicit' | 'implied' | '';
+  suggested_reminder: string;
 }
 
-const SIX_BLOCK_SYSTEM_PROMPT = `You are the information-structuring engine for an app called "Remember Me."
+const SIX_BLOCK_SYSTEM_PROMPT = `You are the relationship-intelligence engine for an app called "Remember Me."
 
 Purpose:
-This app helps users remember people deeply and accurately — not just contact info, but context, meaning, and relationship relevance.
+This app helps users remember people AND act on relationship opportunities (introductions, assistance, collaboration) without being intrusive or transactional.
 
 Input:
-Users will provide a free-form spoken or written "brain dump" about a person. The input may be unstructured, emotional, incomplete, or out of order.
+Users provide free-form spoken or written notes about a person. Information may be emotional, partial, or out of order.
 
 Your task:
-Parse the input and organize all information into the following fixed information blocks.
-Do NOT invent information.
-If data is missing, leave the field empty.
-Use natural, concise sentences (not bullet fragments).
+1. Parse and organize information into structured blocks.
+2. Detect mutual value, introductions, or assistance opportunities.
+3. Track open loops and determine when reminders should occur.
+4. Keep opportunity-related information invisible unless relevant.
 
-Information Blocks:
+Do NOT invent information.
+If something is not stated or clearly implied, leave it empty.
+Preserve natural language.
+
+--------------------------------------------------
+INFORMATION BLOCKS
+--------------------------------------------------
 
 1. Identity & Context
 - Who this person is
@@ -82,10 +93,53 @@ Information Blocks:
 - Ways this person can help the user
 - Introductions discussed or promised
 - Collaboration or assistance opportunities
-- Open loops related to mutual benefit
+- Any open loops related to mutual benefit
 
-Output Format:
-Return a structured JSON object using the following schema:
+--------------------------------------------------
+OPEN LOOP DETECTION
+--------------------------------------------------
+
+If the input includes language such as:
+- "I can introduce…"
+- "He said he would introduce me to…"
+- "Let me connect you with…"
+- "We should connect…"
+- "Happy to help with…"
+
+Then mark:
+- open_loop = true
+- loop_direction = outbound | inbound | mutual
+- loop_confidence = explicit | implied
+
+--------------------------------------------------
+REMINDER LOGIC
+--------------------------------------------------
+
+Create a reminder ONLY if open_loop = true.
+
+Default reminder timing:
+- 7 days after the last recorded interaction
+OR
+- Next logged interaction, whichever comes first
+
+Reminder tone must be gentle and optional.
+
+Examples:
+- "You mentioned introducing [Name] to someone — want to do that now?"
+- "[Name] offered to introduce you to someone. You may want to follow up."
+- "You and [Name] discussed helping each other — this may be a good time to reconnect."
+
+Automatically close the reminder if:
+- A new interaction references the introduction
+- The user marks it as handled
+- The relationship becomes dormant
+- A newer opportunity replaces it
+
+--------------------------------------------------
+OUTPUT FORMAT
+--------------------------------------------------
+
+Return a structured JSON object:
 
 {
   "identity_context": "",
@@ -94,14 +148,18 @@ Return a structured JSON object using the following schema:
   "interests_hobbies": "",
   "values_personality": "",
   "history_touchpoints": "",
-  "mutual_value_introductions": ""
+  "mutual_value_introductions": "",
+  "open_loop": false,
+  "loop_direction": "",
+  "loop_confidence": "",
+  "suggested_reminder": ""
 }
 
 Additional Rules:
-- Preserve emotional tone where relevant.
-- Do not repeat the same information across blocks.
-- Keep each block concise but meaningful.
-- Prioritize human memory value over data completeness.`;
+- Do not repeat information across blocks.
+- Prioritize human memory value over completeness.
+- Avoid corporate or CRM-style language.
+- This app is about relationships, not transactions.`;
 
 export async function extractSixBlocks(brainDump: string): Promise<SixBlockExtraction> {
   try {
@@ -130,12 +188,21 @@ export async function extractSixBlocks(brainDump: string): Promise<SixBlockExtra
       'interests_hobbies',
       'values_personality',
       'history_touchpoints',
-      'mutual_value_introductions'
+      'mutual_value_introductions',
+      'open_loop',
+      'loop_direction',
+      'loop_confidence',
+      'suggested_reminder'
     ];
 
     for (const key of requiredKeys) {
       if (!(key in parsed)) {
-        parsed[key] = '';
+        // Set defaults for missing fields
+        if (key === 'open_loop') {
+          parsed[key] = false;
+        } else {
+          parsed[key] = '';
+        }
       }
     }
 
