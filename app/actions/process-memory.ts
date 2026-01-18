@@ -3,6 +3,7 @@
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import type { Person } from '@/types/database.types';
+import { extractSixBlocks, type SixBlockExtraction } from '@/lib/six-block-extraction';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -102,13 +103,21 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       Input Text: "${text}"
     `;
 
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'gpt-4o',
-      response_format: { type: 'json_object' },
-    });
+    console.log('🤖 Calling OpenAI for extraction...');
+    
+    // Run both extractions in parallel for efficiency
+    const [legacyResponse, sixBlockData] = await Promise.all([
+      openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
+      }),
+      extractSixBlocks(text) // New 6-block extraction
+    ]);
 
-    const result = JSON.parse(completion.choices[0].message.content || '{}');
+    const content = legacyResponse.choices[0].message.content;
+    const result = JSON.parse(content || '{}');
     const extractions = result.extractions || [];
 
     if (extractions.length === 0) {
@@ -205,7 +214,14 @@ export async function processMemory(contactId: string, text: string, autoSave = 
         relationship_summary: relationship_summary,
         company: company,
         job_title: job_title,
-        most_important_to_them: most_important_to_them
+        most_important_to_them: most_important_to_them,
+        // 6-Block structured data
+        identity_context: sixBlockData.identity_context,
+        family_personal: sixBlockData.family_personal,
+        career_craft: sixBlockData.career_craft,
+        interests_hobbies: sixBlockData.interests_hobbies,
+        values_personality: sixBlockData.values_personality,
+        history_touchpoints: sixBlockData.history_touchpoints
     };
 
     // Only save to database if autoSave is true
