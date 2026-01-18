@@ -687,4 +687,6 @@ export interface Person {
   first_impression: string | null;
   memorable_moment: string | null;
   story_completeness: number | null;
+  current_challenges: string | null;
+  goals_aspirations: string | null;
 }
