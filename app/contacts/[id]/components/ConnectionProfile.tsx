@@ -15,6 +15,7 @@ import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { deleteInteraction } from '@/app/actions/delete-interaction';
 import { updateInteraction } from '@/app/actions/update-interaction';
+import { deleteContact } from '@/app/actions/delete-contact';
 import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
 import { UserSettings } from '@/lib/utils/summary-levels';
 
@@ -371,6 +372,25 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     title="Edit Header"
                 >
                     {isEditingHeader ? <span className="text-[12px] font-semibold text-[#ef4444]">Cancel</span> : '✏️'}
+                </button>
+
+                {/* Delete Contact Button */}
+                <button
+                    onClick={async () => {
+                        if (confirm(`Are you sure you want to delete ${contact.first_name} ${contact.last_name || ''}? This cannot be undone.`)) {
+                            const result = await deleteContact(contact.id);
+                            if (result.success) {
+                                toast.success('Contact deleted');
+                                router.push('/contacts');
+                            } else {
+                                toast.error(result.error || 'Failed to delete contact');
+                            }
+                        }
+                    }}
+                    className="absolute top-4 right-16 text-[#64748b] hover:text-[#ef4444] p-2 rounded-lg hover:bg-[#2d3748]/50 transition-all opacity-0 group-hover:opacity-100"
+                    title="Delete Contact"
+                >
+                    🗑️
                 </button>
 
                 <div className="inline-block relative mb-4">
