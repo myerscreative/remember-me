@@ -228,7 +228,11 @@ export function mergeSixBlocks(
     interests_hobbies: '',
     values_personality: '',
     history_touchpoints: '',
-    mutual_value_introductions: ''
+    mutual_value_introductions: '',
+    open_loop: false,
+    loop_direction: '',
+    loop_confidence: '',
+    suggested_reminder: ''
   };
 
   const keys: (keyof SixBlockExtraction)[] = [
