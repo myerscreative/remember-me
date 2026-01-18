@@ -147,6 +147,7 @@ export default function GardenPage() {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .is('target_frequency_days', null)
+        .is('deleted_at', null)
         .eq('archived', false);
       
       if (!countError) setUncategorizedCount(uCount || 0);
@@ -156,6 +157,7 @@ export default function GardenPage() {
         .from('persons')
         .select('id, name, first_name, last_name, last_contact, last_interaction_date, created_at, importance, company, interests, is_favorite, target_frequency_days')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .eq('archived', false)
         .order('name');
         
