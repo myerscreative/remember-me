@@ -438,7 +438,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         {activeTab !== 'Overview' && navigationTabs}
 
         {activeTab === 'Overview' && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 pt-4">
             {/* Header Card */}
             <div className="bg-[#1a1f2e] rounded-2xl p-6 md:p-8 text-center border border-slate-800/50 relative group">
                 <button 
