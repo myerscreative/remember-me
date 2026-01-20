@@ -36,6 +36,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const [isReprocessing, setIsReprocessing] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<any>(null);
+  const [showInitialMode, setShowInitialMode] = useState<'text' | 'voice'>('text');
 
   const contactName = `${contact.first_name} ${contact.last_name || ''}`.trim();
 
@@ -162,7 +163,10 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           Capture what you just discussed with {contactName} while it&apos;s fresh in your mind.
         </p>
         <button
-          onClick={() => setShowPostCallPulse(true)}
+          onClick={() => {
+            setShowInitialMode('voice');
+            setShowPostCallPulse(true);
+          }}
           className="w-full bg-white text-indigo-600 font-bold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
         >
           <Mic className="w-5 h-5" />
@@ -271,11 +275,17 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
         <PostCallPulse
           contactId={contact.id}
           name={contactName}
+          initialMode={showInitialMode}
           onClose={() => setShowPostCallPulse(false)}
-          onComplete={() => {
+          onComplete={async () => {
             setShowPostCallPulse(false);
-            toast.success("Brain dump saved! AI summary updating...", { duration: 2000 });
+            toast.success("Brain dump saved! Analyzing for updates...", { duration: 3000 });
             router.refresh();
+            
+            // Trigger auto-reprocess after a short delay to allow DB propagation
+            setTimeout(() => {
+              handleReprocessMemories();
+            }, 1000);
           }}
         />
       )}
