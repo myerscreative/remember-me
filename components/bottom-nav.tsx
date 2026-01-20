@@ -22,9 +22,9 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
   },
   {
     href: "/",
-    label: "Contacts",
+    label: "People",
     icon: Users,
-    activeColor: "text-blue-600",
+    activeColor: "text-purple-600",
     inactiveColor: "text-gray-600",
   },
   {
@@ -79,7 +79,7 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors relative",
-                isActive ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md" : `${item.inactiveColor} dark:text-gray-400 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`
+                isActive ? item.activeColor : `${item.inactiveColor} dark:text-gray-400`
               )}
             >
               <div className="relative">
