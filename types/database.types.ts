@@ -161,6 +161,7 @@ export interface Database {
           last_interaction_date?: string | null
           interaction_count?: number
           importance?: 'high' | 'medium' | 'low' | null
+          target_frequency_days?: number | null
           archive_status?: boolean
           has_context?: boolean
           imported?: boolean

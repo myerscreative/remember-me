@@ -87,6 +87,8 @@ export async function logHeaderInteraction(
           ? `[Attempted Contact] No note left.` 
           : (interactionType === 'attempt' ? `[Attempted Contact] ${note}` : note);
 
+        console.log('[logHeaderInteraction] Logging Shared Memory:', memoryContent);
+
         if (memoryContent) {
              const { error: memoryError } = await (supabase as any)
               .from("shared_memories")
@@ -96,7 +98,11 @@ export async function logHeaderInteraction(
                 content: memoryContent
               });
             
-             if (memoryError) console.error("Memory Log Error:", memoryError);
+             if (memoryError) {
+                 console.error("Memory Log Error:", memoryError);
+             } else {
+                 console.log("Memory Log SUCCESS");
+             }
         }
     }
 

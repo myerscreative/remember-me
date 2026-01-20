@@ -133,12 +133,15 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         if (!result.success) {
             console.error('Error logging interaction:', result.error);
             const errorDetails = result.details ? JSON.stringify(result.details, null, 2) : '';
-            alert(`Failed to log interaction:\nMessage: ${result.error}\nDetails: ${errorDetails}`);
+            toast.error(`Failed to log: ${result.error}`);
+            // Alert for more detail if needed, but toast is better UI
+            // alert(`Failed to log interaction:\nMessage: ${result.error}\nDetails: ${errorDetails}`);
             return;
         }
 
         setLogNote('');
         setLogType('connection');
+        toast.success("Interaction logged!");
         // Refresh to show new interaction
         router.refresh();
     } catch (error) {
