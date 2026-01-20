@@ -44,6 +44,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     date: '',
     notes: ''
   });
+  // Local state for interactions to enable optimistic updates
+  const [interactions, setInteractions] = useState(contact.interactions || []);
   const [isEditingRelationship, setIsEditingRelationship] = useState(false);
   const [relationshipForm, setRelationshipForm] = useState({
     importance: contact.importance || 'medium',
@@ -128,6 +130,21 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     if (!logNote.trim()) return;
 
     setIsLogging(true);
+    
+    // Create optimistic interaction
+    const optimisticInteraction = {
+        id: `temp-${Date.now()}`,
+        person_id: contact.id,
+        date: new Date().toISOString(),
+        notes: logType === 'attempt' ? `[Attempt] ${logNote}` : logNote,
+        created_at: new Date().toISOString()
+    };
+    
+    // Optimistically add to interactions list
+    setInteractions(prev => [optimisticInteraction, ...prev]);
+    setLogNote('');
+    setLogType('connection');
+    
     try {
         const result = await logHeaderInteraction(
             contact.id,
@@ -139,21 +156,20 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
             console.error('Error logging interaction:', result.error);
             const errorDetails = result.details ? JSON.stringify(result.details, null, 2) : '';
             toast.error(`Failed to log: ${result.error}`);
-            // Alert for more detail if needed, but toast is better UI
-            // alert(`Failed to log interaction:\nMessage: ${result.error}\nDetails: ${errorDetails}`);
+            // Remove optimistic interaction on failure
+            setInteractions(prev => prev.filter(i => i.id !== optimisticInteraction.id));
             return;
         }
 
-        setLogNote('');
-        setLogType('connection');
         toast.success("Interaction logged!");
-        // Refresh to show new interaction
+        // Refresh to get the real interaction data from server
         router.refresh();
     } catch (error) {
         console.error('Error logging interaction:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        const errorDetails = error instanceof Error && (error as any).details ? JSON.stringify((error as any).details, null, 2) : '';
-        alert(`Failed to log interaction:\nMessage: ${errorMessage}\nDetails: ${errorDetails}`);
+        toast.error(`Failed to log: ${errorMessage}`);
+        // Remove optimistic interaction on error
+        setInteractions(prev => prev.filter(i => i.id !== optimisticInteraction.id));
     } finally {
         setIsLogging(false);
     }
@@ -833,10 +849,10 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     </button>
 
                     <div className="mt-4 pt-4 border-t border-[#2d3748]">
-                        <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2.5">Recent Activity ({contact.interactions?.length || 0})</div>
-                        {(contact.interactions?.length || 0) > 0 ? (
+                        <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-2.5">Recent Activity ({interactions.length})</div>
+                        {interactions.length > 0 ? (
                             <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto">
-                                {contact.interactions!.map((interaction: any) => (
+                                {interactions.map((interaction: any) => (
                                     <div key={interaction.id} className="bg-[#0f1419] p-3 rounded-lg border border-[#2d3748] group hover:border-[#3d4758] transition-colors">
                                         {editingInteractionId === interaction.id ? (
                                             <div className="flex flex-col gap-2">
