@@ -11,8 +11,11 @@ import { updateStoryFields } from '@/app/actions/story-actions';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
 
 interface SharedMemory {
+  id?: string;
   created_at: string;
   content: string;
+  person_id?: string;
+  user_id?: string;
 }
 
 interface BrainDumpTabProps {
