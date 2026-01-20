@@ -160,7 +160,7 @@ export interface Database {
           relationship_summary?: string | null
           last_interaction_date?: string | null
           interaction_count?: number
-          contact_importance?: 'high' | 'medium' | 'low' | null
+          importance?: 'high' | 'medium' | 'low' | null
           archive_status?: boolean
           has_context?: boolean
           imported?: boolean
