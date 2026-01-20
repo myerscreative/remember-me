@@ -31,7 +31,6 @@ import { useRouter } from "next/navigation";
 import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
 import SeedMapWidget from '@/components/dashboard/SeedMapWidget';
 import { NeedsNurtureList } from "@/components/dashboard/NeedsNurtureList";
-import { DailyBriefingCard } from '@/components/DailyBriefingCard';
 import { getDailyBriefing, type DailyBriefing } from '@/app/actions/get-daily-briefing';
 import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
 import { cn } from "@/lib/utils";
@@ -315,11 +314,7 @@ export default function DashboardPage() {
                   {/* Weekly Briefing (Automated Context Summary) */}
                   <WeeklyBriefing />
 
-                  {/* Daily Briefing Card (Collapsible/Dynamic) */}
-                  <DailyBriefingCard 
-                    briefing={briefing || { milestones: [], thirstyTribes: [], priorityNurtures: [] }} 
-                    onActionComplete={loadDashboardData} 
-                  />
+
 
                   {/* Needs Nurture List (Redesigned & Compact with Filter) */}
                   <NeedsNurtureList contacts={needingAttention} />
