@@ -128,7 +128,6 @@ export interface Database {
           zip_code?: string | null
           country?: string | null
           created_at?: string
-          created_at?: string
           updated_at?: string
         }
         Update: {
