@@ -65,6 +65,8 @@ export interface Database {
           // Career fields
           company: string | null
           job_title: string | null
+          current_challenges: string | null
+          goals_aspirations: string | null
           created_at: string
           updated_at: string
         }
@@ -111,6 +113,8 @@ export interface Database {
           // Career fields
           company?: string | null
           job_title?: string | null
+          current_challenges?: string | null
+          goals_aspirations?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -164,6 +168,8 @@ export interface Database {
           // Career fields
           company?: string | null
           job_title?: string | null
+          current_challenges?: string | null
+          goals_aspirations?: string | null
           created_at?: string
           updated_at?: string
         }
