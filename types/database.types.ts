@@ -65,6 +65,8 @@ export interface Database {
           // Career fields
           company: string | null
           job_title: string | null
+          current_challenges: string | null
+          goals_aspirations: string | null
           created_at: string
           updated_at: string
         }
@@ -111,6 +113,8 @@ export interface Database {
           // Career fields
           company?: string | null
           job_title?: string | null
+          current_challenges?: string | null
+          goals_aspirations?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -164,6 +168,8 @@ export interface Database {
           // Career fields
           company?: string | null
           job_title?: string | null
+          current_challenges?: string | null
+          goals_aspirations?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -558,6 +564,7 @@ export interface Database {
 
 // Helper types for easier usage
 export type BasePerson = Database['public']['Tables']['persons']['Row']
+export type Person = BasePerson & { is_favorite?: boolean | null; contact_importance?: string | null }
 export type PersonInsert = Database['public']['Tables']['persons']['Insert']
 export type PersonUpdate = Database['public']['Tables']['persons']['Update']
 
@@ -638,55 +645,4 @@ export interface LinkedContact {
   target_frequency_days: number | null;
 }
 
-export interface Person {
-  id: string;
-  user_id: string;
-  name: string;
-  first_name: string;
-  last_name: string | null;
-  photo_url: string | null;
-  phone: string | null;
-  email: string | null;
-  linkedin: string | null;
-  where_met: string | null;
-  who_introduced: string | null;
-  when_met: string | null; // Date
-  why_stay_in_contact: string | null;
-  what_found_interesting: string | null;
-  most_important_to_them: string | null;
-  interests: string[] | null; // ARRAY
-  family_notes: string | null;
-  notes: string | null;
-  last_contact: string | null;
-  follow_up_reminder: string | null;
-  created_at: string;
-  updated_at: string;
-  birthday: string | null;
-  family_members: any | null; // jsonb
-  archived: boolean;
-  archived_at: string | null;
-  archived_reason: string | null;
-  relationship_summary: string | null;
-  last_interaction_date: string | null;
-  interaction_count: number | null;
-  contact_importance: string | null; // Keeping as fallback
-  importance: 'high' | 'medium' | 'low' | string | null;
-  has_context: boolean | null;
-  imported: boolean | null;
-  next_contact_date: string | null;
-  next_contact_reason: string | null;
-  last_contacted_date: string | null;
-  is_favorite: boolean | null;
-  target_frequency_days: number | null;
-  company: string | null;
-  deep_lore: string | null; // This is our 'Shared Memory' source
-  job_title: string | null;
-  relationship_value: string | null;
-  what_i_offered: string | null;
-  what_they_offered: string | null;
-  first_impression: string | null;
-  memorable_moment: string | null;
-  story_completeness: number | null;
-  current_challenges: string | null;
-  goals_aspirations: string | null;
-}
+

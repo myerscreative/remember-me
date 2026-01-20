@@ -136,6 +136,13 @@ export default function NewContactPage() {
         interests: formData.interests.split(',').map(s => s.trim()).filter(Boolean),
       };
 
+      console.log("💾 [Save Debug] Form data being saved:", {
+        email: personData.email,
+        phone: personData.phone,
+        linkedin: personData.linkedin,
+        name: personData.name
+      });
+
       // Insert person
       const { data: newPerson, error: personError } = await (supabase as any)
         .from("persons")
@@ -154,6 +161,14 @@ export default function NewContactPage() {
         console.error("Data being inserted:", personData);
         throw personError;
       }
+
+      console.log("✅ [Save Debug] Contact saved successfully:", {
+        id: newPerson?.id,
+        email: newPerson?.email,
+        phone: newPerson?.phone,
+        linkedin: newPerson?.linkedin,
+        name: newPerson?.name
+      });
 
       // Handle tags if provided
       if (formData.tags.trim() && newPerson) {
@@ -258,6 +273,8 @@ export default function NewContactPage() {
   };
 
   const handleVoiceDataApply = (data: ParsedContactData) => {
+    console.log("🎤 [Voice Debug] handleVoiceDataApply called with data:", data);
+
     // Parse name into first and last name
     let parsedFirstName = "";
     let parsedLastName = "";
@@ -267,30 +284,37 @@ export default function NewContactPage() {
       parsedLastName = nameParts.slice(1).join(" ") || "";
     }
 
+    console.log("🎤 [Voice Debug] Extracted email:", data.email, "phone:", data.phone, "linkedin:", data.linkedin);
+
     // Merge voice data into form, preserving existing data where fields are already filled
-    setFormData((prev) => ({
-      firstName: prev.firstName || parsedFirstName || "",
-      lastName: prev.lastName || parsedLastName || "",
-      email: prev.email || data.email || "",
-      phone: prev.phone || (data.phone ? formatPhoneNumber(data.phone) : ""),
-      linkedin: prev.linkedin || data.linkedin || "",
-      company: prev.company || data.company || "",
-      jobTitle: prev.jobTitle || data.jobTitle || "",
-      whereMet: prev.whereMet || data.whereMet || "",
-      introducedBy: prev.introducedBy || data.introducedBy || "",
-      whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
-      whatInteresting: prev.whatInteresting || data.whatInteresting || "",
-      whatsImportant: prev.whatsImportant || data.whatsImportant || "",
-      firstImpression: prev.firstImpression || "",
-      memorableMoment: prev.memorableMoment || "",
-      interests: prev.interests || (data.interests ? data.interests.join(", ") : ""),
-      skills: prev.skills || (data.skills ? data.skills.join(", ") : ""),
-      birthday: prev.birthday || data.birthday || "",
-      tags: prev.tags || (data.tags ? (Array.isArray(data.tags) ? data.tags.join(", ") : data.tags) : ""),
-      familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
-      notes: prev.notes || data.notes || "",
-      misc: prev.misc || data.notes || "", // Keep misc for backward compat
-    }));
+    setFormData((prev) => {
+      console.log("🎤 [Voice Debug] Previous formData:", { email: prev.email, phone: prev.phone, linkedin: prev.linkedin });
+      const newFormData = {
+        firstName: prev.firstName || parsedFirstName || "",
+        lastName: prev.lastName || parsedLastName || "",
+        email: prev.email || data.email || "",
+        phone: prev.phone || (data.phone ? formatPhoneNumber(data.phone) : ""),
+        linkedin: prev.linkedin || data.linkedin || "",
+        company: prev.company || data.company || "",
+        jobTitle: prev.jobTitle || data.jobTitle || "",
+        whereMet: prev.whereMet || data.whereMet || "",
+        introducedBy: prev.introducedBy || data.introducedBy || "",
+        whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
+        whatInteresting: prev.whatInteresting || data.whatInteresting || "",
+        whatsImportant: prev.whatsImportant || data.whatsImportant || "",
+        firstImpression: prev.firstImpression || "",
+        memorableMoment: prev.memorableMoment || "",
+        interests: prev.interests || (data.interests ? data.interests.join(", ") : ""),
+        skills: prev.skills || (data.skills ? data.skills.join(", ") : ""),
+        birthday: prev.birthday || data.birthday || "",
+        tags: prev.tags || (data.tags ? (Array.isArray(data.tags) ? data.tags.join(", ") : data.tags) : ""),
+        familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
+        notes: prev.notes || data.notes || "",
+        misc: prev.misc || data.notes || "", // Keep misc for backward compat
+      };
+      console.log("🎤 [Voice Debug] New formData:", { email: newFormData.email, phone: newFormData.phone, linkedin: newFormData.linkedin });
+      return newFormData;
+    });
   };
 
   const handleSelectExistingContact = (contactId: string) => {

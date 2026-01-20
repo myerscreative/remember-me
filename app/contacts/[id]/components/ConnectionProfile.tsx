@@ -1,16 +1,18 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { Camera } from 'lucide-react';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import ValuesTab from './tabs/ValuesTab';
 import MutualValueTab from './tabs/MutualValueTab';
 import { BrainDumpTab } from './tabs/BrainDumpTab';
+import { AvatarCropModal } from './AvatarCropModal';
 import { updateContact } from '@/app/actions/update-contact';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { deleteInteraction } from '@/app/actions/delete-interaction';
@@ -62,6 +64,10 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       phone: contact.phone || '',
       birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
   });
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string>('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate the effective summary level
   const summaryLevel: SummaryLevel = useMemo(() => {
@@ -270,6 +276,86 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
       }
   };
 
+  const handleAvatarClick = () => {
+      fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+          toast.error('Please upload an image file');
+          return;
+      }
+
+      // Validate file size (max 20MB)
+      if (file.size > 20 * 1024 * 1024) {
+          toast.error('Image must be less than 20MB');
+          return;
+      }
+
+      // Read file and open crop modal
+      const reader = new FileReader();
+      reader.onload = () => {
+          setSelectedImageSrc(reader.result as string);
+          setIsCropModalOpen(true);
+      };
+      reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+      setIsUploadingPhoto(true);
+      const supabase = createClient();
+
+      try {
+          // Generate unique filename
+          const fileExt = 'jpg';
+          const fileName = `${contact.id}-${Date.now()}.${fileExt}`;
+          const filePath = `${fileName}`;
+
+          // Upload to Supabase Storage
+          const { error: uploadError } = await supabase.storage
+              .from('avatars')
+              .upload(filePath, croppedBlob, {
+                  contentType: 'image/jpeg',
+                  upsert: true
+              });
+
+          if (uploadError) throw uploadError;
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(filePath);
+
+          // Update contact in database
+          const { error: dbError } = await (supabase as any)
+              .from('persons')
+              .update({ photo_url: publicUrl })
+              .eq('id', contact.id);
+
+          if (dbError) throw dbError;
+
+          toast.success('Photo updated successfully!');
+          setIsCropModalOpen(false);
+          setSelectedImageSrc('');
+
+          // Update local state and refresh
+          setHeaderForm(prev => ({ ...prev, photo_url: publicUrl }));
+          router.refresh();
+
+      } catch (error) {
+          console.error('Error uploading photo:', error);
+          toast.error('Failed to upload photo');
+      } finally {
+          setIsUploadingPhoto(false);
+          // Reset file input
+          if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+  };
+
   // Health Score Dates
   const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
   const nextDueDate = lastContactDate && contact.target_frequency_days 
@@ -411,13 +497,22 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                             />
                         </div>
                          <div className="flex flex-col gap-1">
-                            <span className="text-[13px] text-[#64748b] text-center">📷 Photo URL:</span>
+                            <span className="text-[13px] text-[#64748b] text-center">📷 Profile Photo:</span>
+                            <button
+                                type="button"
+                                onClick={handleAvatarClick}
+                                disabled={isUploadingPhoto}
+                                className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Camera size={16} />
+                                {isUploadingPhoto ? 'Uploading...' : 'Upload Photo'}
+                            </button>
                             <input
-                                type="text"
-                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white text-center"
-                                value={headerForm.photo_url}
-                                onChange={(e) => setHeaderForm({...headerForm, photo_url: e.target.value})}
-                                placeholder="https://example.com/photo.jpg"
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
                             />
                         </div>
                         <button
@@ -828,6 +923,18 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
              </div>
           </div>
       </div>
+
+      {/* Avatar Crop Modal */}
+      <AvatarCropModal
+        open={isCropModalOpen}
+        imageSrc={selectedImageSrc}
+        onClose={() => {
+          setIsCropModalOpen(false);
+          setSelectedImageSrc('');
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 };
