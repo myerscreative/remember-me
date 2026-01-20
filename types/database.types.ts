@@ -67,6 +67,12 @@ export interface Database {
           job_title: string | null
           current_challenges: string | null
           goals_aspirations: string | null
+          // Location fields
+          address: string | null
+          city: string | null
+          state: string | null
+          zip_code: string | null
+          country: string | null
           created_at: string
           updated_at: string
         }
@@ -115,6 +121,13 @@ export interface Database {
           job_title?: string | null
           current_challenges?: string | null
           goals_aspirations?: string | null
+          // Location fields
+          address?: string | null
+          city?: string | null
+          state?: string | null
+          zip_code?: string | null
+          country?: string | null
+          created_at?: string
           created_at?: string
           updated_at?: string
         }
@@ -171,6 +184,12 @@ export interface Database {
           job_title?: string | null
           current_challenges?: string | null
           goals_aspirations?: string | null
+          // Location fields
+          address?: string | null
+          city?: string | null
+          state?: string | null
+          zip_code?: string | null
+          country?: string | null
           created_at?: string
           updated_at?: string
         }

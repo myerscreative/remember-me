@@ -62,7 +62,12 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
   const [editForm, setEditForm] = useState({
       email: contact.email || '',
       phone: contact.phone || '',
-      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+      birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : '',
+      address: contact.address || '',
+      city: contact.city || '',
+      state: contact.state || '',
+      zip_code: contact.zip_code || '',
+      country: contact.country || ''
   });
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState<string>('');
@@ -248,18 +253,29 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
   const handleSaveContactInfo = async () => {
       try {
-          // Use editForm which contains email/phone
+          // Optimistic update mechanism
+          const updatedContact = {
+              ...contact,
+              ...editForm,
+              updated_at: new Date().toISOString()
+          };
+          
+          setIsEditingInfo(false);
+          toast.loading("Saving changes...", { id: "save-contact" });
+
           const result = await updateContact(contact.id, editForm);
 
           if (result.success) {
-              setIsEditingInfo(false);
+              toast.success("Saved successfully!", { id: "save-contact" });
               router.refresh();
           } else {
-              alert('Failed to update contact info');
+              toast.error('Failed to update contact info', { id: "save-contact" });
+              setIsEditingInfo(true);
           }
       } catch (error) {
           console.error('Error saving contact info:', error);
-          alert('An error occurred while saving');
+          toast.error('An error occurred while saving', { id: "save-contact" });
+          setIsEditingInfo(true);
       }
   };
 
@@ -365,14 +381,8 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     ? new Date(lastContactDate.getTime() + (contact.target_frequency_days * 24 * 60 * 60 * 1000)) 
     : null;
 
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
-
-      {/* LEFT COLUMN */}
-      <div className="flex flex-col gap-8 px-4 lg:px-0 pb-24 lg:pb-0">
-        
-        {/* Navigation Tabs - Moved to Top of Main Column */}
+  // Define Navigation Tabs Component
+  const navigationTabs = (
         <div className="bg-[#1a1f2e] rounded-2xl p-1 border border-slate-800/50 flex transition-all shadow-lg shadow-black/20 backdrop-blur-xl gap-2">
             <button 
               onClick={() => setActiveTab('Overview')}
@@ -415,6 +425,17 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
               Brain Dump
             </button>
         </div>
+  );
+
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
+
+      {/* LEFT COLUMN */}
+      <div className="flex flex-col gap-6 px-4 lg:px-0 pb-24 lg:pb-0">
+        
+        {/* Navigation Tabs - Show at top only if NOT Overview */}
+        {activeTab !== 'Overview' && navigationTabs}
 
         {activeTab === 'Overview' && (
           <div className="flex flex-col gap-6">
@@ -569,6 +590,9 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     </div>
                 )}
             </div>
+            
+            {/* Navigation Tabs - Show below header in Overview */}
+            {navigationTabs}
 
                 {/* AI Synopsis */}
                 <AISynopsisCard
@@ -596,7 +620,12 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                     setEditForm({ 
                                         email: contact.email || '', 
                                         phone: contact.phone || '',
-                                        birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : ''
+                                        birthday: contact.birthday ? new Date(contact.birthday).toISOString().split('T')[0] : '',
+                                        address: contact.address || '',
+                                        city: contact.city || '',
+                                        state: contact.state || '',
+                                        zip_code: contact.zip_code || '',
+                                        country: contact.country || ''
                                     });
                                 } else {
                                     setIsEditingInfo(true);
@@ -628,7 +657,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 py-3">
+                        <div className="flex items-center gap-3 py-3 border-b border-[#2d3748]">
                             <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">📞</div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Phone</div>
@@ -647,7 +676,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 py-3">
+                        <div className="flex items-center gap-3 py-3 border-b border-[#2d3748]">
                             <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">🎂</div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Birthday</div>
@@ -661,6 +690,66 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                                 ) : (
                                     <div className={`text-[14px] truncate ${!contact.birthday ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
                                         {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) : 'Not set'}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                         <div className="flex items-start gap-3 py-3">
+                            <div className="w-10 h-10 bg-[#2d3748] rounded-xl flex items-center justify-center text-lg shrink-0">📍</div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Location</div>
+                                {isEditingInfo ? (
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <input 
+                                            type="text"
+                                            className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                            value={editForm.address}
+                                            onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
+                                            placeholder="Street Address"
+                                        />
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <input 
+                                                type="text"
+                                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                                value={editForm.city}
+                                                onChange={(e) => setEditForm(prev => ({ ...prev, city: e.target.value }))}
+                                                placeholder="City"
+                                            />
+                                            <input 
+                                                type="text"
+                                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                                value={editForm.state}
+                                                onChange={(e) => setEditForm(prev => ({ ...prev, state: e.target.value }))}
+                                                placeholder="State"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <input 
+                                                type="text"
+                                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                                value={editForm.zip_code}
+                                                onChange={(e) => setEditForm(prev => ({ ...prev, zip_code: e.target.value }))}
+                                                placeholder="Zip"
+                                            />
+                                            <input 
+                                                type="text"
+                                                className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white focus:border-[#60a5fa] outline-none"
+                                                value={editForm.country}
+                                                onChange={(e) => setEditForm(prev => ({ ...prev, country: e.target.value }))}
+                                                placeholder="Country"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`text-[14px] leading-relaxed ${!contact.address && !contact.city && !contact.state ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
+                                        {(contact.address || contact.city || contact.state || contact.zip_code || contact.country) ? (
+                                            <>
+                                                {contact.address && <div>{contact.address}</div>}
+                                                <div>{[contact.city, contact.state, contact.zip_code].filter(Boolean).join(', ')}</div>
+                                                {contact.country && <div>{contact.country}</div>}
+                                            </>
+                                        ) : 'No location info'}
                                     </div>
                                 )}
                             </div>

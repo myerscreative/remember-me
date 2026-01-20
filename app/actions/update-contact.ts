@@ -15,6 +15,12 @@ interface UpdateContactData {
   photo_url?: string;
   importance?: string;
   target_frequency_days?: number;
+  // Address fields
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
 }
 
 export async function updateContact(personId: string, data: UpdateContactData) {
