@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Users, Activity, Search, TreePine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Bottom navigation component - Updated 2026-01-20
 const navItems: { href: string; label: string; icon: React.ElementType; activeColor: string; inactiveColor: string; isSearch?: boolean }[] = [
   {
     href: "/dashboard",
