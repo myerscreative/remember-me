@@ -416,13 +416,18 @@ CREATE POLICY "Users can insert their own relationships"
     )
   );
 
--- Users can update their own relationships
+-- Users can update their own relationships (must own BOTH persons)
 CREATE POLICY "Users can update their own relationships"
   ON relationships FOR UPDATE
   USING (
     EXISTS (
       SELECT 1 FROM persons
       WHERE persons.id = relationships.from_person_id
+      AND persons.user_id = auth.uid()
+    )
+    AND EXISTS (
+      SELECT 1 FROM persons
+      WHERE persons.id = relationships.to_person_id
       AND persons.user_id = auth.uid()
     )
   )
@@ -432,15 +437,25 @@ CREATE POLICY "Users can update their own relationships"
       WHERE persons.id = relationships.from_person_id
       AND persons.user_id = auth.uid()
     )
+    AND EXISTS (
+      SELECT 1 FROM persons
+      WHERE persons.id = relationships.to_person_id
+      AND persons.user_id = auth.uid()
+    )
   );
 
--- Users can delete their own relationships
+-- Users can delete their own relationships (must own BOTH persons)
 CREATE POLICY "Users can delete their own relationships"
   ON relationships FOR DELETE
   USING (
     EXISTS (
       SELECT 1 FROM persons
       WHERE persons.id = relationships.from_person_id
+      AND persons.user_id = auth.uid()
+    )
+    AND EXISTS (
+      SELECT 1 FROM persons
+      WHERE persons.id = relationships.to_person_id
       AND persons.user_id = auth.uid()
     )
   );

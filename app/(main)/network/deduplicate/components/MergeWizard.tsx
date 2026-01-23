@@ -37,11 +37,16 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: 
     const supabase = createClient();
 
     try {
+      // Get current user ID for security verification
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       // Merge each victim into the master, one at a time
       for (const victim of finalVictims) {
         const { error } = await (supabase as any).rpc('merge_contacts', {
           keeper_id: finalMaster.id,
-          duplicate_id: victim.id
+          duplicate_id: victim.id,
+          p_user_id: user.id
         });
 
         if (error) throw error;

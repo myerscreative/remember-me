@@ -474,50 +474,6 @@ export default function GardenPage() {
               <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">🍃 Relationship Garden</h1>
               <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 hidden md:block">Click a health status to see contacts in that group</p>
             </div>
-
-            {/* Desktop-only view controls */}
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                href="/triage"
-                className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
-                title="Rapidly prioritize contacts"
-              >
-                🚨 Triage
-              </Link>
-              <button
-                onClick={() => setViewMode('garden')}
-                className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'garden'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                }`}
-                title="Garden View"
-              >
-                <LayoutGrid className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                }`}
-                title="List View"
-              >
-                <List className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('graph')}
-                className={`p-2 rounded-lg border transition-colors ${
-                  viewMode === 'graph'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                    : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                }`}
-                title="Network Graph"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </div>
 
@@ -800,9 +756,56 @@ export default function GardenPage() {
             onFilterChange={setCategoryFilter}
             counts={categoryCounts}
           />
-
+ 
           {/* Main Content */}
           <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 pb-10 transition-colors">
+            
+            {/* Desktop-only view controls - Now inside the content area */}
+            <div className="hidden md:block mb-6">
+              {/* This will be handled by RelationshipGarden if in garden view, 
+                  but we need it for List and Graph views too. */}
+              {viewMode !== 'garden' && (
+                <div className="flex items-center gap-2 mb-6">
+                  {/* Reuse the buttons */}
+                  <Link
+                    href="/triage"
+                    className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
+                    title="Rapidly prioritize contacts"
+                  >
+                    🚨 Triage
+                  </Link>
+                  <button
+                    onClick={() => setViewMode('garden')}
+                    className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                    title="Garden View"
+                  >
+                    <LayoutGrid className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-lg border transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                        : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                    title="List View"
+                  >
+                    <List className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('graph')}
+                    className={`p-2 rounded-lg border transition-colors ${
+                      viewMode === 'graph'
+                        ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
+                        : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                    title="Network Graph"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </div>
 
             {viewMode === 'garden' && healthFilter === 'all' && (
               <div className="flex flex-col lg:flex-row gap-6 items-start max-w-[1280px] mx-auto justify-center">
@@ -819,6 +822,38 @@ export default function GardenPage() {
                     }}
                     onQuickLog={handleQuickLog}
                     hoveredContactId={hoveredContactId}
+                    desktopheaderControls={
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href="/triage"
+                          className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
+                          title="Rapidly prioritize contacts"
+                        >
+                          🚨 Triage
+                        </Link>
+                        <button
+                          onClick={() => setViewMode('garden')}
+                          className="p-2 rounded-lg border transition-colors bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700"
+                          title="Garden View"
+                        >
+                          <LayoutGrid className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('list')}
+                          className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                          title="List View"
+                        >
+                          <List className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('graph')}
+                          className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                          title="Network Graph"
+                        >
+                          <Share2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    }
                   />
                 </div>
 
