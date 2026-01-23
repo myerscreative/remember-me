@@ -109,8 +109,6 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       Input Text: "${text}"
     `;
 
-    console.log('🤖 Calling OpenAI for extraction...');
-    
     // Run both extractions in parallel for efficiency
     const [legacyResponse, sixBlockData] = await Promise.all([
       openai.chat.completions.create({

@@ -598,14 +598,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
         </div>
 
         {/* Tooltip */}
-        {tooltip.visible && tooltip.contact && (() => {
-          console.log('✅ TOOLTIP RENDERING:', {
-            name: tooltip.contact?.name,
-            position: { x: tooltip.x, y: tooltip.y },
-            visible: tooltip.visible
-          });
-          return true;
-        })() && (
+        {tooltip.visible && tooltip.contact && (
           <div
             className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
             style={{

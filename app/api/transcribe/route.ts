@@ -14,7 +14,7 @@ function getOpenAI(): OpenAI {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const { user, error: authError } = await authenticateRequest(request);
+    const { error: authError } = await authenticateRequest(request);
     if (authError) {
       return authError;
     }

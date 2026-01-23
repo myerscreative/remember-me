@@ -49,8 +49,6 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       return;
     }
 
-    console.log('🔵 [BrainDumpTab] Starting to add memory:', newMemory.substring(0, 50));
-    
     // Optimistically add to UI
     const optimisticMemory: SharedMemory = {
       id: `temp-${Date.now()}`,
@@ -65,13 +63,9 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
     setIsAddingMemory(true); // Using existing state variable name
 
     try {
-      console.log('🔵 [BrainDumpTab] Calling addSharedMemory for contact:', contact.id);
       const result = await addSharedMemory(contact.id, newMemory);
-      
-      console.log('🔵 [BrainDumpTab] addSharedMemory result:', result);
-      
+
       if (result.success) {
-        console.log('✅ [BrainDumpTab] Memory saved successfully');
         toast.success('Memory saved!');
         // Clear optimistic update and refresh to get real data
         setOptimisticMemories([]);

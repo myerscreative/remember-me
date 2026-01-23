@@ -21,8 +21,6 @@ import { getRelationshipHealth } from "@/lib/conversation-helpers";
 import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 import { ArrowRight, RefreshCw } from "lucide-react";
 
-// ... existing imports ...
-
 export function SearchResultCard({ 
   contact, 
   isCompactView, 

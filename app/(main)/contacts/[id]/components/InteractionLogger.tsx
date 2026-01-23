@@ -138,9 +138,7 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
       setIsLogging(true);
       try {
           // Log as "Connection" (Call/Meeting)
-          console.log("🔍 Logging connection:", { contactId, type: 'connection', noteLength: note.length });
           const result = await logHeaderInteraction(contactId, 'connection', note);
-          console.log("📊 Log result:", result);
           
           if (result.success) {
               showNurtureToast(contactName);

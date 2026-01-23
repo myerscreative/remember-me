@@ -249,12 +249,10 @@ export async function addSharedMemory(person_id: string, content: string) {
 
       // Auto-trigger AI processing to extract structured data from the brain dump
       try {
-        console.log('🤖 [DEBUG] addSharedMemory: Triggering AI processing for:', person_id);
         await processMemory(person_id, content, false); // false = don't save again, just extract data
-        console.log('✅ [DEBUG] addSharedMemory: AI processing complete');
       } catch (processError) {
-        console.error('⚠️ [DEBUG] addSharedMemory: AI processing failed (non-fatal):', processError);
         // Don't fail the whole operation if AI processing fails
+        console.error('AI processing failed:', processError);
       }
 
       // Auto-trigger AI summary refresh when memories are added

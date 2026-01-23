@@ -51,7 +51,6 @@ export default function HomePage() {
   // Sorting State
   const [sortOption, setSortOption] = useState<SortOption>("first_name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [migrating, setMigrating] = useState(false);
 
 
   // ... (migrateFavorites stays same)
@@ -559,5 +558,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-// Force redeploy

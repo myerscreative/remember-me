@@ -162,14 +162,6 @@ export default function NewContactPage() {
         throw personError;
       }
 
-      console.log("✅ [Save Debug] Contact saved successfully:", {
-        id: newPerson?.id,
-        email: newPerson?.email,
-        phone: newPerson?.phone,
-        linkedin: newPerson?.linkedin,
-        name: newPerson?.name
-      });
-
       // Handle tags if provided
       if (formData.tags.trim() && newPerson) {
         const tagNames = formData.tags

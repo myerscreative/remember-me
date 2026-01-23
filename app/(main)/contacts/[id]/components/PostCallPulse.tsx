@@ -86,17 +86,13 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
   };
 
   const handleSave = async () => {
-    console.log('🔵 [PostCallPulse] Starting save for contact:', contactId);
     setIsSaving(true);
     try {
         const finalContent = dumpText; 
         
-        console.log('🔵 [PostCallPulse] Calling addSharedMemory with content:', finalContent.substring(0, 50));
         const result = await addSharedMemory(contactId, finalContent);
-        console.log('🔵 [PostCallPulse] addSharedMemory result:', result);
-        
+
         if (result.success) {
-          console.log('✅ [PostCallPulse] Save successful, calling onComplete');
           toast.success("Lore captured!");
           onComplete();
         } else {

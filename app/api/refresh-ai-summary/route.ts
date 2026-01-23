@@ -67,8 +67,6 @@ export async function POST(request: NextRequest) {
       .eq("person_id", contactId)
       .order('created_at', { ascending: false });
 
-    console.log('🤖 [DEBUG] refresh-ai-summary: Fetched memories for', contactId, 'Count:', sharedMemories?.length);
-
     // Build comprehensive context for AI
     const personName = typedPerson.name || `${typedPerson.first_name || ''} ${typedPerson.last_name || ''}`.trim() || 'this person';
 

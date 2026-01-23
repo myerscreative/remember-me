@@ -7,7 +7,6 @@ export async function POST() {
   try {
     const supabase = await createClient();
 
-    // Check if user is authenticated (you might want to add admin check here)
     const {
       data: { user },
       error: userError,
@@ -15,6 +14,12 @@ export async function POST() {
 
     if (userError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Admin check: Only allow specific admin emails to apply migrations
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+    if (!user.email || !adminEmails.includes(user.email.toLowerCase())) {
+      return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
     }
 
     // Read the migration file
