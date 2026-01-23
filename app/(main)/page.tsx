@@ -20,10 +20,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SearchResultCard } from "@/app/contacts/components/SearchResultCard";
+import { SearchResultCard } from "@/app/(main)/contacts/components/SearchResultCard";
 import { ConnectNowModal } from "@/components/contacts/ConnectNowModal";
 import { ErrorFallback } from "@/components/error-fallback";
-import { mockContacts } from "@/app/network/mockContacts"; 
+import { mockContacts } from "@/app/(main)/network/mockContacts"; 
 import { sortContacts, SortOption, SortDirection } from "@/lib/utils/contact-sorting";
 import { ContactListTable } from "@/components/people/ContactListTable";
 

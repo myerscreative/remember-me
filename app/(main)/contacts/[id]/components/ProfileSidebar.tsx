@@ -8,7 +8,7 @@ import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2, S
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
 import { FREQUENCY_PRESETS, getDetailedRelationshipHealth as getRelationshipHealth } from '@/lib/relationship-health';
-import { getRelationshipStatus } from '@/app/network/utils/relationshipStatus';
+import { getRelationshipStatus } from '@/app/(main)/network/utils/relationshipStatus';
 import { cn } from '@/lib/utils';
 import { InteractionLogger } from './InteractionLogger';
 import { getInitials } from '@/lib/utils/contact-helpers';

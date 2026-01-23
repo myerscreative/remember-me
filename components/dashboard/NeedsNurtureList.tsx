@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { getGradient, getInitials, formatBirthday } from "@/lib/utils/contact-helpers";
 import { getMethodIcon, getLastSeenText } from "@/lib/utils/interaction-utils";
 import { UnifiedActionHub } from "@/components/dashboard/UnifiedActionHub";
-import { getRelationshipStatus } from "@/app/network/utils/relationshipStatus";
+import { getRelationshipStatus } from "@/app/(main)/network/utils/relationshipStatus";
 import { getMicroSummaryForList } from "@/lib/utils/summary-levels";
 
 interface NeedsNurtureListProps {
