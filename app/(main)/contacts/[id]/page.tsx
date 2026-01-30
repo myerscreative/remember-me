@@ -223,7 +223,14 @@ export default function ContactDetailPage({
           core_values: person.core_values,
           communication_style: person.communication_style,
           personality_notes: person.personality_notes,
-          mutual_value_introductions: person.mutual_value_introductions
+          mutual_value_introductions: person.mutual_value_introductions,
+          email: person.email,
+          phone: person.phone,
+          address: person.address,
+          city: person.city,
+          state: person.state,
+          zip_code: person.zip_code,
+          country: person.country
       };
 
       setContact(fullContact);
