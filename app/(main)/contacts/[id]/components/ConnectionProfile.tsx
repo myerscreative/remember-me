@@ -589,33 +589,27 @@ export default function ConnectionProfile({
                     </>
                 )}
 
+                </div>
+
                 <div className="grid grid-cols-3 gap-2.5">
                     <ActionButton 
                         icon={<Phone className="w-5 h-5" />} 
                         label="Call" 
                         href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
-                        disabled={!contact.phone} 
+                        onClick={() => !contact.phone && toast.error("No phone number available for this contact.")}
                     />
                     <ActionButton 
                         icon={<Mail className="w-5 h-5" />} 
                         label="Email" 
                         href={contact.email ? `mailto:${contact.email}` : undefined} 
-                        disabled={!contact.email} 
+                        onClick={() => !contact.email && toast.error("No email address available for this contact.")}
                     />
                     
-                    {/* HARDCODED DEBUG BUTTON */}
-                    <ActionButton 
-                        icon={<Mail className="w-5 h-5 text-green-400" />} 
-                        label="Debug Mail" 
-                        href="mailto:test@example.com"
-                        disabled={false}
-                    />
-
                     <ActionButton 
                         icon={<MessageCircle className="w-5 h-5" />} 
                         label="Text" 
                         href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
-                        disabled={!contact.phone} 
+                        onClick={() => !contact.phone && toast.error("No phone number available for this contact.")}
                     />
                 </div>
 
