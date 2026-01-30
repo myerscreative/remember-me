@@ -81,8 +81,6 @@ export default function ContactDetailPage({
   };
 
   // Fetch Data
-  useEffect(() => {
-  // Fetch Data
   const fetchContact = async () => {
     try {
       const supabase = createClient();
