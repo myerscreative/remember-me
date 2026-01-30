@@ -589,8 +589,6 @@ export default function ConnectionProfile({
                     </>
                 )}
 
-                </div>
-
                 <div className="grid grid-cols-3 gap-2.5">
                     <ActionButton 
                         icon={<Phone className="w-5 h-5" />} 
