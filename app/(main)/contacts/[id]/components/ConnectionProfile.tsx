@@ -1103,22 +1103,7 @@ interface ActionButtonProps {
 }
 
 const ActionButton = ({ icon, label, onClick, href, disabled }: ActionButtonProps) => {
-  const handleClick = (e: React.MouseEvent) => {
-    if (disabled) return;
-    
-    if (onClick) {
-      onClick();
-    } else if (href) {
-      e.preventDefault();
-
-      // Reliable navigation for protocols
-      if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('sms:')) {
-          window.location.href = href;
-      } else {
-          window.open(href, '_blank', 'noopener,noreferrer');
-      }
-    }
-  };
+  const baseClasses = "flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group w-full cursor-pointer active:scale-95 relative z-20";
 
   if (disabled) {
     return (
@@ -1129,10 +1114,25 @@ const ActionButton = ({ icon, label, onClick, href, disabled }: ActionButtonProp
     );
   }
 
+  if (href) {
+      return (
+        <a 
+            href={href}
+            onClick={onClick}
+            target={href.startsWith('http') ? '_blank' : undefined}
+            rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+            className={baseClasses}
+        >
+            <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
+            <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>
+        </a>
+      );
+  }
+
   return (
     <button 
-      onClick={handleClick}
-      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group w-full cursor-pointer active:scale-95 relative z-20"
+      onClick={onClick}
+      className={baseClasses}
     >
       <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
       <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>
