@@ -12,9 +12,28 @@ export function CalendarStatus() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
+
+  const checkConnection = useCallback(async () => {
+    if (!session?.user) return;
+    
+    setCheckingStatus(true);
+    try {
+      const response = await fetch('/api/calendar/status');
+      if (response.ok) {
+        const data = await response.json();
+        setIsConnected(data.connected);
+      }
+    } catch (err) {
+      console.error('Error checking calendar status:', err);
+    } finally {
+      setCheckingStatus(false);
+    }
+  }, [session]);
 
   const fetchEvents = useCallback(async () => {
-    if (!session?.accessToken) return;
+    if (!session?.user) return;
 
     setLoading(true);
     setError(null);
@@ -37,9 +56,21 @@ export function CalendarStatus() {
 
   useEffect(() => {
     if (session) {
+      checkConnection();
+    }
+  }, [session, checkConnection]);
+
+  // Re-fetch events when connection status changes to true
+  useEffect(() => {
+    if (isConnected) {
       fetchEvents();
     }
-  }, [session]);
+  }, [isConnected, fetchEvents]);
+
+  const handleConnect = async () => {
+    // Redirect to Google OAuth for calendar permission
+    window.location.href = '/api/auth/google';
+  };
 
   const formatEventTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -62,6 +93,35 @@ export function CalendarStatus() {
   };
 
   if (!session) return null;
+
+  if (checkingStatus) {
+     return (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6 p-8 flex justify-center">
+            <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
+        </div>
+     );
+  }
+
+  if (!isConnected) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
+        <div className="p-6 text-center">
+          <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Connect Your Calendar
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+            Enable automatic meeting prep by connecting your Google Calendar.
+          </p>
+          <Button onClick={handleConnect} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            Connect Google Calendar
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
