@@ -600,7 +600,14 @@ export default function ConnectionProfile({
                         icon={<Mail className="w-5 h-5" />} 
                         label="Email" 
                         href={contact.email ? `mailto:${contact.email}` : undefined} 
-                        onClick={() => !contact.email && toast.error("No email address available for this contact.")}
+                        onClick={() => {
+                            if (!contact.email) {
+                                toast.error("No email address available for this contact.");
+                            } else {
+                                navigator.clipboard.writeText(contact.email);
+                                toast.success("Email copied to clipboard!", { icon: '📋' });
+                            }
+                        }}
                     />
                     
                     <ActionButton 
