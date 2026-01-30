@@ -618,16 +618,6 @@ export default function ConnectionProfile({
                         disabled={!contact.phone} 
                     />
                 </div>
-                
-                {/* VISIBLE DATA DEBUGGING */}
-                <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-400 overflow-hidden break-all">
-                    DEBUG DATA: {JSON.stringify({ 
-                        email: contact.email, 
-                        emailType: typeof contact.email, 
-                        hasEmail: !!contact.email 
-                    })}
-                </div>
-                </div>
 
                 {/* Delete Button - Only show in edit mode */}
                 {isEditingHeader && (
@@ -655,6 +645,7 @@ export default function ConnectionProfile({
             {/* Navigation Tabs - Show below header in Overview */}
             {navigationTabs}
 
+            <div className="flex flex-col gap-6">
                 {/* AI Synopsis */}
                 <AISynopsisCard
                     contactId={contact.id}
@@ -1044,6 +1035,7 @@ export default function ConnectionProfile({
                         </div>
                     )}
                 </div>
+          </div>
           </div>
         )}
         {activeTab === 'Story' && <StoryTab contact={contact} />}
