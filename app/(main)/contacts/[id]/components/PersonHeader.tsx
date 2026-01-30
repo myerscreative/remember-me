@@ -138,7 +138,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         {/* Action Buttons Grid */}
         <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
             {/* Call */}
-            <a href={contact.phone ? `tel:${contact.phone}` : undefined} 
+            <a href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
                  contact.phone 
@@ -164,7 +164,7 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
             </a>
 
             {/* Text */}
-            <a href={contact.phone ? `sms:${contact.phone}` : undefined} 
+            <a href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
                className={cn(
                  "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
                  contact.phone 

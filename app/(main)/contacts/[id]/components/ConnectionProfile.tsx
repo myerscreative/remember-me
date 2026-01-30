@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { Camera } from 'lucide-react';
+import { Camera, Phone, Mail, MessageCircle } from 'lucide-react';
 import { AISynopsisCard } from './tabs/overview/AISynopsisCard';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
@@ -30,9 +30,16 @@ interface ConnectionProfileProps {
   summaryLevel?: any;
   sharedMemory?: any;
   onRefreshAISummary?: () => Promise<void>;
+  onDataUpdate?: () => Promise<void>;
 }
 
-export default function ConnectionProfile({ contact, synopsis, userSettings }: ConnectionProfileProps) {
+export default function ConnectionProfile({ 
+    contact, 
+    synopsis, 
+    userSettings, 
+    onRefreshAISummary, 
+    onDataUpdate 
+}: ConnectionProfileProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Brain Dump'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
@@ -81,7 +88,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
     return getEffectiveSummaryLevel(contact, userSettings);
   }, [contact, userSettings]);
 
-  const handleRefreshAISummary = async () => {
+  const handleLocalRefreshAISummary = async () => {
     try {
         const response = await fetch('/api/refresh-ai-summary', {
             method: 'POST',
@@ -97,7 +104,11 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         if (!response.ok) throw new Error('Failed to refresh summary');
         
         // Refresh the page data
-        router.refresh();
+        if (onDataUpdate) {
+            await onDataUpdate();
+        } else {
+            router.refresh();
+        }
         
     } catch (error) {
         console.error('Error refreshing summary:', error);
@@ -163,7 +174,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
         toast.success("Interaction logged!");
         // Refresh to get the real interaction data from server
-        router.refresh();
+        if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
     } catch (error) {
         console.error('Error logging interaction:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -197,11 +208,11 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         setDeletingInteractionId(null);
 
         // Force a hard refresh to ensure UI updates
-        router.refresh();
+        if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
 
         // Additional refresh after a short delay to ensure data is updated
-        setTimeout(() => {
-            router.refresh();
+        setTimeout(async () => {
+            if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
         }, 100);
     } catch (error) {
         console.error('Error deleting interaction:', error);
@@ -245,7 +256,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         }
 
         // Refresh to show updated interactions
-        router.refresh();
+        if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
     } catch (error) {
         console.error('Error updating interaction:', error);
         alert('An error occurred while updating the interaction');
@@ -257,7 +268,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
         const result = await updateContact(contact.id, headerForm);
         if (result.success) {
             setIsEditingHeader(false);
-            router.refresh();
+            if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
         } else {
             alert('Failed to update profile header');
         }
@@ -283,7 +294,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
           if (result.success) {
               toast.success("Saved successfully!", { id: "save-contact" });
-              router.refresh();
+              if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
           } else {
               toast.error('Failed to update contact info', { id: "save-contact" });
               setIsEditingInfo(true);
@@ -301,7 +312,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
           if (result.success) {
               setIsEditingRelationship(false);
-              router.refresh();
+              if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
           } else {
               alert('Failed to update relationship settings');
           }
@@ -331,7 +342,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
           return;
       }
 
-      // Read file and open crop modal
+      // Reading file first.and open crop modal
       const reader = new FileReader();
       reader.onload = () => {
           setSelectedImageSrc(reader.result as string);
@@ -379,7 +390,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
 
           // Update local state and refresh
           setHeaderForm(prev => ({ ...prev, photo_url: publicUrl }));
-          router.refresh();
+          if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
 
       } catch (error) {
           console.error('Error uploading photo:', error);
@@ -579,9 +590,24 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                 )}
 
                 <div className="grid grid-cols-3 gap-2.5">
-                    <ActionButton icon={<span>📞</span>} label="Call" href={contact.phone ? `tel:${contact.phone}` : undefined} disabled={!contact.phone} />
-                    <ActionButton icon={<span>✉️</span>} label="Email" href={contact.email ? `mailto:${contact.email}` : undefined} disabled={!contact.email} />
-                    <ActionButton icon={<span>💬</span>} label="Text" href={contact.phone ? `sms:${contact.phone}` : undefined} disabled={!contact.phone} />
+                    <ActionButton 
+                        icon={<Phone className="w-5 h-5" />} 
+                        label="Call" 
+                        href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
+                        disabled={!contact.phone} 
+                    />
+                    <ActionButton 
+                        icon={<Mail className="w-5 h-5" />} 
+                        label="Email" 
+                        href={contact.email ? `mailto:${contact.email}` : undefined} 
+                        disabled={!contact.email} 
+                    />
+                    <ActionButton 
+                        icon={<MessageCircle className="w-5 h-5" />} 
+                        label="Text" 
+                        href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
+                        disabled={!contact.phone} 
+                    />
                 </div>
 
                 {/* Delete Button - Only show in edit mode */}
@@ -601,7 +627,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                             }}
                             className="text-xs text-red-400 hover:text-red-300 hover:underline transition-colors"
                         >
-                            🗑️ Delete Contact
+                            <span className="mr-1">🗑️</span> Delete Contact
                         </button>
                     </div>
                 )}
@@ -621,7 +647,7 @@ export default function ConnectionProfile({ contact, synopsis, userSettings }: C
                     lastUpdated={contact.updated_at}
                     isInline={true}
                     onNavigateToStory={() => setActiveTab('Story')}
-                    onRefresh={handleRefreshAISummary}
+                    onRefresh={onRefreshAISummary || handleLocalRefreshAISummary}
                 />
 
                 {/* Contact Info Inline */}
@@ -1057,31 +1083,36 @@ interface ActionButtonProps {
 }
 
 const ActionButton = ({ icon, label, onClick, href, disabled }: ActionButtonProps) => {
-  if (href) {
-    if (disabled) {
-        return (
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/30 border border-[#2d3748] opacity-50 cursor-not-allowed">
-                <div className="text-xl grayscale">{icon}</div>
-                <span className="text-[11px] text-[#64748b] font-medium">{label}</span>
-            </div>
-        );
+  const handleClick = (e: React.MouseEvent) => {
+    if (disabled) return;
+    
+    if (onClick) {
+      onClick();
+    } else if (href) {
+      e.preventDefault();
+
+      // Reliable navigation for protocols
+      if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('sms:')) {
+          window.location.href = href;
+      } else {
+          window.open(href, '_blank', 'noopener,noreferrer');
+      }
     }
+  };
+
+  if (disabled) {
     return (
-      <a 
-        href={href}
-        className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group"
-      >
-        <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
-        <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>
-      </a>
+        <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/30 border border-[#2d3748] opacity-50 cursor-not-allowed w-full relative z-20">
+            <div className="text-xl grayscale">{icon}</div>
+            <span className="text-[11px] text-[#64748b] font-medium">{label}</span>
+        </div>
     );
   }
 
   return (
     <button 
-      onClick={onClick}
-      disabled={disabled}
-      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[#3d4758]"
+      onClick={handleClick}
+      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#2d3748]/50 border border-[#3d4758] hover:border-[#60a5fa] hover:bg-[#2d3748] transition-all group w-full cursor-pointer active:scale-95 relative z-20"
     >
       <div className="text-xl group-hover:scale-110 transition-transform">{icon}</div>
       <span className="text-[11px] text-[#94a3b8] group-hover:text-white font-medium transition-colors">{label}</span>

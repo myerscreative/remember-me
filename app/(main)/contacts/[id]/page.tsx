@@ -82,161 +82,163 @@ export default function ContactDetailPage({
 
   // Fetch Data
   useEffect(() => {
-    async function fetchContact() {
-      try {
-        const supabase = createClient();
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) throw new Error("Not authenticated");
+  // Fetch Data
+  const fetchContact = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error("Not authenticated");
 
-        // 1. Fetch Basic Info
-        const { data: person, error: personError } = await (supabase as any)
-          .from("persons")
-          .select("*")
-          .eq("id", id)
-          .eq("user_id", user.id)
-          .single();
+      // 1. Fetch Basic Info
+      const { data: person, error: personError } = await (supabase as any)
+        .from("persons")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .single();
 
-        if (personError) throw personError;
+      if (personError) throw personError;
 
-        // 1b. Fetch User Settings for summary level preference
-        const { data: userSettings } = await (supabase as any)
-          .from("user_settings")
-          .select("summary_level_default")
-          .eq("user_id", user.id)
-          .single();
+      // 1b. Fetch User Settings for summary level preference
+      const { data: userSettings } = await (supabase as any)
+        .from("user_settings")
+        .select("summary_level_default")
+        .eq("user_id", user.id)
+        .single();
 
-        // 2. Fetch Tags
-        const { data: tagData } = await (supabase as any)
-          .from("person_tags")
-          .select("tags(name)")
-          .eq("person_id", id);
+      // 2. Fetch Tags
+      const { data: tagData } = await (supabase as any)
+        .from("person_tags")
+        .select("tags(name)")
+        .eq("person_id", id);
+      
+      const tags = tagData?.map((t: any) => t.tags.name) || [];
+
+      // 3. Fetch Shared Memories
+      const { data: sharedMemories } = await (supabase as any)
+        .from("shared_memories")
+        .select("id, content, created_at")
+        .eq("person_id", id)
+        .order('created_at', { ascending: false });
+
+      // 3b. Fetch Interactions
+      const { data: interactions } = await (supabase as any)
+        .from("interactions")
+        .select("*")
+        .eq("person_id", id)
+        .order('date', { ascending: false })
+        .limit(10);
+
+      // 4. Fetch Connections (Relationships)
+      // We need both directions: where this person is 'from' OR 'to'
+      const { data: rawRelationships, error: relError } = await (supabase as any)
+        .from("relationships")
+        .select(`
+          id,
+          relationship_type,
+          context,
+          from_person:from_person_id(id, name, photo_url, first_name, last_name),
+          to_person:to_person_id(id, name, photo_url, first_name, last_name)
+        `)
+        .or(`from_person_id.eq.${id},to_person_id.eq.${id}`);
+
+      if (relError) console.error("Error fetching relationships:", relError);
+
+      // Process relationships to get the "other" person
+      const processedConnections = (rawRelationships || []).map((rel: any) => {
+        const isFrom = rel.from_person.id === id;
+        const otherPerson = isFrom ? rel.to_person : rel.from_person;
         
-        const tags = tagData?.map((t: any) => t.tags.name) || [];
-
-        // 3. Fetch Shared Memories
-        const { data: sharedMemories } = await (supabase as any)
-          .from("shared_memories")
-          .select("id, content, created_at")
-          .eq("person_id", id)
-          .order('created_at', { ascending: false });
-
-        // 3b. Fetch Interactions
-        const { data: interactions } = await (supabase as any)
-          .from("interactions")
-          .select("*")
-          .eq("person_id", id)
-          .order('date', { ascending: false })
-          .limit(10);
-
-        // 4. Fetch Connections (Relationships)
-        // We need both directions: where this person is 'from' OR 'to'
-        const { data: rawRelationships, error: relError } = await (supabase as any)
-          .from("relationships")
-          .select(`
-            id,
-            relationship_type,
-            context,
-            from_person:from_person_id(id, name, photo_url, first_name, last_name),
-            to_person:to_person_id(id, name, photo_url, first_name, last_name)
-          `)
-          .or(`from_person_id.eq.${id},to_person_id.eq.${id}`);
-
-        if (relError) console.error("Error fetching relationships:", relError);
-
-        // Process relationships to get the "other" person
-        const processedConnections = (rawRelationships || []).map((rel: any) => {
-          const isFrom = rel.from_person.id === id;
-          const otherPerson = isFrom ? rel.to_person : rel.from_person;
-          
-          return {
-            id: rel.id,
-            relationship_type: rel.relationship_type,
-            context: rel.context,
-            person: otherPerson
-          };
-        });
-
-
-        // 5. Compute effective summary level
-        const effectiveLevel = getEffectiveSummaryLevel(person, userSettings);
-        setEffectiveSummaryLevel(effectiveLevel);
-        setUserSettings(userSettings);
-
-        // Get the appropriate summary at the effective level
-        const summaryAtLevel = getSummaryAtLevel(person, effectiveLevel);
-
-        // Fallback logic for when no summaries exist yet
-        const latestMemory = sharedMemories?.[0]?.content;
-        const storyFallback = [
-            person.where_met ? `**Origin:** ${person.where_met}` : null,
-            person.why_stay_in_contact ? `**Philosophy:** ${person.why_stay_in_contact}` : null,
-            person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
-        ].filter(Boolean).join('\n\n');
-
-        const fallbackContent = [person.deep_lore, storyFallback].filter(Boolean).join('\n\n___\n\n');
-
-        // Use the level-specific summary, or fall back to relationship_summary, or finally to fallback content
-        const baseSummary = summaryAtLevel || person.relationship_summary || fallbackContent || "";
-
-        const fullContact = {
-            ...person,
-            firstName: person.first_name || person.name?.split(" ")[0] || "",
-            lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
-            tags: tags,
-            shared_memories: sharedMemories || [],
-            interactions: interactions || [],
-
-            connections: processedConnections, // Add connections to contact object
-            gift_ideas: person.gift_ideas || [], // Gift Vault
-            story: {
-                whereWeMet: person.where_met,
-                whyStayInContact: person.why_stay_in_contact,
-                whatsImportant: person.most_important_to_them
-            },
-            deep_lore: person.deep_lore,
-            birthday: person.birthday,
-            photo_url: person.photo_url || person.avatar_url, 
-            familyMembers: person.family_members || [],
-            interests: person.interests || [],
-            ai_summary: baseSummary,
-            next_contact_date: person.next_contact_date,
-            last_contact_date: person.last_contacted_date,
-            last_interaction_date: person.last_interaction_date, 
-            importance: person.importance,
-            target_frequency_days: person.target_frequency_days,
-            company: person.company,
-            job_title: person.job_title,
-            current_challenges: person.current_challenges,
-            goals_aspirations: person.goals_aspirations,
-            // 6-Block Structured Data
-            identity_context: person.identity_context,
-            family_personal: person.family_personal,
-            career_craft: person.career_craft,
-            interests_hobbies: person.interests_hobbies,
-            values_personality: person.values_personality,
-            history_touchpoints: person.history_touchpoints,
-            // Additional 6-Block Fields
-            relationship_type: person.relationship_type,
-            life_stage: person.life_stage,
-            career_trajectory: person.career_trajectory,
-            pain_points: person.pain_points,
-            career_goals: person.career_goals,
-            core_values: person.core_values,
-            communication_style: person.communication_style,
-            personality_notes: person.personality_notes,
-            mutual_value_introductions: person.mutual_value_introductions
+        return {
+          id: rel.id,
+          relationship_type: rel.relationship_type,
+          context: rel.context,
+          person: otherPerson
         };
+      });
 
-        setContact(fullContact);
 
-      } catch (err) {
-        console.error("Error loading contact:", err);
-        setError(err instanceof Error ? err.message : "Failed to load contact");
-      } finally {
-        setLoading(false);
-      }
+      // 5. Compute effective summary level
+      const effectiveLevel = getEffectiveSummaryLevel(person, userSettings);
+      setEffectiveSummaryLevel(effectiveLevel);
+      setUserSettings(userSettings);
+
+      // Get the appropriate summary at the effective level
+      const summaryAtLevel = getSummaryAtLevel(person, effectiveLevel);
+
+      // Fallback logic for when no summaries exist yet
+      const latestMemory = sharedMemories?.[0]?.content;
+      const storyFallback = [
+          person.where_met ? `**Origin:** ${person.where_met}` : null,
+          person.why_stay_in_contact ? `**Philosophy:** ${person.why_stay_in_contact}` : null,
+          person.most_important_to_them ? `**Priorities:** ${person.most_important_to_them}` : null
+      ].filter(Boolean).join('\n\n');
+
+      const fallbackContent = [person.deep_lore, storyFallback].filter(Boolean).join('\n\n___\n\n');
+
+      // Use the level-specific summary, or fall back to relationship_summary, or finally to fallback content
+      const baseSummary = summaryAtLevel || person.relationship_summary || fallbackContent || "";
+
+      const fullContact = {
+          ...person,
+          firstName: person.first_name || person.name?.split(" ")[0] || "",
+          lastName: person.last_name || person.name?.split(" ").slice(1).join(" ") || "",
+          tags: tags,
+          shared_memories: sharedMemories || [],
+          interactions: interactions || [],
+
+          connections: processedConnections, // Add connections to contact object
+          gift_ideas: person.gift_ideas || [], // Gift Vault
+          story: {
+              whereWeMet: person.where_met,
+              whyStayInContact: person.why_stay_in_contact,
+              whatsImportant: person.most_important_to_them
+          },
+          deep_lore: person.deep_lore,
+          birthday: person.birthday,
+          photo_url: person.photo_url || person.avatar_url, 
+          familyMembers: person.family_members || [],
+          interests: person.interests || [],
+          ai_summary: baseSummary,
+          next_contact_date: person.next_contact_date,
+          last_contact_date: person.last_contacted_date,
+          last_interaction_date: person.last_interaction_date, 
+          importance: person.importance,
+          target_frequency_days: person.target_frequency_days,
+          company: person.company,
+          job_title: person.job_title,
+          current_challenges: person.current_challenges,
+          goals_aspirations: person.goals_aspirations,
+          // 6-Block Structured Data
+          identity_context: person.identity_context,
+          family_personal: person.family_personal,
+          career_craft: person.career_craft,
+          interests_hobbies: person.interests_hobbies,
+          values_personality: person.values_personality,
+          history_touchpoints: person.history_touchpoints,
+          // Additional 6-Block Fields
+          relationship_type: person.relationship_type,
+          life_stage: person.life_stage,
+          career_trajectory: person.career_trajectory,
+          pain_points: person.pain_points,
+          career_goals: person.career_goals,
+          core_values: person.core_values,
+          communication_style: person.communication_style,
+          personality_notes: person.personality_notes,
+          mutual_value_introductions: person.mutual_value_introductions
+      };
+
+      setContact(fullContact);
+
+    } catch (err) {
+      console.error("Error loading contact:", err);
+      setError(err instanceof Error ? err.message : "Failed to load contact");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchContact();
   }, [id]);
 
@@ -278,6 +280,7 @@ export default function ContactDetailPage({
             summaryLevel={effectiveSummaryLevel}
             sharedMemory={contact.deep_lore || contact.interests?.[0]}
             onRefreshAISummary={handleRefreshAISummary}
+            onDataUpdate={fetchContact}
         />
       </div>
 
