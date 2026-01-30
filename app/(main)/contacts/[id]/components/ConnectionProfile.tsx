@@ -602,12 +602,31 @@ export default function ConnectionProfile({
                         href={contact.email ? `mailto:${contact.email}` : undefined} 
                         disabled={!contact.email} 
                     />
+                    
+                    {/* HARDCODED DEBUG BUTTON */}
+                    <ActionButton 
+                        icon={<Mail className="w-5 h-5 text-green-400" />} 
+                        label="Debug Mail" 
+                        href="mailto:test@example.com"
+                        disabled={false}
+                    />
+
                     <ActionButton 
                         icon={<MessageCircle className="w-5 h-5" />} 
                         label="Text" 
                         href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
                         disabled={!contact.phone} 
                     />
+                </div>
+                
+                {/* VISIBLE DATA DEBUGGING */}
+                <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-400 overflow-hidden break-all">
+                    DEBUG DATA: {JSON.stringify({ 
+                        email: contact.email, 
+                        emailType: typeof contact.email, 
+                        hasEmail: !!contact.email 
+                    })}
+                </div>
                 </div>
 
                 {/* Delete Button - Only show in edit mode */}
