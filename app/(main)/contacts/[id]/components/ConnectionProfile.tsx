@@ -618,15 +618,6 @@ export default function ConnectionProfile({
                     />
                 </div>
 
-                {/* VISIBLE DATA DEBUGGING */}
-                <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-400 overflow-hidden break-all">
-                    DEBUG DATA: {JSON.stringify({ 
-                        email: contact.email, 
-                        emailType: typeof contact.email, 
-                        hasEmail: !!contact.email 
-                    })}
-                </div>
-
                 {/* Delete Button - Only show in edit mode */}
                 {isEditingHeader && (
                     <div className="flex justify-center mt-4">
