@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { encryptToken } from "@/lib/utils/encryption";
+import type { Database } from "@/types/database.types";
 
 /**
  * Google OAuth Callback Route
@@ -69,8 +70,11 @@ export async function GET(request: NextRequest) {
     const expiryDate = new Date();
     expiryDate.setSeconds(expiryDate.getSeconds() + expires_in);
 
-    // Store tokens in database
-    const supabase = await createClient();
+    // Store tokens in database using Service Role to bypass RLS
+    const supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     
     // Get user from state or current session
     const userId = state;
@@ -94,7 +98,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { error: dbError } = await (supabase as any)
+    const { error: dbError } = await supabase
       .from("calendar_preferences")
       .upsert({
         user_id: userId,
@@ -105,6 +109,7 @@ export async function GET(request: NextRequest) {
         token_expiry: expiryDate.toISOString(),
         last_sync_at: new Date().toISOString(),
         notification_time: 30, // Default to 30 minutes
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any, {
         onConflict: "user_id",
       });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/supabase/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/auth-options";
 
 /**
  * Google OAuth Initiation Route
@@ -8,10 +9,14 @@ import { authenticateRequest } from "@/lib/supabase/auth";
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-    const { user, error: authError } = await authenticateRequest(request);
-    if (authError) {
-      return authError;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+       return NextResponse.json(
+        { error: "Unauthorized - Please log in" },
+        { status: 401 }
+      );
     }
+    const userId = session.user.id;
 
     // Check for required environment variables
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -34,7 +39,7 @@ export async function GET(request: NextRequest) {
     authUrl.searchParams.append("scope", "https://www.googleapis.com/auth/calendar.readonly");
     authUrl.searchParams.append("access_type", "offline"); // Get refresh token
     authUrl.searchParams.append("prompt", "consent"); // Force consent to get refresh token
-    authUrl.searchParams.append("state", user.id); // Pass user ID for security
+    authUrl.searchParams.append("state", userId); // Pass user ID for security
 
     // Redirect to Google OAuth
     return NextResponse.redirect(authUrl.toString());
