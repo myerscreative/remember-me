@@ -202,7 +202,7 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
 
   const containerClasses = cn(
     "flex flex-col sm:flex-row gap-4 p-5 bg-gray-50 dark:bg-gray-800/50 border-2 rounded-2xl cursor-pointer transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5",
-    isFirstMeeting ? "border-amber-200 dark:border-amber-800/50 bg-linear-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/5" : "border-gray-200 dark:border-gray-700"
+    "border-gray-200 dark:border-gray-700"
   );
 
   return (
