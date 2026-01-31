@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     );
     const { data: contacts, error: contactsError } = await supabase
       .from('persons')
-      .select('id, name, email, role, company, photo_url')
+      .select('id, name, email, job_title, company, photo_url')
       .eq('user_id', session.user.id);
 
     if (contactsError) {
@@ -43,10 +43,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Map job_title to role for the matching interface
+    type ContactRow = { id: string; name: string; email: string | null; job_title: string | null; company: string | null; photo_url: string | null };
+    const contactsWithRole = ((contacts ?? []) as ContactRow[]).map(contact => ({
+      id: contact.id,
+      name: contact.name,
+      email: contact.email,
+      role: contact.job_title,
+      company: contact.company,
+      photo_url: contact.photo_url,
+    }));
+
     // Match events to contacts
     const matchingResult = EmailMatcher.matchMultipleEvents(
       events,
-      contacts || []
+      contactsWithRole
     );
 
     // Filter to only matched meetings
