@@ -291,7 +291,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 <h2 className="text-lg font-bold text-foreground leading-tight">{person.name}</h2>
                 <div className="flex items-center gap-2">
                    <Badge variant="outline" className={cn("text-[10px] uppercase tracking-wider h-5 px-1.5 font-bold border-white/10 bg-white/5", statusColor, statusBg, statusBorder)}>
-                      {person.relationship_type || "Contact"}
+                      {person.job_title || "Contact"}
                    </Badge>
                 </div>
              </div>
