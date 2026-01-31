@@ -1039,7 +1039,7 @@ export default function ConnectionProfile({
         )}
         {activeTab === 'Story' && <StoryTab contact={contact} />}
         {activeTab === 'Family' && <FamilyTab contact={contact} />}
-        {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
+        {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} onDataUpdate={onDataUpdate} />}
       </div>
 
       {/* RIGHT COLUMN - SIDEBAR */}

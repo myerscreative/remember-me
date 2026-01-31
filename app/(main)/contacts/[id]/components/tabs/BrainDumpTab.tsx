@@ -25,9 +25,10 @@ interface BrainDumpTabProps {
     last_name?: string;
     shared_memories?: SharedMemory[];
   };
+  onDataUpdate?: () => Promise<void>;
 }
 
-export function BrainDumpTab({ contact }: BrainDumpTabProps) {
+export function BrainDumpTab({ contact, onDataUpdate }: BrainDumpTabProps) {
   const router = useRouter();
   const [showPostCallPulse, setShowPostCallPulse] = useState(false);
   const [newMemory, setNewMemory] = useState('');
@@ -69,7 +70,12 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
         toast.success('Memory saved!');
         // Clear optimistic update and refresh to get real data
         setOptimisticMemories([]);
-        router.refresh(); // Refresh the page data to show the new memory
+        // Use onDataUpdate to refetch data properly in client component
+        if (onDataUpdate) {
+          await onDataUpdate();
+        } else {
+          router.refresh();
+        }
       } else {
         console.error('❌ [BrainDumpTab] Failed to save memory:', result.error);
         toast.error(result.error || 'Failed to save memory');
@@ -138,7 +144,12 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       setShowReviewModal(false);
       setPendingChanges(null);
       toast.success('Changes saved successfully!');
-      router.refresh();
+      // Use onDataUpdate to refetch data properly in client component
+      if (onDataUpdate) {
+        await onDataUpdate();
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save changes');
@@ -274,8 +285,13 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           onComplete={async () => {
             setShowPostCallPulse(false);
             toast.success("Brain dump saved! Analyzing for updates...", { duration: 3000 });
-            router.refresh();
-            
+            // Use onDataUpdate to refetch data properly in client component
+            if (onDataUpdate) {
+              await onDataUpdate();
+            } else {
+              router.refresh();
+            }
+
             // Trigger auto-reprocess after a short delay to allow DB propagation
             setTimeout(() => {
               handleReprocessMemories();
