@@ -68,6 +68,49 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
     }
   }, [isOpen, initialMethod]);
 
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
+
+  // ... (existing useEffects)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+
+      // 1. Optimistic UI update
+      setOptimisticLastContact(new Date().toISOString());
+
+      try {
+          // 2. Log Interaction (Updates Last Contact & Blooming status)
+          const interactionResult = await logInteraction({
+              personId: person.id,
+              type: selectedType,
+              note: note.trim() || undefined,
+              date: date ? new Date(date).toISOString() : undefined,
+          });
+
+          // 3. Update 'The Story' if note exists (Per user request for unified persistence)
+          if (note.trim()) {
+              await updatePersonMemory(person.id, note.trim());
+          }
+
+          if (interactionResult.success) {
+              toast.success("Connection Logged & Status Updated! 🌱");
+              onAction(selectedType, note);
+              setNote("");
+              setDate(new Date().toISOString().split('T')[0]); // Reset date
+              setNextGoal(""); // Clear next goal
+              setContextBrief(null); // Invalidate brief to force refresh with new context
+              onClose();
+          } else {
+              toast.error("Failed to log interaction");
+          }
+      } catch {
+          toast.error("Something went wrong");
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
   // Fetch history & generate status/script on Open
   React.useEffect(() => {
     if (isOpen) {
@@ -208,43 +251,6 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const statusBorder = !lastContactDate ? "border-slate-500/30" : (isFading ? "border-orange-500/30" : "border-emerald-500/30");
   const statusBg = !lastContactDate ? "bg-slate-500/10" : (isFading ? "bg-orange-500/10" : "bg-emerald-500/10");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsSubmitting(true);
-
-      // 1. Optimistic UI update
-      setOptimisticLastContact(new Date().toISOString());
-
-      try {
-          // 2. Log Interaction (Updates Last Contact & Blooming status)
-          const interactionResult = await logInteraction({
-              personId: person.id,
-              type: selectedType,
-              note: note.trim() || undefined,
-          });
-
-          // 3. Update 'The Story' if note exists (Per user request for unified persistence)
-          if (note.trim()) {
-              await updatePersonMemory(person.id, note.trim());
-          }
-
-          if (interactionResult.success) {
-              toast.success("Connection Logged & Status Updated! 🌱");
-              onAction(selectedType, note);
-              setNote("");
-              setNextGoal(""); // Clear next goal
-              setContextBrief(null); // Invalidate brief to force refresh with new context
-              onClose();
-          } else {
-              toast.error("Failed to log interaction");
-          }
-      } catch {
-          toast.error("Something went wrong");
-      } finally {
-          setIsSubmitting(false);
-      }
-  };
-
   const handleCopyScript = () => {
       navigator.clipboard.writeText(generatedScript);
       setCopied(true);
@@ -264,162 +270,65 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      {/* High-Contrast Stage: Responsive */}
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl p-0 overflow-hidden gap-0 duration-300">
-        <DialogTitle className="sr-only">Unified Action Hub for {person.name}</DialogTitle>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-border/50 text-foreground shadow-2xl overflow-hidden p-0 gap-0">
+        <DialogTitle className="sr-only">Log Interaction with {person.name}</DialogTitle>
         
-        {/* Header / Banner */}
-        <div className="relative h-32 bg-linear-to-r from-[#0F172A] via-[#1E1B4B] to-[#0F172A]">
-             <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.png')] opacity-20 pointer-events-none mix-blend-overlay" />
-             <div className="absolute inset-0 bg-linear-to-t from-[#0F172A] via-transparent to-transparent" />
-             
-             <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute top-3 right-3 text-slate-400 hover:text-white hover:bg-white/10 z-10 rounded-full"
-                onClick={onClose}
-             >
-                 <X className="h-5 w-5" />
-             </Button>
-
-             {/* Profile Avatar Stage */}
-             <div className="absolute bottom-2 left-6 flex items-end gap-4 z-10">
-                <Avatar className="h-20 w-20 border-4 border-[#0F172A] shadow-2xl ring-2 ring-indigo-500/30">
-                    <AvatarImage src={person.photo_url || undefined} className="object-cover" />
-                    <AvatarFallback className={cn("text-2xl text-white font-bold bg-slate-800")}>
-                        {getInitials(person.first_name, person.last_name)}
-                    </AvatarFallback>
+        {/* Header Section */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border/40 shrink-0 bg-background/50">
+          <div className="flex items-center gap-3">
+             <div className="relative">
+                <Avatar className="h-10 w-10 border-2 border-white/10 shadow-sm">
+                  <AvatarImage src={person.avatar_url || undefined} alt={person.name} className="object-cover" />
+                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium text-sm">
+                    {getInitials(person.name)}
+                  </AvatarFallback>
                 </Avatar>
-                <div className="mb-2">
-                    <h2 className="text-xl font-bold text-white tracking-tight leading-none drop-shadow-md">{person.name}</h2>
-                    <div className="flex items-center gap-2 mt-1.5">
-                         <Badge variant="outline" className={cn("uppercase text-[9px] tracking-widest font-bold px-1.5 py-0 border", statusColor, statusBorder, statusBg)}>
-                            {person.relationship_value || 'Contact'} 
-                        </Badge>
-                        <span className="text-[10px] text-slate-400 flex items-center gap-1 font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/5">
-                            <MapPin className="h-3 w-3" /> {(person as any).location || "San Diego, CA"}
-                        </span>
-                    </div>
+                {/* Online Indicator (Optional) */}
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-background rounded-full"></div>
+             </div>
+             <div>
+                <h2 className="text-lg font-bold text-foreground leading-tight">{person.name}</h2>
+                <div className="flex items-center gap-2">
+                   <Badge variant="outline" className={cn("text-[10px] uppercase tracking-wider h-5 px-1.5 font-bold border-white/10 bg-white/5", statusColor, statusBg, statusBorder)}>
+                      {person.relationship_type || "Contact"}
+                   </Badge>
                 </div>
              </div>
+          </div>
+          
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <X className="h-4 w-4 text-muted-foreground" />
+          </Button>
         </div>
 
-        {/* Actionable Script Box */}
-        <div className="px-6 pb-2 relative z-20 -mt-2">
-             <div className="relative overflow-hidden bg-[var(--conversation-starter-bg,rgba(139,92,246,0.1))] border border-[var(--conversation-starter-border,rgba(139,92,246,0.3))] rounded-xl p-3 shadow-lg group">
-                 <div className="absolute right-2 top-2">
-                     <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-6 w-6 text-[var(--conversation-starter-text)] hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-all"
-                        onClick={handleCopyScript}
-                     >
-                        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                     </Button>
-                 </div>
-                 
-                 <div className="flex gap-2 mb-1.5 justify-between items-start">
-                     <div className="flex gap-2">
-                        <Sparkles className="h-3.5 w-3.5 text-[var(--conversation-starter-text)] mt-0.5" />
-                        <p className="text-[10px] uppercase font-bold text-[var(--conversation-starter-text)] tracking-widest pt-0.5">Conversation Starter</p>
-                     </div>
-                     {goalUsed && !isGeneratingScript && (
-                         <span className="text-[9px] text-indigo-400 font-medium italic border border-indigo-400/20 bg-indigo-400/10 px-1.5 py-0.5 rounded-md">
-                             Drafted based on goal: "{goalUsed.length > 20 ? goalUsed.substring(0, 20) + '...' : goalUsed}"
-                         </span>
-                     )}
-                 </div>
-                 
-                 <p className="text-sm text-[var(--conversation-starter-text)] font-medium leading-relaxed italic pr-6 text-opacity-90">
-                     {isGeneratingScript ? (
-                         <span className="opacity-50 animate-pulse">Designing the perfect approach...</span>
-                     ) : (
-                         `"${generatedScript || "Hey, thinking of you! Hope all is well."}"`
-                     )}
-                 </p>
-             </div>
+        <div className="flex mx-6 mt-4 mb-2 bg-slate-100 dark:bg-slate-900/50 rounded-lg p-1 border border-border/40">
+           <button
+             onClick={() => setActiveTab('log')}
+             className={cn(
+               "flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-200",
+               activeTab === 'log' 
+                 ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                 : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+             )}
+           >
+             <span className="text-base">✨</span> Log Action
+           </button>
+           <button
+             onClick={() => setActiveTab('history')}
+             className={cn(
+               "flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-200",
+               activeTab === 'history' 
+                 ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                 : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+             )}
+           >
+             <span className="text-base">📜</span> History
+           </button>
         </div>
 
-        {/* Deep Lore Sections (Compact) */}
-        <ScrollArea className="px-6 h-[80px]">
-            <div className="space-y-4 pb-2">
-                <div className="space-y-1.5">
-                    <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-                        <Lightbulb className="h-3 w-3 text-amber-400" /> Contextual Updates
-                    </h3>
-                    <div className="flex flex-wrap gap-1.5">
-                        {interests.slice(0, 5).map((interest: string, idx: number) => (
-                            <span key={idx} className="cursor-pointer inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white transition-all">
-                                {interest}
-                            </span>
-                        ))}
-                        {interests.length === 0 && <span className="text-[10px] text-slate-600 italic">No interests yet.</span>}
-                    </div>
-                </div>
-
-                {/* Shared Connections */}
-                {mutuals.length > 0 && (
-                    <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">
-                        <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-                           Shared Connections
-                        </h3>
-                        <div className="flex items-center gap-1">
-                             <div className="flex -space-x-2">
-                                {mutuals.slice(0, 3).map((mutual) => (
-                                    <Avatar 
-                                      key={mutual.id} 
-                                      className="h-6 w-6 border border-[#0F172A] cursor-pointer hover:z-10 hover:scale-110 transition-transform"
-                                      onClick={() => {
-                                         onClose();
-                                         router.push(`/contacts/${mutual.connected_person.id}`);
-                                      }}
-                                    >
-                                        <AvatarImage src={mutual.connected_person.photo_url || undefined} />
-                                        <AvatarFallback className="text-[8px] bg-slate-700 text-slate-300">
-                                            {getInitials(mutual.connected_person.first_name, mutual.connected_person.last_name)}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                ))}
-                             </div>
-                             <span className="text-[10px] text-slate-400 ml-2">
-                                You both know {mutuals[0].connected_person.first_name} {mutuals.length > 1 && `+ ${mutuals.length - 1} others`}
-                             </span>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </ScrollArea>
-
-        {/* UNIFIED ACTION GRID & MEMORY LOG */}
-        <div className="p-4 bg-muted/30 border-t border-border space-y-4 z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] min-h-[340px]">
-             
-             {/* Tab Switcher */}
-             <div className="flex p-1 bg-muted rounded-xl mb-4 border border-border">
-                <button
-                    onClick={() => setActiveTab('log')}
-                    className={cn(
-                        "flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
-                        activeTab === 'log' 
-                            ? "bg-background text-foreground shadow-sm ring-1 ring-border" 
-                            : "text-muted-foreground hover:text-foreground"
-                    )}
-                >
-                    Log Action
-                </button>
-                <button
-                    onClick={() => setActiveTab('history')}
-                    className={cn(
-                        "flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
-                        activeTab === 'history' 
-                            ? "bg-background text-foreground shadow-sm ring-1 ring-border" 
-                            : "text-muted-foreground hover:text-foreground"
-                    )}
-                >
-                    History
-                </button>
-             </div>
-
+        <ScrollArea className="flex-1 max-h-[60vh]">
+         <div className="p-6 pt-2">
              {activeTab === 'log' ? (
                <>
                  {/* 6-Tile Grid */}
@@ -456,6 +365,19 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     })}
                   </div>
                 </div>
+
+                 {/* Date Picker */}
+                 <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-50 mt-4">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
+                       When?
+                    </label>
+                    <input 
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] transition-all text-sm scheme-dark"
+                    />
+                 </div>
 
                  {/* Unified Story Input */}
                  <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-75">
@@ -573,6 +495,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 </div>
              )}
         </div>
+        </ScrollArea>
 
       </DialogContent>
     </Dialog>

@@ -48,6 +48,7 @@ export default function LogInteractionModal({
 }: LogInteractionModalProps) {
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
   const [note, setNote] = useState(initialNote);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
   const [loadingInteractions, setLoadingInteractions] = useState(false);
@@ -72,6 +73,7 @@ export default function LogInteractionModal({
         personId: contact.id,
         type: selectedType,
         note: note.trim() || undefined,
+        date: date ? new Date(date).toISOString() : undefined,
       });
 
       if (result.success) {
@@ -80,6 +82,7 @@ export default function LogInteractionModal({
         toast.success(randomMessage, { icon: '🌱', duration: 4000 });
         await loadInteractions();
         setNote('');
+        setDate(new Date().toISOString().split('T')[0]); // Reset date to today
         onSuccess?.();
         setTimeout(() => {
           onClose();
@@ -110,7 +113,7 @@ export default function LogInteractionModal({
       />
       
       {/* Modal Container - Matches Lore Card */}
-      <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-[90vh] sm:h-auto overflow-y-auto">
         
         {/* DEPLOYMENT CHECK BANNER */}
         <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
@@ -229,6 +232,19 @@ export default function LogInteractionModal({
                 );
               })}
             </div>
+          </div>
+
+          {/* Date Picker */}
+          <div>
+             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+               When did this happen?
+             </label>
+             <input 
+                 type="date"
+                 value={date}
+                 onChange={(e) => setDate(e.target.value)}
+                 className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all [color-scheme:dark]"
+             />
           </div>
 
           {/* Note */}

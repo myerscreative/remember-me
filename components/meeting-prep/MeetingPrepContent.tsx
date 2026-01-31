@@ -4,23 +4,22 @@ import { useState } from "react";
 import { CalendarStatus } from "@/components/calendar/CalendarStatus";
 import { MatchedEventsList } from "@/components/calendar/MatchedEventsList";
 import { UpcomingMeetingsWidget } from "@/components/meeting-prep/UpcomingMeetingsWidget";
-import { MeetingPrepOverlay } from "@/components/meeting-prep/MeetingPrepOverlay";
-import { mockUpcomingMeetings } from "@/lib/data/mock-meetings";
+import { MeetingPrepOverlayReal } from "@/components/meeting-prep/MeetingPrepOverlayReal";
 
 export function MeetingPrepContent() {
-  const [prepMeetingId, setPrepMeetingId] = useState<string | null>(null);
+  const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
       {/* Calendar Connection Status */}
       <CalendarStatus />
-      
-      {/* Upcoming Meetings Widget */}
-      <UpcomingMeetingsWidget onOpenPrep={(id) => setPrepMeetingId(id)} />
-      
+
+      {/* Upcoming Meetings Widget - now uses real data */}
+      <UpcomingMeetingsWidget onOpenPrep={(id) => setSelectedMeetingId(id)} />
+
       {/* Matched Events List */}
       <MatchedEventsList />
-      
+
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -28,30 +27,30 @@ export function MeetingPrepContent() {
           <p className="text-3xl font-bold text-gray-900 dark:text-white">Active</p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">meetings</p>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Ready to Prep</p>
           <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Check</p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">with contacts</p>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
           <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">Live</p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">updates</p>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Priority</p>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">Top</p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">important</p>
         </div>
       </div>
-      
+
       {/* Tips Section */}
-      <div className="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-8 border border-indigo-200 dark:border-indigo-800">
+      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-8 border border-indigo-200 dark:border-indigo-800">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          💡 Pro Tips
+          Pro Tips
         </h3>
         <div className="space-y-3">
           <div className="flex items-start gap-3">
@@ -81,11 +80,11 @@ export function MeetingPrepContent() {
         </div>
       </div>
 
-      {/* Meeting Prep Overlay */}
-      <MeetingPrepOverlay 
-        meeting={mockUpcomingMeetings.find(m => m.id === prepMeetingId) || null} 
-        isOpen={!!prepMeetingId} 
-        onClose={() => setPrepMeetingId(null)} 
+      {/* Meeting Prep Overlay - uses real data */}
+      <MeetingPrepOverlayReal
+        meetingId={selectedMeetingId}
+        isOpen={!!selectedMeetingId}
+        onClose={() => setSelectedMeetingId(null)}
       />
     </div>
   );

@@ -14,6 +14,12 @@ export function CalendarStatus() {
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Track mount state to avoid hydration mismatch with date formatting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const checkConnection = useCallback(async () => {
     if (!session?.user) return;
@@ -73,11 +79,13 @@ export function CalendarStatus() {
   };
 
   const formatEventTime = (dateString: string) => {
+    if (!mounted) return '--:--';
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const getEventDate = (dateString: string) => {
+    if (!mounted) return '';
     const date = new Date(dateString);
     const today = new Date();
     const tomorrow = new Date(today);

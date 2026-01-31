@@ -10,6 +10,12 @@ export function MatchedEventsList() {
   const [stats, setStats] = useState<MatchingResult['stats'] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Track mount state to avoid hydration mismatch with date formatting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchMatchedEvents = useCallback(async () => {
     if (!session?.accessToken) return;
@@ -124,14 +130,14 @@ export function MatchedEventsList() {
                   </div>
 
                   {/* Time */}
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                    📅 {new Date(meeting.calendarEvent.start.dateTime).toLocaleString('en-US', {
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3" suppressHydrationWarning>
+                    📅 {mounted ? new Date(meeting.calendarEvent.start.dateTime).toLocaleString('en-US', {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',
                       hour: 'numeric',
                       minute: '2-digit',
-                    })}
+                    }) : '--'}
                   </p>
 
                   {/* Matched Contacts */}

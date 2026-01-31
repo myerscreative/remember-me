@@ -16,7 +16,7 @@ export type InteractionResult =
   | { success: true; error?: never }
   | { success: false; error: string; details?: any };
 
-export async function logInteraction({ personId, type, note }: LogInteractionInput): Promise<InteractionResult> {
+export async function logInteraction({ personId, type, note, date }: LogInteractionInput & { date?: string }): Promise<InteractionResult> {
   const supabase = await createClient();
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -25,38 +25,65 @@ export async function logInteraction({ personId, type, note }: LogInteractionInp
     return { success: false, error: 'Not authenticated', details: userError };
   }
 
-  const now = new Date().toISOString();
+  // Use provided date or fallback to now
+  const interactionDate = date ? new Date(date).toISOString() : new Date().toISOString();
+  // For last_contact, we generally want the *latest* interaction date. 
+  // However, if we are backdating, we should check if this is actually the latest interaction 
+  // before updating the PERSON level stats. 
+  // For simplicity (and typical user intent of "I forgot to log this yesterday"), 
+  // we will update the person's last_interaction_date to this date IF it is newer than what they have,
+  // OR if they haven't been contacted in a while. 
+  // Actually, to keep it simple and consistent with user request "I need to set the date", 
+  // we will trust the user. But wait, if they backdate to 2010, we don't want to reset "last_contact" to 2010 if they contacted them yesterday.
+  
+  // So: 
+  // 1. Insert interaction with the specific date.
+  // 2. Fetch current person data to compare dates.
+  // 3. Only update person.last_interaction_date if the new date is AFTER the current last_interaction_date.
 
   try {
-    // Insert interaction record and update person's last_interaction_date in parallel
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [interactionResult, updateResult] = await Promise.all([
-      (supabase as any).from('interactions').insert({
-        person_id: personId,
-        user_id: user.id,
-        type,
-        date: now, // Required: interaction timestamp
-        // Map 'note' input to 'notes' column to match standard schema
-        notes: note || null,
-        // next_goal_note removed - column doesn't exist in database schema
-      }),
-      (supabase as any).from('persons').update({
-        last_interaction_date: now,
-        last_contact: now.split('T')[0], // Also update last_contact for backwards compatibility
-      }).eq('id', personId).eq('user_id', user.id),
-    ]);
+    // 1. Fetch current person stats
+    const { data: person, error: personError } = await (supabase as any)
+      .from('persons')
+      .select('last_interaction_date')
+      .eq('id', personId)
+      .single();
 
-    if (interactionResult.error) {
-      console.error('Error inserting interaction:', interactionResult.error);
-      return { success: false, error: interactionResult.error.message || 'Failed to log interaction', details: interactionResult.error };
+    if (personError) throw personError;
+
+    const currentLastInteraction = person.last_interaction_date ? new Date(person.last_interaction_date).getTime() : 0;
+    const newInteractionTime = new Date(interactionDate).getTime();
+    
+    const shouldUpdatePersonStats = newInteractionTime > currentLastInteraction;
+
+    // 2. Insert interaction
+    const { error: insertError } = await (supabase as any).from('interactions').insert({
+      person_id: personId,
+      user_id: user.id,
+      type,
+      date: interactionDate,
+      notes: note || null,
+    });
+
+    if (insertError) {
+      console.error('Error inserting interaction:', insertError);
+      return { success: false, error: insertError.message || 'Failed to log interaction', details: insertError };
     }
 
-    if (updateResult.error) {
-      console.error('Error updating person:', updateResult.error);
-      return { success: false, error: updateResult.error.message || 'Failed to update contact', details: updateResult.error };
+    // 3. Update person stats ONLY if this is a newer interaction
+    if (shouldUpdatePersonStats) {
+       const { error: updateError } = await (supabase as any).from('persons').update({
+        last_interaction_date: interactionDate,
+        last_contact: interactionDate.split('T')[0], 
+      }).eq('id', personId).eq('user_id', user.id);
+
+      if (updateError) {
+        console.error('Error updating person:', updateError);
+        // We don't fail the whole request if just the person update fails, but we log it.
+      }
     }
 
-    // Revalidate the garden page to show updated positions
+    // Revalidate
     revalidatePath('/garden');
     revalidatePath('/');
     
