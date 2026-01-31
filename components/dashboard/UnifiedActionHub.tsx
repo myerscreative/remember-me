@@ -279,7 +279,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
           <div className="flex items-center gap-3">
              <div className="relative">
                 <Avatar className="h-10 w-10 border-2 border-white/10 shadow-sm">
-                  <AvatarImage src={person.avatar_url || undefined} alt={person.name} className="object-cover" />
+                  <AvatarImage src={person.photo_url || undefined} alt={person.name} className="object-cover" />
                   <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium text-sm">
                     {getInitials(person.name)}
                   </AvatarFallback>
