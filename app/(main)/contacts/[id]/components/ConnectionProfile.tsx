@@ -909,12 +909,53 @@ export default function ConnectionProfile({
                                             <div className="flex flex-col gap-2">
                                                 <div>
                                                     <label className="text-[#94a3b8] text-[11px] font-medium mb-1 block">Date & Time</label>
-                                                    <input
-                                                        type="datetime-local"
-                                                        className="w-full bg-[#0a0e1a] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white [color-scheme:dark]"
-                                                        value={editInteractionForm.date}
-                                                        onChange={(e) => setEditInteractionForm({...editInteractionForm, date: e.target.value})}
-                                                    />
+                                                    <div className="flex gap-2">
+                                                        <div className="flex-1">
+                                                            <DatePicker
+                                                                date={editInteractionForm.date ? new Date(editInteractionForm.date) : undefined}
+                                                                setDate={(newDate) => {
+                                                                    if (!newDate) return;
+                                                                    const current = new Date(editInteractionForm.date);
+                                                                    // Keep time, change date
+                                                                    newDate.setHours(current.getHours());
+                                                                    newDate.setMinutes(current.getMinutes());
+                                                                    // Adjust for timezone offset to keep local time consistent if needed, 
+                                                                    // but here we are working with Date objects.
+                                                                    // The form expects a string for the time input though?
+                                                                    // Let's stick to using the local datetime string state 'date' 
+                                                                    // but we need to update it properly.
+                                                                    
+                                                                    // Actually, to avoid TZ mess, let's treat the state 'date' as the source of truth ISO string
+                                                                    // But wait, handleStartEditInteraction sets it to "YYYY-MM-DDTHH:mm" (local)
+                                                                    
+                                                                    // Let's reconstruct the local string
+                                                                    const timePart = editInteractionForm.date.split('T')[1];
+                                                                    const year = newDate.getFullYear();
+                                                                    const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                                                                    const day = String(newDate.getDate()).padStart(2, '0');
+                                                                    
+                                                                    setEditInteractionForm({
+                                                                        ...editInteractionForm,
+                                                                        date: `${year}-${month}-${day}T${timePart}`
+                                                                    });
+                                                                }}
+                                                                className="w-full bg-[#0a0e1a] border-[#3d4758] text-white hover:bg-[#1a1f2e] hover:text-white justify-start text-left font-normal h-9"
+                                                            />
+                                                        </div>
+                                                        <input
+                                                            type="time"
+                                                            className="bg-[#0a0e1a] border border-[#3d4758] rounded-md px-2 text-[13px] text-white focus:border-[#60a5fa] outline-none h-9 [color-scheme:dark]"
+                                                            value={editInteractionForm.date.split('T')[1]}
+                                                            onChange={(e) => {
+                                                                const newTime = e.target.value;
+                                                                const datePart = editInteractionForm.date.split('T')[0];
+                                                                setEditInteractionForm({
+                                                                    ...editInteractionForm,
+                                                                    date: `${datePart}T${newTime}`
+                                                                });
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <label className="text-[#94a3b8] text-[11px] font-medium mb-1 block">Notes</label>
@@ -954,7 +995,7 @@ export default function ConnectionProfile({
                                                         {interaction.notes?.replace('[Attempt] ', '') || 'No notes'}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
+                                                <div className="flex gap-1 shrink-0">
                                                     <button
                                                         onClick={() => handleStartEditInteraction(interaction)}
                                                         className="text-[#64748b] hover:text-[#60a5fa] p-1 rounded transition-colors"
