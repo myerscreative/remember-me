@@ -20,6 +20,7 @@ import { updateInteraction } from '@/app/actions/update-interaction';
 import { deleteContact } from '@/app/actions/delete-contact';
 import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
 import { UserSettings } from '@/lib/utils/summary-levels';
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface ConnectionProfileProps {
   contact: any;
@@ -44,6 +45,7 @@ export default function ConnectionProfile({
   const [activeTab, setActiveTab] = useState<'Overview' | 'Story' | 'Family' | 'Brain Dump'>('Overview');
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
+  const [logDate, setLogDate] = useState<Date | undefined>(new Date());
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
   const [editingInteractionId, setEditingInteractionId] = useState<string | null>(null);
@@ -146,7 +148,7 @@ export default function ConnectionProfile({
     const optimisticInteraction = {
         id: `temp-${Date.now()}`,
         person_id: contact.id,
-        date: new Date().toISOString(),
+        date: logDate?.toISOString() || new Date().toISOString(),
         notes: logType === 'attempt' ? `[Attempt] ${logNote}` : logNote,
         created_at: new Date().toISOString()
     };
@@ -154,13 +156,16 @@ export default function ConnectionProfile({
     // Optimistically add to interactions list
     setInteractions(prev => [optimisticInteraction, ...prev]);
     setLogNote('');
+    const currentDate = new Date();
+    setLogDate(currentDate); // Optimistically reset date
     setLogType('connection');
     
     try {
         const result = await logHeaderInteraction(
             contact.id,
             logType,
-            logNote
+            logNote,
+            logDate?.toISOString()
         );
 
         if (!result.success) {
@@ -169,6 +174,8 @@ export default function ConnectionProfile({
             toast.error(`Failed to log: ${result.error}`);
             // Remove optimistic interaction on failure
             setInteractions(prev => prev.filter(i => i.id !== optimisticInteraction.id));
+            setLogNote(logNote); // Restore note
+            setLogDate(logDate); // Restore date
             return;
         }
 
@@ -181,6 +188,7 @@ export default function ConnectionProfile({
         toast.error(`Failed to log: ${errorMessage}`);
         // Remove optimistic interaction on error
         setInteractions(prev => prev.filter(i => i.id !== optimisticInteraction.id));
+        setLogNote(logNote); // Restore note
     } finally {
         setIsLogging(false);
     }
@@ -844,6 +852,14 @@ export default function ConnectionProfile({
                 {/* Log Interaction Card */}
                 <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
                     <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3">Log Interaction</div>
+                    
+                    <div className="mb-3">
+                         <DatePicker 
+                            date={logDate}
+                            setDate={setLogDate}
+                            className="w-full bg-[#0f1419] border border-[#2d3748] text-gray-300 hover:bg-[#2d3748] hover:text-white justify-start text-left font-normal"
+                        />
+                    </div>
                     
                     <textarea 
                         className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors" 
