@@ -51,6 +51,12 @@ export default function HomePage() {
   // Sorting State
   const [sortOption, setSortOption] = useState<SortOption>("first_name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  
+  const [selectedContactForConnect, setSelectedContactForConnect] = useState<Person | null>(null);
+
+  const handleConnect = (contact: Person) => {
+      setSelectedContactForConnect(contact);
+  };
 
 
   // ... (migrateFavorites stays same)
@@ -256,11 +262,7 @@ export default function HomePage() {
     );
   }
 
-  const [selectedContactForConnect, setSelectedContactForConnect] = useState<Person | null>(null);
 
-  const handleConnect = (contact: Person) => {
-      setSelectedContactForConnect(contact);
-  };
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
@@ -388,17 +390,17 @@ export default function HomePage() {
 
                {/* RIGHT: Actions */}
                <div className="flex items-center gap-2 shrink-0">
-                  <Link href="/contacts/new" className="hidden lg:block">
-                     <Button className="bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
+                  <Button asChild className="hidden lg:block bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
+                     <Link href="/contacts/new">
                        <Plus className="h-4 w-4 mr-2" />
                        Add Contact
-                     </Button>
-                  </Link>
-                  <Link href="/quick-capture" className="hidden lg:block">
-                     <Button variant="ghost" size="icon" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" title="Quick Capture">
+                     </Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="hidden lg:flex text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" title="Quick Capture" asChild>
+                     <Link href="/quick-capture">
                        <Zap className="h-4 w-4" />
-                     </Button>
-                  </Link>
+                     </Link>
+                  </Button>
                   <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1 hidden lg:block" />
                   <Button 
                      variant="ghost" 
@@ -452,11 +454,11 @@ export default function HomePage() {
                   >
                     {isCompactView ? <List size={18} /> : <Rows size={18} />}
                   </Button>
-                  <Link href="/settings">
-                    <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-700 dark:text-gray-400">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-700 dark:text-gray-400" asChild>
+                    <Link href="/settings">
                       <Settings size={18} />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                </div>
              </div>
            </div>
@@ -513,38 +515,40 @@ export default function HomePage() {
       {/* Floating Action Buttons - Mobile & Tablet Only */}
       <div className="lg:hidden fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-3">
         {/* Quick Capture FAB */}
-        <Link href="/quick-capture">
-          <div className="group relative">
-            <Button
-              size="icon"
-              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
-            >
+        <div className="group relative">
+          <Button
+            size="icon"
+            className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
+            asChild
+          >
+            <Link href="/quick-capture">
               <Zap className="h-6 w-6 md:h-7 md:w-7 text-white" />
-            </Button>
-            {/* Tooltip */}
-            <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-              Quick Capture
-              <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
-            </span>
-          </div>
-        </Link>
+            </Link>
+          </Button>
+          {/* Tooltip */}
+          <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+            Quick Capture
+            <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+          </span>
+        </div>
 
         {/* Add Contact FAB */}
-        <Link href="/contacts/new">
-          <div className="group relative">
-            <Button
-              size="icon"
-              className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
-            >
+        <div className="group relative">
+          <Button
+            size="icon"
+            className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
+            asChild
+          >
+            <Link href="/contacts/new">
               <Plus className="h-6 w-6 md:h-7 md:w-7 text-white" />
-            </Button>
-            {/* Tooltip */}
-            <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-              Add Contact
-              <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
-            </span>
-          </div>
-        </Link>
+            </Link>
+          </Button>
+          {/* Tooltip */}
+          <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+            Add Contact
+            <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+          </span>
+        </div>
       </div>
       
       {/* Connect Now Modal */}
