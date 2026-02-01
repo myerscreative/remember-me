@@ -6,7 +6,8 @@ import { revalidatePath } from "next/cache";
 export async function logHeaderInteraction(
   personId: string, 
   interactionType: 'connection' | 'attempt',
-  note?: string
+  note?: string,
+  date?: string
 ) {
   const supabase = await createClient();
   
@@ -34,6 +35,8 @@ export async function logHeaderInteraction(
     const dbNotes = interactionType === 'attempt' 
         ? `[Attempt] ${finalNote}`.trim()
         : finalNote;
+    
+    const interactionDate = date || new Date().toISOString();
 
     // Direct insert
     const { data: insertData, error: insertError } = await (supabase as any)
@@ -42,7 +45,7 @@ export async function logHeaderInteraction(
         person_id: personId,
         user_id: user.id,
         type: dbType, 
-        date: new Date().toISOString(),
+        date: interactionDate,
         notes: dbNotes
       })
       .select();
@@ -60,7 +63,7 @@ export async function logHeaderInteraction(
                 person_id: personId,
                 user_id: user.id,
                 type: dbType,
-                interaction_date: new Date().toISOString(),
+                interaction_date: interactionDate,
                 notes: dbNotes
               })
               .select();
@@ -95,7 +98,15 @@ export async function logHeaderInteraction(
               .insert({
                 person_id: personId,
                 user_id: user.id,
-                content: memoryContent
+                content: memoryContent,
+                created_at: interactionDate // Also backdate the memory creation if possible, or just let it be now. 
+                // Usually created_at is automatic. Let's see if we should override it. 
+                // Ideally shared memories reflect the interaction time.
+                // Depending on schema, created_at might be default driven. 
+                // I will add it if the schema supports it, but standard supabase defaults to now().
+                // Let's assume for now we don't mess with shared_memories created_at unless requested,
+                // but for consistency, if 'date' columns exist there... 
+                // Let's stick to the interaction date being backdated.
               });
             
              if (memoryError) {
@@ -111,8 +122,8 @@ export async function logHeaderInteraction(
       const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
-          last_interaction_date: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          last_interaction_date: interactionDate,
+          updated_at: new Date().toISOString() // Keep updated_at as now because the record changed now
         })
         .eq('id', personId)
         .eq('user_id', user.id);
@@ -139,3 +150,4 @@ export async function logHeaderInteraction(
     };
   }
 }
+

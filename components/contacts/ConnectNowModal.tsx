@@ -13,6 +13,7 @@ import { getInitialsFromFullName, getGradient } from "@/lib/utils/contact-helper
 import toast from "react-hot-toast";
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface ConnectNowModalProps {
   person: Person;
@@ -24,6 +25,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
   const starters = useMemo(() => generateConversationStarters(person), [person]);
   const [selectedMethod, setSelectedMethod] = useState<'text' | 'email' | 'call' | 'whatsapp' | null>(null);
   const [quickNote, setQuickNote] = useState("");
+  const [interactionDate, setInteractionDate] = useState<Date | undefined>(new Date());
   const [isLogging, setIsLogging] = useState(false);
   const router = useRouter();
 
@@ -44,7 +46,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
   const handleLogInteraction = async (type: 'connection' | 'attempt') => {
     setIsLogging(true);
     try {
-        const result = await logHeaderInteraction(person.id, type, quickNote);
+        const result = await logHeaderInteraction(person.id, type, quickNote, interactionDate?.toISOString());
         if (result.success) {
             if (type === 'connection') {
                 showNurtureToast(person.name);
@@ -52,6 +54,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                 toast.success("Interaction logged");
             }
             setQuickNote("");
+            setInteractionDate(new Date()); // Reset date to today
             onOpenChange(false); // Close modal
             router.refresh(); // Refresh client data
         } else {
@@ -102,7 +105,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                         <span className="text-sm font-medium text-gray-300 group-hover:text-white">Text</span>
                     </button>
                     <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
-                         <Mail className="h-7 w-7 text-purple-400 group-hover:scale-110 transition-transform" />
+                         <Mail className="h-7 w-7 text-purple-400 group-hover: scale-110 transition-transform" />
                          <span className="text-sm font-medium text-gray-300 group-hover:text-white">Email</span>
                     </button>
                     <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
@@ -161,6 +164,15 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
             <section>
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Log Interaction</h4>
                 <div className="space-y-3">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs text-gray-400 ml-1">Date</label>
+                        <DatePicker 
+                            date={interactionDate} 
+                            setDate={setInteractionDate} 
+                            className="w-full bg-[#1e1e2d]/60 border-gray-700/30 text-gray-200 hover:bg-[#1e1e2d]/80 hover:text-white"
+                        />
+                    </div>
+
                     {/* Note Input */}
                     <input
                         type="text"
@@ -206,3 +218,4 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
     </Dialog>
   );
 }
+
