@@ -45,6 +45,7 @@ export default function ConnectionProfile({
   const [isLogging, setIsLogging] = useState(false);
   const [logNote, setLogNote] = useState('');
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
+  const [logDate, setLogDate] = useState('');
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
   const [editingInteractionId, setEditingInteractionId] = useState<string | null>(null);
   const [editInteractionForm, setEditInteractionForm] = useState({
@@ -141,26 +142,36 @@ export default function ConnectionProfile({
     if (!logNote.trim()) return;
 
     setIsLogging(true);
-    
+
+    // Capture current values before resetting
+    const currentNote = logNote;
+    const currentType = logType;
+    const currentDate = logDate;
+
+    // Use provided date or current time
+    const interactionDate = currentDate ? new Date(currentDate).toISOString() : new Date().toISOString();
+
     // Create optimistic interaction
     const optimisticInteraction = {
         id: `temp-${Date.now()}`,
         person_id: contact.id,
-        date: new Date().toISOString(),
-        notes: logType === 'attempt' ? `[Attempt] ${logNote}` : logNote,
+        date: interactionDate,
+        notes: currentType === 'attempt' ? `[Attempt] ${currentNote}` : currentNote,
         created_at: new Date().toISOString()
     };
-    
+
     // Optimistically add to interactions list
     setInteractions(prev => [optimisticInteraction, ...prev]);
     setLogNote('');
     setLogType('connection');
-    
+    setLogDate('');
+
     try {
         const result = await logHeaderInteraction(
             contact.id,
-            logType,
-            logNote
+            currentType,
+            currentNote,
+            currentDate || undefined
         );
 
         if (!result.success) {
@@ -845,13 +856,25 @@ export default function ConnectionProfile({
                 <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
                     <div className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3">Log Interaction</div>
                     
-                    <textarea 
-                        className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors" 
+                    <textarea
+                        className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors"
                         placeholder="What did you discuss?"
                         value={logNote}
                         onChange={(e) => setLogNote(e.target.value)}
                     />
-                    
+
+                    <div className="mb-3">
+                        <label className="text-[#94a3b8] text-[11px] font-medium mb-1.5 block">When did this happen?</label>
+                        <input
+                            type="datetime-local"
+                            className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl px-3.5 py-2.5 text-white text-[14px] outline-none transition-colors [color-scheme:dark]"
+                            value={logDate}
+                            onChange={(e) => setLogDate(e.target.value)}
+                            placeholder="Leave empty for current time"
+                        />
+                        <div className="text-[#64748b] text-[11px] mt-1">Leave empty to use current time</div>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-2.5 mb-4">
                         <button 
                             onClick={() => setLogType('attempt')}

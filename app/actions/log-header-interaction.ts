@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function logHeaderInteraction(
-  personId: string, 
+  personId: string,
   interactionType: 'connection' | 'attempt',
-  note?: string
+  note?: string,
+  interactionDate?: string
 ) {
   const supabase = await createClient();
   
@@ -29,11 +30,16 @@ export async function logHeaderInteraction(
     // Map internal types to DB allowed enum types:
     // ('call', 'email', 'text', 'meeting', 'other', 'in-person', 'social')
     const dbType = interactionType === 'connection' ? 'other' : 'other';
-    
+
     // For attempts, we might want to flag it in the notes since the type 'attempt' doesn't exist
-    const dbNotes = interactionType === 'attempt' 
+    const dbNotes = interactionType === 'attempt'
         ? `[Attempt] ${finalNote}`.trim()
         : finalNote;
+
+    // Use provided date if available, otherwise use current time
+    const dateToUse = interactionDate
+        ? new Date(interactionDate).toISOString()
+        : new Date().toISOString();
 
     // Direct insert
     const { data: insertData, error: insertError } = await (supabase as any)
@@ -41,8 +47,8 @@ export async function logHeaderInteraction(
       .insert({
         person_id: personId,
         user_id: user.id,
-        type: dbType, 
-        date: new Date().toISOString(),
+        type: dbType,
+        date: dateToUse,
         notes: dbNotes
       })
       .select();
@@ -60,7 +66,7 @@ export async function logHeaderInteraction(
                 person_id: personId,
                 user_id: user.id,
                 type: dbType,
-                interaction_date: new Date().toISOString(),
+                interaction_date: dateToUse,
                 notes: dbNotes
               })
               .select();
@@ -106,12 +112,12 @@ export async function logHeaderInteraction(
         }
     }
 
-        // 3. Update Person Status (Only for connections)
+    // 3. Update Person Status (Only for connections)
     if (interactionType === 'connection') {
       const { error: updateError } = await (supabase as any)
         .from('persons')
         .update({
-          last_interaction_date: new Date().toISOString(),
+          last_interaction_date: dateToUse,
           updated_at: new Date().toISOString()
         })
         .eq('id', personId)
