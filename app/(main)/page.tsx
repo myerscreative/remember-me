@@ -288,9 +288,9 @@ export default function HomePage() {
 
           {/* Sticky Toolbar */}
           <div className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 border-b border-gray-100 dark:border-gray-800 mb-6 transition-all hover:bg-white/95 dark:hover:bg-gray-900/95">
-             <div className="max-w-[950px] mx-auto flex items-center justify-between gap-4">
+             <div className="max-w-[950px] mx-auto flex items-center justify-between gap-3">
                {/* LEFT: Filters */}
-               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mask-fade-right">
+               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mask-fade-right flex-1 min-w-0 max-w-[600px]">
                  <ExploreFilter
                    tags={Array.from(new Set(Array.from(contactTags.values()).flat())).sort()}
                    interests={Array.from(new Set(contacts.flatMap(c => c.interests || []))).sort()}
@@ -390,7 +390,7 @@ export default function HomePage() {
 
                {/* RIGHT: Actions */}
                <div className="flex items-center gap-2 shrink-0">
-                  <Button asChild className="hidden lg:block bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all">
+                  <Button asChild className="hidden lg:flex bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all whitespace-nowrap px-4">
                      <Link href="/contacts/new">
                        <Plus className="h-4 w-4 mr-2" />
                        Add Contact
