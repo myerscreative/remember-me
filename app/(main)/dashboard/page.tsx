@@ -29,7 +29,7 @@ import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
-import SeedMapWidget from '@/components/dashboard/SeedMapWidget';
+import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
 import { NeedsNurtureList } from "@/components/dashboard/NeedsNurtureList";
 import { getDailyBriefing, type DailyBriefing } from '@/app/actions/get-daily-briefing';
 import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
@@ -318,15 +318,49 @@ export default function DashboardPage() {
               <div className="space-y-4 lg:sticky lg:top-6 w-full lg:w-auto">
                  
                  {/* Relationship Health Card (Map + Stats) */}
-                 {/* Relationship Health Card (Map + Stats) */}
                  <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-                     {/* Map */}
-                     <SeedMapWidget 
-                        contacts={allContacts} 
-                        className="border-0 bg-transparent shadow-none rounded-none" 
-                        totalCount={mapTotalCount}
-                        activeCount={mapActiveCount}
-                     />
+                     {/* Map - Using RelationshipGarden */}
+                     <div className="p-4">
+                       <div className="flex items-center gap-2 mb-3">
+                         <span className="text-xl">🌱</span>
+                         <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wide">Garden Map</h3>
+                       </div>
+                       <div className="h-[400px] relative">
+                         <RelationshipGarden
+                           contacts={allContacts.map((contact: any) => {
+                             // Calculate days since last contact
+                             const lastDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
+                             const now = new Date();
+                             const days = lastDate 
+                               ? Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+                               : 999;
+                             
+                             // Get initials
+                             const nameParts = (contact.name || '').split(' ');
+                             const initials = nameParts.length >= 2
+                               ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+                               : (contact.name || '?').slice(0, 2).toUpperCase();
+                             
+                             return {
+                               id: contact.id,
+                               name: contact.name || 'Unknown',
+                               initials,
+                               days,
+                               importance: contact.importance || 'medium',
+                               category: 'friends' as const, // Default category
+                               target_frequency_days: contact.target_frequency_days,
+                               targetFrequencyDays: contact.target_frequency_days,
+                               is_favorite: contact.is_favorite || false,
+                             };
+                           })}
+                           relationships={[]}
+                           filter="all"
+                           onContactClick={(contact) => {
+                             router.push(`/contacts/${contact.id}`);
+                           }}
+                         />
+                       </div>
+                     </div>
                      
                      {/* Stats Footer */}
                      {relationshipHealth && (
