@@ -358,6 +358,9 @@ export default function DashboardPage() {
                            onContactClick={(contact) => {
                              router.push(`/contacts/${contact.id}`);
                            }}
+                           hideControls={true}
+                           hideInfoBadge={true}
+                           initialZoom={40}
                          />
                        </div>
                      </div>
