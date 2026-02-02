@@ -205,6 +205,7 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
     contactsList.forEach(contact => {
       if (!contact.last_interaction_date) {
         health.noData++;
+        health.needsAttention++;
         return;
       }
 

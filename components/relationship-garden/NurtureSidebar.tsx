@@ -15,9 +15,26 @@ export default function NurtureSidebar({ contacts, onQuickLog, onHover }: Nurtur
   // Fading is generally > 45 days
   const nurtureList = useMemo(() => {
     return contacts
-      .filter(c => c.importance === 'high' && c.days > 45) // Fading threshold
-      .sort((a, b) => b.days - a.days) // Most thirsty first
-      .slice(0, 5);
+      .filter(c => {
+        // 1. Never Contacted
+        if (c.days >= 999) return true;
+        // 2. High Importance slipping away (> 14 days)
+        if (c.importance === 'high' && c.days > 14) return true;
+        // 3. General Neglect (> 30 days)
+        if (c.days > 30) return true;
+        
+        return false;
+      })
+      .sort((a, b) => {
+        // Sort by "Needs Attention Score" approx
+        // Prioritize High Importance
+        if (a.importance === 'high' && b.importance !== 'high') return -1;
+        if (a.importance !== 'high' && b.importance === 'high') return 1;
+        
+        // Then by days overdue (descending)
+        return b.days - a.days;
+      }) 
+      .slice(0, 10);
   }, [contacts]);
 
   // No empty check return null here -> we want to render the empty state if needed

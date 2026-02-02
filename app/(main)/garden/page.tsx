@@ -686,16 +686,7 @@ export default function GardenPage() {
               🚨 Triage Mode
             </Link>
 
-            {/* Nurture Sidebar */}
-            {viewMode === 'garden' && healthFilter === 'all' && (
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
-                <NurtureSidebar
-                  contacts={contacts}
-                  onQuickLog={handleQuickLog}
-                  onHover={setHoveredContactId}
-                />
-              </div>
-            )}
+
 
             {/* Legend */}
             {viewMode === 'garden' && healthFilter === 'all' && (
