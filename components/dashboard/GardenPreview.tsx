@@ -1,13 +1,80 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 interface GardenPreviewProps {
   contacts: any[];
 }
 
+const GOLDEN_ANGLE = 137.508 * (Math.PI / 180);
+
+// Get color based on days since contact and target frequency
+function getColorForDays(days: number, targetFrequencyDays?: number | null): string {
+  const targetDays = targetFrequencyDays || 30;
+  if (days < targetDays) return '#10b981';   // Green - Blooming
+  if (days < targetDays * 1.5) return '#84cc16';   // Lime - Nourished
+  if (days < targetDays * 2.5) return '#fbbf24';  // Yellow - Thirsty
+  return '#f97316';  // Orange - Fading
+}
+
 export function GardenPreview({ contacts }: GardenPreviewProps) {
   const router = useRouter();
+
+  // Calculate positions using same algorithm as Garden page
+  const seedPositions = useMemo(() => {
+    // 1. Bucket by frequency
+    const buckets = {
+      high: [] as any[],
+      medium: [] as any[],
+      low: [] as any[],
+    };
+
+    contacts.forEach(contact => {
+      const targetFreq = contact.target_frequency_days || 999;
+      if (targetFreq <= 14) buckets.high.push(contact);
+      else if (targetFreq <= 45) buckets.medium.push(contact);
+      else buckets.low.push(contact);
+    });
+
+    // 2. Calculate positions for each ring
+    const calculateRing = (items: any[], minR: number, maxR: number, offset: number) => {
+      const sorted = [...items].sort((a, b) => {
+        const lastA = a.last_interaction_date ? new Date(a.last_interaction_date) : null;
+        const lastB = b.last_interaction_date ? new Date(b.last_interaction_date) : null;
+        const now = new Date();
+        const daysA = lastA ? Math.floor((now.getTime() - lastA.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+        const daysB = lastB ? Math.floor((now.getTime() - lastB.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+        return daysA - daysB;
+      });
+
+      return sorted.map((contact, i) => {
+        const norm = i / Math.max(1, items.length - 1);
+        const radius = minR + (maxR - minR) * norm;
+        const angle = i * GOLDEN_ANGLE + offset;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        
+        const lastDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
+        const days = lastDate ? Math.floor((new Date().getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+        const color = getColorForDays(days, contact.target_frequency_days);
+        
+        const nameParts = (contact.name || '').split(' ');
+        const initials = nameParts.length >= 2
+          ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+          : (contact.name || '?').slice(0, 2).toUpperCase();
+
+        return { x, y, color, initials, name: contact.name };
+      });
+    };
+
+    // Scale down for preview (Garden uses 80-900, we'll use smaller scale)
+    const p1 = calculateRing(buckets.high, 20, 55, 0);
+    const p2 = calculateRing(buckets.medium, 70, 125, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRing(buckets.low, 140, 225, (p1.length + p2.length) * GOLDEN_ANGLE);
+
+    return [...p1, ...p2, ...p3];
+  }, [contacts]);
 
   return (
     <div 
@@ -20,55 +87,31 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
         <span className="ml-auto text-xs text-muted-foreground">Click to view →</span>
       </div>
       
-      {/* Simple visual representation */}
-      <div className="h-[300px] relative bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-lg border border-border/50 flex items-center justify-center overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute w-32 h-32 rounded-full border-2 border-emerald-500/20"></div>
-          <div className="absolute w-48 h-48 rounded-full border-2 border-lime-500/20"></div>
-          <div className="absolute w-64 h-64 rounded-full border-2 border-amber-500/20"></div>
-        </div>
-        
-        {/* Sample dots representing contacts */}
-        <div className="absolute inset-0">
-          {contacts.slice(0, 50).map((contact: any, i: number) => {
-            const angle = (i / 50) * Math.PI * 2;
-            const radius = 80 + (i % 3) * 30;
-            const x = 50 + Math.cos(angle) * radius / 3;
-            const y = 50 + Math.sin(angle) * radius / 3;
-            
-            // Calculate color based on target frequency
-            const lastDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
-            const now = new Date();
-            const days = lastDate ? Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)) : 999;
-            const targetDays = contact.target_frequency_days || 30;
-            
-            let color = '#f97316'; // orange - fading
-            if (days < targetDays) color = '#10b981'; // green - blooming
-            else if (days < targetDays * 1.5) color = '#84cc16'; // lime - nourished
-            else if (days < targetDays * 2.5) color = '#fbbf24'; // yellow - thirsty
-            
-            return (
-              <div
-                key={contact.id}
-                className="absolute w-2 h-2 rounded-full transition-all hover:scale-150"
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  backgroundColor: color,
-                  opacity: 0.8,
-                }}
-                title={contact.name}
+      {/* Garden visualization */}
+      <div className="h-[300px] relative bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-lg border border-border/50 overflow-hidden">
+        <svg viewBox="-250 -250 500 500" className="w-full h-full">
+          {seedPositions.map((seed, i) => (
+            <g key={i}>
+              <circle
+                cx={seed.x}
+                cy={seed.y}
+                r="8"
+                fill={seed.color}
+                opacity="0.9"
               />
-            );
-          })}
-        </div>
-        
-        {/* Center text */}
-        <div className="relative z-10 text-center">
-          <div className="text-4xl font-black text-white mb-1">{contacts.length}</div>
-          <div className="text-sm text-muted-foreground">Total Contacts</div>
-        </div>
+              <text
+                x={seed.x}
+                y={seed.y}
+                textAnchor="middle"
+                dominantBaseline="central"
+                className="text-[6px] font-bold fill-white"
+                style={{ pointerEvents: 'none' }}
+              >
+                {seed.initials}
+              </text>
+            </g>
+          ))}
+        </svg>
       </div>
     </div>
   );
