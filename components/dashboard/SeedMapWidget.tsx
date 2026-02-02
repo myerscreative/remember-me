@@ -20,18 +20,29 @@ interface TooltipState {
   contact: any | null;
 }
 
-// Color logic similar to RelationshipGarden but simplified for dashboard widget
-function getColorForDays(days: number): string {
-  if (days <= 14) return '#10b981';   // Green - Blooming
-  if (days <= 45) return '#84cc16';   // Lime - Nourished
-  if (days <= 120) return '#fbbf24';  // Yellow - Thirsty
+// Color logic based on target frequency (matching Garden page logic)
+function getColorForDays(days: number, targetFrequencyDays?: number | null): string {
+  const targetDays = targetFrequencyDays || 30; // Default to monthly if not set
+  
+  // Blooming: Within target cadence
+  if (days < targetDays) return '#10b981';   // Green - Blooming
+  
+  // Nourished: Within 50% grace period
+  if (days < targetDays * 1.5) return '#84cc16';   // Lime - Nourished
+  
+  // Thirsty: Overdue but not severely
+  if (days < targetDays * 2.5) return '#fbbf24';  // Yellow - Thirsty
+  
+  // Fading: Severely overdue
   return '#f97316';                   // Orange - Fading
 }
 
-function getStatusLabel(days: number): string {
-  if (days <= 14) return 'Blooming';
-  if (days <= 45) return 'Nourished';
-  if (days <= 120) return 'Thirsty';
+function getStatusLabel(days: number, targetFrequencyDays?: number | null): string {
+  const targetDays = targetFrequencyDays || 30;
+  
+  if (days < targetDays) return 'Blooming';
+  if (days < targetDays * 1.5) return 'Nourished';
+  if (days < targetDays * 2.5) return 'Thirsty';
   return 'Fading';
 }
 
@@ -114,19 +125,15 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
          const rotation = (Math.atan2(cy - 150, cx - 150) * 180 / Math.PI);
          const rotJitter = (getJitter(contact.id, 'rot') % 30) - 15;
 
-         // Initials
-         const initials = (contact.name || "?").split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-
-         return {
-             ...contact,
-             x: cx,
-             y: cy,
-             radius, 
-             rotation: rotation + 90 + rotJitter, 
-             color: getColorForDays(contact.days),
-             initials,
-             scale: count > 100 ? 0.35 : 0.45 
-         };
+          return {
+              ...contact,
+              x: cx,
+              y: cy,
+              radius, 
+              rotation: rotation + 90 + rotJitter, 
+              color: getColorForDays(contact.days, contact.target_frequency_days),
+              scale: count > 100 ? 0.25 : 0.35 
+          };
       });
     };
 
@@ -210,19 +217,6 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
                               fill="none"
                               opacity="0.4"
                             />
-                            {/* Initials Text - Rotated back for readability */}
-                            <text
-                                x="21"
-                                y="28"
-                                textAnchor="middle"
-                                fill="white"
-                                fontSize="16"
-                                fontWeight="bold"
-                                className="pointer-events-none select-none drop-shadow-md"
-                                transform={`rotate(${-leaf.rotation + 90}, 21, 24)`} 
-                            >
-                                {leaf.initials}
-                            </text>
                          </g>
                     </g>
                    );
@@ -251,7 +245,7 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
                 Last contact: {tooltip.contact.days === 999 ? 'Never' : `${tooltip.contact.days} days ago`}
               </div>
               <div className={`text-[10px] font-bold uppercase tracking-wider inline-block px-1.5 py-0.5 rounded bg-white/10 text-${tooltip.contact.color === '#10b981' ? 'emerald' : tooltip.contact.color === '#84cc16' ? 'lime' : tooltip.contact.color === '#fbbf24' ? 'amber' : 'orange'}-400`}>
-                  {getStatusLabel(tooltip.contact.days)}
+                  {getStatusLabel(tooltip.contact.days, tooltip.contact.target_frequency_days)}
               </div>
             </div>
          )}
