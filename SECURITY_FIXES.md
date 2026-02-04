@@ -89,6 +89,58 @@ Before suggesting any code that touches auth, data, or network operations:
 
 ---
 
+## 🆕 Phase 2: Rate Limiting Implementation (Feb 2026)
+
+### ✅ Completed: Multi-Layer Rate Limiting
+
+**Date**: February 3, 2026  
+**Security Impact**: HIGH - Protects against DoS, brute force, and OpenAI budget draining.
+
+**What Was Done**:
+
+1. ✅ Created `lib/security/rate-limit.ts` - Edge-compatible in-memory rate limiter
+2. ✅ Implemented global rate limiting (60 req/min) per IP/User in `middleware.ts`
+3. ✅ Implemented AI-specific rate limiting (10 req/min) for OpenAI endpoints:
+   - `/api/generate/*`
+   - `/api/refresh-ai/*`
+   - `/api/parse/*`
+   - `/api/transcribe/*`
+4. ✅ Added `X-RateLimit` and `Retry-After` headers for 429 (Too Many Requests) responses
+
+**Security Improvements**:
+
+- ✅ **Budget Protection**: Prevents malicious users from draining OpenAI credits via repeated API calls
+- ✅ **DoS Mitigation**: Limits request volume per-individual to maintain server stability
+- ✅ **Authenticated Identification**: Rate limits are tied to User ID when logged in, preventing IP-rotation-based bypasses for authenticated sessions.
+
+---
+
+## 🆕 Phase 3: Security Headers Implementation (Feb 2026)
+
+### ✅ Completed: Defense-in-Depth Headers
+
+**Date**: February 3, 2026  
+**Security Impact**: HIGH - Mitigates XSS, Clickjacking, and MIME sniffing attacks.
+
+**What Was Done**:
+
+1. ✅ Implemented strict Content Security Policy (CSP) in `next.config.ts`
+2. ✅ Added modern protection headers across all routes:
+   - `X-Frame-Options: DENY` (Clickjacking protection)
+   - `X-Content-Type-Options: nosniff` (MIME sniffing prevention)
+   - `Referrer-Policy: strict-origin-when-cross-origin`
+   - `Permissions-Policy` (Restricts browser features like camera/microphone)
+   - `Strict-Transport-Security` (Force HTTPS)
+3. ✅ Configured CORS headers to support Capacitor mobile apps (`capacitor://localhost`, etc.)
+
+**Security Improvements**:
+
+- ✅ **CSP**: Restricts script execution to trusted domains (Self, Supabase, Google)
+- ✅ **Clickjacking Protection**: Prevents the application from being embedded in malicious iframes
+- ✅ **CORS Management**: Securely allows mobile apps to communicate with the server while keeping standard browser security intact.
+
+---
+
 ## Critical Security Fixes
 
 ### 1. API Route Authentication ✅

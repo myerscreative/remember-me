@@ -3,7 +3,7 @@
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import type { Person } from '@/types/database.types';
-import { extractSixBlocks } from './extract-six-blocks';
+import { extractSixBlocks } from '@/lib/six-block-extraction';
 import { revalidatePath } from 'next/cache';
 import { z } from "zod";
 

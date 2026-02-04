@@ -1,9 +1,55 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { rateLimit } from "@/lib/security/rate-limit";
 
 export async function middleware(request: NextRequest) {
   try {
     const { response, user } = await updateSession(request);
+    
+    // ✅ SECURITY: Rate Limiting
+    const ip = request.headers.get("x-forwarded-for")?.split(',')[0] || 
+               request.headers.get("x-real-ip") || 
+               "unknown";
+    const identifier = user ? user.id : ip;
+
+
+    // 1. Global Rate Limit (Prevent DoS - 60 req/min)
+    const globalLimit = await rateLimit(`global_${identifier}`, 60, 60000);
+    if (!globalLimit.success) {
+      return new NextResponse("Too Many Requests", { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': globalLimit.limit.toString(),
+          'X-RateLimit-Remaining': globalLimit.remaining.toString(),
+          'Retry-After': globalLimit.reset.toString(),
+        }
+      });
+    }
+
+    // 2. Focused AI Rate Limit (Protect OpenAI Budget - 10 req/min)
+    const pathname = request.nextUrl.pathname;
+    const isAiRoute = pathname.includes("/api/generate") || 
+                      pathname.includes("/api/refresh-ai") ||
+                      pathname.includes("/api/parse") ||
+                      pathname.includes("/api/transcribe") ||
+                      pathname.includes("/api/ai/");
+
+    if (isAiRoute) {
+      const aiLimit = await rateLimit(`ai_${identifier}`, 10, 60000);
+      if (!aiLimit.success) {
+        return NextResponse.json(
+          { error: "AI processing limit reached. Please wait a minute." },
+          { 
+            status: 429,
+            headers: { 
+              'Retry-After': aiLimit.reset.toString(),
+              'X-RateLimit-Limit': aiLimit.limit.toString(),
+            }
+          }
+        );
+      }
+    }
+
 
     // Public routes that don't require authentication
     const publicRoutes = ["/login", "/auth/callback", "/reset-password", "/api/auth"];
