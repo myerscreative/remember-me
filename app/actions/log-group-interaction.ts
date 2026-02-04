@@ -3,11 +3,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from "zod";
+import type { InteractionType } from '@/lib/relationship-health';
 
 // ✅ SECURITY: Validation schema for group interactions
 const logGroupInteractionSchema = z.object({
   contactIds: z.array(z.string().uuid("Invalid contact ID format")).min(1, "At least one contact is required").max(100, "Too many contacts"),
-  type: z.enum(['call', 'text', 'meeting', 'gift', 'other']),
+  type: z.enum(['call', 'text', 'email', 'in-person', 'social', 'other']),
   summary: z.string().trim().min(1, "Summary is required").max(1000, "Summary too long"),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date format",
@@ -20,7 +21,7 @@ const logGroupInteractionSchema = z.object({
  */
 export async function logGroupInteraction(params: {
   contactIds: string[];
-  type: 'call' | 'text' | 'meeting' | 'gift' | 'other' | 'in-person' | 'social';
+  type: InteractionType;
   note?: string;
   date?: string;
 }): Promise<{
