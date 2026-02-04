@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
 import { addInterest } from '@/app/actions/story-actions';
@@ -11,7 +11,7 @@ import { EntitySuggestionBar, Suggestion } from './EntitySuggestionBar';
 import { toast } from 'sonner';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, Clock, Settings, Send } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Settings, Send, Mic, Square, Loader2 } from 'lucide-react';
 import { updateTargetFrequency } from '@/app/actions/update-target-frequency'; // Assuming this exists or I'll need to generic update
 
 import { getInitials } from '@/lib/utils/contact-helpers';
@@ -47,6 +47,15 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [frequency, setFrequency] = useState(30); // Default, should fetch from contact if possible or passed in props
+
+  // Audio recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Health Color Logic (Local map to avoid circular dep if mostly visual)
   const ringColor = healthStatus === 'nurtured' ? 'border-green-500' : (healthStatus === 'neglected' ? 'border-red-500' : 'border-orange-500');
@@ -98,6 +107,135 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
     return () => clearTimeout(timer);
   }, [note]);
 
+  // Cleanup audio recording on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Format recording time
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Start audio recording
+  const startRecording = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast.error("Your browser does not support audio recording");
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : MediaRecorder.isTypeSupported("audio/mp4")
+          ? "audio/mp4"
+          : "audio/ogg"
+      });
+
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType
+        });
+
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+
+        // Transcribe the audio
+        await transcribeAudio(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+          toast.error("Microphone permission denied. Please allow access and try again.");
+        } else if (error.name === "NotFoundError") {
+          toast.error("No microphone found. Please connect one and try again.");
+        } else {
+          toast.error(error.message || "Failed to start recording");
+        }
+      }
+    }
+  };
+
+  // Stop audio recording
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  // Transcribe audio to text
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.webm");
+
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Transcription failed");
+      }
+
+      const data = await response.json();
+      if (data.transcript) {
+        // Append transcribed text to existing note
+        setNote((prev) => {
+          const separator = prev.trim() ? " " : "";
+          return prev + separator + data.transcript;
+        });
+        toast.success("Voice transcribed successfully");
+      }
+    } catch (error) {
+      console.error("Transcription error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to transcribe audio");
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
 
   const handleSuggestionConfirm = async (s: Suggestion) => {
       try {
@@ -184,16 +322,53 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
 
         {/* TOP: BRAIN DUMP AREA */}
         <div className="flex-1 min-h-[160px] bg-slate-900/50 border border-slate-700/50 rounded-2xl p-4 flex flex-col relative focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all shadow-inner">
-            <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"/> What did you talk about?
-            </label>
-            <textarea 
+            <div className="flex items-center justify-between mb-2">
+                <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"/> What did you talk about?
+                </label>
+                {/* Audio Recording Button */}
+                <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isTranscribing}
+                    className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                        isRecording
+                            ? "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                            : isTranscribing
+                            ? "bg-slate-700/50 text-slate-500 cursor-wait"
+                            : "bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30"
+                    )}
+                >
+                    {isTranscribing ? (
+                        <>
+                            <Loader2 size={12} className="animate-spin" />
+                            <span>Transcribing...</span>
+                        </>
+                    ) : isRecording ? (
+                        <>
+                            <Square size={12} className="fill-current" />
+                            <span>{formatTime(recordingTime)}</span>
+                        </>
+                    ) : (
+                        <>
+                            <Mic size={12} />
+                            <span>Voice</span>
+                        </>
+                    )}
+                </button>
+            </div>
+            <textarea
                 className="flex-1 bg-transparent border-none focus:ring-0 text-slate-200 text-sm placeholder:text-slate-600 resize-none leading-relaxed selection:bg-indigo-500/30"
                 placeholder="Caught up about his move to Austin. He's worried about the schools but excited for the BBQ..."
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 autoFocus
+                disabled={isRecording}
             />
+            {/* Recording indicator */}
+            {isRecording && (
+                <div className="absolute inset-0 rounded-2xl border-2 border-red-500/50 pointer-events-none animate-pulse" />
+            )}
             {/* Character Count */}
             <div className="absolute bottom-3 right-3 text-[10px] text-slate-600 font-medium font-mono">
                 {note.length}
