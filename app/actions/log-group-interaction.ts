@@ -18,14 +18,24 @@ const logGroupInteractionSchema = z.object({
  * Log an interaction for multiple contacts at once (e.g., family dinner)
  * Updates last_interaction_date and creates interaction records for all contacts
  */
-export async function logGroupInteraction(contactIds: string[], type: 'call' | 'text' | 'meeting' | 'gift' | 'other', summary: string, date?: string): Promise<{
+export async function logGroupInteraction(params: {
+  contactIds: string[];
+  type: 'call' | 'text' | 'meeting' | 'gift' | 'other' | 'in-person' | 'social';
+  note?: string;
+  date?: string;
+}): Promise<{
   success: boolean;
   updatedCount?: number;
   error?: string;
 }> {
   try {
     // ✅ SECURITY: Validate inputs
-    const validationResult = logGroupInteractionSchema.safeParse({ contactIds, type, summary, date });
+    const validationResult = logGroupInteractionSchema.safeParse({ 
+      contactIds: params.contactIds, 
+      type: params.type, 
+      summary: params.note || '', 
+      date: params.date 
+    });
     
     if (!validationResult.success) {
       return { 
