@@ -25,6 +25,7 @@ import type { Person, Interaction } from "@/types/database.types";
 import { ConnectionDiscoverySection } from "@/components/connection-discovery-section";
 import { RelationshipPatternsSection } from "@/components/relationship-patterns-section";
 import { ErrorFallback } from "@/components/error-fallback";
+import { CommunicationActivityChart } from "@/components/communication-activity-chart";
 
 // Types
 interface InsightsSummary {
@@ -442,19 +443,13 @@ export default function InsightsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
           {/* Left Column */}
           <div className="space-y-6">
-            {/* Communication Activity Chart - Placeholder */}
+            {/* Communication Activity Chart */}
             <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
               <div className="mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Communication Activity</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Interactions over time</p>
               </div>
-              <div className="h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {activity.length > 0 
-                    ? `Collected ${activity.reduce((sum, a) => sum + a.interactions, 0)} interactions over ${activity.length} days. Chart visualization coming soon.`
-                    : "Chart visualization coming soon"}
-                </p>
-              </div>
+              <CommunicationActivityChart data={activity} />
             </Card>
 
             {/* Relationship Health */}
