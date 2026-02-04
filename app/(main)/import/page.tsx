@@ -186,10 +186,10 @@ export default function ImportContactsPage() {
       const { importVCard } = await import('@/app/actions/import-vcard');
       const result = await importVCard(contactsToImport);
 
-      setImportedCount(result.created + result.updated);
-      setFailedCount(result.failed);
+      setImportedCount((result.created ?? 0) + (result.updated ?? 0));
+      setFailedCount(result.failed ?? 0);
 
-      if (result.errors.length > 0) {
+      if (result.errors && result.errors.length > 0) {
         // Show first few errors if any
         setErrorMessage(`Import completed with errors: ${result.errors.slice(0, 3).join(', ')}`);
       }
