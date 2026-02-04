@@ -13,6 +13,7 @@ import type { PersonInsert } from "@/types/database.types";
 import { VoiceEntryModalEnhanced } from "@/components/voice-entry-modal-enhanced";
 import { formatPhoneNumber } from "@/lib/utils";
 import toast, { Toaster } from "react-hot-toast";
+import { BirthdayPicker } from "@/components/ui/birthday-picker";
 
 interface ParsedContactData {
   name?: string | null;
@@ -440,6 +441,19 @@ export default function NewContactPage() {
                   placeholder="linkedin.com/in/username"
                   className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   disabled={isSaving}
+                />
+              </div>
+
+              {/* Birthday */}
+              <div className="space-y-2">
+                <Label className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  Birthday
+                </Label>
+                <BirthdayPicker
+                  date={formData.birthday}
+                  onChange={(date) =>
+                    setFormData({ ...formData, birthday: date || "" })
+                  }
                 />
               </div>
 

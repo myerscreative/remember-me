@@ -10,6 +10,7 @@ import { X, Mic, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import toast, { Toaster } from "react-hot-toast";
+import { BirthdayPicker } from "@/components/ui/birthday-picker";
 
 export default function EditContactPage({
   params,
@@ -343,17 +344,14 @@ export default function EditContactPage({
 
                 {/* Birthday */}
                 <div className="space-y-2">
-                  <Label htmlFor="birthday" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  <Label className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
                     Birthday
                   </Label>
-                  <Input
-                    id="birthday"
-                    type="date"
-                    value={formData.birthday}
-                    onChange={(e) =>
-                      setFormData({ ...formData, birthday: e.target.value })
+                  <BirthdayPicker
+                    date={formData.birthday}
+                    onChange={(date) =>
+                      setFormData({ ...formData, birthday: date || "" })
                     }
-                    className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
