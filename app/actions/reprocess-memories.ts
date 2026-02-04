@@ -1,3 +1,5 @@
+'use server';
+
 /**
  * One-time script to reprocess existing brain dumps
  * This will extract structured data from shared_memories that were created before AI processing was added
