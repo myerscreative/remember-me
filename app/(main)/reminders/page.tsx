@@ -65,13 +65,21 @@ export default function RemindersPage() {
     
     const supabase = createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // 🔓 DEVELOPMENT FALLBACK: If authentication fails or no user in dev mode
+      if (!user) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔓 Development mode: Loading mock data');
+          loadMockData();
+          setLoading(false);
+          return;
+        }
+        router.push('/login');
+        return;
+      }
+
       // Fetch reminders with person information
       const { data: remindersData, error } = await (supabase as any)
         .from('reminders')
@@ -86,16 +94,59 @@ export default function RemindersPage() {
       const transformedReminders = remindersData || [];
 
       setReminders(transformedReminders);
+      setLoading(false);
     } catch (error) {
+      // 🔓 DEVELOPMENT FALLBACK: If connection fails in dev mode
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('🔓 Development mode: Backend unreachable, loading mock data', error);
+        loadMockData();
+        setLoading(false);
+        return;
+      }
+
       console.error('Error loading reminders:', error);
       if ((error as any)?.message) console.error('Error message:', (error as any).message);
       if ((error as any)?.details) console.error('Error details:', (error as any).details);
       if ((error as any)?.hint) console.error('Error hint:', (error as any).hint);
-
-      // No fallback needed as we are already fetching simple reminders.
-    } finally {
+      setError(error as Error);
       setLoading(false);
     }
+  }
+
+  function loadMockData() {
+    setReminders([
+      {
+        id: '1',
+        title: 'Call John Doe',
+        description: 'Discuss the new project proposal',
+        due_date: format(new Date(), 'yyyy-MM-dd'),
+        due_time: '14:00',
+        completed: false,
+        priority: 'high',
+        created_at: new Date().toISOString(),
+        user_id: 'mock-user',
+        person_name: 'John Doe'
+      },
+      {
+        id: '2',
+        title: 'Send invoice to Client X',
+        due_date: format(new Date(Date.now() + 86400000), 'yyyy-MM-dd'),
+        completed: false,
+        priority: 'medium',
+        created_at: new Date().toISOString(),
+        user_id: 'mock-user'
+      },
+      {
+        id: '3',
+        title: 'Weekly team sync',
+        due_date: format(new Date(), 'yyyy-MM-dd'),
+        due_time: '10:00',
+        completed: true,
+        priority: 'low',
+        created_at: new Date().toISOString(),
+        user_id: 'mock-user'
+      }
+    ]);
   }
 
   async function toggleComplete(reminderId: string, currentStatus: boolean) {

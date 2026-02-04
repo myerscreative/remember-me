@@ -18,7 +18,21 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `
+            value: process.env.NODE_ENV === 'development' 
+            ? `
+              default-src 'self';
+              script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co https://*.google.com;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+              img-src 'self' blob: data: https://*.supabase.co https://*.googleusercontent.com https://*.githubusercontent.com;
+              font-src 'self' https://fonts.gstatic.com;
+              object-src 'none';
+              base-uri 'self';
+              form-action 'self';
+              frame-ancestors 'none';
+              block-all-mixed-content;
+              connect-src 'self' http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:3000 ws://localhost:3000 https://*.supabase.co https://*.openai.com https://*.google.com;
+            `.replace(/\s{2,}/g, ' ').trim()
+            : `
               default-src 'self';
               script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co https://*.google.com;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;

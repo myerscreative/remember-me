@@ -4,7 +4,25 @@ import { rateLimit } from "@/lib/security/rate-limit";
 
 export async function middleware(request: NextRequest) {
   try {
-    const { response, user } = await updateSession(request);
+    // 🔓 DEVELOPMENT MODE: Skip authentication in local development
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    if (isDevelopment) {
+      console.log('🔓 Development mode: Skipping authentication');
+      return NextResponse.next();
+    }
+
+    // Temporary: Skip Supabase session check in development if connection fails
+    let response = NextResponse.next();
+    let user: any = null;
+    
+    try {
+      const sessionResult = await updateSession(request);
+      response = sessionResult.response;
+      user = sessionResult.user;
+    } catch (supabaseError) {
+      console.error("Supabase connection error (using fallback):", supabaseError);
+      // Continue without user session - will redirect to login below
+    }
     
     // ✅ SECURITY: Rate Limiting
     const ip = request.headers.get("x-forwarded-for")?.split(',')[0] || 

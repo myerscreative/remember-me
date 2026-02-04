@@ -512,42 +512,26 @@ export default function HomePage() {
         </div>
       </div>
         
-      {/* Floating Action Buttons - Mobile & Tablet Only */}
-      <div className="lg:hidden fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 flex flex-col gap-3">
-        {/* Quick Capture FAB */}
-        <div className="group relative">
-          <Button
-            size="icon"
-            className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 hover:from-cyan-600 hover:to-blue-700 dark:hover:from-cyan-500 dark:hover:to-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
-            asChild
+      {/* Action Bar - Mobile & Tablet Only */}
+      <div className="lg:hidden fixed bottom-20 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-auto z-40">
+        <div className="flex gap-2 bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl p-2 shadow-[0_8px_32px_rgba(0,0,0,0.25)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+          {/* Add Contact Button */}
+          <Link
+            href="/contacts/new"
+            className="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Link href="/quick-capture">
-              <Zap className="h-6 w-6 md:h-7 md:w-7 text-white" />
-            </Link>
-          </Button>
-          {/* Tooltip */}
-          <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-            Quick Capture
-            <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
-          </span>
-        </div>
+            <Plus className="h-4 w-4" />
+            <span>Add Contact</span>
+          </Link>
 
-        {/* Add Contact FAB */}
-        <div className="group relative">
-          <Button
-            size="icon"
-            className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-all duration-200 hover:scale-105"
-            asChild
+          {/* Quick Capture Button */}
+          <Link
+            href="/quick-capture"
+            className="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Link href="/contacts/new">
-              <Plus className="h-6 w-6 md:h-7 md:w-7 text-white" />
-            </Link>
-          </Button>
-          {/* Tooltip */}
-          <span className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-            Add Contact
-            <span className="absolute top-full right-4 -translate-y-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
-          </span>
+            <Zap className="h-4 w-4" />
+            <span>Quick Capture</span>
+          </Link>
         </div>
       </div>
       
