@@ -2,32 +2,50 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { ImportedContact } from '@/lib/contacts/importUtils';
+import { z } from "zod";
 
-export interface ImportResult {
-  total: number;
-  created: number;
-  updated: number;
-  failed: number;
-  errors: string[];
-}
+// ✅ SECURITY: Validation schemas for vCard import
+const vCardContactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name too long"),
+  first_name: z.string().trim().max(100).optional().nullable(),
+  last_name: z.string().trim().max(100).optional().nullable(),
+  email: z.string().email("Invalid email format").optional().nullable().or(z.literal("")),
+  phone: z.string().trim().max(50).optional().nullable(),
+  photo: z.string().trim().url("Invalid photo URL").optional().nullable().or(z.literal("")),
+  birthday: z.string().optional().nullable(), // Assuming birthday is a string for now
+  notes: z.string().optional().nullable(),
+});
 
-export async function importVCard(contacts: ImportedContact[]): Promise<ImportResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+const importVCardSchema = z.object({
+  contacts: z.array(vCardContactSchema).max(500, "Too many contacts to import at once"),
+});
 
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-
-  const result: ImportResult = {
-    total: contacts.length,
-    created: 0,
-    updated: 0,
-    failed: 0,
-    errors: [],
-  };
-
+export async function importVCard(contacts: any[]): Promise<{ success: boolean; error?: string; total?: number; created?: number; updated?: number; failed?: number; errors?: string[] }> {
   try {
+    // ✅ SECURITY: Validate inputs
+    const validationResult = importVCardSchema.safeParse({ contacts });
+    
+    if (!validationResult.success) {
+      return { 
+        success: false, 
+        error: `Invalid input: ${validationResult.error.issues.map(i => i.message).join(", ")}` 
+      };
+    }
+
+    const { contacts: validatedContacts } = validationResult.data;
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) {
+      return { success: false, error: "User not authenticated" };
+    }
+
+    let updatedCount = 0;
+    let insertedCount = 0;
+    let failedCount = 0;
+    const errors: string[] = [];
+
     // Fetch existing contacts for matching
     const { data: existingContacts, error: fetchError } = await (supabase as any)
       .from('persons')
@@ -35,7 +53,7 @@ export async function importVCard(contacts: ImportedContact[]): Promise<ImportRe
       .eq('user_id', user.id);
 
     if (fetchError) {
-      throw new Error(`Failed to fetch existing contacts: ${fetchError.message}`);
+      return { success: false, error: `Failed to fetch existing contacts: ${fetchError.message}` };
     }
 
     // Create lookup maps
@@ -47,7 +65,7 @@ export async function importVCard(contacts: ImportedContact[]): Promise<ImportRe
       if (c.name) nameMap.set(c.name.toLowerCase(), c);
     });
 
-    for (const contact of contacts) {
+    for (const contact of validatedContacts) {
       try {
         // MATCHING LOGIC
         let match: any = null;
@@ -92,10 +110,10 @@ export async function importVCard(contacts: ImportedContact[]): Promise<ImportRe
               .eq('id', match.id);
 
             if (updateError) throw updateError;
-            result.updated++;
+            updatedCount++;
           } else {
             // No relevant changes
-            result.updated++; // Count as processed/updated even if no change needed
+            updatedCount++; // Count as processed/updated even if no change needed
           }
 
         } else {
@@ -119,23 +137,31 @@ export async function importVCard(contacts: ImportedContact[]): Promise<ImportRe
             });
 
           if (insertError) throw insertError;
-          result.created++;
+          insertedCount++;
         }
 
       } catch (err: any) {
         console.error(`Error processing contact ${contact.name}:`, err);
-        result.failed++;
-        result.errors.push(`${contact.name}: ${err.message}`);
+        failedCount++;
+        errors.push(`${contact.name}: ${err.message}`);
       }
     }
 
+    return { 
+      success: true, 
+      total: validatedContacts.length, 
+      created: insertedCount, 
+      updated: updatedCount, 
+      failed: failedCount, 
+      errors 
+    };
+
   } catch (error: any) {
     console.error('Fatal import error:', error);
-    result.errors.push(`System Error: ${error.message}`);
+    return { success: false, error: error.message };
   }
-
-  return result;
 }
+
 
 // Helper: Upload Avatar
 async function uploadAvatar(supabase: any, userId: string, contactIdPrefix: string, base64Data: string): Promise<string | null> {

@@ -2,43 +2,44 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { validateUUID } from "@/lib/validations";
 
 export async function deleteInteraction(interactionId: string, personId: string) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    console.error("Delete interaction - auth error:", authError);
     return { success: false, error: "Unauthorized" };
   }
 
-  console.log(`Attempting to delete interaction ${interactionId} for user ${user.id}`);
-
   try {
+    // ✅ SECURITY: Validate UUIDs to prevent injection
+    const validatedInteractionId = validateUUID(interactionId);
+    const validatedPersonId = validateUUID(personId);
+
     // Delete the interaction (RLS policies will ensure user can only delete their own)
-    const { data, error, count } = await (supabase as any)
+    const { error } = await supabase
       .from('interactions')
       .delete()
-      .eq('id', interactionId)
-      .eq('user_id', user.id)
-      .select();
-
-    console.log('Delete response:', { data, error, count });
+      .eq('id', validatedInteractionId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this interaction
 
     if (error) {
       console.error("Supabase delete error:", error);
-      throw error;
+      // ✅ SECURITY: Don't leak internal error details
+      return { success: false, error: "Failed to delete interaction" };
     }
 
-    console.log(`Successfully deleted interaction ${interactionId}`);
-
-    revalidatePath(`/contacts/${personId}`);
+    revalidatePath(`/contacts/${validatedPersonId}`);
     revalidatePath('/dashboard');
     revalidatePath('/network');
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting interaction:", error);
-    return { success: false, error: error.message || "Unknown error" };
+    return { 
+      success: false, 
+      error: "Failed to delete interaction. Please try again." 
+    };
   }
 }

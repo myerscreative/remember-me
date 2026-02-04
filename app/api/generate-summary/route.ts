@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+// ✅ SECURITY: Validation schema for summary generation
+const generateSummarySchema = z.object({
+  name: z.string().max(200).optional(),
+  firstName: z.string().max(100).optional(),
+  lastName: z.string().max(100).optional(),
+  email: z.string().email().max(255).optional().or(z.literal("")),
+  phone: z.string().max(50).optional(),
+  whereMet: z.string().max(500).optional(),
+  whoIntroduced: z.string().max(200).optional(),
+  notes: z.string().max(5000).optional(), // Limit to prevent excessive OpenAI costs
+  birthday: z.string().max(50).optional(),
+  existingSummary: z.string().max(1000).optional(),
+}).refine(
+  (data) => data.name || data.firstName,
+  {
+    message: "At least a name or first name is required",
+    path: ["name"],
+  }
+);
 
 // Lazy initialization to prevent build-time errors
 // Lazy initialization to prevent build-time errors
@@ -32,8 +53,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body
     const body = await request.json();
+    
+    // ✅ SECURITY: Validate all inputs
+    const validationResult = generateSummarySchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(", ");
+      return NextResponse.json(
+        { error: `Invalid input: ${errorMessage}` },
+        { status: 400 }
+      );
+    }
+
     const {
       name,
       firstName,
@@ -45,15 +80,7 @@ export async function POST(request: NextRequest) {
       notes,
       birthday,
       existingSummary,
-    } = body;
-
-    // Validate required fields
-    if (!name && !firstName) {
-      return NextResponse.json(
-        { error: "At least a name or first name is required" },
-        { status: 400 }
-      );
-    }
+    } = validationResult.data;
 
     // Build context for GPT-4
     const contextParts: string[] = [];

@@ -3,14 +3,35 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+import { z } from 'zod';
+
+// ✅ SECURITY: Validation schema for photo uploads
+const uploadPhotoSchema = z.object({
+  personId: z.string().uuid("Invalid person ID format"),
+  // File validation is handled manually as Zod doesn't easily handle File objects in all environments
+});
+
 export async function uploadPersonPhoto(formData: FormData) {
   try {
-    const file = formData.get('file') as File;
     const personId = formData.get('personId') as string;
+    const file = formData.get('file') as File;
 
-    if (!file || !personId) {
-      return { success: false, error: 'Missing file or person ID' };
+    // ✅ SECURITY: Validate inputs
+    const validationResult = uploadPhotoSchema.safeParse({ personId });
+    
+    if (!validationResult.success) {
+      return { 
+        success: false, 
+        error: `Invalid input: ${validationResult.error.issues.map(i => i.message).join(", ")}` 
+      };
     }
+
+    const { personId: validatedPersonId } = validationResult.data;
+
+    if (!file) {
+      return { success: false, error: 'Missing file' };
+    }
+
 
     const supabase = await createClient();
     
@@ -26,7 +47,7 @@ export async function uploadPersonPhoto(formData: FormData) {
     }
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${personId}-${Date.now()}.${fileExt}`;
+    const fileName = `${validatedPersonId}-${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
 
     // Upload to 'avatars' bucket
@@ -51,7 +72,7 @@ export async function uploadPersonPhoto(formData: FormData) {
     const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({ photo_url: publicUrl })
-      .eq('id', personId)
+      .eq('id', validatedPersonId)
       .eq('user_id', user.id);
 
     if (updateError) {
@@ -59,8 +80,9 @@ export async function uploadPersonPhoto(formData: FormData) {
       return { success: false, error: 'Failed to update person record' };
     }
 
-    revalidatePath(`/contacts/${personId}`);
+    revalidatePath(`/contacts/${validatedPersonId}`);
     return { success: true, url: publicUrl };
+
 
   } catch (error) {
     console.error('Unexpected error:', error);

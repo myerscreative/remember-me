@@ -2,6 +2,19 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+// ✅ SECURITY: Validation schema for milestones
+const addMilestoneSchema = z.object({
+  contactId: z.string().uuid("Invalid contact ID format"),
+  milestone: z.object({
+    title: z.string().trim().min(1, "Milestone title is required").max(200, "Title too long"),
+    date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Invalid date format",
+    }),
+    type: z.enum(['Event', 'Goal', 'Life Change', 'Other']),
+  }),
+});
 
 export interface Milestone {
   id: string;
@@ -14,6 +27,18 @@ export interface Milestone {
 
 export async function addMilestone(contactId: string, milestone: Omit<Milestone, 'id' | 'status'>) {
   try {
+    // ✅ SECURITY: Validate inputs
+    const validationResult = addMilestoneSchema.safeParse({ contactId, milestone });
+    
+    if (!validationResult.success) {
+      return { 
+        success: false, 
+        error: `Invalid input: ${validationResult.error.issues.map(i => i.message).join(", ")}` 
+      };
+    }
+
+    const { contactId: validatedContactId, milestone: validatedMilestone } = validationResult.data;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -26,16 +51,17 @@ export async function addMilestone(contactId: string, milestone: Omit<Milestone,
     const { data: person, error: fetchError } = await (supabase as any)
       .from('persons')
       .select('milestones')
-      .eq('id', contactId)
+      .eq('id', validatedContactId)
+      .eq('user_id', user.id) // ✅ SECURITY: Ensure user owns this contact
       .single();
 
-    if (fetchError) throw fetchError;
+    if (fetchError || !person) throw new Error("Contact or milestones not found");
 
     const existingMilestones: Milestone[] = ((person as any)?.milestones) || [];
     
     // 2. Add new
     const newMilestone: Milestone = {
-        ...milestone,
+        ...validatedMilestone,
         id: crypto.randomUUID(),
         status: 'Upcoming'
     };
@@ -46,14 +72,16 @@ export async function addMilestone(contactId: string, milestone: Omit<Milestone,
     const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({ milestones: updatedMilestones })
-      .eq('id', contactId);
+      .eq('id', validatedContactId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this contact
 
     if (updateError) throw updateError;
 
-    revalidatePath(`/contacts/${contactId}`);
+    revalidatePath(`/contacts/${validatedContactId}`);
     return { success: true, milestone: newMilestone };
   } catch (error) {
     console.error('Error adding milestone:', error);
-    return { success: false, error };
+    return { success: false, error: error instanceof Error ? error.message : "Failed to add milestone" };
   }
 }
+

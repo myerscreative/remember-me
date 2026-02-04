@@ -2,11 +2,13 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logInteractionSchema } from "@/lib/validations";
 
 export async function logContactInteraction(
   personId: string, 
   type: 'call' | 'email' | 'message' | 'meeting' | 'other',
-  notes?: string
+  notes?: string,
+  date?: string
 ) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -16,43 +18,62 @@ export async function logContactInteraction(
   }
 
   try {
+    // ✅ SECURITY: Validate all inputs
+    const validationResult = logInteractionSchema.safeParse({
+      personId,
+      type,
+      notes,
+      date
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(", ");
+      return { 
+        success: false, 
+        error: `Invalid interaction data: ${errorMessage}` 
+      };
+    }
+
+    const validatedData = validationResult.data;
+
     // 1. Insert Interaction Record
-    const { error: maxInteractionError } = await (supabase as any)
+    const { error: interactionError } = await supabase
       .from('interactions')
       .insert({
-        person_id: personId,
+        person_id: validatedData.personId,
         user_id: user.id,
-        type: type,
-        date: new Date().toISOString(),
-        notes: notes || null
+        type: validatedData.type,
+        date: validatedData.date || new Date().toISOString(),
+        notes: validatedData.notes || null
       });
 
-    if (maxInteractionError) throw maxInteractionError;
+    if (interactionError) throw interactionError;
 
     // 2. Update Person Status
-    // We increment interaction_count and set last_interaction_date
-    // We could also set a 'status' field if it existed (e.g. 'Blooming'), 
-    // but the schema uses `relationship_value` or similar. 
-    // For now, we update the core timestamp fields.
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('persons')
       .update({
-        last_interaction_date: new Date().toISOString(),
-        last_contact_method: type,
-        // Optional: Increment interaction_count if we want to track volume
+        last_interaction_date: validatedData.date || new Date().toISOString(),
+        last_contact_method: validatedData.type,
         updated_at: new Date().toISOString()
       })
-      .eq('id', personId)
-      .eq('user_id', user.id);
+      .eq('id', validatedData.personId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this contact
 
     if (updateError) throw updateError;
 
     revalidatePath('/dashboard');
-    revalidatePath(`/contacts/${personId}`);
+    revalidatePath(`/contacts/${validatedData.personId}`);
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error logging interaction:", error);
-    return { success: false, error: error.message };
+    // ✅ SECURITY: Don't leak internal error details
+    return { 
+      success: false, 
+      error: "Failed to log interaction. Please try again." 
+    };
   }
 }

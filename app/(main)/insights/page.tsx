@@ -19,13 +19,11 @@ import {
   Calendar,
   ChevronRight,
   AlertTriangle,
-  Archive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Person, Interaction } from "@/types/database.types";
 import { ConnectionDiscoverySection } from "@/components/connection-discovery-section";
 import { RelationshipPatternsSection } from "@/components/relationship-patterns-section";
-import { getInitials as getInitialsHelper, getFullName as getFullNameHelper, getGradient as getGradientHelper } from "@/lib/utils/contact-helpers";
 import { ErrorFallback } from "@/components/error-fallback";
 
 // Types
@@ -96,18 +94,6 @@ export default function InsightsPage() {
   const [decayingRelationships, setDecayingRelationships] = useState<DecayingRelationship[]>([]);
   const [error, setError] = useState<Error | null>(null);
 
-  // Helper wrappers for person objects
-  const getInitials = (person: { first_name: string; last_name: string | null }): string => {
-    return getInitialsHelper(person.first_name, person.last_name);
-  };
-
-  const getFullName = (person: { first_name: string; last_name: string | null }): string => {
-    return getFullNameHelper(person.first_name, person.last_name);
-  };
-
-  const getGradient = (person: { first_name: string; last_name: string | null }): string => {
-    return getGradientHelper(getFullName(person));
-  };
 
   // Load data
   useEffect(() => {
@@ -124,7 +110,211 @@ export default function InsightsPage() {
           return;
         }
 
-        // ... (existing data fetching logic)
+        const days = parseInt(timeRange);
+        const now = new Date();
+        const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        const previousPeriodStart = new Date(startDate.getTime() - days * 24 * 60 * 60 * 1000);
+
+        // Parallel fetch: Persons, Interactions AND Decay Alerts
+        const [personsRes, interactionsRes, decayRes] = await Promise.all([
+          supabase.from("persons").select("*").eq("user_id", user.id).or("archived.eq.false,archived.is.null"),
+          supabase.from("interactions").select("*").eq("user_id", user.id),
+          fetch(`/api/decay-alerts?days=${Math.max(days, 180)}`).then(res => res.ok ? res.json() : { relationships: [] })
+        ]);
+
+        const allPersons = (personsRes.data || []) as Person[];
+        const allInteractions = (interactionsRes.data || []) as Interaction[];
+
+        // 1. Calculate summary stats
+        const totalContacts = allPersons.length;
+        
+        // Contacts added in current period
+        const currentPeriodContacts = allPersons.filter(p => 
+          new Date(p.created_at) >= startDate
+        ).length;
+        
+        // Contacts added in previous period
+        const previousPeriodContacts = allPersons.filter(p => {
+          const created = new Date(p.created_at);
+          return created >= previousPeriodStart && created < startDate;
+        }).length;
+
+        const networkGrowthChange = previousPeriodContacts > 0 
+          ? ((currentPeriodContacts - previousPeriodContacts) / previousPeriodContacts) * 100 
+          : currentPeriodContacts > 0 ? 100 : 0;
+
+        // Active this week (last 7 days)
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        
+        const activeThisWeekIds = new Set(
+          allInteractions
+            .filter(i => new Date(i.date) >= weekAgo)
+            .map(i => i.person_id)
+        );
+        const activeThisWeek = activeThisWeekIds.size;
+
+        const activePreviousWeek = new Set(
+          allInteractions
+            .filter(i => {
+              const date = new Date(i.date);
+              return date >= twoWeeksAgo && date < weekAgo;
+            })
+            .map(i => i.person_id)
+        ).size;
+
+        const activeThisWeekChange = activePreviousWeek > 0
+          ? ((activeThisWeek - activePreviousWeek) / activePreviousWeek) * 100
+          : activeThisWeek > 0 ? 100 : 0;
+
+        // Reminders completed
+        const remindersCompleted = allPersons.filter(p => {
+          if (!p.follow_up_reminder) return false;
+          const reminderDate = new Date(p.follow_up_reminder);
+          return reminderDate < now && reminderDate >= startDate;
+        }).length;
+
+        const remindersCompletedPrevious = allPersons.filter(p => {
+          if (!p.follow_up_reminder) return false;
+          const reminderDate = new Date(p.follow_up_reminder);
+          return reminderDate < startDate && reminderDate >= previousPeriodStart;
+        }).length;
+
+        const remindersCompletedChange = remindersCompletedPrevious > 0
+          ? ((remindersCompleted - remindersCompletedPrevious) / remindersCompletedPrevious) * 100
+          : remindersCompleted > 0 ? 100 : 0;
+
+        setSummary({
+          totalContacts,
+          totalContactsChange: networkGrowthChange,
+          activeThisWeek,
+          activeThisWeekChange,
+          remindersCompleted,
+          remindersCompletedChange,
+          networkGrowth: currentPeriodContacts,
+          networkGrowthChange,
+        });
+
+        // 2. Calculate relationship health
+        const healthData: RelationshipHealth[] = allPersons.map(p => {
+          const lastDate = p.last_interaction_date || p.last_contact || p.created_at;
+          const daysSinceContact = Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24));
+          
+          // Calculate health score (0-100)
+          const target = p.target_frequency_days || 30;
+          let healthScore = 100;
+          
+          if (daysSinceContact > target * 3) healthScore = 0;
+          else if (daysSinceContact > target * 2) healthScore = 30;
+          else if (daysSinceContact > target) healthScore = 60;
+          else healthScore = Math.max(0, 100 - (daysSinceContact / target) * 40);
+
+          return {
+            id: p.id,
+            name: p.name,
+            avatar: p.photo_url,
+            lastContact: daysSinceContact,
+            healthScore: Math.round(healthScore),
+          };
+        })
+        .filter(h => h.healthScore < 90)
+        .sort((a, b) => a.healthScore - b.healthScore)
+        .slice(0, 5);
+
+        setHealthList(healthData);
+
+        // 3. Calculate top connections
+        const personInteractionCounts = new Map<string, number>();
+        allInteractions.forEach(i => {
+          personInteractionCounts.set(
+            i.person_id,
+            (personInteractionCounts.get(i.person_id) || 0) + 1
+          );
+        });
+
+        const topConnectionsData: TopConnection[] = Array.from(personInteractionCounts.entries())
+          .map(([personId, count]) => {
+            const person = allPersons.find(p => p.id === personId);
+            return person ? {
+              id: person.id,
+              name: person.name,
+              avatar: person.photo_url,
+              interactionCount: count,
+            } : null;
+          })
+          .filter((c): c is TopConnection => c !== null)
+          .sort((a, b) => b.interactionCount - a.interactionCount)
+          .slice(0, 10);
+
+        setTopConnections(topConnectionsData);
+
+        // 4. Upcoming reminders
+        const upcomingData: UpcomingReminder[] = allPersons
+          .filter(p => p.follow_up_reminder && new Date(p.follow_up_reminder) >= now)
+          .map(p => ({
+            id: p.id,
+            date: p.follow_up_reminder!,
+            description: `Reach out to ${p.name}`,
+            priority: 'medium' as const,
+          }))
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .slice(0, 5);
+
+        setUpcomingReminders(upcomingData);
+
+        // 5. Calculate activity for chart
+        const activityMap = new Map<string, number>();
+        // Initialize last X days with 0
+        for (let i = 0; i < days; i++) {
+          const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+          const dateString = date.toISOString().split('T')[0];
+          activityMap.set(dateString, 0);
+        }
+
+        allInteractions.forEach(i => {
+          const dateString = new Date(i.date).toISOString().split('T')[0];
+          if (activityMap.has(dateString)) {
+            activityMap.set(dateString, (activityMap.get(dateString) || 0) + 1);
+          }
+        });
+
+        const activityData: CommunicationActivity[] = Array.from(activityMap.entries())
+          .map(([date, interactions]) => ({ date, interactions }))
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        setActivity(activityData);
+
+        // 6. Process Decaying Relationships
+        const decayProcessed = (decayRes.relationships || []).map((p: Person) => {
+          const lastDate = (p as Person).last_interaction_date || p.last_contact || p.created_at;
+          const contactDays = Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24));
+          
+          let severity: "mild" | "moderate" | "severe" = "mild";
+          if (contactDays > 365) severity = "severe";
+          else if (contactDays > 180) severity = "moderate";
+
+          return {
+            person_id: p.id,
+            name: p.name,
+            last_contact_days: contactDays,
+            interaction_count: (p as Person).interaction_count || 0,
+            decay_severity: severity
+          };
+        });
+        setDecayingRelationships(decayProcessed);
+
+        // 7. Generate insight message
+        let insight = "";
+        if (activeThisWeek > 5) {
+          insight = "Great job! You've been active with several contacts this week. Keep up the momentum!";
+        } else if (healthData.length > 0) {
+          insight = `You have relationships that are starting to drift. A quick message can make a big difference!`;
+        } else if (currentPeriodContacts > 0) {
+          insight = "Your network is growing. Don't forget to set follow-up targets for new contacts!";
+        } else {
+          insight = "Consistent interaction is the key to deep relationships. Try reaching out to one person today just to say hi.";
+        }
+        setInsightMessage(insight);
 
       } catch (error) {
         console.error("Error loading insights:", error);
@@ -259,7 +449,11 @@ export default function InsightsPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Interactions over time</p>
               </div>
               <div className="h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Chart visualization coming soon</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {activity.length > 0 
+                    ? `Collected ${activity.reduce((sum, a) => sum + a.interactions, 0)} interactions over ${activity.length} days. Chart visualization coming soon.`
+                    : "Chart visualization coming soon"}
+                </p>
               </div>
             </Card>
 

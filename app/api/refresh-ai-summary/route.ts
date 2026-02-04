@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+// ✅ SECURITY: Validation schema for refresh summary
+const refreshSummarySchema = z.object({
+  contactId: z.string().uuid("Invalid contact ID format"),
+});
 
 // Lazy initialization to prevent build-time errors
 let openaiInstance: OpenAI | null = null;
@@ -31,16 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body
     const body = await request.json();
-    const { contactId } = body;
+    const validationResult = refreshSummarySchema.safeParse(body);
 
-    if (!contactId) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Contact ID is required" },
+        { error: validationResult.error.issues[0].message },
         { status: 400 }
       );
     }
+
+    const { contactId } = validationResult.data;
 
     // Fetch complete contact data
     const { data: person, error: personError } = await (supabase as any)

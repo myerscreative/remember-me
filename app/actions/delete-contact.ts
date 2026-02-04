@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { validateUUID } from '@/lib/validations';
 
 export async function deleteContact(contactId: string) {
   try {
@@ -12,17 +13,21 @@ export async function deleteContact(contactId: string) {
       return { success: false, error: 'Unauthorized' };
     }
 
+    // ✅ SECURITY: Validate UUID to prevent injection
+    const validatedId = validateUUID(contactId);
+
     // Soft delete: set deleted_at timestamp instead of actually deleting
     // Contact can be recovered within 30 days
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('persons')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', contactId)
-      .eq('user_id', user.id); // Important: ensure user owns this contact
+      .eq('id', validatedId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this contact
 
     if (error) {
       console.error('Error deleting contact:', error);
-      return { success: false, error: error.message };
+      // ✅ SECURITY: Don't leak internal error details
+      return { success: false, error: 'Failed to delete contact' };
     }
 
     // Revalidate the contacts list page
@@ -34,7 +39,7 @@ export async function deleteContact(contactId: string) {
     console.error('Error in deleteContact:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'Failed to delete contact' 
+      error: 'Failed to delete contact. Please try again.' 
     };
   }
 }
@@ -48,16 +53,19 @@ export async function restoreContact(contactId: string) {
       return { success: false, error: 'Unauthorized' };
     }
 
+    // ✅ SECURITY: Validate UUID to prevent injection
+    const validatedId = validateUUID(contactId);
+
     // Restore contact by clearing deleted_at
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('persons')
       .update({ deleted_at: null })
-      .eq('id', contactId)
-      .eq('user_id', user.id);
+      .eq('id', validatedId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this contact
 
     if (error) {
       console.error('Error restoring contact:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Failed to restore contact' };
     }
 
     revalidatePath('/contacts');
@@ -68,7 +76,7 @@ export async function restoreContact(contactId: string) {
     console.error('Error in restoreContact:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'Failed to restore contact' 
+      error: 'Failed to restore contact. Please try again.' 
     };
   }
 }
@@ -82,16 +90,19 @@ export async function permanentlyDeleteContact(contactId: string) {
       return { success: false, error: 'Unauthorized' };
     }
 
+    // ✅ SECURITY: Validate UUID to prevent injection
+    const validatedId = validateUUID(contactId);
+
     // Permanently delete the contact (cascade will handle related records)
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('persons')
       .delete()
-      .eq('id', contactId)
-      .eq('user_id', user.id);
+      .eq('id', validatedId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this contact
 
     if (error) {
       console.error('Error permanently deleting contact:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Failed to permanently delete contact' };
     }
 
     revalidatePath('/contacts');
@@ -102,7 +113,7 @@ export async function permanentlyDeleteContact(contactId: string) {
     console.error('Error in permanentlyDeleteContact:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'Failed to permanently delete contact' 
+      error: 'Failed to permanently delete contact. Please try again.' 
     };
   }
 }

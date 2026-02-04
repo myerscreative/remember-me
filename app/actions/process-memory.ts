@@ -3,14 +3,35 @@
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import type { Person } from '@/types/database.types';
-import { extractSixBlocks, type SixBlockExtraction } from '@/lib/six-block-extraction';
+import { extractSixBlocks } from './extract-six-blocks';
+import { revalidatePath } from 'next/cache';
+import { z } from "zod";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// ✅ SECURITY: Validation schema for memory processing
+const processMemorySchema = z.object({
+  contactId: z.string().uuid("Invalid contact ID format"),
+  text: z.string().trim().min(1, "Text cannot be empty").max(10000, "Text too long"),
+  autoSave: z.boolean().optional().default(true),
+});
+
 export async function processMemory(contactId: string, text: string, autoSave = true) {
   try {
+    // ✅ SECURITY: Validate inputs
+    const validationResult = processMemorySchema.safeParse({ contactId, text, autoSave });
+    
+    if (!validationResult.success) {
+      return { 
+        success: false, 
+        error: `Invalid input: ${validationResult.error.issues.map(i => i.message).join(", ")}` 
+      };
+    }
+
+    const { contactId: validatedContactId, text: validatedText, autoSave: validatedAutoSave } = validationResult.data;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -22,7 +43,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
     const { data: personData, error: fetchError } = await supabase
         .from('persons')
         .select('*')
-        .eq('id', contactId)
+        .eq('id', validatedContactId)
         .eq('user_id', user.id)
         .single();
         
@@ -87,7 +108,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       
       2. INTEREST: Use this for hobbies, sports, likes, or topics of interest.
          Data Format: { value: string }.
-         
+          
       3. WHERE_WE_MET: Use this for origin stories or meeting locations.
          Data Format: { value: string }.
 
@@ -106,7 +127,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       
       Return JSON: { "extractions": [ { "category": "...", "data": ... }, ... ] }
       
-      Input Text: "${text}"
+      Input Text: "${validatedText}"
     `;
 
     // Run both extractions in parallel for efficiency
@@ -117,7 +138,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
         temperature: 0.7,
         response_format: { type: 'json_object' },
       }),
-      extractSixBlocks(text) // New 6-block extraction
+      extractSixBlocks(validatedText) // New 6-block extraction
     ]);
 
     const content = legacyResponse.choices[0].message.content;
@@ -126,8 +147,9 @@ export async function processMemory(contactId: string, text: string, autoSave = 
 
     if (extractions.length === 0) {
         // Fallback to basic story if nothing extracted
-        extractions.push({ category: "SYNOPSIS", data: { value: text } });
+        extractions.push({ category: "SYNOPSIS", data: { value: validatedText } });
     }
+
 
     const fieldsUpdated: string[] = [];
 
@@ -255,13 +277,13 @@ export async function processMemory(contactId: string, text: string, autoSave = 
     if (sixBlockData.history_touchpoints) extractedData.history_touchpoints = sixBlockData.history_touchpoints;
     if (sixBlockData.mutual_value_introductions) extractedData.mutual_value_introductions = sixBlockData.mutual_value_introductions;
 
-    // Only save to database if autoSave is true
-    if (autoSave) {
+    // Only save to database if validatedAutoSave is true
+    if (validatedAutoSave) {
         // 4. Update Person
         const { error } = await (supabase as any)
             .from('persons')
             .update(extractedData)
-            .eq('id', contactId)
+            .eq('id', validatedContactId)
             .eq('user_id', user.id); // CRITICAL: Must filter by user_id for RLS
 
         if (error) {

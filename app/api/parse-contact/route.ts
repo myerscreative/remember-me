@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { authenticateRequest } from "@/lib/supabase/auth";
+import { parseTranscriptSchema, voiceContactDataSchema } from "@/lib/validations";
 
 // Lazy initialization to prevent build-time errors
 let openaiInstance: OpenAI | null = null;
@@ -9,10 +10,6 @@ function getOpenAI(): OpenAI {
     openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   return openaiInstance;
-}
-
-interface ParseRequest {
-  transcript: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -31,15 +28,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: ParseRequest = await request.json();
-    const { transcript } = body;
+    const body = await request.json();
 
-    if (!transcript || !transcript.trim()) {
+    // ✅ SECURITY: Validate transcript input
+    const validationResult = parseTranscriptSchema.safeParse(body);
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues
+        .map((e) => e.message)
+        .join(", ");
       return NextResponse.json(
-        { error: "No transcript provided" },
+        { error: `Invalid input: ${errorMessage}` },
         { status: 400 }
       );
     }
+
+    const { transcript } = validationResult.data;
 
     // Use GPT-4 to parse the transcript into structured data
     const completion = await getOpenAI().chat.completions.create({

@@ -1,47 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+// ✅ SECURITY: Validation schema for voice input parsing
+const parseVoiceSchema = z.object({
+  transcript: z.string().trim().min(1, "Transcript is required").max(10000, "Transcript too long"),
+});
 
 // Lazy initialization to prevent build-time errors
 let openaiInstance: OpenAI | null = null;
 function getOpenAI(): OpenAI {
   if (!openaiInstance) {
-    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Missing OPENAI_API_KEY environment variable");
+    }
+    openaiInstance = new OpenAI({ apiKey });
   }
   return openaiInstance;
 }
 
-interface ParseVoiceRequest {
-  transcript: string;
-  userId: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    // Check for API key
-    if (!process.env.OPENAI_API_KEY) {
+    // Authenticate user
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json(
-        { error: "OpenAI API key not configured" },
-        { status: 500 }
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const body: ParseVoiceRequest = await request.json();
-    const { transcript, userId } = body;
+    // Parse and validate request body
+    const body = await request.json();
+    const validationResult = parseVoiceSchema.safeParse(body);
 
-    if (!transcript || !transcript.trim()) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "No transcript provided" },
+        { error: validationResult.error.issues[0].message },
         { status: 400 }
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID required" },
-        { status: 400 }
-      );
-    }
+    const { transcript } = validationResult.data;
+    const userId = user.id; // ✅ SECURITY: Use authenticated user ID, not from body
+
 
     // Step 1: Determine intent (new contact or update)
     const intentCompletion = await getOpenAI().chat.completions.create({

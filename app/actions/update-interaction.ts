@@ -2,16 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-
-interface UpdateInteractionData {
-  date?: string;
-  notes?: string;
-}
+import { updateInteractionSchema } from "@/lib/validations";
 
 export async function updateInteraction(
   interactionId: string,
   personId: string,
-  data: UpdateInteractionData
+  data: unknown
 ) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -21,15 +17,33 @@ export async function updateInteraction(
   }
 
   try {
+    // ✅ SECURITY: Validate all inputs
+    const validationResult = updateInteractionSchema.safeParse({
+      interactionId,
+      ...data
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(", ");
+      return { 
+        success: false, 
+        error: `Invalid interaction data: ${errorMessage}` 
+      };
+    }
+
+    const { interactionId: validatedId, ...updateData } = validationResult.data;
+
     // Update the interaction (RLS policies will ensure user can only update their own)
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('interactions')
       .update({
-        ...data,
+        ...updateData,
         updated_at: new Date().toISOString()
-      } as any)
-      .eq('id', interactionId)
-      .eq('user_id', user.id);
+      })
+      .eq('id', validatedId)
+      .eq('user_id', user.id); // ✅ SECURITY: Ensure user owns this interaction
 
     if (error) throw error;
 
@@ -38,8 +52,12 @@ export async function updateInteraction(
     revalidatePath('/network');
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating interaction:", error);
-    return { success: false, error: error.message };
+    // ✅ SECURITY: Don't leak internal error details
+    return { 
+      success: false, 
+      error: "Failed to update interaction. Please try again." 
+    };
   }
 }

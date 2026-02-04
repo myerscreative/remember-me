@@ -2,24 +2,46 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { validateUUID, importanceSchema } from '@/lib/validations'
 
-export async function updatePersonImportance(personId: string, importance: 'high' | 'medium' | 'low') {
+export async function updatePersonImportance(
+  personId: string, 
+  importance: 'high' | 'medium' | 'low' | 'critical'
+) {
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('persons')
-    .update({ importance: importance })
-    .eq('id', personId)
+  try {
+    // ✅ SECURITY: Validate inputs
+    const validatedPersonId = validateUUID(personId);
+    const validationResult = importanceSchema.safeParse(importance);
 
-  if (error) {
-    console.error("Failed to update importance:", error)
-    return { success: false, error: error.message }
+    if (!validationResult.success) {
+      return { 
+        success: false, 
+        error: 'Invalid importance level' 
+      };
+    }
+
+    const { error } = await supabase
+      .from('persons')
+      .update({ importance: validationResult.data })
+      .eq('id', validatedPersonId)
+
+    if (error) {
+      console.error("Failed to update importance:", error)
+      return { success: false, error: 'Failed to update importance' }
+    }
+
+    // Revalidate both views
+    revalidatePath('/triage')
+    revalidatePath('/garden')
+
+    return { success: true }
+  } catch (error: unknown) {
+    console.error('Error in updatePersonImportance:', error);
+    return { 
+      success: false, 
+      error: 'Failed to update importance. Please try again.' 
+    };
   }
-
-  // Revalidate both views
-  revalidatePath('/triage')
-  revalidatePath('/garden')
-
-  return { success: true }
 }

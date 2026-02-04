@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { authenticateRequest } from "@/lib/supabase/auth";
+import { audioFileSchema } from "@/lib/validations";
 
 // Lazy initialization to prevent build-time errors
 let openaiInstance: OpenAI | null = null;
@@ -34,6 +35,18 @@ export async function POST(request: NextRequest) {
     if (!audioFile) {
       return NextResponse.json(
         { error: "No audio file provided" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ SECURITY: Validate file type, size, and format
+    const validationResult = audioFileSchema.safeParse(audioFile);
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues
+        .map((e) => e.message)
+        .join(", ");
+      return NextResponse.json(
+        { error: `Invalid audio file: ${errorMessage}` },
         { status: 400 }
       );
     }
