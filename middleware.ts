@@ -70,7 +70,7 @@ export async function middleware(request: NextRequest) {
 
 
     // Public routes that don't require authentication
-    const publicRoutes = ["/login", "/auth/callback", "/reset-password", "/api/auth"];
+    const publicRoutes = ["/login", "/auth/callback", "/reset-password", "/api/auth", "/landing"];
     const isPublicRoute = publicRoutes.some((route) =>
       request.nextUrl.pathname.startsWith(route)
     );
@@ -91,7 +91,7 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     console.error("Middleware error:", error);
     // On error, allow public routes to proceed, otherwise redirect to login
-    const publicRoutes = ["/login", "/auth/callback", "/reset-password", "/api/auth"];
+    const publicRoutes = ["/login", "/auth/callback", "/reset-password", "/api/auth", "/landing"];
     const isPublicRoute = publicRoutes.some((route) =>
       request.nextUrl.pathname.startsWith(route)
     );
