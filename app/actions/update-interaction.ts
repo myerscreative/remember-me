@@ -20,23 +20,24 @@ export async function updateInteraction(
     // ✅ SECURITY: Validate all inputs
     const validationResult = updateInteractionSchema.safeParse({
       interactionId,
-      ...data
+      ...(data as Record<string, unknown>)
     });
 
     if (!validationResult.success) {
       const errorMessage = validationResult.error.issues
         .map((e) => `${e.path.join('.')}: ${e.message}`)
         .join(", ");
-      return { 
-        success: false, 
-        error: `Invalid interaction data: ${errorMessage}` 
+      return {
+        success: false,
+        error: `Invalid interaction data: ${errorMessage}`
       };
     }
 
     const { interactionId: validatedId, ...updateData } = validationResult.data;
 
     // Update the interaction (RLS policies will ensure user can only update their own)
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('interactions')
       .update({
         ...updateData,

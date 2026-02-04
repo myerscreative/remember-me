@@ -14,7 +14,8 @@ export async function toggleInterest(personId: string, interestName: string) {
     const normalizedName = validatedInterestName.toLowerCase().trim();
 
     // 1. Ensure the interest exists in the global table
-    let { data: interest, error: findError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let { data: interest, error: findError } = await (supabase as any)
       .from('interests')
       .select()
       .eq('name', normalizedName)
@@ -22,7 +23,8 @@ export async function toggleInterest(personId: string, interestName: string) {
 
     if (!interest) {
       // Attempt to insert
-      const { data: newInterest, error: insertError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: newInterest, error: insertError } = await (supabase as any)
         .from('interests')
         .insert({ name: normalizedName })
         .select()
@@ -30,9 +32,10 @@ export async function toggleInterest(personId: string, interestName: string) {
 
       if (insertError) {
         // Check if it's a unique constraint violation (someone else just added it)
-        if (insertError.code === '23505') { 
+        if (insertError.code === '23505') {
           // Retry fetch
-          const { data: retryInterest, error: retryError } = await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: retryInterest, error: retryError } = await (supabase as any)
             .from('interests')
             .select()
             .eq('name', normalizedName)
@@ -53,7 +56,8 @@ export async function toggleInterest(personId: string, interestName: string) {
     }
 
     // 2. Check if the link already exists
-    const { data: existing, error: fetchError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing, error: fetchError } = await (supabase as any)
       .from('person_interests')
       .select()
       .eq('person_id', validatedPersonId)
@@ -67,18 +71,20 @@ export async function toggleInterest(personId: string, interestName: string) {
 
     if (existing) {
       // Remove it
-      const { error: deleteError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: deleteError } = await (supabase as any)
         .from('person_interests')
         .delete()
         .match({ person_id: validatedPersonId, interest_id: interest.id })
-      
+
       if (deleteError) {
         console.error('Error removing interest:', deleteError);
         return { success: false, error: 'Failed to remove interest' };
       }
     } else {
       // Add it
-      const { error: insertError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insertError } = await (supabase as any)
         .from('person_interests')
         .insert({ person_id: validatedPersonId, interest_id: interest.id })
       

@@ -19,7 +19,8 @@ export async function toggleTag(personId: string, tagName: string) {
     const normalizedName = validatedTagName.toLowerCase().trim();
 
     // 1. Ensure the tag exists in the global table
-    let { data: tag, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let { data: tag, error } = await (supabase as any)
       .from('tags')
       .select()
       .eq('name', normalizedName)
@@ -32,7 +33,8 @@ export async function toggleTag(personId: string, tagName: string) {
 
     if (!tag) {
       // Attempt to insert
-      const { data: newTag, error: insertError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: newTag, error: insertError } = await (supabase as any)
         .from('tags')
         .insert({ name: normalizedName, user_id: user.id })
         .select()
@@ -40,9 +42,10 @@ export async function toggleTag(personId: string, tagName: string) {
 
       if (insertError) {
         // Check if it's a unique constraint violation
-        if (insertError.code === '23505') { 
+        if (insertError.code === '23505') {
           // Retry fetch
-          const { data: retryTag, error: retryError } = await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: retryTag, error: retryError } = await (supabase as any)
             .from('tags')
             .select()
             .eq('name', normalizedName)
@@ -63,7 +66,8 @@ export async function toggleTag(personId: string, tagName: string) {
     }
 
     // 2. Check if the link already exists
-    const { data: existing, error: fetchError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing, error: fetchError } = await (supabase as any)
       .from('person_tags')
       .select()
       .eq('person_id', validatedPersonId)
@@ -77,18 +81,20 @@ export async function toggleTag(personId: string, tagName: string) {
 
     if (existing) {
       // Remove it
-      const { error: deleteError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: deleteError } = await (supabase as any)
         .from('person_tags')
         .delete()
         .match({ person_id: validatedPersonId, tag_id: tag.id })
-      
+
       if (deleteError) {
         console.error('Error removing tag:', deleteError);
         return { success: false, error: 'Failed to remove tag' };
       }
     } else {
       // Add it
-      const { error: insertError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insertError } = await (supabase as any)
         .from('person_tags')
         .insert({ person_id: validatedPersonId, tag_id: tag.id })
       

@@ -24,6 +24,7 @@ export async function logGroupInteraction(params: {
   type: InteractionType;
   note?: string;
   date?: string;
+  nextGoalNote?: string | null;
 }): Promise<{
   success: boolean;
   updatedCount?: number;
@@ -76,6 +77,7 @@ export async function logGroupInteraction(params: {
       type: validatedType,
       notes: validatedSummary,
       date: interactionDate,
+      next_goal_note: params.nextGoalNote || null,
     }));
 
     const insertPromise = (supabase as any)

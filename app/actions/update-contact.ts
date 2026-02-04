@@ -35,7 +35,8 @@ export async function updateContact(personId: string, data: unknown) {
       Object.entries(validatedData).filter(([, v]) => v !== undefined)
     );
 
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('persons')
       .update({
         ...updateData,

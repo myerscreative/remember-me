@@ -19,7 +19,8 @@ export async function updateTargetFrequency(personId: string, frequencyDays: num
       };
     }
 
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('persons')
       .update({ target_frequency_days: validationResult.data })
       .eq('id', validatedPersonId)
