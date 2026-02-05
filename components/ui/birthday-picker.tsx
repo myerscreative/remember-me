@@ -8,8 +8,11 @@ import { cn } from "@/lib/utils";
 interface BirthdayPickerProps {
   date?: string | null;
   onChange: (date: string | null) => void;
-  className?: string;
+  className?: string; // Container class
+  inputClassName?: string; // Input/Select class
 }
+
+// ... MONTHS and DAYS constants ...
 
 const MONTHS = [
   { value: "01", label: "January" },
@@ -31,8 +34,8 @@ const DAYS = Array.from({ length: 31 }, (_, i) => {
   return { value: day, label: day };
 });
 
-export function BirthdayPicker({ date, onChange, className }: BirthdayPickerProps) {
-  // Parse initial date
+export function BirthdayPicker({ date, onChange, className, inputClassName }: BirthdayPickerProps) {
+  // ... parseDate and state logic (unchanged) ...
   const parseDate = (dateStr?: string | null) => {
     if (!dateStr) return { month: "", day: "", year: "" };
     try {
@@ -82,6 +85,7 @@ export function BirthdayPicker({ date, onChange, className }: BirthdayPickerProp
         <Select
           value={values.month}
           onChange={(e) => updateDate({ ...values, month: e.target.value })}
+          className={inputClassName}
         >
           <option value="" disabled>Month</option>
           {MONTHS.map((m) => (
@@ -96,6 +100,7 @@ export function BirthdayPicker({ date, onChange, className }: BirthdayPickerProp
         <Select
           value={values.day}
           onChange={(e) => updateDate({ ...values, day: e.target.value })}
+          className={inputClassName}
         >
           <option value="" disabled>Day</option>
           {DAYS.map((d) => (
@@ -112,7 +117,7 @@ export function BirthdayPicker({ date, onChange, className }: BirthdayPickerProp
           placeholder="Year (Opt)"
           value={values.year}
           onChange={(e) => updateDate({ ...values, year: e.target.value })}
-          className="w-full"
+          className={cn("w-full", inputClassName)}
           min="1900"
           max={new Date().getFullYear()}
         />

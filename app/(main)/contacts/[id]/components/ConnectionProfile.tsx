@@ -21,6 +21,7 @@ import { deleteContact } from '@/app/actions/delete-contact';
 import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-levels';
 import { UserSettings } from '@/lib/utils/summary-levels';
 import { DatePicker } from "@/components/ui/date-picker";
+import { BirthdayPicker } from "@/components/ui/birthday-picker";
 
 interface ConnectionProfileProps {
   contact: any;
@@ -548,13 +549,14 @@ export default function ConnectionProfile({
                         </div>
                          <div className="flex items-center justify-center gap-2">
                             <span className="text-[13px] text-[#64748b]">🎂 Birthday:</span>
-                            <input
-                                type="date"
-                                className="bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white [color-scheme:dark]"
-                                value={headerForm.birthday}
-                                onChange={(e) => setHeaderForm({...headerForm, birthday: e.target.value})}
+                            <BirthdayPicker
+                                date={headerForm.birthday}
+                                onChange={(date) => setHeaderForm({...headerForm, birthday: date || ''})}
+                                inputClassName="bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white [color-scheme:dark] h-8"
+                                className="w-full"
                             />
                         </div>
+
                          <div className="flex flex-col gap-1">
                             <span className="text-[13px] text-[#64748b] text-center">📷 Profile Photo:</span>
                             <button
@@ -740,13 +742,13 @@ export default function ConnectionProfile({
                             <div className="flex-1 min-w-0">
                                 <div className="text-[10px] text-[#64748b] uppercase tracking-[0.3px] mb-0.5 font-semibold">Birthday</div>
                                 {isEditingInfo ? (
-                                    <input 
-                                        type="date"
-                                        className="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white focus:border-[#60a5fa] outline-none [color-scheme:dark]"
-                                        value={editForm.birthday}
-                                        onChange={(e) => setEditForm(prev => ({ ...prev, birthday: e.target.value }))}
+                                    <BirthdayPicker
+                                        date={editForm.birthday}
+                                        onChange={(date) => setEditForm(prev => ({ ...prev, birthday: date || '' }))}
+                                        inputClassName="w-full bg-[#0f1419] border border-[#3d4758] rounded-lg px-2 py-1 text-[13px] text-white focus:border-[#60a5fa] outline-none [color-scheme:dark]"
                                     />
                                 ) : (
+
                                     <div className={`text-[14px] truncate ${!contact.birthday ? 'text-[#64748b] italic' : 'text-[#e2e8f0]'}`}>
                                         {contact.birthday ? new Date(contact.birthday).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) : 'Not set'}
                                     </div>
