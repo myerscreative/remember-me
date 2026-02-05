@@ -88,6 +88,15 @@ export const dateStringSchema = z
   .nullable();
 
 /**
+ * Date only validator - YYYY-MM-DD format
+ */
+export const dateOnlySchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
+  .optional()
+  .nullable();
+
+/**
  * Importance level validator
  */
 export const importanceSchema = z
@@ -118,7 +127,7 @@ export const targetFrequencySchema = z
 export const familyMemberSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
   relationship: z.string().trim().min(1, "Relationship required").max(50),
-  birthday: dateStringSchema,
+  birthday: dateOnlySchema,
   hobbies: safeStringSchema(500),
   interests: safeStringSchema(500),
 });
@@ -130,7 +139,7 @@ export const familyMemberSchema = z.object({
 export const updateContactSchema = z.object({
   email: emailSchema,
   phone: phoneSchema,
-  birthday: dateStringSchema,
+  birthday: dateOnlySchema,
   company: safeStringSchema(255),
   job_title: safeStringSchema(255),
   where_met: safeStringSchema(500),
