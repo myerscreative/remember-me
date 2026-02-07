@@ -22,6 +22,8 @@ import { getEffectiveSummaryLevel, SummaryLevel } from '@/lib/utils/summary-leve
 import { UserSettings } from '@/lib/utils/summary-levels';
 import { DatePicker } from "@/components/ui/date-picker";
 import { BirthdayPicker } from "@/components/ui/birthday-picker";
+import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 
 interface ConnectionProfileProps {
   contact: any;
@@ -48,6 +50,9 @@ export default function ConnectionProfile({
   const [logNote, setLogNote] = useState('');
   const [logDate, setLogDate] = useState<Date | undefined>(new Date());
   const [logType, setLogType] = useState<'connection' | 'attempt'>('connection');
+  const [showNextContact, setShowNextContact] = useState(false);
+  const [nextContactDate, setNextContactDate] = useState("");
+  const [nextContactReason, setNextContactReason] = useState("");
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
   const [editingInteractionId, setEditingInteractionId] = useState<string | null>(null);
   const [editInteractionForm, setEditInteractionForm] = useState({
@@ -178,6 +183,30 @@ export default function ConnectionProfile({
             setLogNote(logNote); // Restore note
             setLogDate(logDate); // Restore date
             return;
+        }
+
+        // Schedule next contact if requested
+        if (showNextContact && nextContactDate) {
+            try {
+                const scheduleResult = await scheduleNextContact(
+                    contact.id,
+                    nextContactDate,
+                    nextContactReason || undefined
+                );
+                
+                if (!scheduleResult.success) {
+                    toast.error(scheduleResult.error || 'Failed to schedule next contact');
+                } else {
+                    toast.success('Next contact scheduled!');
+                    // Reset scheduling state
+                    setShowNextContact(false);
+                    setNextContactDate("");
+                    setNextContactReason("");
+                }
+            } catch (scheduleError) {
+                console.error("Failed to schedule next contact:", scheduleError);
+                toast.error("Interaction logged, but failed to schedule next contact");
+            }
         }
 
         toast.success("Interaction logged!");
@@ -891,6 +920,45 @@ export default function ConnectionProfile({
                         >
                             ✅ Connected
                         </button>
+                    </div>
+
+                    {/* Schedule Next Contact Section */}
+                    <div className="mb-4 pt-1 border-t border-[#2d3748]/50">
+                        <button 
+                            onClick={() => setShowNextContact(!showNextContact)}
+                            className="flex items-center gap-2 text-[#94a3b8] hover:text-[#a78bfa] text-xs transition-colors w-full justify-between py-2 group"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Calendar size={14} className="group-hover:text-[#a78bfa]" />
+                                <span>Schedule Next Contact</span>
+                            </div>
+                            {showNextContact ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                        
+                        {showNextContact && (
+                            <div className="mt-2 space-y-3 bg-[#0f1419] rounded-xl p-3 border border-[#2d3748] animate-in fade-in slide-in-from-top-1">
+                                <div>
+                                    <label className="text-[10px] uppercase font-bold text-[#64748b] mb-1.5 block tracking-wider">When?</label>
+                                    <input 
+                                        type="date"
+                                        value={nextContactDate}
+                                        onChange={(e) => setNextContactDate(e.target.value)}
+                                        className="w-full bg-[#1a1f2e] border border-[#2d3748] rounded-lg px-3 py-2 text-sm text-gray-200 focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors outline-none"
+                                        min={new Date().toISOString().split('T')[0]}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase font-bold text-[#64748b] mb-1.5 block tracking-wider">Note (Optional)</label>
+                                    <input 
+                                        type="text"
+                                        value={nextContactReason}
+                                        onChange={(e) => setNextContactReason(e.target.value)}
+                                        placeholder="e.g., Follow up on project"
+                                        className="w-full bg-[#1a1f2e] border border-[#2d3748] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder:text-[#475569] focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors outline-none"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button 
