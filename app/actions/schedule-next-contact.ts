@@ -41,7 +41,8 @@ export async function scheduleNextContact(
     }
 
     // Update the contact's next_contact_date and next_contact_reason
-    const { error: updateError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({
         next_contact_date: nextContactDate,
