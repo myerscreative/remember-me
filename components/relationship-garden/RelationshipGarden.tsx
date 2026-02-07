@@ -23,7 +23,7 @@ export interface Contact {
 
 interface RelationshipGardenProps {
   contacts: Contact[];
-  relationships?: any[]; // Added relationships prop
+  // relationships prop removed as it was unused and typed as any
   filter: FilterType;
   onContactClick?: (contact: Contact) => void;
   onQuickLog?: (contact: Contact) => void;
@@ -68,11 +68,11 @@ function getStatusLabel(days: number, targetFrequencyDays?: number | null): stri
   return 'Fading';
 }
 
-import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles, Search, X, Save } from 'lucide-react';
+import { Search, X, Save, Sparkles } from 'lucide-react';
 
 // ... existing imports ...
 
-export default function RelationshipGarden({ contacts, relationships = [], filter, onContactClick, onQuickLog, hoveredContactId, desktopheaderControls, hideControls = false, hideInfoBadge = false, initialZoom = 100 }: RelationshipGardenProps) {
+export default function RelationshipGarden({ contacts, filter, onContactClick, onQuickLog, hoveredContactId, desktopheaderControls, hideControls = false, hideInfoBadge = false, initialZoom = 100 }: RelationshipGardenProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>({
     visible: false,
@@ -109,25 +109,25 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Search logic
-  useEffect(() => {
-    if (!searchQuery.trim()) {
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
       setHighlightedContactId(null);
       return;
     }
     
-    const query = searchQuery.toLowerCase();
-    const match = contacts.find(c => c.name.toLowerCase().includes(query));
+    const lowerQuery = query.toLowerCase();
+    const match = contacts.find(c => c.name.toLowerCase().includes(lowerQuery));
     
     if (match) {
       setHighlightedContactId(match.id.toString());
     } else {
       setHighlightedContactId(null);
     }
-  }, [searchQuery, contacts]);
+  };
 
   const clearSearch = () => {
-    setSearchQuery('');
-    setHighlightedContactId(null);
+    handleSearch('');
   };
 
   // Zoom handlers
@@ -370,7 +370,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
 
     // Clamp position to ensure tooltip stays on screen
     const tooltipWidth = 200; // min-w-[200px]
-    const tooltipHeight = 150; // approximate height
+    // const tooltipHeight = 150; // approximate height
     const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
     const yPos = Math.max(10, e.clientY - 70); // Ensure it doesn't go above viewport
 
@@ -389,7 +389,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
 
     // Clamp position to ensure tooltip stays on screen
     const tooltipWidth = 200;
-    const tooltipHeight = 150;
+    // const tooltipHeight = 150; // Unused
     const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
     const yPos = Math.max(10, e.clientY - 70);
 
@@ -488,7 +488,7 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
                 type="text"
                 placeholder="Search for a person..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
                 className="w-full bg-white/95 dark:bg-[#1e293b]/95 border-2 border-indigo-500/20 dark:border-indigo-500/30 rounded-xl py-2.5 pl-10 pr-10 text-sm md:text-[15px] text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm"
               />
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -543,13 +543,23 @@ export default function RelationshipGarden({ contacts, relationships = [], filte
           {/* Leaves Container (Centered) */}
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
             {/* Center label */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-700 text-sm font-semibold pointer-events-none select-none z-0">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500/50 text-xs font-bold uppercase tracking-widest pointer-events-none select-none z-0 mt-8">
               High Priority
             </div>
+
             {/* Render Rings Guidelines - Three rings for contact frequency (Matching new max radii: 220, 500, 900) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] rounded-full border border-red-500/20 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-amber-500/15 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1800px] h-[1800px] rounded-full border border-green-500/10 pointer-events-none" />
+            {/* Low Priority (Outer) - Green */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1800px] h-[1800px] rounded-full border border-green-500/20 bg-green-500/5 pointer-events-none">
+               <div className="absolute top-[22%] left-1/2 -translate-x-1/2 text-green-500/50 text-xs font-bold uppercase tracking-widest">Low Priority</div>
+            </div>
+            
+            {/* Medium Priority (Middle) - Amber */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-amber-500/20 bg-amber-500/5 pointer-events-none">
+              <div className="absolute top-[18%] left-1/2 -translate-x-1/2 text-amber-500/50 text-xs font-bold uppercase tracking-widest">Medium Priority</div>
+            </div>
+
+            {/* High Priority (Inner) - Red */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] rounded-full border border-red-500/20 bg-red-500/5 pointer-events-none" />
             
 
 
