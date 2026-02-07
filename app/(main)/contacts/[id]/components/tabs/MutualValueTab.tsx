@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Handshake, ArrowLeftRight, Users, Lightbulb, Sparkles } from 'lucide-react';
 import { updateStoryFields } from '@/app/actions/story-actions';
 import { toast } from 'react-hot-toast';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface MutualValueTabProps {
   contact: any;
@@ -48,17 +49,31 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
         </label>
         <p className="text-slate-400 text-sm mb-4">Ways you can provide value or assistance</p>
         
-        <textarea
-          placeholder="What can you offer? Introductions, expertise, resources, connections..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
-          value={mutualValueIntroductions.split('\n\n')[0] || ''}
-          onChange={(e) => {
-            const parts = mutualValueIntroductions.split('\n\n');
-            parts[0] = e.target.value;
-            setMutualValueIntroductions(parts.join('\n\n'));
-          }}
-          onBlur={handleBlur}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="What can you offer? Introductions, expertise, resources, connections..."
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            value={mutualValueIntroductions.split('\n\n')[0] || ''}
+            onChange={(e) => {
+              const parts = mutualValueIntroductions.split('\n\n');
+              parts[0] = e.target.value;
+              setMutualValueIntroductions(parts.join('\n\n'));
+            }}
+            onBlur={handleBlur}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const parts = mutualValueIntroductions.split('\n\n');
+                parts[0] = parts[0] ? `${parts[0]} ${text}` : text;
+                const newValue = parts.join('\n\n');
+                setMutualValueIntroductions(newValue);
+                updateStoryFields(contact.id, { mutual_value_introductions: newValue });
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       {/* How They Can Help Me */}
@@ -68,17 +83,31 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
         </label>
         <p className="text-slate-400 text-sm mb-4">Ways they can provide value or assistance</p>
         
-        <textarea
-          placeholder="What can they offer? Their expertise, network, resources, insights..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
-          value={mutualValueIntroductions.split('\n\n')[1] || ''}
-          onChange={(e) => {
-            const parts = mutualValueIntroductions.split('\n\n');
-            parts[1] = e.target.value;
-            setMutualValueIntroductions(parts.join('\n\n'));
-          }}
-          onBlur={handleBlur}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="What can they offer? Their expertise, network, resources, insights..."
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            value={mutualValueIntroductions.split('\n\n')[1] || ''}
+            onChange={(e) => {
+              const parts = mutualValueIntroductions.split('\n\n');
+              parts[1] = e.target.value;
+              setMutualValueIntroductions(parts.join('\n\n'));
+            }}
+            onBlur={handleBlur}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const parts = mutualValueIntroductions.split('\n\n');
+                parts[1] = parts[1] ? `${parts[1]} ${text}` : text;
+                const newValue = parts.join('\n\n');
+                setMutualValueIntroductions(newValue);
+                updateStoryFields(contact.id, { mutual_value_introductions: newValue });
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Introductions & Connections */}
@@ -88,17 +117,31 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
         </label>
         <p className="text-slate-400 text-sm mb-4">People to introduce, connections to make</p>
         
-        <textarea
-          placeholder="Who should you introduce them to? Who did you promise to connect them with?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
-          value={mutualValueIntroductions.split('\n\n')[2] || ''}
-          onChange={(e) => {
-            const parts = mutualValueIntroductions.split('\n\n');
-            parts[2] = e.target.value;
-            setMutualValueIntroductions(parts.join('\n\n'));
-          }}
-          onBlur={handleBlur}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="Who should you introduce them to? Who did you promise to connect them with?"
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            value={mutualValueIntroductions.split('\n\n')[2] || ''}
+            onChange={(e) => {
+              const parts = mutualValueIntroductions.split('\n\n');
+              parts[2] = e.target.value;
+              setMutualValueIntroductions(parts.join('\n\n'));
+            }}
+            onBlur={handleBlur}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const parts = mutualValueIntroductions.split('\n\n');
+                parts[2] = parts[2] ? `${parts[2]} ${text}` : text;
+                const newValue = parts.join('\n\n');
+                setMutualValueIntroductions(newValue);
+                updateStoryFields(contact.id, { mutual_value_introductions: newValue });
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Collaboration Opportunities */}
@@ -108,17 +151,31 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
         </label>
         <p className="text-slate-400 text-sm mb-4">Projects, partnerships, or ways to work together</p>
         
-        <textarea
-          placeholder="What could you build together? Business opportunities, creative projects, shared goals..."
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
-          value={mutualValueIntroductions.split('\n\n')[3] || ''}
-          onChange={(e) => {
-            const parts = mutualValueIntroductions.split('\n\n');
-            parts[3] = e.target.value;
-            setMutualValueIntroductions(parts.join('\n\n'));
-          }}
-          onBlur={handleBlur}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="What could you build together? Business opportunities, creative projects, shared goals..."
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            value={mutualValueIntroductions.split('\n\n')[3] || ''}
+            onChange={(e) => {
+              const parts = mutualValueIntroductions.split('\n\n');
+              parts[3] = e.target.value;
+              setMutualValueIntroductions(parts.join('\n\n'));
+            }}
+            onBlur={handleBlur}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const parts = mutualValueIntroductions.split('\n\n');
+                parts[3] = parts[3] ? `${parts[3]} ${text}` : text;
+                const newValue = parts.join('\n\n');
+                setMutualValueIntroductions(newValue);
+                updateStoryFields(contact.id, { mutual_value_introductions: newValue });
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Helper Text */}

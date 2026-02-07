@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle, Plus, Loader2, Heart, MessageCircle, Target, Sparkles, Handshake, Edit2, Check, X } from 'lucide-react';
 import { addGiftIdea, toggleGiftStatus, type GiftIdea } from '@/app/actions/gift-actions';
 import { updateStoryFields } from '@/app/actions/story-actions';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface StoryTabProps {
   contact: any;
@@ -289,24 +290,32 @@ function DisplaySection({
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
           {emoji} {title}
         </label>
-        {multiline ? (
-          <textarea
-            value={editValue}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-xl p-3.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none leading-relaxed"
-            autoFocus
-          />
-        ) : (
-          <input
-            type="text"
-            value={editValue}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-lg p-3 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
-            autoFocus
-          />
-        )}
+        <div className="relative">
+          {multiline ? (
+            <textarea
+              value={editValue}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-xl p-3.5 pr-10 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none leading-relaxed"
+              autoFocus
+            />
+          ) : (
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-lg p-3 pr-10 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+              autoFocus
+            />
+          )}
+          <div className="absolute right-1 bottom-1">
+            <AudioInputButton 
+              onTranscript={(text) => onChange(editValue ? `${editValue} ${text}` : text)}
+              size="sm"
+            />
+          </div>
+        </div>
         <div className="flex gap-2 mt-2">
           <button
             onClick={onSave}

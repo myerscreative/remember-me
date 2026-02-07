@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
-import { updateStoryFields } from '@/app/actions/story-actions'; // Reusing for family_notes mapped to simple field if needed, or create new action.
-// Actually, `family_notes` is a field on persons table. updateStoryFields logic is generic enough? 
-// Let's check story-actions. it takes specific fields. I might need a generic update action or just add family_notes to it.
+import { updateStoryFields } from '@/app/actions/story-actions'; 
+import { AudioInputButton } from '@/components/audio-input-button';
 import { X, Heart, User, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -19,6 +18,15 @@ interface FamilyMember {
   id?: string;
 }
 
+interface ValuesTabProps {
+  contact: {
+    id: string;
+    core_values?: string[];
+    communication_style?: string;
+    personality_notes?: string;
+    values_personality?: string;
+  };
+}
 interface FamilyTabProps {
   contact: {
     id: string;
@@ -56,7 +64,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
 
   const handleUpdateMember = (index: number, field: keyof FamilyMember, value: string) => {
     const newMembers = [...members];
-    (newMembers[index] as any)[field] = value;
+    newMembers[index] = { ...newMembers[index], [field]: value };
     setMembers(newMembers); // Update local state immediately
   };
 
@@ -115,13 +123,25 @@ export function FamilyTab({ contact }: FamilyTabProps) {
         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
            <Home size={14} /> Household Context
         </label>
-        <textarea 
-          placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[80px] text-sm resize-none"
-          value={householdNotes}
-          onChange={(e) => setHouseholdNotes(e.target.value)}
-          onBlur={handleSaveHouseholdNotes}
-        />
+        <div className="relative">
+          <textarea 
+            placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[80px] text-sm resize-none"
+            value={householdNotes}
+            onChange={(e) => setHouseholdNotes(e.target.value)}
+            onBlur={handleSaveHouseholdNotes}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const newNotes = householdNotes ? `${householdNotes} ${text}` : text;
+                setHouseholdNotes(newNotes);
+                updateStoryFields(contact.id, { family_notes: newNotes });
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       
@@ -196,14 +216,25 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                          />
                     </div>
                     {/* Partner Notes */}
-                    <div>
+                    <div className="relative">
                          <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Notes & Brain Dump</label>
                          <textarea 
-                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500 min-h-[60px] resize-none"
+                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 pr-10 text-slate-300 text-sm focus:outline-none focus:border-indigo-500 min-h-[60px] resize-none"
                              placeholder="Anniversary ideas, food allergies, work info..."
                              value={partner.notes || ''}
                              onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
+                             onBlur={() => handleSaveMember(realIdx)}
                          />
+                         <div className="absolute right-1 bottom-1">
+                             <AudioInputButton 
+                               onTranscript={(text) => {
+                                 const newNotes = partner.notes ? `${partner.notes} ${text}` : text;
+                                 handleUpdateMember(realIdx, 'notes', newNotes);
+                                 handleSaveMember(realIdx);
+                               }}
+                               size="sm"
+                             />
+                         </div>
                     </div>
                 </div>
              );
@@ -254,12 +285,25 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                                   />
                              </div>
                              
-                             <textarea 
-                                className="w-full bg-slate-900 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none border border-slate-800 focus:border-indigo-500/30 resize-none" 
-                                placeholder="Age, Grade, Interests (e.g. Soccer, Minecraft)..."
-                                value={child.notes || ''}
-                                onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
-                             />
+                             <div className="relative">
+                               <textarea 
+                                  className="w-full bg-slate-900 rounded-xl px-3 py-2 pr-10 text-xs text-slate-300 focus:outline-none border border-slate-800 focus:border-indigo-500/30 resize-none" 
+                                  placeholder="Age, Grade, Interests (e.g. Soccer, Minecraft)..."
+                                  value={child.notes || ''}
+                                  onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
+                                  onBlur={() => handleSaveMember(realIdx)}
+                               />
+                               <div className="absolute right-1 bottom-1">
+                                 <AudioInputButton 
+                                   onTranscript={(text) => {
+                                     const newNotes = child.notes ? `${child.notes} ${text}` : text;
+                                     handleUpdateMember(realIdx, 'notes', newNotes);
+                                     handleSaveMember(realIdx);
+                                   }}
+                                   size="sm"
+                                 />
+                               </div>
+                             </div>
                         </div>
                      );
                 })

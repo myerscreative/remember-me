@@ -5,6 +5,7 @@ import { addMilestone } from '@/app/actions/milestone-actions';
 import { Loader2, X, Sparkles, Calendar, Mic, Keyboard, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { VoiceRecorder } from '@/components/voice-recorder';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface PostCallPulseProps {
   contactId: string;
@@ -224,13 +225,21 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                 <label className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-2 block">
                     The Interaction Dump
                 </label>
-                <textarea 
-                    autoFocus
-                    value={dumpText}
-                    onChange={(e) => setDumpText(e.target.value)}
-                    placeholder={`Ex: ${name} is moving to Austin in July. His daughter Chloe started violin. We joked about...`}
-                    className="w-full flex-1 bg-transparent text-slate-200 focus:outline-none leading-relaxed resize-none placeholder:text-slate-600"
-                />
+                <div className="relative flex-1 flex flex-col min-h-[300px]">
+                  <textarea 
+                      autoFocus
+                      value={dumpText}
+                      onChange={(e) => setDumpText(e.target.value)}
+                      placeholder={`Ex: ${name} is moving to Austin in July. His daughter Chloe started violin. We joked about...`}
+                      className="w-full flex-1 bg-transparent text-slate-200 focus:outline-none leading-relaxed resize-none placeholder:text-slate-600 pr-12"
+                  />
+                  <div className="absolute right-0 bottom-2">
+                    <AudioInputButton 
+                      onTranscript={(text) => setDumpText(prev => prev ? `${prev} ${text}` : text)}
+                      size="md"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

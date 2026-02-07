@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Heart, MessageCircle, Target, Sparkles } from 'lucide-react';
 import { updateStoryFields } from '@/app/actions/story-actions';
 import { toast } from 'react-hot-toast';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface ValuesTabProps {
   contact: any;
@@ -112,13 +113,25 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
         </label>
         <p className="text-slate-400 text-sm mb-4">Decision-making style, motivations, sensitivities</p>
         
-        <textarea
-          placeholder="What drives them? How do they make decisions? Any sensitivities to be aware of?"
-          className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[150px] resize-none leading-relaxed"
-          value={personalityNotes}
-          onChange={(e) => setPersonalityNotes(e.target.value)}
-          onBlur={() => handleBlur('personality_notes', personalityNotes)}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="What drives them? How do they make decisions? Any sensitivities to be aware of?"
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[150px] resize-none leading-relaxed"
+            value={personalityNotes}
+            onChange={(e) => setPersonalityNotes(e.target.value)}
+            onBlur={() => handleBlur('personality_notes', personalityNotes)}
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => {
+                const newValue = personalityNotes ? `${personalityNotes} ${text}` : text;
+                setPersonalityNotes(newValue);
+                handleBlur('personality_notes', newValue);
+              }}
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Helper Text */}

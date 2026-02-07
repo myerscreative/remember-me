@@ -9,6 +9,7 @@ import { addSharedMemory } from '@/app/actions/story-actions';
 import { ReviewChangesModal } from '../ReviewChangesModal';
 import { updateStoryFields } from '@/app/actions/story-actions';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface SharedMemory {
   id: string;
@@ -173,12 +174,20 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
         <label className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3 block">
           ✏️ Quick Text Memory
         </label>
-        <textarea
-          value={newMemory}
-          onChange={(e) => setNewMemory(e.target.value)}
-          placeholder={`Add a quick note about ${contactName}...`}
-          className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[100px] placeholder:text-[#64748b] transition-colors"
-        />
+        <div className="relative">
+          <textarea
+            value={newMemory}
+            onChange={(e) => setNewMemory(e.target.value)}
+            placeholder={`Add a quick note about ${contactName}...`}
+            className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 pr-12 text-white text-[15px] outline-none resize-none min-h-[100px] placeholder:text-[#64748b] transition-colors"
+          />
+          <div className="absolute right-2 bottom-4">
+            <AudioInputButton 
+              onTranscript={(text) => setNewMemory(prev => prev ? `${prev} ${text}` : text)}
+              size="sm"
+            />
+          </div>
+        </div>
         <button
           onClick={handleAddMemory}
           disabled={!newMemory.trim() || isAddingMemory}

@@ -24,6 +24,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { BirthdayPicker } from "@/components/ui/birthday-picker";
 import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
+import { AudioInputButton } from '@/components/audio-input-button';
 
 interface ConnectionProfileProps {
   contact: any;
@@ -886,12 +887,20 @@ export default function ConnectionProfile({
                         />
                     </div>
                     
-                    <textarea 
-                        className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors" 
-                        placeholder="What did you discuss?"
-                        value={logNote}
-                        onChange={(e) => setLogNote(e.target.value)}
-                    />
+                    <div className="relative group/textarea">
+                        <textarea 
+                            className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 pr-12 text-white text-[15px] outline-none resize-none min-h-[80px] mb-3 placeholder:text-[#64748b] transition-colors" 
+                            placeholder="What did you discuss?"
+                            value={logNote}
+                            onChange={(e) => setLogNote(e.target.value)}
+                        />
+                        <div className="absolute right-2 bottom-6">
+                            <AudioInputButton 
+                                onTranscript={(text) => setLogNote(prev => prev ? `${prev} ${text}` : text)}
+                                size="sm"
+                            />
+                        </div>
+                    </div>
                     
                     <div className="grid grid-cols-2 gap-2.5 mb-4">
                         <button 
@@ -1021,14 +1030,20 @@ export default function ConnectionProfile({
                                                         />
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div className="relative">
                                                     <label className="text-[#94a3b8] text-[11px] font-medium mb-1 block">Notes</label>
                                                     <textarea
-                                                        className="w-full bg-[#0a0e1a] border border-[#3d4758] rounded-lg px-2 py-1.5 text-[13px] text-white resize-none"
+                                                        className="w-full bg-[#0a0e1a] border border-[#3d4758] rounded-lg px-2 py-1.5 pr-8 text-[13px] text-white resize-none"
                                                         rows={2}
                                                         value={editInteractionForm.notes}
                                                         onChange={(e) => setEditInteractionForm({...editInteractionForm, notes: e.target.value})}
                                                     />
+                                                    <div className="absolute right-1 bottom-1">
+                                                        <AudioInputButton 
+                                                            onTranscript={(text) => setEditInteractionForm(prev => ({ ...prev, notes: prev.notes ? `${prev.notes} ${text}` : text }))}
+                                                            size="sm"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
