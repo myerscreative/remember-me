@@ -310,30 +310,45 @@ export const parseTranscriptSchema = z.object({
  */
 export const audioFileSchema = z
   .instanceof(File)
-  .refine((file) => file.size <= 25 * 1024 * 1024, {
-    message: "File size must be less than 25MB",
-  })
-  .refine(
-    (file) => {
-      const validTypes = [
-        "audio/mpeg",
-        "audio/mp3",
-        "audio/wav",
-        "audio/webm",
-        "audio/mp4",
-        "audio/m4a",
-        "audio/x-m4a",
-        "audio/aac",
-        "audio/ogg",
-        "audio/quicktime",
-        "video/mp4",
-      ];
-      return validTypes.includes(file.type);
-    },
-    {
-      message: "Invalid file type. Supported: MP3, WAV, WebM, M4A",
+  .superRefine((file, ctx) => {
+    // 1. Validate Size
+    if (file.size > 25 * 1024 * 1024) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "File size must be less than 25MB",
+      });
     }
-  );
+
+    // 2. Validate Type
+    const validTypes = [
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/wave",
+      "audio/x-wav",
+      "audio/webm",
+      "audio/mp4",
+      "audio/m4a",
+      "audio/x-m4a",
+      "audio/aac",
+      "audio/ogg",
+      "audio/flac",
+      "audio/x-flac",
+      "audio/quicktime",
+      "video/mp4",
+      "video/webm",
+      "application/octet-stream",
+    ];
+
+    const isValidType = validTypes.includes(file.type) || file.type.startsWith("audio/");
+
+    if (!isValidType) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Invalid file type: ${file.type || "unknown"}. Supported: MP3, WAV, WebM, M4A, etc.`,
+      });
+    }
+  });
 
 // ============================================================================
 // HELPER FUNCTIONS
