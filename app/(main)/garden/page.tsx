@@ -518,7 +518,6 @@ export default function GardenPage() {
             <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
               <RelationshipGarden
                 contacts={filteredContacts}
-                relationships={relationships} // Pass relationships data
                 filter={categoryFilter}
                 onContactClick={(contact) => {
                   const extendedContact = contacts.find(c => c.id === contact.id);
@@ -803,7 +802,6 @@ export default function GardenPage() {
                 <div className="flex-1 w-full min-w-0">
                   <RelationshipGarden
                     contacts={filteredContacts}
-                    relationships={relationships} // Pass relationships data
                     filter={categoryFilter}
                     onContactClick={(contact) => {
                       const extendedContact = contacts.find(c => c.id === contact.id);
