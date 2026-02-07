@@ -84,7 +84,11 @@ export function AudioInputButton({
   const handleTranscription = async (audioBlob: Blob) => {
     setIsTranscribing(true);
     const formData = new FormData();
-    formData.append("audio", audioBlob, "recording.webm");
+    
+    // Determine the correct extension based on the blob's MIME type
+    const mimeType = audioBlob.type || mediaRecorderRef.current?.mimeType || "audio/webm";
+    const extension = mimeType.includes("mp4") ? "mp4" : "webm";
+    formData.append("audio", audioBlob, `recording.${extension}`);
 
     try {
       const response = await fetch("/api/transcribe", {
@@ -93,7 +97,8 @@ export function AudioInputButton({
       });
 
       if (!response.ok) {
-        throw new Error("Transcription failed");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Transcription failed");
       }
 
       const { transcript } = await response.json();
@@ -103,7 +108,7 @@ export function AudioInputButton({
       }
     } catch (err) {
       console.error("Transcription error:", err);
-      toast.error("Failed to transcribe audio.");
+      toast.error(err instanceof Error ? err.message : "Failed to transcribe audio.");
     } finally {
       setIsTranscribing(false);
     }

@@ -322,6 +322,11 @@ export const audioFileSchema = z
         "audio/webm",
         "audio/mp4",
         "audio/m4a",
+        "audio/x-m4a",
+        "audio/aac",
+        "audio/ogg",
+        "audio/quicktime",
+        "video/mp4",
       ];
       return validTypes.includes(file.type);
     },
