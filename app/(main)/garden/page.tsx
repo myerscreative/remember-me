@@ -11,7 +11,6 @@ import RelationshipGarden, { Contact } from '@/components/relationship-garden/Re
 import CategoryFilters, { FilterType } from '@/components/relationship-garden/CategoryFilters';
 import GardenStats from '@/components/relationship-garden/GardenStats';
 import NurtureSidebar from '@/components/relationship-garden/NurtureSidebar';
-import GardenLegend from '@/components/relationship-garden/GardenLegend';
 import LogInteractionModal from '@/components/relationship-garden/LogInteractionModal';
 import { toast } from 'sonner';
 
@@ -687,12 +686,7 @@ export default function GardenPage() {
 
 
 
-            {/* Legend */}
-            {viewMode === 'garden' && healthFilter === 'all' && (
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
-                <GardenLegend />
-              </div>
-            )}
+            {/* Legend removed - now accessible via info icon in garden view */}
           </div>
         </div>
 
@@ -852,7 +846,6 @@ export default function GardenPage() {
                     onQuickLog={handleQuickLog}
                     onHover={setHoveredContactId}
                   />
-                  <GardenLegend />
                 </div>
               </div>
             )}

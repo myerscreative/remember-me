@@ -5,7 +5,9 @@ import { useGardenLayout, GardenContact, GardenMode } from '@/hooks/useGardenLay
 import { GardenLeaf } from './GardenLeaf';
 import { GardenToggle } from './GardenToggle';
 import { GardenLegend } from './GardenLegend';
+import { GardenGuideModal } from './GardenGuideModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Info } from 'lucide-react';
 
 interface GardenViewProps {
   contacts: GardenContact[];
@@ -14,6 +16,7 @@ interface GardenViewProps {
 
 export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
   const [mode, setMode] = useState<GardenMode>('frequency');
+  const [showGuide, setShowGuide] = useState(false);
   const positionedContacts = useGardenLayout(contacts, mode);
   
   // Pan/Zoom State
@@ -70,7 +73,14 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
   return (
     <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-linear-to-br from-[#f8fafc] to-[#f1f5f9] dark:from-slate-900 dark:to-[#0f172a] select-none rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner">
         {/* Header Controls */}
-        <div className="absolute top-4 right-4 z-50">
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+            <button
+              onClick={() => setShowGuide(true)}
+              className="p-2.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all hover:scale-105 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              title="Garden Guide"
+            >
+              <Info className="w-5 h-5" />
+            </button>
             <GardenToggle mode={mode} onChange={handleModeChange} />
         </div>
 
@@ -133,6 +143,9 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
                 </div>
             </div>
         )}
+        
+        {/* Garden Guide Modal */}
+        <GardenGuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }

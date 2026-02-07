@@ -239,7 +239,7 @@ export default function EditContactPage({
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">
             {/* Header */}
-            <div className="flex items-center justify-between pt-4 pb-4 md:pt-6 md:pb-6">
+            <div className="flex items-center gap-4 pt-4 pb-4 md:pt-6 md:pb-6">
               <Link href={`/contacts/${id}`}>
                 <Button
                   variant="ghost"
@@ -250,7 +250,6 @@ export default function EditContactPage({
                 </Button>
               </Link>
               <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Edit Contact</h1>
-              <div className="w-10" /> {/* Spacer for centering */}
             </div>
 
             <form onSubmit={handleSubmit} id="contact-form" className="space-y-6 pb-32 md:pb-40">
