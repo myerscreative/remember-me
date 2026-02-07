@@ -28,9 +28,15 @@ export const uuidSchema = z.string().uuid({
 export const emailSchema = z
   .string()
   .trim()
-  .email({ message: "Invalid email address" })
-  .max(255, "Email too long")
-  .toLowerCase()
+  .transform((val) => (val === "" ? null : val))
+  .pipe(
+    z
+      .string()
+      .email({ message: "Invalid email address" })
+      .max(255, "Email too long")
+      .toLowerCase()
+      .nullable()
+  )
   .optional()
   .nullable();
 
@@ -40,8 +46,14 @@ export const emailSchema = z
 export const phoneSchema = z
   .string()
   .trim()
-  .max(20, "Phone number too long")
-  .regex(/^[+\d\s()-]+$/, "Invalid phone number format")
+  .transform((val) => (val === "" ? null : val))
+  .pipe(
+    z
+      .string()
+      .max(20, "Phone number too long")
+      .regex(/^[+\d\s()-]*$/, "Invalid phone number format")
+      .nullable()
+  )
   .optional()
   .nullable();
 
@@ -51,8 +63,14 @@ export const phoneSchema = z
 export const urlSchema = z
   .string()
   .trim()
-  .url({ message: "Invalid URL format" })
-  .max(500, "URL too long")
+  .transform((val) => (val === "" ? null : val))
+  .pipe(
+    z
+      .string()
+      .url({ message: "Invalid URL format" })
+      .max(500, "URL too long")
+      .nullable()
+  )
   .optional()
   .nullable();
 
@@ -83,7 +101,13 @@ export const longTextSchema = z
  */
 export const dateStringSchema = z
   .string()
-  .datetime({ message: "Invalid date format" })
+  .transform((val) => (val === "" ? null : val))
+  .pipe(
+    z
+      .string()
+      .datetime({ message: "Invalid date format" })
+      .nullable()
+  )
   .optional()
   .nullable();
 
@@ -92,7 +116,13 @@ export const dateStringSchema = z
  */
 export const dateOnlySchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
+  .transform((val) => (val === "" ? null : val))
+  .pipe(
+    z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
+      .nullable()
+  )
   .optional()
   .nullable();
 

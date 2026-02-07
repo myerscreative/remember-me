@@ -306,25 +306,19 @@ export default function ConnectionProfile({
         const result = await updateContact(contact.id, headerForm);
         if (result.success) {
             setIsEditingHeader(false);
+            toast.success("Header updated!");
             if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
         } else {
-            alert('Failed to update profile header');
+            toast.error(result.error || 'Failed to update profile header');
         }
     } catch (error) {
         console.error('Error saving header:', error);
-        alert('An error occurred while saving');
+        toast.error('An error occurred while saving');
     }
   };
 
   const handleSaveContactInfo = async () => {
       try {
-          // Optimistic update mechanism
-          const updatedContact = {
-              ...contact,
-              ...editForm,
-              updated_at: new Date().toISOString()
-          };
-          
           setIsEditingInfo(false);
           toast.loading("Saving changes...", { id: "save-contact" });
 
@@ -334,7 +328,7 @@ export default function ConnectionProfile({
               toast.success("Saved successfully!", { id: "save-contact" });
               if (onDataUpdate) { await onDataUpdate(); } else { router.refresh(); }
           } else {
-              toast.error('Failed to update contact info', { id: "save-contact" });
+              toast.error(result.error || 'Failed to update contact info', { id: "save-contact" });
               setIsEditingInfo(true);
           }
       } catch (error) {
