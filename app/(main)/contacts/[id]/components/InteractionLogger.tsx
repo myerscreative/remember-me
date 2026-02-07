@@ -6,13 +6,13 @@ import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
 import { addInterest } from '@/app/actions/story-actions';
 import { addFamilyMember } from '@/app/actions/update-family-members';
 import { addMilestone } from '@/app/actions/milestone-actions';
-import { extractEntities, extractMilestones, EntityType } from '@/lib/entity-extractor';
+import { extractEntities, extractMilestones } from '@/lib/entity-extractor';
 import { EntitySuggestionBar, Suggestion } from './EntitySuggestionBar';
 import { toast } from 'sonner';
 import { showNurtureToast } from '@/components/ui/nurture-toast';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, Clock, Settings, Send, Mic, Square, Loader2 } from 'lucide-react';
-import { updateTargetFrequency } from '@/app/actions/update-target-frequency'; // Assuming this exists or I'll need to generic update
+import { ChevronDown, ChevronUp, Clock, Settings, Send, Mic, Square, Loader2, Calendar } from 'lucide-react';
+import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 
 import { getInitials } from '@/lib/utils/contact-helpers';
 
@@ -47,6 +47,11 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [frequency, setFrequency] = useState(30); // Default, should fetch from contact if possible or passed in props
+
+  // Next contact scheduling state
+  const [showNextContact, setShowNextContact] = useState(false);
+  const [nextContactDate, setNextContactDate] = useState("");
+  const [nextContactReason, setNextContactReason] = useState("");
 
   // Audio recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -279,8 +284,26 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
           const result = await logHeaderInteraction(contactId, 'connection', note);
           
           if (result.success) {
+              // If next contact is scheduled, save it
+              if (nextContactDate) {
+                  const scheduleResult = await scheduleNextContact(
+                      contactId,
+                      nextContactDate,
+                      nextContactReason || undefined
+                  );
+                  
+                  if (!scheduleResult.success) {
+                      toast.error(scheduleResult.error || 'Failed to schedule next contact');
+                  } else {
+                      toast.success('Next contact scheduled!');
+                  }
+              }
+              
               showNurtureToast(contactName);
               setNote("");
+              setNextContactDate("");
+              setNextContactReason("");
+              setShowNextContact(false);
               fetchInteractions();
               if (onSuccess) onSuccess();
           } else {
@@ -391,6 +414,45 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
             </div>
 
             <EntitySuggestionBar suggestions={suggestions} onConfirm={handleSuggestionConfirm} />
+        </div>
+
+        {/* SCHEDULE NEXT CONTACT SECTION */}
+        <div className="border-t border-slate-800 pt-3">
+            <button 
+                onClick={() => setShowNextContact(!showNextContact)}
+                className="flex items-center gap-2 text-slate-400 hover:text-indigo-300 text-sm transition-colors w-full justify-between"
+            >
+                <div className="flex items-center gap-2">
+                    <Calendar size={14} />
+                    <span>Schedule Next Contact</span>
+                </div>
+                {showNextContact ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+            
+            {showNextContact && (
+                <div className="mt-3 space-y-3 bg-slate-900/30 rounded-xl p-3 border border-white/5 animate-in fade-in slide-in-from-bottom-2">
+                    <div>
+                        <label className="text-xs text-slate-400 mb-1 block">When?</label>
+                        <input 
+                            type="date"
+                            value={nextContactDate}
+                            onChange={(e) => setNextContactDate(e.target.value)}
+                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                            min={new Date().toISOString().split('T')[0]}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs text-slate-400 mb-1 block">What for? (optional)</label>
+                        <input 
+                            type="text"
+                            value={nextContactReason}
+                            onChange={(e) => setNextContactReason(e.target.value)}
+                            placeholder="e.g., Follow up on job search, Check in about project"
+                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* BOTTOM: ACTIONS */}
