@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Leaf from './Leaf';
 import { FilterType } from './CategoryFilters';
+import { GardenGuideModal } from '../garden/GardenGuideModal';
 
 // GOLDEN ANGLE - Nature's perfect packing angle (137.5°)
 const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
@@ -68,7 +69,7 @@ function getStatusLabel(days: number, targetFrequencyDays?: number | null): stri
   return 'Fading';
 }
 
-import { Search, X, Save, Sparkles } from 'lucide-react';
+import { Search, X, Save, Sparkles, Info } from 'lucide-react';
 
 // ... existing imports ...
 
@@ -102,6 +103,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     return initialZoom;
   });
   const [saved, setSaved] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   
   // Pan state
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -482,6 +484,15 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
               </div>
             </div>
 
+            {/* Info Icon Button */}
+            <button
+              onClick={() => setShowGuide(true)}
+              className="p-2.5 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all hover:scale-105 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              title="Garden Guide"
+            >
+              <Info className="w-5 h-5" />
+            </button>
+
             {/* Search Bar - Positioned to the right of zoom on desktop */}
             <div className="relative w-full md:flex-1 md:max-w-[400px] mx-auto md:mx-0">
               <input
@@ -689,7 +700,8 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         )}
       </div>
 
-
+      {/* Garden Guide Modal */}
+      <GardenGuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }
