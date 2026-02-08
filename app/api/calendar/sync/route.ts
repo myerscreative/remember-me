@@ -27,11 +27,15 @@ export async function POST(_request: NextRequest) {
 
     // If session doesn't have token, try database
     if (!accessToken) {
-      const { data: prefs } = await supabase
+      const { data: prefs, error: prefsError } = await supabase
         .from('calendar_preferences')
         .select('access_token_encrypted, provider')
         .eq('user_id', effectiveUserId)
-        .single();
+        .maybeSingle<{ access_token_encrypted: string | null; provider: string | null }>();
+      
+      if (prefsError) {
+        console.error('Error fetching calendar preferences for sync:', prefsError);
+      }
       
       if (prefs?.access_token_encrypted && prefs.provider === 'google') {
         const encrypted = prefs.access_token_encrypted;

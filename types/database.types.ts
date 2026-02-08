@@ -506,6 +506,103 @@ export interface Database {
           updated_at?: string
         }
       }
+      calendar_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          calendar_enabled: boolean
+          notification_time: number
+          only_known_contacts: boolean
+          provider: 'google' | 'microsoft' | 'apple' | null
+          access_token_encrypted: string | null
+          refresh_token_encrypted: string | null
+          token_expiry: string | null
+          last_sync_at: string | null
+          last_sync_error: string | null
+          sync_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          calendar_enabled?: boolean
+          notification_time?: number
+          only_known_contacts?: boolean
+          provider?: 'google' | 'microsoft' | 'apple' | null
+          access_token_encrypted?: string | null
+          refresh_token_encrypted?: string | null
+          token_expiry?: string | null
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          sync_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          calendar_enabled?: boolean
+          notification_time?: number
+          only_known_contacts?: boolean
+          provider?: 'google' | 'microsoft' | 'apple' | null
+          access_token_encrypted?: string | null
+          refresh_token_encrypted?: string | null
+          token_expiry?: string | null
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          sync_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      meeting_notifications: {
+        Row: {
+          id: string
+          user_id: string
+          event_id: string
+          event_title: string
+          event_start: string
+          event_provider: string
+          notification_shown: boolean
+          notification_shown_at: string | null
+          notification_dismissed: boolean
+          notification_dismissed_at: string | null
+          matched_contacts_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          event_id: string
+          event_title: string
+          event_start: string
+          event_provider: string
+          notification_shown?: boolean
+          notification_shown_at?: string | null
+          notification_dismissed?: boolean
+          notification_dismissed_at?: string | null
+          matched_contacts_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          event_id?: string
+          event_title?: string
+          event_start?: string
+          event_provider?: string
+          notification_shown?: boolean
+          notification_shown_at?: string | null
+          notification_dismissed?: boolean
+          notification_dismissed_at?: string | null
+          matched_contacts_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       person_health_status: {

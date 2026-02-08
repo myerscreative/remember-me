@@ -18,12 +18,16 @@ export async function GET(_request: NextRequest) {
   if (!accessToken && userId) {
     try {
       const supabase = await createClient();
-      const { data: prefs } = await supabase
+      const { data: prefs, error: prefsError } = await supabase
         .from('calendar_preferences')
         .select('access_token_encrypted, provider')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle<{ access_token_encrypted: string | null; provider: string | null }>();
       
+      if (prefsError) {
+        console.error('Error fetching calendar preferences:', prefsError);
+      }
+
       if (prefs?.access_token_encrypted && prefs.provider === 'google') {
         const encrypted = prefs.access_token_encrypted;
         accessToken = isEncrypted(encrypted) ? decryptToken(encrypted) : encrypted;
