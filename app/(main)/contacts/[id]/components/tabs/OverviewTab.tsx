@@ -168,6 +168,8 @@ interface OverviewTabProps {
   onLogInteraction: (note: string, type: 'connected' | 'attempted', date: string, nextDate?: string) => Promise<void>;
   onAvatarClick?: () => void;
   isLogging?: boolean;
+  synopsis?: string | null;
+  onRefreshAISummary?: () => Promise<void>;
 }
 
 export function OverviewTab({ 
@@ -175,7 +177,9 @@ export function OverviewTab({
   interactions = [], 
   onLogInteraction,
   onAvatarClick,
-  isLogging 
+  isLogging,
+  synopsis,
+  onRefreshAISummary
 }: OverviewTabProps) {
   
   // Tag/Interest Management States
@@ -294,7 +298,7 @@ export function OverviewTab({
           <Cake size={14} className="text-indigo-400" /> Birthday: {birthdayText}
         </p>
       </section>
-
+      
       {/* 2. Quick Actions */}
       <section className="grid grid-cols-3 gap-4 px-4">
         <QuickActionButton 
@@ -313,6 +317,32 @@ export function OverviewTab({
           href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
         />
       </section>
+
+      {/* 3. AI Synopsis (Moved from sidebar to prominent overview) */}
+      {synopsis && (
+        <section className="px-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-150">
+          <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-5 relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-indigo-400" />
+                <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">AI Relationship Synopsis</span>
+              </div>
+              {onRefreshAISummary && (
+                <button 
+                  onClick={onRefreshAISummary}
+                  className="text-indigo-400 hover:text-indigo-300 p-1 hover:bg-white/5 rounded-lg transition-all"
+                  title="Refresh AI Summary"
+                >
+                  <Loader2 size={14} className={cn("transition-all", false ? "animate-spin" : "")} />
+                </button>
+              )}
+            </div>
+            <p className="text-sm text-slate-300 leading-relaxed italic line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
+              &ldquo;{synopsis}&rdquo;
+            </p>
+          </div>
+        </section>
+      )}
 
       <div className="px-4 space-y-6">
         {/* 3. Vital Signs Card */}

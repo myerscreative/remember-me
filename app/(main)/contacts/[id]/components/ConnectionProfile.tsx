@@ -14,14 +14,25 @@ import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 import { OverviewTab } from './tabs/OverviewTab';
 
 interface ConnectionProfileProps {
-  contact: any; // Ideally a specific interface, but keeping 'any' to match rest of codebase for now
-  synopsis: string | null;
+  contact: any;
+  synopsis?: string | null;
+  health?: any;
+  lastContact?: string;
+  summaryLevel?: string;
+  sharedMemory?: any;
+  onRefreshAISummary?: () => Promise<void>;
   onDataUpdate?: () => Promise<void>;
 }
 
 export default function ConnectionProfile({ 
     contact, 
-    onDataUpdate 
+    onDataUpdate,
+    synopsis,
+    health,
+    lastContact,
+    summaryLevel,
+    sharedMemory,
+    onRefreshAISummary
 }: ConnectionProfileProps) {
   const router = useRouter();
 
@@ -150,6 +161,8 @@ export default function ConnectionProfile({
               interactions={contact.interactions || []}
               isLogging={isLogging || isUploadingPhoto}
               onAvatarClick={handleAvatarClick}
+              synopsis={synopsis}
+              onRefreshAISummary={onRefreshAISummary}
               onLogInteraction={async (note, type, date, nextDate) => {
                 setIsLogging(true);
                 try {
