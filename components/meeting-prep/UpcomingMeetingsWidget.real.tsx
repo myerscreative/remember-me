@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Video, MapPin, ArrowRight, Coffee, RefreshCw, Users } from "lucide-react";
@@ -52,7 +52,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
   }, [session, fetchMeetings]);
 
   const getMeetingGroup = (meeting: MatchedMeeting) => {
-    const meetingDate = new Date(meeting.calendarEvent.start.dateTime);
+    const meetingDate = new Date(meeting.calendarEvent.start.dateTime ?? meeting.calendarEvent.start.date ?? Date.now());
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -195,7 +195,8 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
   };
 
   // Format time only after mount to avoid hydration mismatch
-  const formatTime = (dateString: string) => {
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return "";
     if (!mounted) return '--:--';
     return new Date(dateString).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   };
