@@ -4,7 +4,6 @@ import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import type { Person } from '@/types/database.types';
 import { extractSixBlocks } from '@/lib/six-block-extraction';
-import { revalidatePath } from 'next/cache';
 import { z } from "zod";
 
 const openai = new OpenAI({
@@ -71,6 +70,11 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       INPUT STYLE
       The user may speak freely, jump between topics, repeat themselves, or mix facts with impressions. Treat all input as intentional and valuable.
 
+      "BRAIN DUMP" PROCESSING LOGIC
+      1. Extract Facts: Identify names, dates, or specific life updates (e.g., 'Sarah started a new job').
+      2. Categorize: Route data to Story (Career, Values), Family (Relationships, Household), or Shared Memories (Timeline updates).
+      3. Update Health: If the tone is high-value (e.g., 'We had a deep talk', 'We reconnected after years', 'It was a very meaningful conversation'), trigger a +5 boost to the Health Score.
+
       OUTPUT OBJECTIVE
       Transform the input into a high-level AI synopsis (human, not robotic), clearly grouped and labeled categories, and actionable memory anchors.
       Nothing should feel like a "ball of string." Everything must have meaning and place.
@@ -121,7 +125,10 @@ export async function processMemory(contactId: string, text: string, autoSave = 
       6. GOALS_ASPIRATIONS: Use this for goals, dreams, aspirations, or what they're working toward.
          Data Format: { value: string }.
 
-      7. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above.
+      7. HEALTH_BOOST: If the conversation tone is high-value or deep, specify the boost amount.
+         Data Format: { value: number } (e.g., 5).
+
+      8. SYNOPSIS: The FULL formatted markdown text based on the "REQUIRED STRUCTURE" sections above.
          IMPORTANT: Pass the entire multi-paragraph markdown string as the value here. This will be the high-quality snapshot shown to the user.
          Data Format: { value: string }.
       
@@ -152,9 +159,9 @@ export async function processMemory(contactId: string, text: string, autoSave = 
 
 
     const fieldsUpdated: string[] = [];
-
-    let currentFamily: any[] = Array.isArray(person.family_members) ? person.family_members : [];
-    let currentInterests: string[] = Array.isArray(person.interests) ? person.interests : [];
+    const currentFamily = (Array.isArray(person.family_members) ? person.family_members : []) as any[];
+    let currentInterests = (Array.isArray(person.interests) ? person.interests : []) as string[];
+    let health_boost: number = person.health_boost || 0;
     let where_met: string | null = person.where_met;
     let deep_lore: string | null = person.deep_lore;
     let relationship_summary: string | null = person.relationship_summary;
@@ -182,7 +189,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
                     fieldsUpdated.push('Family (Updated)');
                 } else if (existingIndex === -1) {
                     // Add new family member
-                    const { action, ...memberData } = data; // Remove action field
+                    const { action: _, ...memberData } = data; // Remove action field
                     currentFamily.push(memberData);
                     fieldsUpdated.push('Family (Added)');
                 }
@@ -235,6 +242,12 @@ export async function processMemory(contactId: string, text: string, autoSave = 
                 deep_lore = deep_lore ? `${deep_lore}\n\n${newStory}` : newStory;
                 fieldsUpdated.push('Summary');
                 break;
+            case 'HEALTH_BOOST':
+                if (typeof data.value === 'number') {
+                    health_boost += data.value;
+                    fieldsUpdated.push('Health Score');
+                }
+                break;
         }
     }
 
@@ -259,6 +272,7 @@ export async function processMemory(contactId: string, text: string, autoSave = 
         'Challenges': { current_challenges },
         'Goals': { goals_aspirations },
         'Summary': { deep_lore, relationship_summary },
+        'Health Score': { health_boost },
     };
 
     for (const field of fieldsUpdated) {

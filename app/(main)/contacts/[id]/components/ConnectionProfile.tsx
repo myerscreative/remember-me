@@ -143,7 +143,8 @@ export default function ConnectionProfile({
   
   // Health Score Logic (Consistent with OverviewTab)
   const daysSince = contact.days_since_last_interaction ?? 30;
-  const healthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
+  const baseHealthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
+  const healthScore = Math.min(100, baseHealthScore + (contact.health_boost || 0));
 
   const birthdayText = contact.birthday 
     ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric', timeZone: 'UTC' })

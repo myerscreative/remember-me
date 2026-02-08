@@ -10,6 +10,7 @@ import { ReviewChangesModal } from '../ReviewChangesModal';
 import { updateStoryFields } from '@/app/actions/story-actions';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
 import { AudioInputButton } from '@/components/audio-input-button';
+import { BrainDumpProcessing } from '../BrainDumpProcessing';
 
 interface SharedMemory {
   id: string;
@@ -147,7 +148,14 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
+    <div className="flex flex-col gap-6 pb-20 relative">
+      {/* Processing Overlay */}
+      {isReprocessing && (
+        <div className="absolute inset-x-0 top-0 z-50 animate-in fade-in zoom-in duration-300">
+          <BrainDumpProcessing name={contact.first_name} />
+        </div>
+      )}
+
       {/* Quick Voice Brain Dump Button */}
       <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl">
         <h3 className="text-white text-lg font-bold mb-2 flex items-center gap-2">

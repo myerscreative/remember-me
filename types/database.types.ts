@@ -73,6 +73,7 @@ export interface Database {
           state: string | null
           zip_code: string | null
           country: string | null
+          health_boost: number | null
           created_at: string
           updated_at: string
         }
@@ -127,6 +128,7 @@ export interface Database {
           state?: string | null
           zip_code?: string | null
           country?: string | null
+          health_boost?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -189,6 +191,7 @@ export interface Database {
           state?: string | null
           zip_code?: string | null
           country?: string | null
+          health_boost?: number | null
           created_at?: string
           updated_at?: string
         }

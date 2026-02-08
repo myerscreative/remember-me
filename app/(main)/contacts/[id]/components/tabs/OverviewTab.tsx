@@ -216,7 +216,8 @@ export function OverviewTab({
   // Health Score Logic 
   const daysSince = contact.days_since_last_interaction ?? 30;
   const targetDays = contact.target_frequency_days ?? 30;
-  const healthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
+  const baseHealthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
+  const healthScore = Math.min(100, baseHealthScore + (contact.health_boost || 0));
       
   const lastInteractionDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
   const nextDueDate = lastInteractionDate 
