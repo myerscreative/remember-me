@@ -52,7 +52,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
   const getMeetingGroup = (meeting: MatchedMeeting) => {
     if (!mounted) return "This Week";
-    const meetingDate = new Date(meeting.calendarEvent.start.dateTime);
+    const meetingDate = new Date(meeting.calendarEvent.start.dateTime ?? meeting.calendarEvent.start.date ?? Date.now());
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -191,7 +191,8 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const formatTime = (dateString: string) => {
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return "";
     if (!mounted) return '--:--';
     return new Date(dateString).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   };
