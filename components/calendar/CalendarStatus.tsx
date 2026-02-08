@@ -182,17 +182,21 @@ export function CalendarStatus() {
               Next {Math.min(events.length, 5)} Events
             </p>
             
-            {events.slice(0, 5).map((event) => (
+            {events.slice(0, 5).map((event) => {
+              const startDate = event.start.dateTime || event.start.date || new Date().toISOString();
+              const endDate = event.end.dateTime || event.end.date || new Date().toISOString();
+              
+              return (
               <div 
                 key={event.id} 
                 className="group flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
               >
                 <div className="shrink-0 w-14 text-center">
                   <span className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
-                    {getEventDate(event.start.dateTime)}
+                    {getEventDate(startDate)}
                   </span>
                   <span className="block text-sm font-semibold text-gray-900 dark:text-gray-200">
-                    {formatEventTime(event.start.dateTime)}
+                    {formatEventTime(startDate)}
                   </span>
                 </div>
                 
@@ -224,12 +228,12 @@ export function CalendarStatus() {
 
                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                       <Clock className="w-3 h-3" />
-                      {Math.round((new Date(event.end.dateTime).getTime() - new Date(event.start.dateTime).getTime()) / 60000)}m
+                      {Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 60000)}m
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
