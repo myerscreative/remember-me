@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,7 +115,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] w-[calc(100%-24px)] max-h-[95vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
         <DialogHeader>
           <DialogTitle>Edit Contact Info</DialogTitle>
           <DialogDescription>
@@ -123,8 +123,8 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4 pb-32">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-5 py-2 pb-24">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
               <Input
@@ -177,7 +177,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
               <Input
@@ -211,7 +211,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
           {/* Last Contact Section */}
           <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Last Contact (for backfilling)</h4>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="lastContactDate">Date</Label>
                 <Input
@@ -258,7 +258,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
 
 
       <div className="flex flex-col gap-4 w-full pt-4 border-t border-gray-100 dark:border-gray-800">
-        <div className="flex justify-between items-center w-full">
+        <div className="flex flex-col-reverse sm:flex-row justify-between items-center w-full gap-4">
             {!showDeleteConfirm ? (
               <Button 
                 type="button" 
@@ -321,11 +321,11 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
             )}
 
             {!showDeleteConfirm && (
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Button type="button" variant="outline" onClick={onClose} disabled={isSaving} className="w-full sm:w-auto">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSaving}>
+                <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
