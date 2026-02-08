@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,8 @@ import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import { formatPhoneNumber } from "@/lib/utils";
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
+
 
 interface EditContactModalProps {
   isOpen: boolean;
@@ -33,7 +36,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
     birthday: "",
     lastContactDate: "",
     lastContactMethod: "",
+    targetFrequencyDays: 30,
   });
+
 
   // Load initial data when contact changes or modal opens
   useEffect(() => {
@@ -49,7 +54,9 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
         birthday: contact.birthday || "",
         lastContactDate: contact.last_interaction_date?.split('T')[0] || contact.last_contact_date?.split('T')[0] || "",
         lastContactMethod: contact.last_contact_method || "",
+        targetFrequencyDays: contact.target_frequency_days || 30,
       });
+
     }
   }, [contact, isOpen]);
 
@@ -68,7 +75,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       : formData.firstName.trim();
 
     // Only include fields that exist in the persons table
-    const updates: Record<string, string | null> = {
+    const updates: Record<string, any> = {
       first_name: formData.firstName.trim(),
       last_name: formData.lastName.trim() || null,
       name: fullName,
@@ -79,7 +86,10 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
       job_title: formData.jobTitle.trim() || null,
       birthday: formData.birthday || null,
       last_interaction_date: formData.lastContactDate || null,
+      target_frequency_days: formData.targetFrequencyDays,
     };
+
+
 
     try {
       const supabase = createClient();
@@ -228,6 +238,23 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               </div>
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="targetFrequencyDays">Follow-up Frequency</Label>
+            <select
+              id="targetFrequencyDays"
+              value={formData.targetFrequencyDays}
+              onChange={(e) => setFormData({ ...formData, targetFrequencyDays: parseInt(e.target.value) })}
+              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {FREQUENCY_PRESETS.map((preset) => (
+                <option key={preset.days} value={preset.days}>
+                  {preset.label} ({preset.days} days)
+                </option>
+              ))}
+            </select>
+          </div>
+
 
 
       <div className="flex flex-col gap-4 w-full pt-4 border-t border-gray-100 dark:border-gray-800">
