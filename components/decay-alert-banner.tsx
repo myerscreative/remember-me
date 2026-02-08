@@ -22,6 +22,7 @@ interface DecayingRelationship {
   interaction_count: number;
   decay_severity: "mild" | "moderate" | "severe";
   last_interaction_date?: string;
+  relationship_summary?: string;
 }
 
 export function DecayAlertBanner() {
@@ -36,7 +37,14 @@ export function DecayAlertBanner() {
         const response = await fetch("/api/decay-alerts?days=180");
         if (response.ok) {
           const data = await response.json();
-          const processed = (data.relationships || []).map((p: any) => {
+          const processed = (data.relationships || []).map((p: {
+            id: string;
+            name: string;
+            last_interaction_date?: string;
+            created_at: string;
+            interaction_count?: number;
+            relationship_summary?: string;
+          }) => {
             const lastDate = p.last_interaction_date || p.created_at;
             const days = Math.floor((new Date().getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24));
             
@@ -50,7 +58,8 @@ export function DecayAlertBanner() {
               last_contact_days: days,
               interaction_count: p.interaction_count || 0,
               decay_severity: severity,
-              last_interaction_date: p.last_interaction_date
+              last_interaction_date: p.last_interaction_date,
+              relationship_summary: p.relationship_summary
             };
           });
           setDecayingRelationships(processed);
@@ -101,7 +110,9 @@ export function DecayAlertBanner() {
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">
-                {decayingRelationships.length} {decayingRelationships.length === 1 ? "person needs" : "people need"} attention
+                {decayingRelationships.length > 3 
+                  ? "Contact your next 3 people" 
+                  : `${decayingRelationships.length} ${decayingRelationships.length === 1 ? "person needs" : "people need"} attention`}
               </h3>
               <p className="text-xs text-slate-400">
                 Nurture your network today
@@ -111,9 +122,9 @@ export function DecayAlertBanner() {
           
           <Button 
             onClick={() => setIsExpanded(true)}
-            variant="secondary"
+            variant="default"
             size="sm"
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border-0 h-9 px-4 rounded-lg font-semibold"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white border-0 h-9 px-4 rounded-lg font-semibold shadow-md shadow-indigo-500/20"
           >
             View Suggestions
           </Button>
@@ -162,6 +173,11 @@ export function DecayAlertBanner() {
                       <h4 className="text-base font-bold text-white truncate">
                         {relationship.name}
                       </h4>
+                      {relationship.relationship_summary && (
+                        <p className="text-[11px] text-slate-400 font-medium italic mb-1 line-clamp-1">
+                          {relationship.relationship_summary}
+                        </p>
+                      )}
                       <p className="text-xs text-slate-500 font-medium">
                         Last touch: {formatDate(relationship.last_interaction_date)}
                       </p>
