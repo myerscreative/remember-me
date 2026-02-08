@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState, useCallback } from 'react';
 import { MatchedMeeting, MatchingResult } from '@/lib/matching/types';
+import { formatCalendarDate } from '@/lib/utils/date-helpers';
 
 export function MatchedEventsList() {
   const { data: session } = useSession();
@@ -131,13 +132,7 @@ export function MatchedEventsList() {
 
                   {/* Time */}
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-3" suppressHydrationWarning>
-                    📅 {mounted ? new Date(meeting.calendarEvent.start.dateTime).toLocaleString('en-US', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    }) : '--'}
+                    📅 {mounted ? formatCalendarDate(meeting.calendarEvent.start.dateTime) : '--'}
                   </p>
 
                   {/* Matched Contacts */}

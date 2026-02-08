@@ -1,6 +1,5 @@
 
-import { Person } from "@/types/database.types";
-import { formatDistanceToNow, parseISO, differenceInDays, isToday, addYears, setYear, isPast, isFuture, isValid } from "date-fns";
+import { formatDistanceToNow, parseISO, differenceInDays, isToday, addYears, setYear, isPast, isValid } from "date-fns";
 
 /**
  * Calculates days until the next birthday.
@@ -136,4 +135,27 @@ export function getFrequencyLabel(days: number | null): string {
   if (days <= 90) return "Quarterly";
   if (days <= 180) return "Twice a year";
   return "Yearly";
+}
+
+/**
+ * Safe formatter for calendar event dates
+ * Handles undefined/null inputs and invalid dates
+ */
+export function formatCalendarDate(dateTime?: string | null): string {
+  if (!dateTime) return "No date available";
+
+  try {
+    const date = new Date(dateTime);
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    return date.toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return "Date error";
+  }
 }
