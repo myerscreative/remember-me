@@ -1,37 +1,45 @@
 'use client';
 
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react';
+import { 
+  Check, 
+  X, 
+  Edit2, 
+  Plus, 
+  Circle, 
+  CheckCircle, 
+  ShoppingBag,
+  Loader2,
+  Heart,
+  MessageCircle
+} from 'lucide-react';
+import { GiftIcon } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { Gift as GiftIcon, ShoppingBag, CheckCircle, Circle, Plus, Loader2, Heart, MessageCircle, Target, Sparkles, Handshake, Edit2, Check, X } from 'lucide-react';
-import { addGiftIdea, toggleGiftStatus, type GiftIdea } from '@/app/actions/gift-actions';
-import { updateStoryFields } from '@/app/actions/story-actions';
 import { AudioInputButton } from '@/components/audio-input-button';
+import { updateStoryFields } from '@/app/actions/update-story-fields';
+import { addGiftIdea, toggleGiftStatus } from '@/app/actions/gift-actions';
+
+interface GiftIdea {
+  id: string;
+  item: string;
+  status: 'idea' | 'purchased' | 'given';
+  created_at: string;
+}
 
 interface StoryTabProps {
   contact: any;
 }
 
 export function StoryTab({ contact }: StoryTabProps) {
-  // Track which section is being edited
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Record<string, string>>({});
 
-  // Local state for editing
-  const [editValues, setEditValues] = useState<Record<string, any>>({});
-
-  // Values fields
-  const [coreValues, setCoreValues] = useState<string[]>(contact.core_values || []);
-  const [communicationStyle, setCommunicationStyle] = useState(contact.communication_style || '');
-
-  const commonValues = [
-    'Security', 'Freedom', 'Recognition', 'Contribution',
-    'Growth', 'Family', 'Achievement', 'Authenticity',
-    'Innovation', 'Stability', 'Adventure', 'Connection'
-  ];
-
-  const startEdit = (section: string, currentValue: any) => {
+  const coreValues = Array.isArray(contact.core_values) ? contact.core_values : [];
+  
+  const startEdit = (section: string, value: string) => {
     setEditingSection(section);
-    setEditValues({ [section]: currentValue });
+    setEditValues({ [section]: value });
   };
 
   const cancelEdit = () => {
@@ -40,49 +48,28 @@ export function StoryTab({ contact }: StoryTabProps) {
   };
 
   const saveEdit = async (field: string) => {
-    const value = editValues[editingSection!];
-    const update: Record<string, any> = { [field]: value };
-
-    const result = await updateStoryFields(contact.id, update);
-    if (!result.success) {
-      toast.error("Failed to save");
-    } else {
-      toast.success("Saved!", { duration: 1500 });
-      setEditingSection(null);
-      setEditValues({});
-      // Update the contact object
-      (contact as any)[field] = value;
-    }
-  };
-
-  const toggleValue = async (value: string) => {
-    const newValues = coreValues.includes(value)
-      ? coreValues.filter(v => v !== value)
-      : [...coreValues, value];
-    setCoreValues(newValues);
-
-    const result = await updateStoryFields(contact.id, { core_values: newValues });
-    if (result.success) {
-      toast.success("Saved!", { duration: 1000 });
-    }
-  };
-
-  const updateCommunicationStyle = async (style: string) => {
-    setCommunicationStyle(style);
-    const result = await updateStoryFields(contact.id, { communication_style: style });
-    if (result.success) {
-      toast.success("Saved!", { duration: 1000 });
+    const value = editValues[field];
+    try {
+      const result = await updateStoryFields(contact.id, { [field]: value });
+      if (result.success) {
+        toast.success('Updated successfully');
+        setEditingSection(null);
+      } else {
+        toast.error('Failed to update');
+      }
+    } catch {
+      toast.error('An error occurred');
     }
   };
 
   return (
-    <div className="flex flex-col gap-3 pb-20 text-slate-200">
+    <div className="flex flex-col gap-4 pb-20 text-slate-200">
 
       {/* HOW WE MET */}
-      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
         <DisplaySection
           emoji="📍"
-          title="HOW WE MET"
+          title="how we met"
           content={contact.where_met}
           isEditing={editingSection === 'where_met'}
           editValue={editValues['where_met']}
@@ -95,10 +82,10 @@ export function StoryTab({ contact }: StoryTabProps) {
       </div>
 
       {/* WHY WE STAY CONNECTED */}
-      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
         <DisplaySection
           emoji="💭"
-          title="WHY WE STAY CONNECTED"
+          title="why we stay connected"
           content={contact.why_stay_in_contact}
           isEditing={editingSection === 'why_stay_in_contact'}
           editValue={editValues['why_stay_in_contact']}
@@ -111,10 +98,10 @@ export function StoryTab({ contact }: StoryTabProps) {
       </div>
 
       {/* WHAT MATTERS TO THEM */}
-      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
         <DisplaySection
           emoji="💎"
-          title="WHAT MATTERS TO THEM"
+          title="what matters to them"
           content={contact.most_important_to_them}
           isEditing={editingSection === 'most_important_to_them'}
           editValue={editValues['most_important_to_them']}
@@ -128,9 +115,9 @@ export function StoryTab({ contact }: StoryTabProps) {
       </div>
 
       {/* CAREER & BUSINESS */}
-      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
-          💼 CAREER & BUSINESS
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
+        <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
+          💼 career & business
         </label>
         {(contact.job_title || contact.company) ? (
           <p className="text-slate-300 text-sm leading-relaxed">
@@ -139,54 +126,16 @@ export function StoryTab({ contact }: StoryTabProps) {
             {contact.company && <span>{contact.company}</span>}
           </p>
         ) : (
-          <p className="text-slate-500 text-sm italic">Not set</p>
+          <p className="text-slate-500 text-sm italic">not set</p>
         )}
       </div>
 
-      {/* CHALLENGES */}
-      {contact.current_challenges && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <DisplaySection
-            emoji="💪"
-            title="CURRENT CHALLENGES"
-            content={contact.current_challenges}
-            isEditing={editingSection === 'current_challenges'}
-            editValue={editValues['current_challenges']}
-            onEdit={() => startEdit('current_challenges', contact.current_challenges || '')}
-            onCancel={cancelEdit}
-            onSave={() => saveEdit('current_challenges')}
-            onChange={(val) => setEditValues({ current_challenges: val })}
-            placeholder="Current challenges, obstacles, what they're navigating..."
-            multiline
-          />
-        </div>
-      )}
-
-      {/* GOALS & ASPIRATIONS */}
-      {contact.goals_aspirations && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <DisplaySection
-            emoji="✨"
-            title="GOALS & ASPIRATIONS"
-            content={contact.goals_aspirations}
-            isEditing={editingSection === 'goals_aspirations'}
-            editValue={editValues['goals_aspirations']}
-            onEdit={() => startEdit('goals_aspirations', contact.goals_aspirations || '')}
-            onCancel={cancelEdit}
-            onSave={() => saveEdit('goals_aspirations')}
-            onChange={(val) => setEditValues({ goals_aspirations: val })}
-            placeholder="Goals, dreams, aspirations, what drives them forward..."
-            multiline
-          />
-        </div>
-      )}
-
       {/* CORE VALUES */}
-      {coreValues.length > 0 && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-            <Heart size={13} className="text-pink-500" /> CORE VALUES
-          </label>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
+        <label className="text-indigo-400 text-xs font-bold mb-2 flex items-center gap-2 lowercase tracking-tight">
+          <Heart size={13} className="text-pink-500" /> core values
+        </label>
+        {coreValues.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {coreValues.map(value => (
               <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
@@ -194,61 +143,32 @@ export function StoryTab({ contact }: StoryTabProps) {
               </span>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* COMMUNICATION STYLE */}
-      {communicationStyle && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-            <MessageCircle size={13} className="text-blue-500" /> COMMUNICATION STYLE
-          </label>
-          <p className="text-slate-300 text-sm">{communicationStyle}</p>
-        </div>
-      )}
+        ) : (
+          <p className="text-slate-500 text-sm italic">not set</p>
+        )}
+      </div>
 
       {/* PERSONALITY & MOTIVATIONS */}
-      {contact.personality_notes && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <DisplaySection
-            emoji="🎯"
-            title="PERSONALITY & MOTIVATIONS"
-            content={contact.personality_notes}
-            isEditing={editingSection === 'personality_notes'}
-            editValue={editValues['personality_notes']}
-            onEdit={() => startEdit('personality_notes', contact.personality_notes || '')}
-            onCancel={cancelEdit}
-            onSave={() => saveEdit('personality_notes')}
-            onChange={(val) => setEditValues({ personality_notes: val })}
-            placeholder="What drives them? How do they make decisions?"
-            multiline
-          />
-        </div>
-      )}
-
-      {/* MUTUAL VALUE */}
-      {contact.mutual_value_introductions && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-          <DisplaySection
-            emoji="🤝"
-            title="MUTUAL VALUE & COLLABORATION"
-            content={contact.mutual_value_introductions}
-            isEditing={editingSection === 'mutual_value_introductions'}
-            editValue={editValues['mutual_value_introductions']}
-            onEdit={() => startEdit('mutual_value_introductions', contact.mutual_value_introductions || '')}
-            onCancel={cancelEdit}
-            onSave={() => saveEdit('mutual_value_introductions')}
-            onChange={(val) => setEditValues({ mutual_value_introductions: val })}
-            placeholder="How you can help each other, introductions, collaboration opportunities..."
-            multiline
-          />
-        </div>
-      )}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
+        <DisplaySection
+          emoji="🎯"
+          title="personality & motivations"
+          content={contact.personality_notes}
+          isEditing={editingSection === 'personality_notes'}
+          editValue={editValues['personality_notes']}
+          onEdit={() => startEdit('personality_notes', contact.personality_notes || '')}
+          onCancel={cancelEdit}
+          onSave={() => saveEdit('personality_notes')}
+          onChange={(val) => setEditValues({ personality_notes: val })}
+          placeholder="What drives them? How do they make decisions?"
+          multiline
+        />
+      </div>
 
       {/* GIFT VAULT */}
-      <div className="bg-slate-900/30 border border-slate-800/50 rounded-xl p-3">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
-          <GiftIcon className="w-3 h-3" /> GIFT VAULT
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm mt-4">
+        <label className="text-indigo-400 text-xs font-bold mb-3 flex items-center gap-2 lowercase tracking-tight">
+          <GiftIcon className="w-3 h-3" /> gift vault
         </label>
         <GiftVault contactId={contact.id} initialGifts={contact.gift_ideas || []} />
       </div>
@@ -287,7 +207,7 @@ function DisplaySection({
   if (isEditing) {
     return (
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+        <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
           {emoji} {title}
         </label>
         <div className="relative">
@@ -336,7 +256,7 @@ function DisplaySection({
 
   return (
     <div className="group relative">
-      <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.15em] mb-2 block">
+      <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
         {emoji} {title}
       </label>
       {content ? (

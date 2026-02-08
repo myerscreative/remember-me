@@ -12,14 +12,34 @@ import { AvatarCropModal } from './AvatarCropModal';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 import { OverviewTab } from './tabs/OverviewTab';
+import Image from 'next/image';
+import { Camera } from 'lucide-react';
+
+const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
+  return (
+    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 w-full">
+      <div className="flex justify-around items-center p-2 max-w-2xl mx-auto">
+        {['Overview', 'Story', 'Family', 'Brain Dump'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+              activeTab === tab 
+              ? 'bg-slate-800 text-white border border-slate-700' 
+              : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+};
 
 interface ConnectionProfileProps {
   contact: any;
   synopsis?: string | null;
-  health?: any;
-  lastContact?: string;
-  summaryLevel?: string;
-  sharedMemory?: any;
   onRefreshAISummary?: () => Promise<void>;
   onDataUpdate?: () => Promise<void>;
 }
@@ -28,10 +48,6 @@ export default function ConnectionProfile({
     contact, 
     onDataUpdate,
     synopsis,
-    health,
-    lastContact,
-    summaryLevel,
-    sharedMemory,
     onRefreshAISummary
 }: ConnectionProfileProps) {
   const router = useRouter();
@@ -111,133 +127,103 @@ export default function ConnectionProfile({
     }
   };
 
-  const lastContactDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
   const targetDays = contact.target_frequency_days || 30;
-  const nextDueDate = lastContactDate 
-    ? new Date(lastContactDate.getTime() + (targetDays * 24 * 60 * 60 * 1000)) 
-    : null;
+  const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.name;
+  const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  
+  // Health Score Logic (Consistent with OverviewTab)
+  const daysSince = contact.days_since_last_interaction ?? 30;
+  const healthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
 
-  const navigationTabs = (
-    <div className="bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1 border border-slate-800 flex transition-all shadow-xl shadow-black/20 gap-2">
-      {['Overview', 'Story', 'Family', 'Brain Dump'].map((tab) => (
-        <button 
-          key={tab}
-          onClick={() => setActiveTab(tab as any)}
-          className={cn(
-            "flex-1 py-3 rounded-xl text-[14px] font-bold transition-all",
-            activeTab === tab 
-              ? "bg-slate-800 text-white shadow-sm border border-slate-700" 
-              : "text-slate-500 hover:text-slate-300 hover:bg-slate-800/40"
-          )}
-        >
-          {tab}
-        </button>
-      ))}
-    </div>
-  );
+  const birthdayText = contact.birthday 
+    ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric', timeZone: 'UTC' })
+    : 'Not set';
+
+  const handleLogInteraction = async (note: string, type: 'connected' | 'attempted', date: string, nextDate?: string) => {
+    setIsLogging(true);
+    try {
+      const result = await logHeaderInteraction(
+        contact.id, 
+        type === 'connected' ? 'connection' : 'attempt', 
+        note, 
+        date
+      );
+      if (result.success) {
+        if (nextDate) {
+          await scheduleNextContact(contact.id, nextDate);
+        }
+        toast.success("Interaction logged!");
+        if (onDataUpdate) await onDataUpdate(); else router.refresh();
+      } else {
+        toast.error(`Failed to log: ${result.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred");
+    } finally {
+      setIsLogging(false);
+    }
+  };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 max-w-7xl mx-auto items-start min-h-screen">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        className="hidden" 
-        accept="image/*" 
-        onChange={handleFileChange} 
-      />
+    <div className="min-h-screen bg-slate-950 text-slate-200">
+      <GlobalTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      <main className="max-w-2xl mx-auto px-4 pb-32">
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept="image/*" 
+          onChange={handleFileChange} 
+        />
 
-      {/* Main Content */}
-      <div className="flex flex-col gap-6 px-4 lg:px-0 pb-32 lg:pb-0">
-        {activeTab !== 'Overview' && (
-          <div className="pt-4">
-            {navigationTabs}
+        {/* Profile Identity - Shared across tabs */}
+        <section className="flex flex-col items-center pt-10 pb-8 text-center border-b border-slate-900 mb-6">
+          <div className="relative group mb-6 cursor-pointer" onClick={handleAvatarClick}>
+            <div className={cn(
+              "w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-black text-white border-4 transition-all duration-500 shadow-2xl group-hover:scale-105",
+              healthScore > 80 ? "border-emerald-500" : healthScore > 40 ? "border-orange-500" : "border-red-500"
+            )}>
+              {contact.photo_url ? (
+                <div className="relative w-full h-full rounded-full overflow-hidden">
+                  <Image src={contact.photo_url} alt={name} fill className="object-cover" />
+                </div>
+              ) : (
+                initials
+              )}
+              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera size={32} className="text-white drop-shadow-lg" />
+              </div>
+            </div>
+            <div className={cn(
+              "absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-slate-950 shadow-md",
+              healthScore > 80 ? "bg-emerald-500" : healthScore > 40 ? "bg-orange-500" : "bg-red-500"
+            )} />
           </div>
-        )}
+          <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none mb-2">{name}</h1>
+          <p className="text-slate-500 text-[11px] font-bold uppercase tracking-[0.2em]">
+            Birthday: {birthdayText}
+          </p>
+        </section>
 
-        {activeTab === 'Overview' && (
-          <div className="flex flex-col gap-6 pt-4">
+        {/* Tab Content */}
+        <div className="animate-in fade-in duration-500">
+          {activeTab === 'Overview' && (
             <OverviewTab 
               contact={contact}
               interactions={contact.interactions || []}
+              onLogInteraction={handleLogInteraction}
               isLogging={isLogging || isUploadingPhoto}
-              onAvatarClick={handleAvatarClick}
               synopsis={synopsis}
               onRefreshAISummary={onRefreshAISummary}
-              onLogInteraction={async (note, type, date, nextDate) => {
-                setIsLogging(true);
-                try {
-                  const result = await logHeaderInteraction(
-                    contact.id, 
-                    type === 'connected' ? 'connection' : 'attempt', 
-                    note, 
-                    date
-                  );
-                  if (result.success) {
-                    if (nextDate) {
-                      await scheduleNextContact(contact.id, nextDate);
-                    }
-                    toast.success("Interaction logged!");
-                    if (onDataUpdate) await onDataUpdate(); else router.refresh();
-                  } else {
-                    toast.error(`Failed to log: ${result.error}`);
-                  }
-                } catch (err) {
-                  console.error(err);
-                  toast.error("An error occurred");
-                } finally {
-                  setIsLogging(false);
-                }
-              }}
             />
-            {navigationTabs}
-          </div>
-        )}
-        {activeTab === 'Story' && <StoryTab contact={contact} />}
-        {activeTab === 'Family' && <FamilyTab contact={contact} />}
-        {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
-      </div>
-
-      {/* Sidebar - Desktop Only */}
-      <aside className="hidden lg:flex flex-col gap-6 sticky top-8">
-        <div className="bg-slate-900 border border-slate-200/20 rounded-2xl p-6 shadow-2xl">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Nurture Pulse</h3>
-            <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-bold">ACTIVE</span>
-          </div>
-          
-          <div className="flex items-center gap-4 mb-8">
-            <div className="text-5xl font-black text-white">
-              {contact.days_since_last_interaction !== null 
-                ? Math.round(Math.max(0, 100 - (contact.days_since_last_interaction / (targetDays * 1.5)) * 100))
-                : 85}
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Health score</p>
-              <div className="flex gap-1 mt-1">
-                {[1,2,3,4,5].map(i => (
-                  <div key={i} className={cn("w-3 h-1 rounded-full", i <= 4 ? "bg-emerald-500" : "bg-slate-800")} />
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-4 pt-6 border-t border-slate-800">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Last Contact</span>
-              <span className="text-xs font-bold text-slate-300">{lastContactDate ? lastContactDate.toLocaleDateString() : 'Never'}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Next Due</span>
-              <span className={cn(
-                "text-xs font-black",
-                nextDueDate && nextDueDate < new Date() ? 'text-red-400' : 'text-indigo-400'
-              )}>
-                {nextDueDate ? nextDueDate.toLocaleDateString() : 'Not set'}
-              </span>
-            </div>
-          </div>
+          )}
+          {activeTab === 'Story' && <StoryTab contact={contact} />}
+          {activeTab === 'Family' && <FamilyTab contact={contact} />}
+          {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
         </div>
-      </aside>
+      </main>
 
       <AvatarCropModal
         open={isCropModalOpen}
