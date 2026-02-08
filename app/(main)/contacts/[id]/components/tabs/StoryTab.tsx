@@ -17,7 +17,7 @@ import { GiftIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { AudioInputButton } from '@/components/audio-input-button';
-import { updateStoryFields } from '@/app/actions/update-story-fields';
+import { updateStoryFields } from '@/app/actions/story-actions';
 import { addGiftIdea, toggleGiftStatus } from '@/app/actions/gift-actions';
 
 interface GiftIdea {

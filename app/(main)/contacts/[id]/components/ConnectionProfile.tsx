@@ -37,9 +37,15 @@ const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveT
   );
 };
 
+import { HealthStatus } from '@/lib/relationship-health';
+
 interface ConnectionProfileProps {
   contact: any;
+  health?: HealthStatus;
+  lastContact?: string;
   synopsis?: string | null;
+  summaryLevel?: 'micro' | 'default' | 'full';
+  sharedMemory?: string;
   onRefreshAISummary?: () => Promise<void>;
   onDataUpdate?: () => Promise<void>;
 }
@@ -48,7 +54,11 @@ export default function ConnectionProfile({
     contact, 
     onDataUpdate,
     synopsis,
-    onRefreshAISummary
+    onRefreshAISummary,
+    health,
+    lastContact,
+    summaryLevel,
+    sharedMemory
 }: ConnectionProfileProps) {
   const router = useRouter();
 
