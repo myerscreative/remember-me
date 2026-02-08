@@ -139,16 +139,8 @@ export function DecayAlertBanner() {
           
           <div className="px-6 flex-1 overflow-y-auto">
             <SheetHeader className="text-left space-y-1 mb-8">
-              <SheetTitle className="text-2xl font-bold text-white flex items-center justify-between">
+              <SheetTitle className="text-2xl font-bold text-white">
                 Time to Reconnect
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-slate-500 hover:text-white hover:bg-slate-900 rounded-full"
-                  onClick={() => setIsExpanded(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
               </SheetTitle>
               <SheetDescription className="text-slate-400 text-base leading-relaxed">
                 Nurture your network to keep it healthy. <br />
