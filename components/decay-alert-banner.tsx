@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetDescription 
 } from "@/components/ui/sheet";
-import { Leaf, X } from "lucide-react";
+import { Leaf } from "lucide-react";
 import Link from "next/link";
 
 interface DecayingRelationship {
