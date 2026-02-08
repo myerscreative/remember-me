@@ -88,9 +88,9 @@ export function DecayAlertBanner() {
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "Never";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   const getSeverityText = (days: number) => {
@@ -98,6 +98,9 @@ export function DecayAlertBanner() {
     if (days > 180) return `${Math.floor(days / 30)} months`;
     return `${days} days`;
   };
+
+  // Limit to top 3 suggestions
+  const topSuggestions = decayingRelationships.slice(0, 3);
 
   return (
     <>
@@ -110,9 +113,7 @@ export function DecayAlertBanner() {
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">
-                {decayingRelationships.length > 3 
-                  ? "Contact your next 3 people" 
-                  : `${decayingRelationships.length} ${decayingRelationships.length === 1 ? "person needs" : "people need"} attention`}
+                Contact your next 3 people
               </h3>
               <p className="text-xs text-slate-400">
                 Nurture your network today
@@ -155,39 +156,49 @@ export function DecayAlertBanner() {
               </SheetDescription>
             </SheetHeader>
 
-            <div className="space-y-3 pb-24">
-              {decayingRelationships.slice(0, 10).map((relationship) => (
+            <div className="space-y-4 pb-24">
+              {topSuggestions.map((relationship) => (
                 <Link 
                   key={relationship.person_id} 
                   href={`/contacts/${relationship.person_id}`}
                   onClick={() => setIsExpanded(false)}
+                  className="block"
                 >
-                  <div className="flex items-center gap-4 p-4 bg-slate-900 border border-slate-800 rounded-2xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all group">
-                    <Avatar className="h-12 w-12 border-2 border-slate-800 group-hover:border-indigo-500/30">
-                      <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-sm">
-                        {getInitials(relationship.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-base font-bold text-white truncate">
-                        {relationship.name}
-                      </h4>
-                      {relationship.relationship_summary && (
-                        <p className="text-[11px] text-slate-400 font-medium italic mb-1 line-clamp-1">
-                          {relationship.relationship_summary}
+                  <div className="flex flex-col gap-3 p-5 bg-slate-900 border border-slate-800 rounded-2xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all group shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-14 w-14 border-2 border-slate-800 group-hover:border-indigo-500/30 shadow-inner">
+                        <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-lg">
+                          {getInitials(relationship.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                          {relationship.name}
+                        </h4>
+                        <p className="text-sm text-slate-400 font-medium mt-0.5">
+                          Last contact: <span className="text-slate-300">{formatDate(relationship.last_interaction_date)}</span>
                         </p>
-                      )}
-                      <p className="text-xs text-slate-500 font-medium">
-                        Last touch: {formatDate(relationship.last_interaction_date)}
-                      </p>
-                    </div>
+                      </div>
 
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-slate-800/80 text-slate-400 border-slate-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1">
+                      <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-1 h-fit shrink-0">
                         {getSeverityText(relationship.last_contact_days)} AGO
                       </Badge>
                     </div>
+
+                    {relationship.relationship_summary ? (
+                      <div className="mt-2 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50 italic">
+                        <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
+                          &quot;{relationship.relationship_summary}&quot;
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="mt-2 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50">
+                        <p className="text-sm text-slate-500 italic">
+                          No reach-out suggestion available yet. Start a memory dump to get AI insights.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </Link>
               ))}
