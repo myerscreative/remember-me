@@ -30,6 +30,7 @@ import toast from 'react-hot-toast';
 
 const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
   const statusColor = score > 80 ? 'text-emerald-400' : score > 40 ? 'text-orange-400' : 'text-red-400';
+  const statusLabel = score > 80 ? 'Nurtured' : score > 40 ? 'Drifting' : 'Needs Water';
   
   return (
     <div className={cn(
@@ -50,11 +51,11 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Health Score</p>
-          <p className="text-sm text-slate-300 font-medium">Nurtured State</p>
+          <p className={cn("text-xs font-bold uppercase tracking-tight", statusColor)}>{statusLabel}</p>
         </div>
       </div>
       <div className="text-right border-l border-slate-800 pl-4">
-        <p className="text-[9px] uppercase text-slate-500">Next Due</p>
+        <p className="text-[8px] uppercase text-slate-500 font-black tracking-tighter mb-0.5">Next Contact</p>
         <p className="text-xs text-indigo-400 font-bold">{nextDue}</p>
       </div>
     </div>
@@ -107,7 +108,7 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
       </div>
 
       {isExpanded && (
-        <div className="px-4 pb-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+        <div className="px-4 pb-4 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300 ease-out">
           <div className="flex gap-2">
             <button 
               onClick={() => setStatus('attempted')} 
@@ -150,7 +151,7 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
 const MetadataFolder = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   return (
-    <div className="mt-8 border-t border-slate-800">
+    <div className="mt-12 border-t border-slate-800 pt-2">
       <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between w-full py-5 text-slate-500 hover:text-slate-300 transition-colors group">
         <span className="text-sm font-bold uppercase tracking-widest group-hover:tracking-wider transition-all">Contact Info & Metadata</span>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -380,6 +381,8 @@ export function OverviewTab({
           )}
         </section>
 
+        <div className="h-4" /> {/* Spacer for separation */}
+        
         {/* 6. Metadata Folder */}
         <MetadataFolder>
           <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-300">
