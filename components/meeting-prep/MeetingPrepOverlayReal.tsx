@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { MatchedMeeting } from "@/lib/matching/types";
 import type { Database } from "@/types/database.types";
+import { formatCalendarTime, getTimeUntilCalendar } from "@/lib/utils/date-helpers";
 
 type Person = Database['public']['Tables']['persons']['Row'];
 
@@ -168,26 +169,6 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const formatTime = (dateString: string) => {
-    if (!mounted) return '--:--';
-    return new Date(dateString).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  };
-
-  const getTimeUntil = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = date.getTime() - now.getTime();
-
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (diff < 0) return 'Started';
-    if (hours < 1) return `In ${minutes} minutes`;
-    if (hours < 24) return `In ${hours} hours`;
-    const days = Math.floor(hours / 24);
-    return `In ${days} ${days === 1 ? 'day' : 'days'}`;
-  };
-
   const getDaysAgo = (dateStr: string | null) => {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -284,10 +265,10 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
             </h2>
             <div className="flex flex-wrap gap-4 text-gray-600 dark:text-gray-300 font-medium text-sm md:text-base mb-3">
               <span className="flex items-center gap-1.5" suppressHydrationWarning>
-                {formatTime(event.start.dateTime)}
+                {mounted ? formatCalendarTime(event.start.dateTime) : '--:--'}
               </span>
               <span className="flex items-center gap-1.5" suppressHydrationWarning>
-                <Clock className="w-4 h-4" /> {getTimeUntil(event.start.dateTime)}
+                <Clock className="w-4 h-4" /> {mounted ? getTimeUntilCalendar(event.start.dateTime) : '—'}
               </span>
               <span className="flex items-center gap-1.5">
                 {locationIsVideo ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}

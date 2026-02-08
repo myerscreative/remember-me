@@ -159,3 +159,52 @@ export function formatCalendarDate(dateTime?: string | null): string {
     return "Date error";
   }
 }
+
+/**
+ * Safe formatter for calendar event time
+ * Handles undefined/null inputs and invalid dates
+ */
+export function formatCalendarTime(dateTime?: string | null): string {
+  if (!dateTime) return "All-day";
+
+  try {
+    const date = new Date(dateTime);
+    if (isNaN(date.getTime())) return "Invalid time";
+
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return "Time error";
+  }
+}
+
+/**
+ * Calculates relative time until a calendar event
+ */
+export function getTimeUntilCalendar(dateTime?: string | null): string {
+  if (!dateTime) return "—";
+
+  try {
+    const eventDate = new Date(dateTime);
+    if (isNaN(eventDate.getTime())) return "Invalid";
+
+    const now = new Date();
+    const diff = eventDate.getTime() - now.getTime();
+
+    if (diff < 0) return "Started";
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (hours < 1) return `In ${minutes} minutes`;
+    if (hours < 24) return `In ${hours} hours`;
+    
+    const days = Math.floor(hours / 24);
+    return `In ${days} ${days === 1 ? 'day' : 'days'}`;
+  } catch {
+    return "—";
+  }
+}
