@@ -10,8 +10,7 @@ import {
   CheckCircle, 
   ShoppingBag,
   Loader2,
-  Heart,
-  MessageCircle
+  Heart
 } from 'lucide-react';
 import { GiftIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -29,9 +28,10 @@ interface GiftIdea {
 
 interface StoryTabProps {
   contact: any;
+  onEdit?: () => void;
 }
 
-export function StoryTab({ contact }: StoryTabProps) {
+export function StoryTab({ contact, onEdit }: StoryTabProps) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<Record<string, string>>({});
 
@@ -119,15 +119,28 @@ export function StoryTab({ contact }: StoryTabProps) {
         <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
           💼 career & business
         </label>
-        {(contact.job_title || contact.company) ? (
-          <p className="text-slate-300 text-sm leading-relaxed">
-            {contact.job_title && <span className="font-medium">{contact.job_title}</span>}
-            {contact.job_title && contact.company && <span className="text-slate-500"> at </span>}
-            {contact.company && <span>{contact.company}</span>}
-          </p>
-        ) : (
-          <p className="text-slate-500 text-sm italic">not set</p>
-        )}
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            {(contact.job_title || contact.company) ? (
+              <p className="text-slate-300 text-sm leading-relaxed">
+                {contact.job_title && <span className="font-medium">{contact.job_title}</span>}
+                {contact.job_title && contact.company && <span className="text-slate-500"> at </span>}
+                {contact.company && <span>{contact.company}</span>}
+              </p>
+            ) : (
+              <p className="text-slate-500 text-sm italic">not set</p>
+            )}
+          </div>
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="p-3 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+              title="Edit Career Info"
+            >
+              <Edit2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* CORE VALUES */}
@@ -264,10 +277,10 @@ function DisplaySection({
           <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap pr-8">{content}</p>
           <button
             onClick={onEdit}
-            className="absolute top-0 right-0 p-1 text-slate-500 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute -top-2 -right-2 p-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
             title="Edit"
           >
-            <Edit2 size={14} />
+            <Edit2 size={16} />
           </button>
         </div>
       ) : (

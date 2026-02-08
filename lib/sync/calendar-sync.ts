@@ -32,21 +32,21 @@ export class CalendarSyncService {
         const contact = matched.matchedContacts[0]; // Primary contact
 
         await MeetingDatabase.upsertMeeting(supabase, {
-          userId,
-          calendarEventId: event.id,
-          calendarProvider: 'google',
+          user_id: userId,
+          calendar_event_id: event.id,
+          calendar_provider: 'google',
           title: event.summary || 'Untitled Meeting',
-          description: event.description,
-          startTime: event.start.dateTime,
-          endTime: event.end.dateTime,
-          location: event.location,
-          meetingUrl: event.hangoutLink,
+          description: event.description || '',
+          start_time: event.start.dateTime || event.start.date || '',
+          end_time: event.end.dateTime || event.end.date || '',
+          location: event.location || '',
+          meeting_url: event.hangoutLink || '',
           attendees: event.attendees || [],
-          contactId: contact?.id,
-          matchConfidence: matched.confidence,
-          isFirstMeeting: this.isFirstMeeting(contact, event),
+          contact_id: contact?.id,
+          match_confidence: matched.confidence || 'none',
+          is_first_meeting: this.isFirstMeeting(contact, event),
           importance: this.calculateImportance(contact, event),
-        } as unknown as Partial<Meeting>); // Cast to avoid strict Partial mismatches for now
+        } as Partial<Meeting>);
       }
 
       console.log(`Synced ${events.length} calendar events for user ${userId}`);

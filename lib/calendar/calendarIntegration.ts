@@ -58,7 +58,7 @@ export async function requestCalendarPermission(
  */
 async function requestGoogleCalendarPermission(): Promise<CalendarPermissionResult> {
   try {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
 
     if (!clientId) {
       return {

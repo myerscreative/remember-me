@@ -12,7 +12,8 @@ import {
   Sparkles,
   X,
   Plus,
-  Loader2
+  Loader2,
+  Edit2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -168,16 +169,30 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
   );
 };
 
-const MetadataFolder = ({ children }: { children: React.ReactNode }) => {
+const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdit?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="mt-12 border-t border-slate-900 pt-2">
-      <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between w-full py-6 text-slate-500 hover:text-slate-300 transition-colors group">
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Contact Info & Metadata</span>
-        <div className={cn("transition-transform duration-300", isOpen ? "rotate-180" : "")}>
-          <ChevronDown size={18} />
-        </div>
-      </button>
+      <div className="flex items-center gap-2">
+        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-6 text-slate-500 hover:text-slate-300 transition-colors group">
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Contact Info & Metadata</span>
+          <div className={cn("transition-transform duration-300", isOpen ? "rotate-180" : "")}>
+            <ChevronDown size={18} />
+          </div>
+        </button>
+        {onEdit && (
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="p-3 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+            title="Edit Contact Info"
+          >
+            <Edit2 size={16} />
+          </button>
+        )}
+      </div>
       {isOpen && <div className="pb-12 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">{children}</div>}
     </div>
   );
@@ -193,6 +208,7 @@ interface OverviewTabProps {
   isLogging?: boolean;
   synopsis?: string | null;
   onRefreshAISummary?: () => Promise<void>;
+  onEdit?: () => void;
 }
 
 export function OverviewTab({ 
@@ -201,7 +217,8 @@ export function OverviewTab({
   onLogInteraction,
   isLogging,
   synopsis,
-  onRefreshAISummary
+  onRefreshAISummary,
+  onEdit
 }: OverviewTabProps) {
   
   const [tags, setTags] = useState<string[]>(contact.tags || []);
@@ -360,7 +377,7 @@ export function OverviewTab({
         </section>
         
         {/* Metadata Folder */}
-        <MetadataFolder>
+        <MetadataFolder onEdit={onEdit}>
           <div className="space-y-10 animate-in slide-in-from-bottom-2 duration-500">
             <div className="grid grid-cols-1 gap-4">
               <MetadataItem icon={<Mail size={18} />} label="Primary Email" value={contact.email || 'Not set'} />

@@ -13,7 +13,8 @@ import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 import { OverviewTab } from './tabs/OverviewTab';
 import Image from 'next/image';
-import { Camera } from 'lucide-react';
+import { Camera, Edit2 } from 'lucide-react';
+import { EditContactModal } from './EditContactModal';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
   return (
@@ -68,6 +69,7 @@ export default function ConnectionProfile({
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState<string>('');
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarClick = () => {
@@ -94,6 +96,14 @@ export default function ConnectionProfile({
       setIsCropModalOpen(true);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleEditSuccess = async () => {
+    if (onDataUpdate) {
+      await onDataUpdate();
+    } else {
+      router.refresh();
+    }
   };
 
   const handleCropComplete = async (croppedBlob: Blob) => {
@@ -212,7 +222,16 @@ export default function ConnectionProfile({
               healthScore > 80 ? "bg-emerald-500" : healthScore > 40 ? "bg-orange-500" : "bg-red-500"
             )} />
           </div>
-          <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none mb-2">{name}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none">{name}</h1>
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-full transition-all"
+              title="Edit Profile"
+            >
+              <Edit2 size={18} />
+            </button>
+          </div>
           <p className="text-slate-500 text-[11px] font-bold uppercase tracking-[0.2em]">
             Birthday: {birthdayText}
           </p>
@@ -228,9 +247,10 @@ export default function ConnectionProfile({
               isLogging={isLogging || isUploadingPhoto}
               synopsis={synopsis}
               onRefreshAISummary={onRefreshAISummary}
+              onEdit={() => setIsEditModalOpen(true)}
             />
           )}
-          {activeTab === 'Story' && <StoryTab contact={contact} />}
+          {activeTab === 'Story' && <StoryTab contact={contact} onEdit={() => setIsEditModalOpen(true)} />}
           {activeTab === 'Family' && <FamilyTab contact={contact} />}
           {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
         </div>
@@ -245,6 +265,13 @@ export default function ConnectionProfile({
           if (fileInputRef.current) fileInputRef.current.value = '';
         }}
         onCropComplete={handleCropComplete}
+      />
+
+      <EditContactModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        contact={contact}
+        onSuccess={handleEditSuccess}
       />
     </div>
   );

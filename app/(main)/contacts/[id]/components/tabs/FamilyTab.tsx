@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
 import { updateStoryFields } from '@/app/actions/story-actions'; 
 import { AudioInputButton } from '@/components/audio-input-button';
-import { X, Heart, User, Home } from 'lucide-react';
+import { X, Heart, User, Home, Edit2, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import Image from "next/image";
@@ -50,6 +50,8 @@ interface FamilyTabProps {
 export function FamilyTab({ contact }: FamilyTabProps) {
   const [members, setMembers] = useState<FamilyMember[]>(contact.familyMembers || []);
   const [householdNotes, setHouseholdNotes] = useState(contact.family_notes || '');
+  const [isEditingHousehold, setIsEditingHousehold] = useState(false);
+  const [isEditingCircle, setIsEditingCircle] = useState(false);
 
   // Helper to save members
   const saveMembers = async (newMembers: FamilyMember[]) => {
@@ -119,28 +121,46 @@ export function FamilyTab({ contact }: FamilyTabProps) {
     <div className="flex flex-col gap-8 pb-20 text-slate-200">
 
       {/* HOUSEHOLD CONTEXT */}
-       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-           <Home size={14} /> Household Context
+       <div className="group bg-slate-900 border border-slate-800 rounded-2xl p-4 relative">
+        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center justify-between">
+           <span className="flex items-center gap-2"><Home size={14} /> Household Context</span>
+           <button 
+             onClick={() => setIsEditingHousehold(!isEditingHousehold)}
+             className="p-3 -mr-3 -mt-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+           >
+             {isEditingHousehold ? <Check size={16} className="text-emerald-400" /> : <Edit2 size={16} />}
+           </button>
         </label>
         <div className="relative">
-          <textarea 
-            placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[80px] text-sm resize-none"
-            value={householdNotes}
-            onChange={(e) => setHouseholdNotes(e.target.value)}
-            onBlur={handleSaveHouseholdNotes}
-          />
-          <div className="absolute right-2 bottom-4">
-            <AudioInputButton 
-              onTranscript={(text) => {
-                const newNotes = householdNotes ? `${householdNotes} ${text}` : text;
-                setHouseholdNotes(newNotes);
-                updateStoryFields(contact.id, { family_notes: newNotes });
+          {isEditingHousehold ? (
+            <textarea 
+              placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
+              className="w-full bg-slate-950 border border-indigo-500/50 rounded-xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm resize-none"
+              value={householdNotes}
+              onChange={(e) => setHouseholdNotes(e.target.value)}
+              onBlur={() => {
+                handleSaveHouseholdNotes();
+                setIsEditingHousehold(false);
               }}
-              size="sm"
+              autoFocus
             />
-          </div>
+          ) : (
+            <p className="text-sm text-slate-300 leading-relaxed pr-8">
+              {householdNotes || <span className="text-slate-600 italic">No notes set</span>}
+            </p>
+          )}
+          {isEditingHousehold && (
+            <div className="absolute right-2 bottom-4">
+              <AudioInputButton 
+                onTranscript={(text) => {
+                  const newNotes = householdNotes ? `${householdNotes} ${text}` : text;
+                  setHouseholdNotes(newNotes);
+                  updateStoryFields(contact.id, { family_notes: newNotes });
+                }}
+                size="sm"
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -153,11 +173,19 @@ export function FamilyTab({ contact }: FamilyTabProps) {
           <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
             <Heart size={14} className="text-pink-500"/> Partner
           </label>
-           {partners.length === 0 && (
-             <button onClick={() => handleAddMember('Partner')} className="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg transition-colors border border-slate-700">
-                + Add Partner
-             </button>
-           )}
+          <div className="flex items-center gap-1">
+            {partners.length === 0 && !isEditingCircle && (
+              <button onClick={() => { handleAddMember('Partner'); setIsEditingCircle(true); }} className="text-[10px] font-black uppercase tracking-widest bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg transition-colors border border-slate-700">
+                  + Add
+              </button>
+            )}
+            <button 
+              onClick={() => setIsEditingCircle(!isEditingCircle)}
+              className="p-3 -mr-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+            >
+              {isEditingCircle ? <Check size={16} className="text-emerald-400" /> : <Edit2 size={16} />}
+            </button>
+          </div>
         </div>
         
         {partners.length > 0 ? (

@@ -2,27 +2,27 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface Meeting {
   id: string;
-  userId: string;
-  calendarEventId: string;
-  calendarProvider: string;
+  user_id: string;
+  calendar_event_id: string;
+  calendar_provider: string;
   title: string;
   description?: string;
-  startTime: string;
-  endTime: string;
+  start_time: string;
+  end_time: string;
   location?: string;
-  meetingUrl?: string;
+  meeting_url?: string;
   attendees: any[];
-  contactId?: string;
-  matchConfidence?: 'high' | 'medium' | 'low';
-  isFirstMeeting: boolean;
+  contact_id?: string;
+  match_confidence?: 'high' | 'medium' | 'low' | 'none';
+  is_first_meeting: boolean;
   importance: 'normal' | 'important' | 'critical';
-  meetingType?: string;
-  conversationStarters: string[];
-  mutualConnections: any[];
-  prepNotes?: string;
-  prepStatus: 'not_started' | 'in_progress' | 'ready';
-  createdAt: string;
-  updatedAt: string;
+  meeting_type?: string;
+  conversation_starters: string[];
+  mutual_connections: any[];
+  prep_notes?: string;
+  prep_status: 'not_started' | 'in_progress' | 'ready';
+  created_at: string;
+  updated_at: string;
 }
 
 export class MeetingDatabase {
@@ -149,3 +149,4 @@ export class MeetingDatabase {
     return count || 0;
   }
 }
+

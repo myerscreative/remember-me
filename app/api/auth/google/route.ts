@@ -19,14 +19,16 @@ export async function GET(request: NextRequest) {
     const userId = session.user.id;
 
     // Check for required environment variables
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_BASE_URL 
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google/callback`
-      : `${request.nextUrl.origin}/api/auth/google/callback`;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    
+    // Use the origin from the request to build the redirect URI
+    const origin = request.nextUrl.origin;
+    const redirectUri = `${origin}/api/auth/google/callback`;
 
     if (!clientId) {
       return NextResponse.json(
-        { error: "Google OAuth not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID." },
+        { error: "Google OAuth not configured. Please set GOOGLE_CLIENT_ID in your environment variables." },
         { status: 500 }
       );
     }
