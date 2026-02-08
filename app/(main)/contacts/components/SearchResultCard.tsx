@@ -1,12 +1,19 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatBirthday, getGradient, getInitialsFromFullName } from "@/lib/utils/contact-helpers";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Star, Link as LinkIcon, CalendarDays, Cake } from "lucide-react";
+import { ChevronRight, Star, Link as LinkIcon, CalendarDays, Cake, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Person } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO } from "date-fns";
+import toast from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SearchResultCardProps {
   contact: Person;
@@ -29,6 +36,8 @@ export function SearchResultCard({
   mutualCount = 0,
   onConnect
 }: SearchResultCardProps) {
+  const [isUpdatingFrequency, setIsUpdatingFrequency] = useState(false);
+  const [currentFrequency, setCurrentFrequency] = useState(contact.target_frequency_days);
   
   const birthday = useMemo(() => {
     if (!contact.birthday) return null;
@@ -48,13 +57,45 @@ export function SearchResultCard({
      }
   }, [contact.last_interaction_date]);
 
-  const health = getRelationshipHealth(contact);
+  const health = getRelationshipHealth({
+    ...contact,
+    target_frequency_days: currentFrequency
+  });
 
   // Stop propagation for connect button to prevent navigation
   const handleConnectClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       onConnect?.(contact);
+  };
+
+  const handleUpdateFrequency = async (days: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (days === currentFrequency) return;
+
+    setIsUpdatingFrequency(true);
+    const oldFrequency = currentFrequency;
+    setCurrentFrequency(days);
+
+    try {
+      const response = await fetch("/api/update-frequency", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactId: contact.id, frequencyDays: days }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update frequency");
+      
+      toast.success("Follow-up frequency updated");
+    } catch (error) {
+      console.error("Error updating frequency:", error);
+      toast.error("Failed to update frequency");
+      setCurrentFrequency(oldFrequency);
+    } finally {
+      setIsUpdatingFrequency(false);
+    }
   };
 
   return (
@@ -120,12 +161,33 @@ export function SearchResultCard({
                         )}>
                              <CalendarDays size={14} className={cn("shrink-0", !lastContact && "opacity-70")} />
                              <span>{lastContact ? `Last contacted: ${lastContact}` : "No contact yet"}</span>
-                             {contact.target_frequency_days && (
-                                <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/5">
-                                    <RefreshCw size={10} className="opacity-70" />
-                                    {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Custom"}
-                                </span>
-                             )}
+                             
+                             <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <span 
+                                    className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/5 cursor-pointer hover:bg-black/10 dark:hover:bg-white/20 transition-colors z-20"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                      {isUpdatingFrequency ? (
+                                        <Loader2 size={10} className="animate-spin" />
+                                      ) : (
+                                        <RefreshCw size={10} className="opacity-70" />
+                                      )}
+                                      {FREQUENCY_PRESETS.find(p => p.days === currentFrequency)?.label || "Custom"}
+                                  </span>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-40 z-30">
+                                  {FREQUENCY_PRESETS.map((preset) => (
+                                    <DropdownMenuItem 
+                                      key={preset.days}
+                                      onClick={(e) => handleUpdateFrequency(preset.days, e)}
+                                      className={cn(currentFrequency === preset.days && "bg-indigo-50 dark:bg-indigo-900/30 font-bold")}
+                                    >
+                                      {preset.label}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                             </DropdownMenu>
                         </div>
 
                         {/* Birthday Row */}
@@ -165,11 +227,31 @@ export function SearchResultCard({
                         )}>
                         {lastContact || "No contact"}
                      </span>
-                     {contact.target_frequency_days && (
-                       <span className="text-[10px] text-gray-400">
-                         {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label}
-                       </span>
-                     )}
+                     
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <span 
+                            className="text-[10px] text-gray-400 hover:text-indigo-400 cursor-pointer transition-colors z-20"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {isUpdatingFrequency ? (
+                                <Loader2 size={10} className="animate-spin inline mr-1" />
+                              ) : null}
+                            {FREQUENCY_PRESETS.find(p => p.days === currentFrequency)?.label}
+                          </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40 z-30">
+                          {FREQUENCY_PRESETS.map((preset) => (
+                            <DropdownMenuItem 
+                              key={preset.days}
+                              onClick={(e) => handleUpdateFrequency(preset.days, e)}
+                              className={cn(currentFrequency === preset.days && "bg-indigo-50 dark:bg-indigo-900/30 font-bold")}
+                            >
+                              {preset.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                     </DropdownMenu>
                 </div>
             )}
         </div>

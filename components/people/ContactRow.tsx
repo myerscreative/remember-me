@@ -1,13 +1,22 @@
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Person } from "@/types/database.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getBirthdayDisplayInfo, getLastContactText, getStatusConfig, getFrequencyLabel } from "@/lib/utils/date-helpers";
 import { getInitials } from "@/lib/utils/contact-helpers";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface ContactRowProps {
   contact: Person;
@@ -16,6 +25,8 @@ interface ContactRowProps {
 
 export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
   const router = useRouter();
+  const [isUpdatingFrequency, setIsUpdatingFrequency] = useState(false);
+  const [currentFrequency, setCurrentFrequency] = useState(contact.target_frequency_days);
 
   // Avatar Initials
   const initials = getInitials(contact.first_name, contact.last_name);
@@ -28,18 +39,42 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
   };
 
   const birthdayInfo = getBirthdayDisplayInfo(contact.birthday);
-  const lastContactText = getLastContactText(contact.last_contact); // using last_contact based on type, or last_interaction_date? 
-  // Database type has 'last_contact' and 'last_interaction_date'. Prompt says "last_contact_date (timestamp)". 
-  // Let's check existing code. existing code usually uses `last_interaction_date` for recent interactions.
-  // But type def has `last_contact`.
-  // I will use `last_contact` field from the Person object as per the prompt instructions "last_contact_date" which probably maps to `last_contact`.
-  // Actually, let's use `contact.last_contact` as primary.
-
-  const frequencyLabel = getFrequencyLabel(contact.target_frequency_days);
-  const statusConfig = getStatusConfig(contact.last_contact, contact.target_frequency_days);
+  const lastContactText = getLastContactText(contact.last_contact); 
+  
+  const frequencyLabel = getFrequencyLabel(currentFrequency);
+  const statusConfig = getStatusConfig(contact.last_contact, currentFrequency);
 
   const handleClick = () => {
     router.push(`/contacts/${contact.id}`);
+  };
+
+  const handleUpdateFrequency = async (days: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (days === currentFrequency) return;
+
+    setIsUpdatingFrequency(true);
+    const oldFrequency = currentFrequency;
+    setCurrentFrequency(days);
+
+    try {
+      const response = await fetch("/api/update-frequency", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactId: contact.id, frequencyDays: days }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update frequency");
+      
+      toast.success("Follow-up frequency updated");
+    } catch (error) {
+      console.error("Error updating frequency:", error);
+      toast.error("Failed to update frequency");
+      setCurrentFrequency(oldFrequency);
+    } finally {
+      setIsUpdatingFrequency(false);
+    }
   };
 
   return (
@@ -87,7 +122,30 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
 
         {/* Frequency */}
         <div className="text-[14px] text-slate-400">
-          {frequencyLabel}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div 
+                className="hover:text-indigo-400 cursor-pointer flex items-center gap-1 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {isUpdatingFrequency ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : null}
+                {frequencyLabel}
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-40">
+              {FREQUENCY_PRESETS.map((preset) => (
+                <DropdownMenuItem 
+                  key={preset.days}
+                  onClick={(e) => handleUpdateFrequency(preset.days, e)}
+                  className={cn(currentFrequency === preset.days && "bg-indigo-50 dark:bg-indigo-900/30 font-bold")}
+                >
+                  {preset.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Status */}
@@ -150,7 +208,30 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
            </div>
            <span className="text-[#3d4758] text-[13px]">/</span>
            <div>
-              {frequencyLabel}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div 
+                    className="hover:text-indigo-400 cursor-pointer flex items-center gap-1 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {isUpdatingFrequency ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : null}
+                    {frequencyLabel}
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  {FREQUENCY_PRESETS.map((preset) => (
+                    <DropdownMenuItem 
+                      key={preset.days}
+                      onClick={(e) => handleUpdateFrequency(preset.days, e)}
+                      className={cn(currentFrequency === preset.days && "bg-indigo-50 dark:bg-indigo-900/30 font-bold")}
+                    >
+                      {preset.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
            </div>
         </div>
       </div>
