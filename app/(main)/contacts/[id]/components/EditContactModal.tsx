@@ -127,21 +127,23 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                placeholder="First Name"
-              />
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="First Name"
+                  className="h-11 px-4 text-base capitalize"
+                />
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                placeholder="Last Name"
-              />
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  placeholder="Last Name"
+                  className="h-11 px-4 text-base capitalize"
+                />
             </div>
           </div>
 
@@ -153,6 +155,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="email@example.com"
+              className="h-11 px-4 text-base"
             />
           </div>
 
@@ -164,6 +167,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
               placeholder="+1 (555) 123-4567"
+              className="h-11 px-4 text-base"
             />
           </div>
 
@@ -174,27 +178,30 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               value={formData.linkedin}
               onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
               placeholder="linkedin.com/in/username"
+              className="h-11 px-4 text-base"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
-              <Input
-                id="company"
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                placeholder="Company Name"
-              />
+                <Input
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  placeholder="Company Name"
+                  className="h-11 px-4 text-base"
+                />
             </div>
             <div className="space-y-2">
               <Label htmlFor="jobTitle">Job Title</Label>
-              <Input
-                id="jobTitle"
-                value={formData.jobTitle}
-                onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                placeholder="Job Title"
-              />
+                <Input
+                  id="jobTitle"
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                  placeholder="Job Title"
+                  className="h-11 px-4 text-base"
+                />
             </div>
           </div>
           
@@ -205,6 +212,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                type="date"
                value={formData.birthday}
                onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+               className="h-11 px-4 text-base w-full min-w-0"
              />
           </div>
 
@@ -214,21 +222,22 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="lastContactDate">Date</Label>
-                <Input
-                  id="lastContactDate"
-                  type="date"
-                  value={formData.lastContactDate}
-                  onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
-                />
+                  <Input
+                    id="lastContactDate"
+                    type="date"
+                    value={formData.lastContactDate}
+                    onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
+                    className="h-11 px-4 text-base w-full min-w-0"
+                  />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastContactMethod">Method</Label>
-                <select
-                  id="lastContactMethod"
-                  value={formData.lastContactMethod}
-                  onChange={(e) => setFormData({ ...formData, lastContactMethod: e.target.value })}
-                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                  <select
+                    id="lastContactMethod"
+                    value={formData.lastContactMethod}
+                    onChange={(e) => setFormData({ ...formData, lastContactMethod: e.target.value })}
+                    className="w-full h-11 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
+                  >
                   <option value="">Select method...</option>
                   <option value="call">Call</option>
                   <option value="email">Email</option>
@@ -245,7 +254,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               id="targetFrequencyDays"
               value={formData.targetFrequencyDays}
               onChange={(e) => setFormData({ ...formData, targetFrequencyDays: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full h-11 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
             >
               {FREQUENCY_PRESETS.map((preset) => (
                 <option key={preset.days} value={preset.days}>
