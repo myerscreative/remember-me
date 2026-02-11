@@ -48,6 +48,7 @@ export default function GameCenterPage() {
   const router = useRouter();
   const { stats, isLoaded } = useGameStats();
   const [resetTime, setResetTime] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   // Derived stats
   // Level N starts at THRESHOLD[N-1]
@@ -185,6 +186,9 @@ export default function GameCenterPage() {
   };
 
   useEffect(() => {
+    // Set mounted state in next tick to avoid hydration mismatch and lint warning
+    const timer = setTimeout(() => setIsMounted(true), 0);
+    
     // Calculate immediately on mount
     const updateTimer = () => {
       setResetTime(getTimeUntilReset());
@@ -193,7 +197,10 @@ export default function GameCenterPage() {
     updateTimer(); // Initial call
     
     const interval = setInterval(updateTimer, 60000); 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   const [selectedGame, setSelectedGame] = useState<GameMode | null>(null);
@@ -207,7 +214,7 @@ export default function GameCenterPage() {
       }
   };
 
-  const handleStartGame = (config: any) => { // using any temporarily to avoid circular deps if types not shared perfectly
+  const handleStartGame = (config: { filterType: string; filterValue?: string }) => {
       if (!selectedGame) return;
       setIsSetupOpen(false);
       
@@ -229,7 +236,7 @@ export default function GameCenterPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-[#111827] pb-20 transition-colors duration-300">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm transition-colors duration-300">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -252,7 +259,7 @@ export default function GameCenterPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Level & Stats Card */}
-        <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8 transition-all hover:shadow-md">
+        <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 mb-8 transition-all hover:shadow-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
             <div>
               <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
@@ -322,7 +329,7 @@ export default function GameCenterPage() {
                 </div>
                 <div className="px-4 py-2 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5">
                   <span className="text-xs font-medium text-white/90">
-                    ⏰ Resets in {resetTime || "--"}
+                    ⏰ Resets in {isMounted ? (resetTime || "--") : "--"}
                   </span>
                 </div>
               </div>
@@ -338,9 +345,12 @@ export default function GameCenterPage() {
                 {!dailyChallenge.completed && (
                    <button 
                     onClick={() => handleGameLaunch('daily-challenge')}
-                    className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200"
+                    className="px-8 py-4 bg-white text-indigo-600 font-black rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2"
                    >
                      {dailyChallenge.progress > 0 ? 'Continue Challenge' : 'Start Challenge'}
+                     <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                        <span className="text-[10px] text-emerald-600 uppercase tracking-tighter">🌱 +10 Garden Health</span>
+                     </div>
                    </button>
                 )}
               </div>
@@ -384,7 +394,7 @@ export default function GameCenterPage() {
             {gameModes.map((mode) => (
               <div
                 key={mode.id}
-                className="group bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm dark:shadow-[0_0_25px_-5px_rgba(var(--glow-rgb),0.2)] border border-gray-200 dark:border-gray-800 p-8 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl dark:hover:shadow-[0_0_50px_-10px_rgba(var(--glow-rgb),0.5)] transition-all duration-300 cursor-pointer transform hover:-translate-y-1 relative overflow-hidden"
+                className="group bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm dark:shadow-[0_0_25px_-5px_rgba(var(--glow-rgb),0.2)] border border-slate-200 dark:border-slate-800 p-8 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl dark:hover:shadow-[0_0_50px_-10px_rgba(var(--glow-rgb),0.5)] transition-all duration-300 cursor-pointer transform hover:-translate-y-1 relative overflow-hidden"
                 onClick={() => handleGameLaunch(mode.id)}
                 style={{ '--glow-rgb': hexToRgb(mode.iconColor) } as React.CSSProperties}
               >
@@ -398,7 +408,20 @@ export default function GameCenterPage() {
                 </div>
 
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 relative z-10">{mode.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 font-medium relative z-10">{mode.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2 font-medium relative z-10">{mode.description}</p>
+                
+                <div className="flex items-center gap-2 mb-6 relative z-10">
+                  <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/10 rounded-full border border-emerald-200/50 dark:border-emerald-500/20">
+                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                      🌱 +5 Garden Health
+                    </span>
+                  </div>
+                  <div className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/10 rounded-full border border-indigo-200/50 dark:border-indigo-500/20">
+                    <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                      +20 XP
+                    </span>
+                  </div>
+                </div>
 
                 <div className="flex items-center justify-between mt-auto relative z-10 border-t border-gray-100 dark:border-gray-800 pt-6">
                   <div className="text-xs font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -421,7 +444,7 @@ export default function GameCenterPage() {
         {/* Stats & Achievements Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Your Stats */}
-          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-8">
+          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
             <div className="flex items-center gap-3 mb-8">
                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl">
                    <div className="text-xl">📊</div>
@@ -430,7 +453,7 @@ export default function GameCenterPage() {
             </div>
 
             {stats.gamesPlayed === 0 ? (
-              <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700">
                 <div className="text-6xl mb-4 opacity-50">🎮</div>
                 <p className="text-gray-900 dark:text-white font-bold mb-2">No games played yet</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Start playing to track your stats and level up!</p>
@@ -452,13 +475,13 @@ export default function GameCenterPage() {
               </div>
             )}
 
-            <button className="w-full mt-8 px-6 py-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <button className="w-full mt-8 px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
               View Detailed Stats
             </button>
           </div>
 
           {/* Recent Achievements */}
-          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-8">
+          <div className="bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
             <div className="flex items-center gap-3 mb-8">
                <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-xl">
                    <div className="text-xl">🏆</div>
@@ -505,14 +528,14 @@ export default function GameCenterPage() {
               ))}
             </div>
 
-            <button className="w-full mt-8 px-6 py-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <button className="w-full mt-8 px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
               View All Achievements
             </button>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-center text-gray-400 text-sm font-medium pb-8 border-t border-gray-200 pt-8">
+        <div className="text-center text-slate-400 text-sm font-medium pb-8 border-t border-slate-200 dark:border-slate-800 pt-8">
             <p className="mb-2">More game modes coming soon!</p>
             <p>ReMember Me • Practice & Gamification</p>
         </div>
