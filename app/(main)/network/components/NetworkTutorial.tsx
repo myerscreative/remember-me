@@ -21,19 +21,19 @@ interface Step {
 
 const steps: Step[] = [
   {
-    title: "Discover your Tribe",
+    title: "Find your Seeds",
     description: "Search by interests, skills, or even where you first met.",
     icon: Search,
     color: "text-blue-500 bg-blue-500/10"
   },
   {
-    title: "Explore Domains",
-    description: "Browse wide categories like Relationships, Work, or Travel.",
+    title: "Map your Garden",
+    description: "Browse wide categories like Family, Work, or Travel.",
     icon: LayoutGrid,
     color: "text-purple-500 bg-purple-500/10"
   },
   {
-    title: "Dive into Tags",
+    title: "Inspect the Roots",
     description: "Select a domain to reveal sub-tags and see your collective.",
     icon: Tag,
     color: "text-pink-500 bg-pink-500/10"
@@ -68,7 +68,7 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto">
+        <div className="p-6 md:p-8 pb-32 space-y-6 md:space-y-8 overflow-y-auto">
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-2">
@@ -76,22 +76,30 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
                     <Sparkles className="w-6 h-6 text-indigo-500" />
                 </div>
             </div>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white leading-tight">
-              Tribe Search Quick Start
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+              Tools for a Flourishing Garden
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-              Master your network ecosystem with these four powerful features.
+            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-normal">
+              Four ways to tend to your connections and help your relationships grow.
             </p>
           </div>
 
           {/* Steps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {steps.map((step, i) => {
               const Icon = step.icon;
+              const isNurture = step.title === "Nurture Connections";
               return (
-                <div key={i} className="flex gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800 transition-all hover:shadow-md group">
-                  <div className={`shrink-0 p-3 h-12 w-12 rounded-lg flex items-center justify-center ${step.color} group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-6 h-6" />
+                <div 
+                  key={i} 
+                  className={`flex gap-4 px-4 py-2.5 rounded-xl border transition-all hover:shadow-md group ${
+                    isNurture 
+                      ? "border-red-500/30 bg-red-500/5 dark:bg-red-500/10 scale-[1.02] shadow-sm" 
+                      : "border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <div className={`shrink-0 p-2 h-10 w-10 rounded-lg flex items-center justify-center ${step.color} group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-5 h-5" />
                   </div>
                   <div className="space-y-1">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100">{step.title}</h4>
