@@ -20,6 +20,11 @@ import { cn } from '@/lib/utils';
 import { AudioInputButton } from '@/components/audio-input-button';
 import { toggleTag } from '@/app/actions/toggle-tag';
 import { toggleInterest } from '@/app/actions/toggle-interest';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import toast from 'react-hot-toast';
 
 // --- Components from Blueprint ---
@@ -29,7 +34,7 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
   const statusColor = score > 80 ? 'text-emerald-400' : score > 40 ? 'text-orange-400' : 'text-red-400';
   
   return (
-    <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between mb-4 shadow-sm">
+    <div className="w-full bg-slate-900 border border-slate-200/10 rounded-2xl p-5 flex items-center justify-between mb-4 shadow-sm">
       <div className="flex items-center gap-5">
         <div className="relative w-14 h-14 flex items-center justify-center">
           <svg className="w-full h-full transform -rotate-90">
@@ -83,14 +88,48 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
   return (
     <div className={cn(
       "w-full bg-slate-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
-      isExpanded ? "border-slate-300 shadow-xl shadow-indigo-950/20" : "border-slate-800"
+      isExpanded ? "border-slate-200 shadow-xl shadow-indigo-950/20" : "border-slate-800"
     )}>
-      <div className="p-5">
-        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">New Shared Memory</label>
+      <div className={cn("p-5", isExpanded && "border-b border-slate-200/10")}>
+        <div className="flex justify-between items-center mb-3">
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
+          {isExpanded && (
+            <div className="flex items-center gap-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    className="p-1.5 text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
+                    title="AI Sparkle"
+                  >
+                    <Sparkles size={14} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2 bg-slate-900 border-slate-700 shadow-2xl z-50" align="end">
+                  <div className="flex flex-col gap-1">
+                    <button 
+                      onClick={() => toast.success('Polite-ifying your note...', { icon: '✨' })}
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 rounded-md transition-all text-left"
+                    >
+                      <MessageSquare size={12} className="text-indigo-400" />
+                      Polite-ify Note
+                    </button>
+                    <button 
+                      onClick={() => toast.success('Summarizing into Bio...', { icon: '✨' })}
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 rounded-md transition-all text-left"
+                    >
+                      <Sparkles size={12} className="text-indigo-400" />
+                      Summarize to Bio
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
+        </div>
         <div className="relative">
           <textarea
             onFocus={() => setIsExpanded(true)}
-            placeholder="What did you discuss? Any new details?"
+            placeholder="Capture thoughts here..."
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="w-full bg-transparent text-slate-100 placeholder-slate-600 resize-none focus:outline-none min-h-[100px] text-base leading-relaxed"
@@ -115,7 +154,7 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
               className={cn(
                 "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
                 status === 'attempted' 
-                  ? "bg-slate-800 border-slate-600 text-white" 
+                  ? "bg-slate-800 border-slate-200 text-white" 
                   : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
               )}
             >
@@ -126,7 +165,7 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
               className={cn(
                 "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
                 status === 'connected' 
-                  ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/40" 
+                  ? "bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40" 
                   : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
               )}
             >
@@ -134,43 +173,39 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
             </button>
           </div>
           
-          <div className="flex gap-4">
-            <div className="flex-1 bg-slate-950/50 rounded-xl p-4 border border-slate-800/80 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center">
-                <Calendar size={18} className="text-indigo-400" />
-              </div>
+          <div className="flex gap-3">
+            <div className="flex-1 bg-slate-950/50 rounded-xl p-3 border border-slate-200/10 flex items-center gap-3">
+              <Calendar size={14} className="text-slate-500" />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Interaction Date</p>
+                <p className="text-[9px] uppercase font-black text-slate-600 tracking-widest mb-0.5">Interaction Date</p>
                 <input 
                   type="date" 
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="bg-transparent text-slate-200 text-sm font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                  className="bg-transparent text-slate-200 text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
                 />
               </div>
             </div>
 
-            <div className="flex-1 bg-slate-950/50 rounded-xl p-4 border border-slate-800/80 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center">
-                <Calendar size={18} className="text-indigo-400" />
-              </div>
+            <div className="flex-1 bg-slate-950/50 rounded-xl p-3 border border-slate-200/10 flex items-center gap-3">
+              <Calendar size={14} className="text-slate-500" />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Schedule Next</p>
+                <p className="text-[9px] uppercase font-black text-slate-500 tracking-widest mb-0.5">Schedule Next</p>
                 <input 
                   type="date" 
                   value={nextDate}
                   onChange={(e) => setNextDate(e.target.value)}
-                  className="bg-transparent text-slate-200 text-sm font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                  className="bg-transparent text-slate-200 text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 sticky bottom-4 z-10 bg-slate-900 pt-2 pb-1">
             <button 
               onClick={handleLogInteraction}
               disabled={isLogging || !note.trim() || !status}
-              className="flex-1 py-5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all shadow-xl shadow-indigo-900/40"
+              className="flex-1 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl shadow-indigo-900/40"
             >
               {isLogging ? 'Logging...' : 'Log Shared Memory'}
             </button>
@@ -180,9 +215,9 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
                 setNote('');
                 setStatus(null);
               }}
-              className="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-xl transition-all border border-slate-700"
+              className="px-5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-xl transition-all border border-slate-700"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
         </div>
@@ -315,7 +350,7 @@ export function OverviewTab({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-8 bg-slate-950 pb-20">
+    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-8 bg-slate-950 pb-36">
       
       {/* Quick Actions */}
       <section className="grid grid-cols-3 gap-4 px-4 pt-4">
@@ -373,7 +408,7 @@ export function OverviewTab({
         <section className="space-y-5">
           <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] px-1">Timeline</h3>
           {latestInteraction ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-4 group hover:border-slate-700 transition-all duration-300">
+            <div className="bg-slate-900 border border-slate-200/10 rounded-2xl p-6 shadow-sm flex flex-col gap-4 group hover:border-slate-700 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   {new Date(latestInteraction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -425,7 +460,7 @@ export function OverviewTab({
                   <Badge 
                     key={tag} 
                     variant="secondary" 
-                    className="bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
                   >
                     {tag}
                     <button onClick={() => handleRemoveTag(tag)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
@@ -442,7 +477,7 @@ export function OverviewTab({
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                     placeholder="Identify with tag..."
-                    className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddTag} disabled={submittingTag} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -470,7 +505,7 @@ export function OverviewTab({
                   <Badge 
                     key={interest} 
                     variant="secondary" 
-                    className="bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
                   >
                     {interest}
                     <button onClick={() => handleRemoveInterest(interest)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
@@ -487,7 +522,7 @@ export function OverviewTab({
                     onChange={(e) => setInterestInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
                     placeholder="Favorite interest..."
-                    className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddInterest} disabled={submittingInterest} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -505,7 +540,7 @@ export function OverviewTab({
 
 const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) => {
   const content = (
-    <div className="flex flex-col items-center justify-center p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
+    <div className="flex flex-col items-center justify-center p-6 bg-slate-900 border border-slate-200/10 rounded-2xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
       <div className="text-indigo-400 group-hover:text-white mb-2 transition-all">{icon}</div>
       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-300">{label}</span>
     </div>
@@ -520,7 +555,7 @@ const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label
 };
 
 const MetadataItem = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
-  <div className="flex items-center gap-5 bg-slate-900/40 p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all group">
+  <div className="flex items-center gap-5 bg-slate-900/40 p-5 rounded-2xl border border-slate-200/10 hover:border-slate-700 transition-all group">
     <div className="text-indigo-400/50 group-hover:text-indigo-400 transition-colors shrink-0">{icon}</div>
     <div className="min-w-0">
       <p className="text-[9px] uppercase font-black text-slate-600 tracking-widest mb-1">{label}</p>

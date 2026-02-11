@@ -41,7 +41,7 @@ export default function TriageHeader() {
               className="w-72 p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-50"
             >
               <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Unplanted Seeds are contacts who haven&apos;t been assigned a priority yet. Categorize them here to see them grow in your Garden Map.
+                Unplanted Seeds are contacts who haven&apos;t been assigned a priority yet. Once you choose a level, they are planted in your Garden Map.
               </p>
             </PopoverContent>
           </Popover>

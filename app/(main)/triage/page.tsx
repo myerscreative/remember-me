@@ -19,7 +19,8 @@ export default async function TriagePage() {
     .from('persons')
     .select('id, name, first_name, last_name, last_contact, last_interaction_date, importance')
     .eq('user_id', user.id)
-    .eq('archived', false);
+    .eq('archived', false)
+    .is('importance', null);
 
   if (error) {
     console.error("Error fetching triage contacts:", error);
@@ -57,7 +58,7 @@ export default async function TriagePage() {
     return {
       id: p.id,
       name: p.name || `${p.first_name} ${p.last_name}`.trim(),
-      importance: p.importance as 'high' | 'medium' | 'low' || 'medium',
+      importance: p.importance as 'high' | 'medium' | 'low' | null,
       status,
       daysAgo: diffDays,
       lastDate: date

@@ -142,7 +142,7 @@ export default function AIBatchPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-transparent pb-36">
+    <div className="flex flex-col min-h-screen bg-transparent pb-32">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
@@ -224,7 +224,7 @@ export default function AIBatchPage() {
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
-                        <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">Add Context in Garden Prep</p>
+                        <p className="text-[10px] text-orange-600/70 font-medium">Add Context in Garden Prep</p>
                       </div>
                     </div>
 
@@ -447,7 +447,7 @@ export default function AIBatchPage() {
           )}
 
           {/* Info Card */}
-          <Card className="border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40 shadow-lg">
+          <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-400 shrink-0 mt-0.5" />
