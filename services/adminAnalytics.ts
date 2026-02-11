@@ -1,3 +1,4 @@
+'use server';
 import { createClient } from '@/lib/supabase/server';
 
 export interface CommunityVitalSigns {
@@ -59,7 +60,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
 
   // Manual aggregation since Supabase client doesn't support complex groupBy easily
   const skillCloud = (tagCounts || [])
-    .map((t: any) => ({
+    .map((t: { name: string; person_tags: { count: number }[] | null }) => ({
       name: t.name,
       count: t.person_tags?.[0]?.count || 0
     }))
