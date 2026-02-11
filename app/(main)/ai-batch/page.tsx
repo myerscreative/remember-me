@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Brain,
   Flower2,
+  RefreshCw,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -211,7 +212,7 @@ export default function AIBatchPage() {
 
                       <div 
                         className="space-y-1 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => router.push("/triage")}
+                        onClick={() => router.push("/triage?mode=enrichment")}
                       >
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Need More Context
@@ -224,12 +225,12 @@ export default function AIBatchPage() {
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
-                        <p className="text-[10px] text-orange-600/70 font-medium">Add Context in Garden Prep</p>
+                        <p className="text-[10px] text-orange-600/70 font-medium">Go to Garden Enrichment</p>
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-200 dark:border-gray-800/10 pt-4">
-                      <div className="flex flex-wrap items-center gap-6 mb-4">
+                    <div className="border-t border-gray-200 dark:border-gray-800/10 pt-4 flex items-center justify-between">
+                      <div className="flex flex-wrap items-center gap-6">
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-green-600" />
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -246,7 +247,19 @@ export default function AIBatchPage() {
                           <span className="text-xs text-gray-500">Est. Time</span>
                         </div>
                       </div>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={loadData}
+                        className="text-xs h-8"
+                      >
+                        <RefreshCw className={`h-3 w-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                        Refresh Counts
+                      </Button>
+                    </div>
 
+                    <div className="pt-2">
                       <Button
                         onClick={startBatchProcessing}
                         className="w-full bg-purple-600 hover:bg-purple-700 h-10"

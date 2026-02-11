@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { ArrowLeft, Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-export default function TriageHeader() {
+interface TriageHeaderProps {
+  isEnrichment?: boolean;
+}
+
+export default function TriageHeader({ isEnrichment }: TriageHeaderProps) {
   return (
     <div className="mb-4">
       {/* Slim top-row navigation bar */}
@@ -28,7 +32,7 @@ export default function TriageHeader() {
 
       <div className="flex items-center gap-2">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>🌱 Garden Prep</span>
+          <span>{isEnrichment ? '✨ Garden Enrichment' : '🌱 Garden Prep'}</span>
           <Popover>
             <PopoverTrigger asChild>
               <button className="cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none">
@@ -41,7 +45,10 @@ export default function TriageHeader() {
               className="w-72 p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-xl z-50"
             >
               <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Unplanted Seeds are contacts who haven&apos;t been assigned a priority yet. Once you choose a level, they are planted in your Garden Map.
+                {isEnrichment 
+                  ? "Help your garden grow by adding specific notes or context to these contacts. This allows the AI to generate deeper, more meaningful relationship insights."
+                  : "Unplanted Seeds are contacts who haven't been assigned a priority yet. Once you choose a level, they are planted in your Garden Map."
+                }
               </p>
             </PopoverContent>
           </Popover>
