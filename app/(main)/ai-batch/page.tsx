@@ -2,10 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  Sparkles,
+  Sprout,
   Zap,
   Download,
   AlertCircle,
@@ -13,6 +12,9 @@ import {
   Loader2,
   DollarSign,
   Clock,
+  ArrowRight,
+  Brain,
+  Flower2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -59,9 +61,10 @@ export default function AIBatchPage() {
 
       setContacts(contactsData);
       setSummary(summaryData);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error loading data:", err);
-      setError(err?.message || "Failed to load contacts");
+      const errorMessage = err instanceof Error ? err.message : "Failed to load contacts";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -99,9 +102,10 @@ export default function AIBatchPage() {
       if (batchResults.some((r) => r.success)) {
         await loadData();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error during batch processing:", err);
-      setError(err?.message || "Batch processing failed");
+      const errorMessage = err instanceof Error ? err.message : "Batch processing failed";
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -138,18 +142,20 @@ export default function AIBatchPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen bg-transparent pb-32">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Sparkles className="h-8 w-8 text-purple-600" />
-              AI Batch Processing
+              <div className="relative">
+                <Sprout className="h-8 w-8 text-green-600" />
+                <Brain className="h-4 w-4 text-purple-600 absolute -top-1 -right-1" />
+              </div>
+              AI Relationship Insight
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Automatically generate relationship summaries for your imported
-              contacts
+              Automatically cultivate context and summaries for your imported seeds.
             </p>
           </div>
 
@@ -172,118 +178,124 @@ export default function AIBatchPage() {
             </Card>
           )}
 
-          {/* Summary Card */}
+          {/* Summary Card or Success State */}
           {summary && !isProcessing && results.length === 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Download className="h-5 w-5 text-purple-600" />
-                  Imported Contacts Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Total Imported
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {summary.total}
-                    </p>
-                  </div>
+            <>
+              {summary.withEnoughContext > 0 ? (
+                <Card className="border-slate-200 dark:border-slate-800">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Download className="h-5 w-5 text-purple-600" />
+                      Imported Contacts Analysis
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Total Imported
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {summary.total}
+                        </p>
+                      </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Ready to Process
-                    </p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {summary.withEnoughContext}
-                    </p>
-                  </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Ready to Process
+                        </p>
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                          {summary.withEnoughContext}
+                        </p>
+                      </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Need More Context
-                    </p>
-                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                      {summary.needMoreContext}
-                    </p>
-                  </div>
-                </div>
-
-                {summary.withEnoughContext > 0 && (
-                  <>
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
-                      <h4 className="font-semibold text-gray-900 dark:text-white">
-                        Processing Estimates
-                      </h4>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                          <DollarSign className="h-5 w-5 text-green-600" />
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Estimated Cost
-                            </p>
-                            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {formatCurrency(summary.estimatedCost)}
-                            </p>
-                          </div>
+                      <div 
+                        className="space-y-1 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => router.push("/triage")}
+                      >
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Need More Context
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                            {summary.needMoreContext}
+                          </p>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-orange-600">
+                            <ArrowRight className="h-4 w-4" />
+                          </Button>
                         </div>
-
-                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Estimated Time
-                            </p>
-                            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {formatDuration(summary.estimatedTime)}
-                            </p>
-                          </div>
-                        </div>
+                        <p className="text-[10px] text-orange-600/70 font-medium">Add Context in Garden Prep</p>
                       </div>
                     </div>
 
-                    <Button
-                      onClick={startBatchProcessing}
-                      className="w-full bg-purple-600 hover:bg-purple-700"
-                      size="lg"
-                    >
-                      <Zap className="h-5 w-5 mr-2" />
-                      Start AI Processing ({summary.withEnoughContext} contacts)
-                    </Button>
-                  </>
-                )}
+                    <div className="border-t border-gray-200 dark:border-gray-800/10 pt-4">
+                      <div className="flex flex-wrap items-center gap-6 mb-4">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {formatCurrency(summary.estimatedCost)}
+                          </span>
+                          <span className="text-xs text-gray-500">Est. Cost</span>
+                        </div>
 
-                {summary.withEnoughContext === 0 && summary.total > 0 && (
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-                    <p className="text-sm text-orange-800 dark:text-orange-200">
-                      Your imported contacts don't have enough information yet.
-                      Add details like where you met them or who introduced you
-                      before generating summaries.
-                    </p>
-                  </div>
-                )}
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {formatDuration(summary.estimatedTime)}
+                          </span>
+                          <span className="text-xs text-gray-500">Est. Time</span>
+                        </div>
+                      </div>
 
-                {summary.total === 0 && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-                      No imported contacts found. Import contacts first to use
-                      AI batch processing.
-                    </p>
-                    <Button
-                      onClick={() => router.push("/import")}
-                      variant="outline"
-                      size="sm"
+                      <Button
+                        onClick={startBatchProcessing}
+                        className="w-full bg-purple-600 hover:bg-purple-700 h-10"
+                        size="default"
+                      >
+                        <Zap className="h-4 w-4 mr-2" />
+                        Start AI Processing ({summary.withEnoughContext} contacts)
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : summary.total > 0 ? (
+                /* Success State (Enriched) */
+                <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+                  <CardContent className="pt-10 pb-10 flex flex-col items-center text-center space-y-4">
+                    <div className="h-16 w-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
+                      <Flower2 className="h-10 w-10 text-green-600" />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Your Garden is Enriched!</h2>
+                      <p className="text-slate-600 dark:text-slate-400 max-w-md">
+                        All your seeds have been analyzed and have the context they need to flourish. Your Relationship Garden is looking healthy.
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={() => router.push("/garden")}
+                      className="mt-4 bg-purple-600 hover:bg-purple-700 shadow-sm px-8"
                     >
-                      <Download className="h-4 w-4 mr-2" />
-                      Go to Import
+                      View My Garden
                     </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+                    No imported contacts found. Import contacts first to use
+                    AI Relationship Insight.
+                  </p>
+                  <Button
+                    onClick={() => router.push("/import")}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Go to Import
+                  </Button>
+                </div>
+              )}
+            </>
           )}
 
           {/* Processing Progress */}
@@ -435,15 +447,15 @@ export default function AIBatchPage() {
           )}
 
           {/* Info Card */}
-          <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+          <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-400 shrink-0 mt-0.5" />
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-200">
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                     How AI Batch Processing Works
                   </h3>
-                  <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
+                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
                     <li>
                       Generates one-line summaries for imported contacts
                     </li>
@@ -459,7 +471,7 @@ export default function AIBatchPage() {
                       generate summaries
                     </li>
                     <li>
-                      All processed contacts are marked as "has context" in the
+                      All processed contacts are marked as &quot;has context&quot; in the
                       database
                     </li>
                   </ul>
