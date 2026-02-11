@@ -11,7 +11,6 @@ import {
   Tag, 
   Sparkles,
   X,
-  X,
   Loader2,
   Edit2
 } from 'lucide-react';
