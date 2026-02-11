@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Network, Activity, Settings, Sparkles, Calendar, Brain, Flame, TreePine } from "lucide-react";
+import { Users, Bell, Activity, Settings, Sparkles, Calendar, Brain, Flame, TreePine, ShieldAlert } from "lucide-react";
 import { NetworkIcon } from "./icons/NetworkIcon";
 import { cn } from "@/lib/utils";
 import { useGameStats } from "@/hooks/useGameStats";
@@ -69,6 +69,12 @@ const navGroups = [
       href: "/settings",
       label: "Settings",
       icon: Settings,
+      inactiveColor: "text-gray-600",
+    },
+    {
+      href: "/admin/dashboard",
+      label: "Command Center",
+      icon: ShieldAlert,
       inactiveColor: "text-gray-600",
     },
   ],

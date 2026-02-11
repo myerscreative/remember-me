@@ -9,7 +9,6 @@ import {
   Search,
   X,
   Sparkles,
-  Filter,
   Clock,
   Star,
   Download,
@@ -28,6 +27,9 @@ import {
 } from "@/lib/search/searchUtils";
 import type { Person } from "@/types/database.types";
 import { getInitials, getGradient } from "@/lib/utils/contact-helpers";
+import { createClient } from "@/lib/supabase/client";
+import { findSkillInNetwork, type DiscoveryResult } from "@/lib/network/discoveryService";
+import { DiscoveryCard } from "@/components/network/DiscoveryCard";
 
 type QuickFilter = "recent" | "high-priority" | "imported" | null;
 
@@ -37,18 +39,20 @@ export default function SearchPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchTime, setSearchTime] = useState<number | null>(null);
   const [activeFilter, setActiveFilter] = useState<QuickFilter>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [discoveryResults, setDiscoveryResults] = useState<DiscoveryResult[]>([]);
 
   // Filters state
   const [hasContext, setHasContext] = useState<boolean | null>(null);
   const [imported, setImported] = useState<boolean | null>(null);
 
   // Debounced search function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const performSearch = useCallback(
     debounce(async (query: string) => {
       if (!query || query.trim().length < 2) {
         setSearchResults([]);
         setSearchTime(null);
+        setDiscoveryResults([]); // Clear discovery results when query is too short
         return;
       }
 
@@ -56,11 +60,26 @@ export default function SearchPage() {
       const startTime = performance.now();
 
       try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // 1. Direct Search results
         const results = await searchPersonsFullText(query, {
           limit: 50,
           hasContext: hasContext,
           imported: imported,
         });
+
+        // 2. Network Discovery search
+        if (user) {
+          try {
+            const networkResults = await findSkillInNetwork(user.id, query);
+            setDiscoveryResults(networkResults);
+          } catch (netErr) {
+            console.error("Network search error:", netErr);
+            setDiscoveryResults([]);
+          }
+        }
 
         const endTime = performance.now();
         setSearchTime(endTime - startTime);
@@ -68,6 +87,7 @@ export default function SearchPage() {
       } catch (error) {
         console.error("Search error:", error);
         setSearchResults([]);
+        setDiscoveryResults([]);
       } finally {
         setIsSearching(false);
       }
@@ -125,7 +145,7 @@ export default function SearchPage() {
     };
 
     loadFilteredResults();
-  }, [activeFilter]);
+  }, [activeFilter, searchTerm]);
 
   const handleQuickFilter = (filter: QuickFilter) => {
     if (activeFilter === filter) {
@@ -143,6 +163,7 @@ export default function SearchPage() {
     setHasContext(null);
     setImported(null);
     setSearchResults([]);
+    setDiscoveryResults([]);
     setSearchTime(null);
   };
 
@@ -301,91 +322,120 @@ export default function SearchPage() {
 
           {/* Search Results */}
           {(searchTerm || activeFilter) && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {searchResults.length > 0
-                    ? `${searchResults.length} Result${searchResults.length !== 1 ? "s" : ""}`
-                    : "No results"}
-                </h2>
-              </div>
+            <div className="space-y-8 pb-12">
+              {/* Network Discovery Section */}
+              {discoveryResults.length > 0 && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-indigo-500" />
+                      Through Your Network
+                    </h2>
+                    <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                      Second-Degree Discoveries
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {discoveryResults.map((result, idx) => (
+                      <DiscoveryCard 
+                        key={`${result.bridgeContactId}-${idx}`}
+                        skill={result.skill}
+                        bridgeName={result.bridgeName}
+                        bridgePhotoUrl={result.bridgePhotoUrl}
+                        bridgeContactId={result.bridgeContactId}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-              {searchResults.length > 0 ? (
-                <div className="space-y-3">
-                  {searchResults.map((contact) => (
-                    <Link key={contact.id} href={`/contacts/${contact.id}`}>
-                      <Card className="hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer border border-gray-200 dark:border-gray-700">
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-4">
-                            <Avatar className="h-12 w-12 shrink-0">
-                              <AvatarImage src={contact.photo_url || undefined} />
-                              <AvatarFallback
-                                className={cn(
-                                  "bg-linear-to-br text-white font-semibold",
-                                  getGradient(contact.name)
-                                )}
-                              >
-                                {getInitials(contact.first_name, contact.last_name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                                {contact.first_name} {contact.last_name || ""}
-                              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-8 mt-2">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {searchResults.length > 0
+                      ? `${searchResults.length} Contact${searchResults.length !== 1 ? "s" : ""} in your Garden`
+                      : "Direct Contacts"}
+                  </h2>
+                </div>
 
-                              <div className="flex flex-wrap gap-2 items-center">
-                                {contact.email && (
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {contact.email}
-                                  </span>
-                                )}
-                                {contact.imported && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                                  >
-                                    Imported
-                                  </Badge>
-                                )}
-                                {contact.importance && (
-                                  <Badge
-                                    variant="secondary"
-                                    className={cn(
-                                      "text-xs",
-                                      contact.importance === "high" &&
-                                        "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                                    )}
-                                  >
-                                    {contact.importance}
-                                  </Badge>
+                {searchResults.length > 0 ? (
+                  <div className="space-y-3">
+                    {searchResults.map((contact) => (
+                      <Link key={contact.id} href={`/contacts/${contact.id}`}>
+                        <Card className="hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer border border-gray-200 dark:border-gray-700">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-4">
+                              <Avatar className="h-12 w-12 shrink-0">
+                                <AvatarImage src={contact.photo_url || undefined} />
+                                <AvatarFallback
+                                  className={cn(
+                                    "bg-linear-to-br text-white font-semibold",
+                                    getGradient(contact.name)
+                                  )}
+                                >
+                                  {getInitials(contact.first_name, contact.last_name)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                                  {contact.first_name} {contact.last_name || ""}
+                                </h3>
+
+                                <div className="flex flex-wrap gap-2 items-center">
+                                  {contact.email && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {contact.email}
+                                    </span>
+                                  )}
+                                  {contact.imported && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                                    >
+                                      Imported
+                                    </Badge>
+                                  )}
+                                  {contact.importance && (
+                                    <Badge
+                                      variant="secondary"
+                                      className={cn(
+                                        "text-xs",
+                                        contact.importance === "high" &&
+                                          "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                                      )}
+                                    >
+                                      {contact.importance}
+                                    </Badge>
+                                  )}
+                                </div>
+
+                                {(contact.relationship_summary || contact.where_met) && (
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                                    {contact.relationship_summary || contact.where_met}
+                                  </p>
                                 )}
                               </div>
-
-                              {(contact.relationship_summary || contact.where_met) && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
-                                  {contact.relationship_summary || contact.where_met}
-                                </p>
-                              )}
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              ) : !isSearching ? (
-                <Card className="border-2 border-dashed border-gray-200 dark:border-gray-700">
-                  <CardContent className="py-12 text-center">
-                    <Search className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                      No results found
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Try different keywords or use quick filters above
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : null}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                ) : !isSearching ? (
+                  <Card className="border-2 border-dashed border-gray-200 dark:border-gray-700">
+                    <CardContent className="py-12 text-center">
+                      <Search className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                        No results found
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Try different keywords or use quick filters above
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : null}
+              </div>
             </div>
           )}
         </div>

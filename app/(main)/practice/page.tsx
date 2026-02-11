@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Lightbulb, Trophy, Star, Zap } from "lucide-react";
 
 import { GameSetupModal } from "@/components/game/GameSetupModal";
+import { LevelUpModal } from "@/components/game/LevelUpModal";
 import { useGameStats } from "@/hooks/useGameStats";
 import { getBloomingContactsAction } from "@/app/actions/get-blooming-contacts";
+import { levelingService, LevelUpResult } from "@/lib/game/levelingService";
 
 // Types
 interface GameMode {
@@ -16,6 +18,7 @@ interface GameMode {
   title: string;
   description: string;
   category: 'quick' | 'focus' | 'challenge';
+  minLevel?: number;
 }
 
 interface DailyChallenge {
@@ -49,6 +52,7 @@ export default function GameCenterPage() {
   const { stats, isLoaded } = useGameStats();
   const [resetTime, setResetTime] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const [levelUpData, setLevelUpData] = useState<LevelUpResult | null>(null);
 
   // Derived stats
   // Level N starts at THRESHOLD[N-1]
@@ -136,6 +140,15 @@ export default function GameCenterPage() {
       description: 'Practice everyone attending your next event. Walk in confident!',
       category: 'challenge',
     },
+    {
+      id: 'web-recall',
+      icon: <span className="text-3xl">🕸️</span>,
+      iconColor: '#a855f7', // Purple
+      title: 'Web Recall',
+      description: 'Identify the connection between two contacts.',
+      category: 'challenge',
+      minLevel: 2,
+    },
   ];
 
   const achievements: Achievement[] = [
@@ -202,6 +215,17 @@ export default function GameCenterPage() {
       clearInterval(interval);
     };
   }, []);
+
+  // Level Up Detection
+  useEffect(() => {
+    if (isLoaded && stats.totalXP >= 500 && stats.level < 2) {
+      const result = levelingService.checkLevelUp(stats.totalXP, stats.level);
+      if (result.hasLeveledUp) {
+        const timer = setTimeout(() => setLevelUpData(result), 0);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [stats.totalXP, stats.level, isLoaded]);
 
   const [selectedGame, setSelectedGame] = useState<GameMode | null>(null);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
@@ -345,10 +369,10 @@ export default function GameCenterPage() {
                 {!dailyChallenge.completed && (
                    <button 
                     onClick={() => handleGameLaunch('daily-challenge')}
-                    className="px-8 py-4 bg-white text-indigo-600 font-black rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2"
+                    className="px-10 py-5 bg-white text-indigo-600 font-black rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-50 transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-3"
                    >
                      {dailyChallenge.progress > 0 ? 'Continue Challenge' : 'Start Challenge'}
-                     <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
                         <span className="text-[10px] text-emerald-600 uppercase tracking-tighter">🌱 +10 Garden Health</span>
                      </div>
                    </button>
@@ -394,11 +418,22 @@ export default function GameCenterPage() {
             {gameModes.map((mode) => (
               <div
                 key={mode.id}
-                className="group bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm dark:shadow-[0_0_25px_-5px_rgba(var(--glow-rgb),0.2)] border border-slate-200 dark:border-slate-800 p-8 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl dark:hover:shadow-[0_0_50px_-10px_rgba(var(--glow-rgb),0.5)] transition-all duration-300 cursor-pointer transform hover:-translate-y-1 relative overflow-hidden"
-                onClick={() => handleGameLaunch(mode.id)}
+                className={`group bg-white dark:bg-[#1f2937] rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden ${
+                  mode.id === 'web-recall' && stats.level < 2 ? 'opacity-75 cursor-not-allowed border-dashed grayscale-[0.5]' : 'cursor-pointer'
+                }`}
+                onClick={() => {
+                  if (mode.id === 'web-recall' && stats.level < 2) return;
+                  handleGameLaunch(mode.id);
+                }}
                 style={{ '--glow-rgb': hexToRgb(mode.iconColor) } as React.CSSProperties}
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 dark:bg-gray-800/50 rounded-bl-[100px] -mr-8 -mt-8 transition-colors group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-500/10" />
+                
+                {mode.id === 'web-recall' && stats.level < 2 && (
+                  <div className="absolute top-4 right-4 z-20 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-500">🔒 Lvl 2</span>
+                  </div>
+                )}
                 
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-6 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm bg-opacity-10"
@@ -410,7 +445,7 @@ export default function GameCenterPage() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 relative z-10">{mode.title}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2 font-medium relative z-10">{mode.description}</p>
                 
-                <div className="flex items-center gap-2 mb-6 relative z-10">
+                <div className="flex items-center gap-1 mb-6 relative z-10 w-full justify-start">
                   <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/10 rounded-full border border-emerald-200/50 dark:border-emerald-500/20">
                     <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1">
                       🌱 +5 Garden Health
@@ -423,15 +458,16 @@ export default function GameCenterPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-auto relative z-10 border-t border-gray-100 dark:border-gray-800 pt-6">
+                <div className="flex items-center justify-between mt-auto relative z-10 border-t border-gray-100 dark:border-gray-800 pt-6 min-h-[56px]">
                   <div className="text-xs font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                     Best: {
                         mode.id === 'face-match' ? stats.bestScores.faceMatch : 
                         mode.id === 'fact-match' ? stats.bestScores.factMatch : 
+                        mode.id === 'web-recall' ? stats.bestScores.webRecall :
                         0
                     }
                   </div>
-                  <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm group-hover:gap-3 transition-all h-full self-center">
                     <span>Play</span>
                     <ArrowLeft className="rotate-180 w-4 h-4" />
                   </div>
@@ -528,7 +564,7 @@ export default function GameCenterPage() {
               ))}
             </div>
 
-            <button className="w-full mt-8 px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <button className="w-full mt-8 mb-8 px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
               View All Achievements
             </button>
           </div>
@@ -548,6 +584,16 @@ export default function GameCenterPage() {
         onStart={handleStartGame}
         gameTitle={selectedGame?.title || 'Game'}
       />
+
+      {levelUpData && (
+        <LevelUpModal
+          isOpen={!!levelUpData}
+          onClose={() => setLevelUpData(null)}
+          level={levelUpData.newLevel || 2}
+          title={levelUpData.title || 'Garden Keeper'}
+          unlocks={levelUpData.unlocks || []}
+        />
+      )}
 
       <style jsx>{`
         @keyframes shimmer {

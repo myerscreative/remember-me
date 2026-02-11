@@ -11,6 +11,7 @@ export interface GameStats {
   bestScores: {
     faceMatch: number;
     factMatch: number;
+    webRecall: number;
   };
 }
 
@@ -30,7 +31,7 @@ export function useGameStats() {
     currentStreak: 0,
     lastPlayedDate: null,
     gamesPlayed: 0,
-    bestScores: { faceMatch: 0, factMatch: 0 }
+    bestScores: { faceMatch: 0, factMatch: 0, webRecall: 0 }
   });
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -40,7 +41,8 @@ export function useGameStats() {
     const saved = localStorage.getItem("remember-me-stats");
     if (saved) {
       try {
-        setStats(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setStats(parsed);
       } catch (e) {
         console.error("Failed to parse game stats", e);
       }
@@ -75,7 +77,7 @@ export function useGameStats() {
     });
   };
 
-  const recordGame = (mode: 'faceMatch' | 'factMatch', score: number) => {
+  const recordGame = (mode: 'faceMatch' | 'factMatch' | 'webRecall', score: number) => {
     setStats(prev => {
       const today = new Date().toISOString().split('T')[0];
       const lastPlayed = prev.lastPlayedDate ? prev.lastPlayedDate.split('T')[0] : null;
