@@ -115,7 +115,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] w-[calc(100%-24px)] max-h-[95vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
+      <DialogContent className="sm:max-w-[600px] w-[calc(100%-24px)] max-h-[95vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6 rounded-2xl">
         <DialogHeader>
           <DialogTitle>Edit Contact Info</DialogTitle>
           <DialogDescription>
@@ -212,7 +212,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                type="date"
                value={formData.birthday}
                onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-               className="h-11 px-4 text-base w-full max-w-[200px] min-w-0"
+               className="h-11 px-4 text-base w-full max-w-[140px] min-w-0"
              />
           </div>
 
@@ -227,7 +227,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                     type="date"
                     value={formData.lastContactDate}
                     onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
-                    className="h-11 px-4 text-base w-full max-w-[200px] min-w-0"
+                    className="h-11 px-4 text-base w-full max-w-[140px] min-w-0"
                   />
               </div>
               <div className="space-y-2">

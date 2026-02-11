@@ -11,7 +11,7 @@ import {
   Tag, 
   Sparkles,
   X,
-  Plus,
+  X,
   Loader2,
   Edit2
 } from 'lucide-react';
@@ -110,12 +110,14 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
 
       {isExpanded && (
         <div className="px-5 pb-5 space-y-5 animate-in fade-in slide-in-from-top-4 duration-500 ease-out">
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <button 
               onClick={() => setStatus('attempted')} 
               className={cn(
-                "flex-1 py-4 rounded-xl border text-xs font-black uppercase tracking-widest transition-all",
-                status === 'attempted' ? "bg-slate-800 border-slate-500 text-white" : "border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-400"
+                "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
+                status === 'attempted' 
+                  ? "bg-slate-800 border-slate-600 text-white" 
+                  : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
               )}
             >
               Attempted
@@ -123,8 +125,10 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
             <button 
               onClick={() => setStatus('connected')} 
               className={cn(
-                "flex-1 py-4 rounded-xl border text-xs font-black uppercase tracking-widest transition-all",
-                status === 'connected' ? "bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40" : "border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-400"
+                "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
+                status === 'connected' 
+                  ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/40" 
+                  : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
               )}
             >
               ✓ Connected

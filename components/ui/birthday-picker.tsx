@@ -80,8 +80,8 @@ export function BirthdayPicker({ date, onChange, className, inputClassName }: Bi
   };
 
   return (
-    <div className={cn("grid grid-cols-3 gap-2", className)}>
-      <div className="col-span-1">
+    <div className={cn("grid grid-cols-3 gap-2 min-w-0", className)}>
+      <div className="col-span-1 min-w-0">
         <Select
           value={values.month}
           onChange={(e) => updateDate({ ...values, month: e.target.value })}
@@ -96,7 +96,7 @@ export function BirthdayPicker({ date, onChange, className, inputClassName }: Bi
         </Select>
       </div>
 
-      <div className="col-span-1">
+      <div className="col-span-1 min-w-0">
         <Select
           value={values.day}
           onChange={(e) => updateDate({ ...values, day: e.target.value })}
@@ -111,7 +111,7 @@ export function BirthdayPicker({ date, onChange, className, inputClassName }: Bi
         </Select>
       </div>
 
-      <div className="col-span-1 relative">
+      <div className="col-span-1 min-w-0 relative">
         <Input
           type="number"
           placeholder="Year (Opt)"
