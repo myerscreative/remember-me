@@ -64,15 +64,17 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [status, setStatus] = useState<'connected' | 'attempted' | null>(null);
   const [note, setNote] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [nextDate, setNextDate] = useState('');
 
   const handleLogInteraction = async () => {
     if (!note.trim() || !status) return;
     try {
-      await onLog(note, status, new Date().toISOString(), nextDate);
+      await onLog(note, status, date, nextDate);
       setNote('');
       setStatus(null);
       setIsExpanded(false);
+      setDate(new Date().toISOString().split('T')[0]);
       setNextDate('');
     } catch (e) {
       console.error(e);
@@ -129,18 +131,35 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
             </button>
           </div>
           
-          <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800/80 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center">
-              <Calendar size={18} className="text-indigo-400" />
+          <div className="flex gap-4">
+            <div className="flex-1 bg-slate-950/50 rounded-xl p-4 border border-slate-800/80 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center">
+                <Calendar size={18} className="text-indigo-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Interaction Date</p>
+                <input 
+                  type="date" 
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="bg-transparent text-slate-200 text-sm font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                />
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Schedule Next Contact</p>
-              <input 
-                type="date" 
-                value={nextDate}
-                onChange={(e) => setNextDate(e.target.value)}
-                className="bg-transparent text-slate-200 text-sm font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
-              />
+
+            <div className="flex-1 bg-slate-950/50 rounded-xl p-4 border border-slate-800/80 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-indigo-600/10 flex items-center justify-center">
+                <Calendar size={18} className="text-indigo-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Schedule Next</p>
+                <input 
+                  type="date" 
+                  value={nextDate}
+                  onChange={(e) => setNextDate(e.target.value)}
+                  className="bg-transparent text-slate-200 text-sm font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                />
+              </div>
             </div>
           </div>
 

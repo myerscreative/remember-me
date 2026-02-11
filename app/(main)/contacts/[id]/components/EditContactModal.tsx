@@ -212,7 +212,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                type="date"
                value={formData.birthday}
                onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-               className="h-11 px-4 text-base w-full min-w-0"
+               className="h-11 px-4 text-base w-full max-w-[200px] min-w-0"
              />
           </div>
 
@@ -227,7 +227,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                     type="date"
                     value={formData.lastContactDate}
                     onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
-                    className="h-11 px-4 text-base w-full min-w-0"
+                    className="h-11 px-4 text-base w-full max-w-[200px] min-w-0"
                   />
               </div>
               <div className="space-y-2">
