@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid, Share2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
@@ -460,17 +460,17 @@ export default function GardenPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden">
-      <div className="max-w-[1400px] mx-auto px-4 py-8">
+      <div className="max-w-[1400px] mx-auto px-4 py-4 md:py-6">
         
         {/* Header - Compact on mobile */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-2 md:mb-4">
           <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-3 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
           </Link>
           <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">🍃 Relationship Garden</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">🍃 Relationship Garden</h1>
               <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 hidden md:block">Click a health status to see contacts in that group</p>
             </div>
           </div>
@@ -479,7 +479,7 @@ export default function GardenPage() {
         {/* MOBILE: Garden First, Filters Below */}
         <div className="md:hidden">
           {/* View Mode Toggle - ALWAYS AT TOP */}
-          <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
+          <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-2 mb-2">
             <button
               onClick={() => setViewMode('garden')}
               className={`flex-1 py-2 rounded-lg border transition-colors ${
@@ -514,7 +514,7 @@ export default function GardenPage() {
 
           {/* Garden View */}
           {viewMode === 'garden' && healthFilter === 'all' && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-2 mb-2 transition-colors">
               <RelationshipGarden
                 contacts={filteredContacts}
                 filter={categoryFilter}
@@ -693,7 +693,7 @@ export default function GardenPage() {
         {/* DESKTOP: Original Layout */}
         <div className="hidden md:block">
           {/* Health Status Bar (clickable filters) */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-4 mb-4 transition-colors">
+          <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-3 transition-colors">
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setHealthFilter('all')}
@@ -742,7 +742,7 @@ export default function GardenPage() {
           />
  
           {/* Main Content */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 pb-10 transition-colors">
+          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 md:p-6 transition-colors">
             
             {/* Desktop-only view controls - Now inside the content area */}
             <div className="hidden md:block mb-6">
