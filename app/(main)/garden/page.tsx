@@ -3,7 +3,12 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, List, LayoutGrid, Share2 } from 'lucide-react';
+import { ArrowLeft, Loader2, List, LayoutGrid, Share2, Info } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import RelationshipGarden, { Contact } from '@/components/relationship-garden/RelationshipGarden';
@@ -459,7 +464,7 @@ export default function GardenPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden pb-24">
       <div className="max-w-[1400px] mx-auto px-4 py-4 md:py-6">
         
         {/* Header - Compact on mobile */}
@@ -634,38 +639,40 @@ export default function GardenPage() {
           {/* Filters & Controls Section */}
           <div className="space-y-3 mb-4">
             
-            {/* Health Status Filters - Compact */}
-            <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Health Status</div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setHealthFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    healthFilter === 'all'
-                      ? 'bg-slate-900 dark:bg-slate-700 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                  }`}
-                >
-                  All ({contacts.length})
-                </button>
-                {(Object.keys(healthConfig) as Array<keyof typeof healthConfig>).map((status) => {
-                  const config = healthConfig[status];
-                  const count = stats[status];
-                  return (
-                    <button
-                      key={status}
-                      onClick={() => setHealthFilter(status)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all`}
-                      style={{
-                        backgroundColor: healthFilter === status ? config.color : `${config.color}20`,
-                        color: healthFilter === status ? 'white' : config.color
-                      }}
-                    >
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
-                      {config.label} ({count})
-                    </button>
-                  );
-                })}
+            {/* Health Status Filters - Compact & Scrollable */}
+            <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-2">
+              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider px-1">Health Status</div>
+              <div className="flex overflow-x-auto pb-1 gap-2 no-scrollbar">
+                <div className="flex flex-nowrap gap-2 min-w-max">
+                  <button
+                    onClick={() => setHealthFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      healthFilter === 'all'
+                        ? 'bg-slate-900 dark:bg-slate-700 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                    }`}
+                  >
+                    All ({contacts.length})
+                  </button>
+                  {(Object.keys(healthConfig) as Array<keyof typeof healthConfig>).map((status) => {
+                    const config = healthConfig[status];
+                    const count = stats[status];
+                    return (
+                      <button
+                        key={status}
+                        onClick={() => setHealthFilter(status)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all`}
+                        style={{
+                          backgroundColor: healthFilter === status ? config.color : `${config.color}20`,
+                          color: healthFilter === status ? 'white' : config.color
+                        }}
+                      >
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
+                        {config.label} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -676,13 +683,33 @@ export default function GardenPage() {
               counts={categoryCounts}
             />
 
-            {/* Triage Link */}
-            <Link
-              href="/triage"
-              className="block text-center px-4 py-3 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors font-medium"
-            >
-              🚨 Triage Mode
-            </Link>
+            {/* Triage Link - Garden Rescue */}
+            <div className="relative group">
+              <Link
+                href="/triage"
+                className="flex items-center justify-between px-4 py-3.5 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-xl hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-all font-bold shadow-sm border border-orange-200/50 dark:border-orange-900/50 animate-pulse-subtle"
+              >
+                <span className="flex items-center gap-2">
+                  🚨 Garden Rescue
+                </span>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      onClick={(e) => e.preventDefault()}
+                      className="p-1 hover:bg-orange-200 dark:hover:bg-orange-800/40 rounded-full transition-colors"
+                    >
+                      <Info className="w-4 h-4 text-slate-400" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
+                    <p className="leading-relaxed">
+                      Garden Rescue surfaces your most neglected connections so you can quickly bring them back to health.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Link>
+            </div>
 
 
 

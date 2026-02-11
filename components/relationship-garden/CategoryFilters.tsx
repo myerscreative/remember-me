@@ -20,7 +20,8 @@ export default function CategoryFilters({ currentFilter, onFilterChange, counts 
   ];
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex overflow-x-auto pb-2 gap-2 mb-2 no-scrollbar">
+      <div className="flex flex-nowrap gap-2 min-w-max">
       {filters.map((filter) => (
         <button
           key={filter.id}
@@ -46,6 +47,7 @@ export default function CategoryFilters({ currentFilter, onFilterChange, counts 
           </span>
         </button>
       ))}
+      </div>
     </div>
   );
 }

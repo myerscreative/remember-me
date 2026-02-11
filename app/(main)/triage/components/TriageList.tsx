@@ -66,18 +66,18 @@ export default function TriageList({ initialContacts }: TriageListProps) {
             className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400 dark:text-white"
           />
         </div>
-        <div className="text-sm text-slate-500 dark:text-slate-400">
-          {filteredContacts.length} contacts
+        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          {filteredContacts.length} Unplanted Seeds
         </div>
       </div>
 
       {/* List */}
-      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="divide-y divide-slate-100 dark:divide-slate-800 pb-24">
         {filteredContacts.map(contact => (
           <div 
             key={contact.id}
             className={`
-              p-4 flex items-center justify-between transition-colors duration-300
+              py-2 px-4 flex items-center justify-between transition-colors duration-300
               ${contact.importance === 'high' 
                 ? 'bg-amber-50/80 dark:bg-amber-900/10 border-l-4 border-l-amber-400' 
                 : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-4 border-l-transparent'}
@@ -138,7 +138,7 @@ export default function TriageList({ initialContacts }: TriageListProps) {
 
         {filteredContacts.length === 0 && (
           <div className="p-12 text-center text-slate-500 dark:text-slate-400">
-            No contacts found matching "{query}"
+            No contacts found matching &quot;{query}&quot;
           </div>
         )}
       </div>

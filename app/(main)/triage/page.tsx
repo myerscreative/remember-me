@@ -2,8 +2,7 @@ import React from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import TriageList, { TriageContact } from './components/TriageList';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import TriageHeader from './components/TriageHeader';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +32,15 @@ export default async function TriagePage() {
 
   // Process and sort contacts
   // Sort Order: Default sort by "Needs Love" (oldest last_interaction_date first)
-  const contacts: TriageContact[] = (persons || []).map((p: any) => {
+  const contacts: TriageContact[] = (persons || []).map((p: {
+    id: string;
+    name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    last_contact: string | null;
+    last_interaction_date: string | null;
+    importance: string | null;
+  }) => {
     // Calculate effective date for sorting/status
     const dateStr = p.last_contact || p.last_interaction_date;
     const date = dateStr ? new Date(dateStr).getTime() : 0; // 0 = very old
@@ -65,26 +72,9 @@ export default async function TriagePage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-2 transition-colors">
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Back to Dashboard
-            </Link>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">🚨 Contact Triage</h1>
-            <p className="text-slate-500 dark:text-slate-400">
-              Rapidly categorize your contacts to build your garden.
-            </p>
-          </div>
-          <Link 
-            href="/garden"
-            className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-          >
-            Finish & View Garden →
-          </Link>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors pb-24">
+      <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
+        <TriageHeader />
 
         <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
           <TriageList initialContacts={contacts} />
