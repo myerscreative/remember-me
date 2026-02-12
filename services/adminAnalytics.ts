@@ -38,10 +38,29 @@ interface Connector {
  * All data is anonymized/aggregated to respect privacy where possible.
  */
 export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  // Default values to prevent dashboard crash
+  const emptySigns: CommunityVitalSigns = {
+    pulseScore: 0,
+    referralVelocity: 0,
+    skillCloud: [],
+    networkDensity: 0,
+    gardenHealth: { nurtured: 0, drifting: 0, neglected: 0 },
+    bridgeActivity: { dates: [], requests: [], approvals: [] },
+    topConnectors: [],
+    totalUsers: 0,
+    activeUsers: 0
+  };
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Admin Analytics: Missing Supabase environment variables');
+      return emptySigns;
+    }
+
+    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
 
   const { count: totalUsers } = await supabase
     .from('user_stats')
@@ -219,19 +238,24 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     }
   }
 
-  return {
-    pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,
-    referralVelocity: bridgeActivity.approvals.reduce((a, b) => a + b, 0),
-    skillCloud,
-    networkDensity: Math.min(100, (density * 100) * 10), // Multiplied by 10 for visibility of sparse networks
-    gardenHealth: {
-      nurtured: (health.nurtured / totalHealth) * 100,
-      drifting: (health.drifting / totalHealth) * 100,
-      neglected: (health.neglected / totalHealth) * 100
-    },
-    bridgeActivity,
-    topConnectors,
-    totalUsers: totalUsers || 0,
-    activeUsers: activeUsers || 0
-  };
+    return {
+      pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,
+      referralVelocity: bridgeActivity.approvals.reduce((a, b) => a + b, 0),
+      skillCloud,
+      networkDensity: Math.min(100, (density * 100) * 10), // Multiplied by 10 for visibility of sparse networks
+      gardenHealth: {
+        nurtured: (health.nurtured / totalHealth) * 100,
+        drifting: (health.drifting / totalHealth) * 100,
+        neglected: (health.neglected / totalHealth) * 100
+      },
+      bridgeActivity,
+      topConnectors,
+      totalUsers: totalUsers || 0,
+      activeUsers: activeUsers || 0
+    };
+  } catch (error) {
+    console.error('Admin Analytics Error:', error);
+    // Return empty state rather than throwing 500
+    return emptySigns;
+  }
 }
