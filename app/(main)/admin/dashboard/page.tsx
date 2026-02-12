@@ -171,14 +171,14 @@ export default function AdminDashboardPage() {
             <StatCard 
               label="Network Density" 
               value={`${data.networkDensity.toFixed(1)}%`}
-              change="+2.4%"
+              change="Verified"
               positive={true}
               icon={<Users className="h-4 w-4" />}
             />
             <StatCard 
               label="Bridge Velocity" 
               value={data.referralVelocity.toString()}
-              change="+15%"
+              change="Avg/Mo"
               positive={true}
               icon={<Share2 className="h-4 w-4" />}
               info={<BridgeVelocityInfo />}
@@ -186,14 +186,14 @@ export default function AdminDashboardPage() {
             <StatCard 
               label="Pulse Score" 
               value={`${Math.round(data.pulseScore)}%`}
-              change="-1.2%"
-              positive={false}
+              change="Real-time"
+              positive={true}
               icon={<Activity className="h-4 w-4" />}
             />
             <StatCard 
               label="Active Nodes" 
-              value="482"
-              change="+52"
+              value={data.activeUsers.toString()}
+              change={`of ${data.totalUsers}`}
               positive={true}
               icon={<TrendingUp className="h-4 w-4" />}
             />
@@ -224,7 +224,7 @@ export default function AdminDashboardPage() {
                 <div>
                   <p className="text-xs font-bold text-orange-400 mb-1">Attention Required</p>
                   <p className="text-[10px] text-slate-400 leading-relaxed">
-                    Connectivity is down 5% this week. 12 members haven&apos;t interacted in 14+ days.
+                    {Math.round(data.gardenHealth.neglected)}% of your garden is neglected. Focus on re-engaging your core network.
                   </p>
                 </div>
               </div>

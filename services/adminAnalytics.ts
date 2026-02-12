@@ -23,6 +23,8 @@ export interface CommunityVitalSigns {
     avatar: string | null;
     referrals: number;
   }[];
+  totalUsers: number;
+  activeUsers: number;
 }
 
 interface Connector {
@@ -218,13 +220,15 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,
     referralVelocity: bridgeActivity.approvals.reduce((a, b) => a + b, 0),
     skillCloud,
-    networkDensity: density * 100, // as percentage
+    networkDensity: Math.min(100, (actualConnections || 0) / (potentialConnections * 10) * 100), // Calibrated for community density
     gardenHealth: {
       nurtured: (health.nurtured / totalHealth) * 100,
       drifting: (health.drifting / totalHealth) * 100,
       neglected: (health.neglected / totalHealth) * 100
     },
     bridgeActivity,
-    topConnectors
+    topConnectors,
+    totalUsers: totalUsers || 0,
+    activeUsers: activeUsers || 0
   };
 }
