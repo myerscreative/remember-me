@@ -105,12 +105,23 @@ export default function AdminDashboardPage() {
     loadData();
   }, []);
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Aggregating Vital Signs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center p-8 bg-slate-800 rounded-2xl border border-slate-700">
+          <p className="text-white font-bold mb-2">Aggregation Failed</p>
+          <p className="text-slate-400 text-sm">Unable to fetch community metrics. Please refresh or contact admin.</p>
         </div>
       </div>
     );
