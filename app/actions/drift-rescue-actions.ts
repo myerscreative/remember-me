@@ -23,13 +23,14 @@ export async function getDriftingContacts(): Promise<DriftingContact[]> {
   if (!user) return [];
 
   // 1. Fetch contacts
-  const { data: contacts, error } = await supabase
+  const { data, error } = await supabase
     .from('persons')
     .select('id, name, last_interaction_date, target_frequency_days, importance, shared_memories(count)')
     .eq('user_id', user.id)
     .or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null');
 
-  if (error || !contacts) return [];
+  if (error || !data) return [];
+  const contacts = data as any[];
 
   const now = new Date();
   const driftingContacts = contacts.filter(contact => {
