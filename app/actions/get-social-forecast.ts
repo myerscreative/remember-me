@@ -2,6 +2,14 @@
 
 import { createClient } from '@/lib/supabase/server';
 
+interface Contact {
+  id: string;
+  name: string;
+  importance?: 'high' | 'medium' | 'low';
+  target_frequency_days?: number;
+  last_interaction_date?: string | null;
+}
+
 export interface ForecastData {
   currentHealth: number;
   forecastedHealth: number;
@@ -52,7 +60,7 @@ export async function getSocialForecast(): Promise<{ data: ForecastData | null; 
     let decayCount = 0;
     const atRiskContacts: ForecastData['atRiskContacts'] = [];
 
-    (contacts || []).forEach(contact => {
+    ((contacts as Contact[]) || []).forEach((contact: Contact) => {
       const importanceValue = contact.importance || 'medium';
       const targetFrequency = contact.target_frequency_days || (importanceValue === 'high' ? 14 : importanceValue === 'low' ? 90 : 30);
       
