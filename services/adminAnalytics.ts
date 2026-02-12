@@ -63,52 +63,46 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
 
     // Prepare time filters
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysStr = thirtyDaysAgo.toISOString();
 
     // Parallel fetch all primary data
     const [
-      totalUsersRes,
-      activeUsersRes,
       totalPersonsRes,
-      actualConnectionsRes,
       allPersonTagsRes,
       personsWithInterestsRes,
       contactsRes,
       newContactsRes,
       recentInteractionsRes,
-      topUsersRes
+      topUsersRes,
+      verifiedContactsRes
     ] = await Promise.all([
-      supabase.from('user_stats').select('*', { count: 'exact' }),
-      supabase.from('user_stats').select('*', { count: 'exact' }).gte('last_activity_date', sevenDaysAgo),
       supabase.from('persons').select('*', { count: 'exact' }),
-      supabase.from('relationships').select('*', { count: 'exact' }),
       supabase.from('person_tags').select('tag_id, tags(name)'),
       supabase.from('persons').select('interests').not('interests', 'is', null),
       supabase.from('persons').select('last_interaction_date, target_frequency_days, importance').or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null'),
       supabase.from('persons').select('created_at').gte('created_at', thirtyDaysStr),
       supabase.from('interactions').select('date').gte('date', thirtyDaysStr),
-      supabase.from('user_stats').select('user_id, total_contacts').order('total_contacts', { ascending: false }).limit(5)
+      supabase.from('user_stats').select('user_id, total_contacts').order('total_contacts', { ascending: false }).limit(5),
+      supabase.from('shared_memories').select('person_id')
     ]);
 
     // Extract results
-    const totalUsers = totalUsersRes.count || 0;
-    const activeUsers = activeUsersRes.count || 0;
     const totalPersons = totalPersonsRes.count || 0;
-    const actualConnections = actualConnectionsRes.count || 0;
     const allPersonTags = allPersonTagsRes.data || [];
     const personsWithInterests = personsWithInterestsRes.data || [];
     const contacts = contactsRes.data || [];
     const newContacts = newContactsRes.data || [];
     const recentInteractions = recentInteractionsRes.data || [];
     const topUsers = topUsersRes.data || [];
+    const sharedMemories = verifiedContactsRes.data || [];
 
-    // 1. Density Calculation
-    const n = totalPersons || 1;
-    const potentialConnections = (n * (n - 1)) / 2 || 1;
-    const density = (actualConnections || 0) / potentialConnections;
+    // 1. Verified Contact Calculation (Per Requirement 4)
+    // "Verified" = Any contact with at least one entry in shared_memories
+    const verifiedPersonIds = new Set(sharedMemories.map((m: any) => m.person_id));
+    const verifiedCount = verifiedPersonIds.size;
+    const networkDensity = totalPersons > 0 ? (verifiedCount / totalPersons) * 100 : 0;
 
     // 2. Skill Cloud Aggregation
     const tagMap = new Map<string, number>();
@@ -158,6 +152,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
       }
     });
 
+    const totalActiveNodes = contacts.filter((c: any) => (c.target_frequency_days || 0) > 0).length || 1;
     const totalHealth = (health.nurtured + health.drifting + health.neglected) || 1;
 
     // 4. Activity Buckets for Velocity
@@ -203,28 +198,17 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
             const avatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
             return { name, avatar, referrals: stat.total_contacts || 0 };
           });
-        } else {
-          topConnectors = topUsers.map((stat: any) => ({
-            name: `User ${stat.user_id.substring(0,4)}...`,
-            avatar: null,
-            referrals: stat.total_contacts || 0
-          }));
         }
       } catch (authFetchError) {
         console.warn('Admin Analytics: Failed to fetch auth users', authFetchError);
-        topConnectors = topUsers.map((stat: any) => ({
-          name: `User ${stat.user_id.substring(0,4)}...`,
-          avatar: null,
-          referrals: stat.total_contacts || 0
-        }));
       }
     }
 
     return {
-      pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,
+      pulseScore: (health.nurtured / totalActiveNodes) * 100,
       referralVelocity: bridgeActivity.approvals.reduce((a, b) => a + b, 0),
       skillCloud,
-      networkDensity: Math.min(100, (density * 100) * 10),
+      networkDensity,
       gardenHealth: {
         nurtured: (health.nurtured / totalHealth) * 100,
         drifting: (health.drifting / totalHealth) * 100,
@@ -232,8 +216,8 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
       },
       bridgeActivity,
       topConnectors,
-      totalUsers,
-      activeUsers
+      totalUsers: totalPersons, 
+      activeUsers: contacts.filter((c: any) => (c.target_frequency_days || 0) > 0).length
     };
   } catch (error) {
     console.error('Admin Analytics Critical Error:', error);

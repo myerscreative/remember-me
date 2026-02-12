@@ -115,6 +115,17 @@ export async function getSocialForecast(): Promise<{ data: ForecastData | null; 
 
   } catch (error) {
     console.error('Error in getSocialForecast:', error);
-    return { data: null, error };
+    // Return a neutral fallback state instead of null to prevent UI issues (Requirement 5)
+    return { 
+      data: {
+        currentHealth: 0,
+        forecastedHealth: 0,
+        velocityResonance: 0,
+        decayCount: 0,
+        weatherState: 'overcast',
+        atRiskContacts: []
+      }, 
+      error: null 
+    };
   }
 }

@@ -298,6 +298,8 @@ export async function upsertSharedMemory(person_id: string, content: string) {
     if (error) throw error;
 
     revalidatePath(`/contacts/${validatedPersonId}`);
+    revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
     return { success: true };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -343,7 +345,7 @@ export async function updateStoryFields(contactId: string, fields: { where_met?:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contactId: validatedContactId }),
       }).catch(err => console.error('Background AI refresh failed:', err));
-    } catch (refreshError) {
+    } catch {
       console.log('Could not trigger background AI refresh');
     }
 
@@ -403,11 +405,13 @@ export async function addSharedMemory(person_id: string, content: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contactId: validatedPersonId }),
         }).catch(err => console.error('Background AI refresh failed:', err));
-      } catch (refreshError) {
+      } catch {
         console.log('Could not trigger background AI refresh');
       }
 
       revalidatePath(`/contacts/${validatedPersonId}`);
+      revalidatePath('/dashboard');
+      revalidatePath('/admin/dashboard');
       return { success: true };
     } catch (error: unknown) {
       console.error('❌ [DEBUG] addSharedMemory Error:', error);

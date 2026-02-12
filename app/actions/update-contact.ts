@@ -49,6 +49,7 @@ export async function updateContact(personId: string, data: unknown) {
 
     revalidatePath(`/contacts/${validatedPersonId}`);
     revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
     return { success: true };
   } catch (error: unknown) {
     console.error("Error updating contact:", error);

@@ -34,6 +34,8 @@ export async function deleteContact(contactId: string) {
     // Revalidate the contacts list page
     revalidatePath('/contacts');
     revalidatePath('/garden');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
 
     return { success: true };
   } catch (error) {
@@ -72,6 +74,8 @@ export async function restoreContact(contactId: string) {
 
     revalidatePath('/contacts');
     revalidatePath('/garden');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
 
     return { success: true };
   } catch (error) {
@@ -109,6 +113,8 @@ export async function permanentlyDeleteContact(contactId: string) {
 
     revalidatePath('/contacts');
     revalidatePath('/garden');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
 
     return { success: true };
   } catch (error) {

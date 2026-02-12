@@ -99,6 +99,8 @@ export async function logInteraction({ personId, type, note, date, predictedReso
 
     // Revalidate
     revalidatePath('/garden');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin/dashboard');
     revalidatePath('/');
     
     return { success: true };

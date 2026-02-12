@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/popover";
 import toast from 'react-hot-toast';
 import { auditDraftMessage } from '@/app/actions/audit-message';
+import { addSharedMemory } from '@/app/actions/story-actions';
 import { useDebounce } from '@/hooks/use-debounce';
 
 // --- Components from Blueprint ---
@@ -66,16 +67,21 @@ interface InteractionSuiteProps {
   contactId: string;
   onLog: (note: string, status: 'connected' | 'attempted', date: string, nextDate?: string) => Promise<void>;
   isLogging?: boolean;
+  isThin?: boolean;
 }
   
-const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps) => {
+const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSuiteProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [status, setStatus] = useState<'connected' | 'attempted' | null>(null);
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [nextDate, setNextDate] = useState('');
   
-  // Resonance Logic
+  // Success & Enrichment States
+  const [showSuccessEnrichment, setShowSuccessEnrichment] = useState(false);
+  const [enrichmentNote, setEnrichmentNote] = useState('');
+  const [isEnriching, setIsEnriching] = useState(false);
+
   const [resonance, setResonance] = useState<{ score: number; point?: string; tweak?: string } | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const debouncedNote = useDebounce(note, 1000);
@@ -109,16 +115,45 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
     'border-indigo-400 shadow-indigo-900/40 ring-2 ring-indigo-500/20';
 
   const handleLogInteraction = async () => {
-    if (!note.trim() || !status) return;
+    if (!status) return; // Note is now optional
     try {
+      const wasNoteEmpty = !note.trim();
       await onLog(note, status, date, nextDate);
+      
       setNote('');
       setStatus(null);
       setIsExpanded(false);
       setDate(new Date().toISOString().split('T')[0]);
       setNextDate('');
+      
+      // If profile is thin and no note was provided, show enrichment invitation
+      if (wasNoteEmpty) {
+        setShowSuccessEnrichment(true);
+      } else {
+        setShowSuccessEnrichment(false);
+      }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleEnrichmentSubmit = async () => {
+    if (!enrichmentNote.trim()) return;
+    setIsEnriching(true);
+    try {
+      const result = await addSharedMemory(contactId, enrichmentNote);
+      if (result.success) {
+        toast.success("Relationship nourished! 🌱", { icon: '✨' });
+        setShowSuccessEnrichment(false);
+        setEnrichmentNote('');
+      } else {
+        toast.error("Failed to save detail");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred");
+    } finally {
+      setIsEnriching(false);
     }
   };
 
@@ -127,13 +162,13 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
       "w-full bg-slate-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
       isExpanded ? resonanceColor : "border-slate-800"
     )}>
-      {resonance && resonance.score < 60 && isExpanded && (
-        <div className="bg-orange-500/10 border-b border-orange-500/20 px-5 py-2 flex items-center justify-between animate-pulse">
-          <div className="flex items-center gap-2">
-            <AlertCircle size={12} className="text-orange-500" />
-            <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Friction Warning: {resonance.point}</span>
-          </div>
-          <p className="text-[9px] text-orange-400/80 italic font-medium">&ldquo;{resonance.tweak}&rdquo;</p>
+      {/* Optional Nudge (Replacing Friction Warning) */}
+      {!note.trim() && isThin && isExpanded && (
+        <div className="bg-indigo-600/5 border-b border-indigo-500/10 px-5 py-2 flex items-center gap-2 animate-in fade-in duration-500">
+          <Sparkles size={12} className="text-indigo-400 opacity-60" />
+          <span className="text-[9px] font-black text-indigo-400/80 uppercase tracking-widest">
+            Invitation: Reference a specific memory to improve resonance.
+          </span>
         </div>
       )}
       {resonance && resonance.score >= 85 && isExpanded && (
@@ -267,7 +302,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
           <div className="flex gap-3 sticky bottom-4 z-10 bg-slate-900 pt-2 pb-1">
             <button 
               onClick={handleLogInteraction}
-              disabled={isLogging || !note.trim() || !status}
+              disabled={isLogging || !status}
               className={cn(
                 "flex-1 py-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl",
                 resonance && resonance.score >= 85 
@@ -275,7 +310,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
                   : "bg-slate-800 hover:bg-slate-700 text-slate-300"
               )}
             >
-              {isLogging ? 'Logging...' : 'Log Shared Memory'}
+              {isLogging ? 'Logging...' : 'Save Interaction'}
             </button>
             <button 
               onClick={() => {
@@ -287,6 +322,49 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
             >
               <X size={18} />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Optional Success Enrichment */}
+      {showSuccessEnrichment && (
+        <div className="px-5 py-6 bg-indigo-600/5 border-t border-indigo-500/10 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-400">
+              <Sparkles size={14} />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-200">Interaction Saved!</p>
+              <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Optional Invitation</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <p className="text-xs text-slate-400 leading-relaxed italic">
+              "Add a quick detail you want to remember from this chat?"
+            </p>
+            <textarea
+              value={enrichmentNote}
+              onChange={(e) => setEnrichmentNote(e.target.value)}
+              placeholder="e.g. They just adopted a golden retriever named Rex..."
+              className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all resize-none"
+              rows={2}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleEnrichmentSubmit}
+                disabled={isEnriching || !enrichmentNote.trim()}
+                className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all disabled:opacity-50"
+              >
+                {isEnriching ? 'Saving Memory...' : 'Save Detail'}
+              </button>
+              <button
+                onClick={() => setShowSuccessEnrichment(false)}
+                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+              >
+                Skip
+              </button>
+            </div>
           </div>
         </div>
       )}
