@@ -13,6 +13,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+interface RescueTask {
+  user_id: string;
+  contact_id: string;
+  suggested_hook: string;
+  relationship_value_score: number;
+}
+
+interface CronSummary {
+  userId: string;
+  rescues: number;
+}
+
 export async function GET(req: NextRequest) {
   // 1. Basic security check (use a secret token in production)
   const authHeader = req.headers.get('authorization');
@@ -28,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     if (usersError) throw usersError;
 
-    const summary = [];
+    const summary: CronSummary[] = [];
 
     for (const stat of userStats || []) {
       const userId = stat.user_id;
@@ -69,7 +81,7 @@ export async function GET(req: NextRequest) {
 
       if (top5.length === 0) continue;
 
-      const rescues = [];
+      const rescues: RescueTask[] = [];
       for (const contact of top5) {
         const memories = contact.shared_memories?.map((m: any) => m.content).join('; ') || "";
         
