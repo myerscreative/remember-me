@@ -60,12 +60,13 @@ export async function getDriftingContacts(): Promise<DriftingContact[]> {
   
   for (const contact of sortedDrift.slice(0, 10)) {
     // Fetch some memories for the hook
-    const { data: memories } = await supabase
+    const { data: memoriesData } = await supabase
       .from('shared_memories')
       .select('content')
       .eq('person_id', contact.id)
       .limit(3);
 
+    const memories = memoriesData as any[] | null;
     const memoryContent = memories?.map(m => m.content).join('; ') || '';
     
     let suggestedHook = "Just thinking of you! Hope your week is going great.";
@@ -111,7 +112,7 @@ export async function rescueContact(contactId: string, message: string) {
   if (!user) throw new Error('Unauthorized');
 
   // 1. Log the interaction
-  const { error: logError } = await supabase
+  const { error: logError } = await (supabase as any)
     .from('interactions')
     .insert({
       person_id: contactId,
@@ -125,7 +126,7 @@ export async function rescueContact(contactId: string, message: string) {
   if (logError) throw logError;
 
   // 2. Update contact status (last_interaction_date)
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('persons')
     .update({
       last_interaction_date: new Date().toISOString(),
@@ -144,7 +145,7 @@ export async function rescueContact(contactId: string, message: string) {
   const diff = now.getDate() - day + (day === 0 ? -6:1);
   const monday = new Date(now.setDate(diff)).toISOString().split('T')[0];
 
-  await supabase
+  await (supabase as any)
     .from('weekly_rescues')
     .update({ status: 'sent' })
     .eq('contact_id', contactId)
@@ -171,8 +172,9 @@ export async function getWeeklyRescues(): Promise<DriftingContact[]> {
     .eq('status', 'pending');
 
   if (error || !data) return [];
+  const rescues = data as any[];
 
-  return data.map(r => ({
+  return rescues.map(r => ({
     id: r.contact_id,
     name: (r.persons as any).name,
     lastInteractionDate: (r.persons as any).last_interaction_date,
@@ -192,7 +194,7 @@ export async function skipWeeklyRescue(contactId: string) {
   const diff = now.getDate() - day + (day === 0 ? -6 : 1);
   const mondayStr = new Date(now.setDate(diff)).toISOString().split('T')[0];
 
-  await supabase
+  await (supabase as any)
     .from('weekly_rescues')
     .update({ status: 'skipped' })
     .eq('user_id', user.id)
