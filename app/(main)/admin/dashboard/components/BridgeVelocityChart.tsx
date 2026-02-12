@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BridgeVelocityInfo } from './BridgeVelocityInfo';
 
 interface BridgeVelocityChartProps {
   data: {
@@ -32,7 +33,10 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
     <div className="flex flex-col p-6 bg-slate-800 rounded-2xl border border-slate-700/50 shadow-xl w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-white">Bridge Velocity</h3>
+          <h3 className="text-lg font-bold text-white flex items-center">
+            Bridge Velocity
+            <BridgeVelocityInfo />
+          </h3>
           <p className="text-xs text-slate-400">Introduction requests vs. successful approvals</p>
         </div>
         <div className="flex gap-4">

@@ -4,11 +4,11 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import type { InteractionType } from '@/lib/relationship-health';
 
-interface LogInteractionInput {
+export interface LogInteractionInput {
   personId: string;
   type: InteractionType;
   note?: string;
-  // nextGoal removed - column doesn't exist in database
+  predictedResonance?: number;
 }
 
 
@@ -16,7 +16,7 @@ export type InteractionResult =
   | { success: true; error?: never }
   | { success: false; error: string; details?: any };
 
-export async function logInteraction({ personId, type, note, date }: LogInteractionInput & { date?: string }): Promise<InteractionResult> {
+export async function logInteraction({ personId, type, note, date, predictedResonance }: LogInteractionInput & { date?: string }): Promise<InteractionResult> {
   const supabase = await createClient();
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -57,17 +57,31 @@ export async function logInteraction({ personId, type, note, date }: LogInteract
     const shouldUpdatePersonStats = newInteractionTime > currentLastInteraction;
 
     // 2. Insert interaction
-    const { error: insertError } = await (supabase as any).from('interactions').insert({
+    const { data: newInteraction, error: insertError } = await (supabase as any).from('interactions').insert({
       person_id: personId,
       user_id: user.id,
       type,
       date: interactionDate,
       notes: note || null,
-    });
+      is_inbound: false, // Explicitly outbound for outreach
+    }).select('id').single();
 
     if (insertError) {
       console.error('Error inserting interaction:', insertError);
       return { success: false, error: insertError.message || 'Failed to log interaction', details: insertError };
+    }
+
+    // 2b. If predictedResonance provided, create Learning Ledger entry
+    if (predictedResonance !== undefined && newInteraction) {
+      const { error: ledgerError } = await (supabase as any).from('learning_ledger').insert({
+        outreach_id: newInteraction.id,
+        contact_id: personId,
+        user_id: user.id,
+        predicted_resonance: predictedResonance,
+        actual_outcome: false,
+      });
+
+      if (ledgerError) console.error('Error creating ledger entry:', ledgerError);
     }
 
     // 3. Update person stats ONLY if this is a newer interaction

@@ -12,7 +12,8 @@ import {
   Sparkles,
   X,
   Loader2,
-  Edit2
+  Edit2,
+  AlertCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import toast from 'react-hot-toast';
+import { auditDraftMessage } from '@/app/actions/audit-message';
+import { useDebounce } from '@/hooks/use-debounce';
 
 // --- Components from Blueprint ---
 
@@ -60,16 +63,50 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
 };
   
 interface InteractionSuiteProps {
+  contactId: string;
   onLog: (note: string, status: 'connected' | 'attempted', date: string, nextDate?: string) => Promise<void>;
   isLogging?: boolean;
 }
   
-const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
+const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [status, setStatus] = useState<'connected' | 'attempted' | null>(null);
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [nextDate, setNextDate] = useState('');
+  
+  // Resonance Logic
+  const [resonance, setResonance] = useState<{ score: number; point?: string; tweak?: string } | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const debouncedNote = useDebounce(note, 1000);
+
+  React.useEffect(() => {
+    async function runAudit() {
+      if (!debouncedNote.trim() || debouncedNote.length < 10) {
+        setResonance(null);
+        return;
+      }
+      setIsAuditing(true);
+      try {
+        const result = await auditDraftMessage(contactId, debouncedNote);
+        setResonance({
+          score: result.resonance_score,
+          point: result.primary_friction_point,
+          tweak: result.suggested_tweak
+        });
+      } catch (err) {
+        console.error("Audit failed:", err);
+      } finally {
+        setIsAuditing(false);
+      }
+    }
+    runAudit();
+  }, [debouncedNote, contactId]);
+
+  const resonanceColor = !resonance ? 'border-slate-800' : 
+    resonance.score < 60 ? 'border-orange-500 shadow-orange-900/20' : 
+    resonance.score < 85 ? 'border-slate-200 shadow-slate-900/20' : 
+    'border-indigo-400 shadow-indigo-900/40 ring-2 ring-indigo-500/20';
 
   const handleLogInteraction = async () => {
     if (!note.trim() || !status) return;
@@ -88,8 +125,23 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
   return (
     <div className={cn(
       "w-full bg-slate-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
-      isExpanded ? "border-slate-200 shadow-xl shadow-indigo-950/20" : "border-slate-800"
+      isExpanded ? resonanceColor : "border-slate-800"
     )}>
+      {resonance && resonance.score < 60 && isExpanded && (
+        <div className="bg-orange-500/10 border-b border-orange-500/20 px-5 py-2 flex items-center justify-between animate-pulse">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={12} className="text-orange-500" />
+            <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Friction Warning: {resonance.point}</span>
+          </div>
+          <p className="text-[9px] text-orange-400/80 italic font-medium">&ldquo;{resonance.tweak}&rdquo;</p>
+        </div>
+      )}
+      {resonance && resonance.score >= 85 && isExpanded && (
+        <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-5 py-2 flex items-center gap-2">
+          <Sparkles size={12} className="text-indigo-400" />
+          <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">High Resonance Active</span>
+        </div>
+      )}
       <div className={cn("p-5", isExpanded && "border-b border-slate-200/10")}>
         <div className="flex justify-between items-center mb-3">
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
@@ -134,7 +186,18 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
             onChange={(e) => setNote(e.target.value)}
             className="w-full bg-transparent text-slate-100 placeholder-slate-600 resize-none focus:outline-none min-h-[100px] text-base leading-relaxed"
           />
-          <div className="absolute right-0 bottom-0 p-1">
+          <div className="absolute right-0 bottom-0 p-1 flex items-center gap-2">
+            {isAuditing && <Loader2 size={12} className="animate-spin text-slate-600" />}
+            {resonance && (
+              <div className={cn(
+                "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter",
+                resonance.score < 60 ? "bg-orange-500/20 text-orange-400" :
+                resonance.score < 85 ? "bg-slate-800 text-slate-400" :
+                "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+              )}>
+                R:{resonance.score}
+              </div>
+            )}
             <AudioInputButton 
               onTranscript={(text) => {
                 setNote(prev => prev ? `${prev} ${text}` : text);
@@ -205,7 +268,12 @@ const InteractionSuite = ({ onLog, isLogging }: InteractionSuiteProps) => {
             <button 
               onClick={handleLogInteraction}
               disabled={isLogging || !note.trim() || !status}
-              className="flex-1 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl shadow-indigo-900/40"
+              className={cn(
+                "flex-1 py-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl",
+                resonance && resonance.score >= 85 
+                  ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/40 ring-2 ring-white/10" 
+                  : "bg-slate-800 hover:bg-slate-700 text-slate-300"
+              )}
             >
               {isLogging ? 'Logging...' : 'Log Shared Memory'}
             </button>
@@ -402,7 +470,7 @@ export function OverviewTab({
         <VitalSigns score={healthScore} nextDue={nextDueText} />
 
         {/* Interaction Suite */}
-        <InteractionSuite onLog={onLogInteraction} isLogging={isLogging} />
+        <InteractionSuite contactId={contact.id} onLog={onLogInteraction} isLogging={isLogging} />
 
         {/* Recent Activity */}
         <section className="space-y-5">

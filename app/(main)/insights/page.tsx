@@ -26,6 +26,8 @@ import { ConnectionDiscoverySection } from "@/components/connection-discovery-se
 import { RelationshipPatternsSection } from "@/components/relationship-patterns-section";
 import { ErrorFallback } from "@/components/error-fallback";
 import { CommunicationActivityChart } from "@/components/communication-activity-chart";
+import { LearningLedgerSection } from "@/components/learning-ledger-section";
+import { motion } from "framer-motion";
 
 // Types
 interface InsightsSummary {
@@ -76,6 +78,7 @@ interface DecayingRelationship {
 
 export default function InsightsPage() {
   const [timeRange, setTimeRange] = useState("30");
+  const [activeTab, setActiveTab] = useState<"overview" | "ledger">("overview");
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<InsightsSummary>({
     totalContacts: 0,
@@ -376,8 +379,48 @@ export default function InsightsPage() {
           </Select>
         </div>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Tab Switcher */}
+        <div className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-800">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={cn(
+              "pb-4 text-sm font-bold uppercase tracking-widest transition-all relative",
+              activeTab === "overview" 
+                ? "text-indigo-600 dark:text-indigo-400" 
+                : "text-gray-400 hover:text-gray-600"
+            )}
+          >
+            Overview
+            {activeTab === "overview" && (
+              <motion.div 
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" 
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("ledger")}
+            className={cn(
+              "pb-4 text-sm font-bold uppercase tracking-widest transition-all relative",
+              activeTab === "ledger" 
+                ? "text-indigo-600 dark:text-indigo-400" 
+                : "text-gray-400 hover:text-gray-600"
+            )}
+          >
+            Learning Ledger
+            {activeTab === "ledger" && (
+              <motion.div 
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" 
+              />
+            )}
+          </button>
+        </div>
+
+        {activeTab === "overview" ? (
+          <>
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Total Contacts */}
           <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
             <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
@@ -731,6 +774,10 @@ export default function InsightsPage() {
             <ConnectionDiscoverySection />
           </div>
         </div>
+          </>
+        ) : (
+          <LearningLedgerSection />
+        )}
       </div>
     </div>
   );

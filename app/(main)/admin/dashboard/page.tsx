@@ -16,16 +16,86 @@ import PulseChart from './components/PulseChart';
 import BridgeVelocityChart from './components/BridgeVelocityChart';
 import SkillCloud from './components/SkillCloud';
 import ConnectorLeaderboard from './components/ConnectorLeaderboard';
+import { useSocialFriction } from '@/hooks/useSocialFriction';
+import { PivotCard } from './components/PivotCard';
+import { BridgeVelocityInfo } from './components/BridgeVelocityInfo';
+import { SocialForecast } from '@/components/dashboard/SocialForecast';
+import { LearningLedgerSection } from '@/components/learning-ledger-section';
+import { DriftRescue } from '@/components/dashboard/DriftRescue';
+import { MondayRescueSlot } from '@/components/dashboard/MondayRescueSlot';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger,
+  SheetDescription
+} from "@/components/ui/sheet";
+import { Brain } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { createClient } from '@/lib/supabase/client';
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<CommunityVitalSigns | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastOutreach, setLastOutreach] = useState<{ content: string; contactId: string } | undefined>(undefined);
+  const [isPivotOpen, setIsPivotOpen] = useState(false);
+
+  const { alert, dismissAlert } = useSocialFriction(data?.bridgeActivity || { requests: [], approvals: [] }, lastOutreach);
+
+  useEffect(() => {
+    if (alert?.active && !isPivotOpen) {
+      toast(() => (
+        <div className="flex items-center gap-4 bg-slate-50 p-1">
+          <div className="flex flex-col">
+            <p className="text-xs font-black text-rose-600 uppercase tracking-widest leading-none mb-1">Friction Alert</p>
+            <p className="text-[10px] text-slate-500 font-bold">{alert.data.score}</p>
+          </div>
+          <button 
+            onClick={() => {
+              setIsPivotOpen(true);
+              dismissAlert();
+            }}
+            className="px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-colors"
+          >
+            View Pivot
+          </button>
+        </div>
+      ), {
+        duration: 10000,
+        position: 'bottom-center',
+        style: {
+          borderRadius: '16px',
+          background: '#f8fafc',
+          color: '#0f172a',
+          border: '1px solid #e2e8f0',
+          padding: '12px'
+        }
+      });
+    }
+  }, [alert, isPivotOpen, dismissAlert]);
 
   useEffect(() => {
     async function loadData() {
       try {
         const signs = await getCommunityVitalSigns();
         setData(signs);
+
+        // Fetch last interaction for friction analysis
+        const supabase = createClient();
+        const { data: interaction } = await supabase
+          .from('interactions')
+          .select('notes, person_id')
+          .order('date', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (interaction) {
+          setLastOutreach({
+            content: (interaction as any).notes || "",
+            contactId: (interaction as any).person_id
+          });
+        }
       } catch (error) {
         console.error('Failed to load community signs:', error);
       } finally {
@@ -59,7 +129,42 @@ export default function AdminDashboardPage() {
               • Private Command Center
             </span>
           </div>
-          <h1 className="text-3xl font-black text-white mb-6">Community Command</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-black text-white">Community Command</h1>
+            
+            <div className="flex items-center gap-3">
+              <DriftRescue />
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/30 rounded-full transition-all group">
+                    <Brain className="h-5 w-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hidden sm:inline">Ledger Insights</span>
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-xl bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="p-2 bg-indigo-500/10 rounded-lg">
+                        <Brain className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Learning Ledger</SheetTitle>
+                    </div>
+                    <SheetDescription className="text-slate-500 font-medium">
+                      AI-driven insights from your outreach performance and response resonance.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <LearningLedgerSection />
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+
+          <MondayRescueSlot />
+
+          {/* Social Forecast (North Star) */}
+          <div className="mb-8">
+            <SocialForecast />
+          </div>
           
           {/* Top Level Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -76,6 +181,7 @@ export default function AdminDashboardPage() {
               change="+15%"
               positive={true}
               icon={<Share2 className="h-4 w-4" />}
+              info={<BridgeVelocityInfo />}
             />
             <StatCard 
               label="Pulse Score" 
@@ -148,6 +254,14 @@ export default function AdminDashboardPage() {
 
         </div>
       </main>
+
+      <PivotCard 
+        isOpen={isPivotOpen}
+        onOpenChange={setIsPivotOpen}
+        contactId={alert?.data.contactId || lastOutreach?.contactId || ""}
+        originalHook={alert?.data.originalHook || lastOutreach?.content || ""}
+        frictionScore={alert?.data.score || "72% Resonance"}
+      />
     </div>
   );
 }
@@ -158,14 +272,16 @@ interface StatCardProps {
   change: string;
   positive: boolean;
   icon: React.ReactNode;
+  info?: React.ReactNode;
 }
 
-function StatCard({ label, value, change, positive, icon }: StatCardProps) {
+function StatCard({ label, value, change, positive, icon, info }: StatCardProps) {
   return (
     <div className="p-4 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
       <div className="flex items-center gap-2 mb-2 text-slate-500">
         {icon}
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+        {info}
       </div>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-black text-white">{value}</span>

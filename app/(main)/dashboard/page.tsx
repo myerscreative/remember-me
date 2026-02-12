@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ErrorFallback } from "@/components/error-fallback";
 import {
@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { autoMapTribes } from "@/app/actions/auto-map-tribes";
 import { MilestoneRadar } from "@/components/MilestoneRadar";
 import { CriticalNudges } from "@/components/dashboard/CriticalNudges";
+import { SocialForecast } from "@/components/dashboard/SocialForecast";
 import { WeeklyBriefing } from "@/components/dashboard/WeeklyBriefing";
 import { TriageMode } from "@/components/dashboard/TriageMode";
 import {
@@ -204,6 +205,11 @@ export default function DashboardPage() {
                     You have <span className="font-bold text-purple-600 dark:text-purple-400">{stats?.imported || 0} Seeds</span> ready to be planted 
                     and <span className="font-bold text-orange-600 dark:text-orange-400">{(relationshipHealth?.warning || 0) + (relationshipHealth?.needsAttention || 0)} connections</span> that could use some water.
                 </p>
+              </div>
+
+              {/* Social Forecast (North Star) */}
+              <div className="mb-4">
+                  <SocialForecast />
               </div>
               
               {/* MAIN 3-COLUMN GRID */}
