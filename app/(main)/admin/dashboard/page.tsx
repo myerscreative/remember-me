@@ -131,9 +131,6 @@ export default function AdminDashboardPage() {
           </div>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-black text-white">Community Command</h1>
-            <div className="bg-red-600 text-white px-4 py-2 rounded-full font-black animate-pulse">
-              LIVE DATA VERIFIED
-            </div>
             
             <div className="flex items-center gap-3">
               <DriftRescue />

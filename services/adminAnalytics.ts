@@ -43,23 +43,26 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // 1. Calculate 'Pulse' (Active users vs total)
   const { count: totalUsers } = await supabase
     .from('user_stats')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact' });
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { count: activeUsers } = await supabase
     .from('user_stats')
-    .select('*', { count: 'exact', head: true })
+    .select('*', { count: 'exact' })
     .gte('last_activity_date', sevenDaysAgo);
 
-  // 2. Network Density
+  // 2. Network Density (Based on total persons in the database)
+  const { count: totalPersons } = await supabase
+    .from('persons')
+    .select('*', { count: 'exact' });
+
   const { count: actualConnections } = await supabase
     .from('relationships')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact' });
 
-  const n = totalUsers || 1;
+  const n = totalPersons || 1;
   const potentialConnections = (n * (n - 1)) / 2 || 1;
   const density = (actualConnections || 0) / potentialConnections;
 
@@ -220,7 +223,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,
     referralVelocity: bridgeActivity.approvals.reduce((a, b) => a + b, 0),
     skillCloud,
-    networkDensity: Math.min(100, (actualConnections || 0) / (potentialConnections * 10) * 100), // Calibrated for community density
+    networkDensity: Math.min(100, (density * 100) * 10), // Multiplied by 10 for visibility of sparse networks
     gardenHealth: {
       nurtured: (health.nurtured / totalHealth) * 100,
       drifting: (health.drifting / totalHealth) * 100,
