@@ -13,6 +13,30 @@ export interface DriftingContact {
   relationshipValue?: number;
 }
 
+interface PersonWithMemoryCount {
+  id: string;
+  name: string;
+  last_interaction_date: string | null;
+  target_frequency_days: number | null;
+  importance: 'high' | 'medium' | 'low' | string | null;
+  shared_memories: { count: number }[];
+}
+
+interface MemoryRow {
+  content: string;
+}
+
+interface WeeklyRescueRow {
+  contact_id: string;
+  suggested_hook: string;
+  relationship_value_score: number;
+  persons: {
+    name: string;
+    last_interaction_date: string | null;
+    shared_memories: { count: number }[];
+  };
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -30,7 +54,7 @@ export async function getDriftingContacts(): Promise<DriftingContact[]> {
     .or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null');
 
   if (error || !data) return [];
-  const contacts = data as any[];
+  const contacts = data as unknown as PersonWithMemoryCount[];
 
   const now = new Date();
   const driftingContacts = contacts.filter(contact => {
@@ -51,7 +75,7 @@ export async function getDriftingContacts(): Promise<DriftingContact[]> {
   const sortedDrift = driftingContacts
     .map(c => ({
       ...c,
-      memoryCount: (c.shared_memories as any)?.[0]?.count || 0
+      memoryCount: c.shared_memories?.[0]?.count || 0
     }))
     .sort((a, b) => b.memoryCount - a.memoryCount);
 
@@ -66,7 +90,7 @@ export async function getDriftingContacts(): Promise<DriftingContact[]> {
       .eq('person_id', contact.id)
       .limit(3);
 
-    const memories = memoriesData as any[] | null;
+    const memories = memoriesData as unknown as MemoryRow[] | null;
     const memoryContent = memories?.map(m => m.content).join('; ') || '';
     
     let suggestedHook = "Just thinking of you! Hope your week is going great.";
@@ -172,13 +196,13 @@ export async function getWeeklyRescues(): Promise<DriftingContact[]> {
     .eq('status', 'pending');
 
   if (error || !data) return [];
-  const rescues = data as any[];
+  const rescues = data as unknown as WeeklyRescueRow[];
 
   return rescues.map(r => ({
     id: r.contact_id,
-    name: (r.persons as any).name,
-    lastInteractionDate: (r.persons as any).last_interaction_date,
-    memoryDensity: (r.persons as any).shared_memories?.[0]?.count || 0,
+    name: r.persons.name,
+    lastInteractionDate: r.persons.last_interaction_date,
+    memoryDensity: r.persons.shared_memories?.[0]?.count || 0,
     suggestedHook: r.suggested_hook,
     relationshipValue: r.relationship_value_score
   }));
