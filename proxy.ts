@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { rateLimit } from "@/lib/security/rate-limit";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   try {
     // 🔓 DEVELOPMENT MODE: Skip authentication in local development
     const isDevelopment = process.env.NODE_ENV === 'development';
