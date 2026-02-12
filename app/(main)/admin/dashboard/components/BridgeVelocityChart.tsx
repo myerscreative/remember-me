@@ -34,19 +34,19 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-white flex items-center">
-            Bridge Velocity
+            Community Velocity
             <BridgeVelocityInfo />
           </h3>
-          <p className="text-xs text-slate-400">Introduction requests vs. successful approvals</p>
+          <p className="text-xs text-slate-400">New connections added vs. daily interactions</p>
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-0.5 bg-slate-500 rounded-full"></span>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Requests</span>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">New Contacts</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-0.5 bg-emerald-400 rounded-full"></span>
-            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Approvals</span>
+            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Interactions</span>
           </div>
         </div>
       </div>

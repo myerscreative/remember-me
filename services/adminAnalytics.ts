@@ -1,5 +1,7 @@
 'use server';
-import { createClient } from '@/lib/supabase/server';
+
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/database.types';
 
 export interface CommunityVitalSigns {
   pulseScore: number;
@@ -23,12 +25,21 @@ export interface CommunityVitalSigns {
   }[];
 }
 
+interface Connector {
+  name: string;
+  avatar: string | null;
+  referrals: number;
+}
+
 /**
  * Aggregates community-wide data for the Admin Dashboard.
- * All data is anonymized to respect privacy.
+ * All data is anonymized/aggregated to respect privacy where possible.
  */
 export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
-  const supabase = await createClient();
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   // 1. Calculate 'Pulse' (Active users vs total)
   const { count: totalUsers } = await supabase
@@ -58,7 +69,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
   const { data: personsWithInterests } = await supabase
     .from('persons')
     .select('interests')
-    .not('interests', 'is', null) as { data: { interests: string[] | null }[] | null };
+    .not('interests', 'is', null) as { data: any[] | null };
 
   const tagMap = new Map<string, number>();
   
@@ -71,9 +82,9 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
   });
 
   // From persons.interests array
-  (personsWithInterests || []).forEach(p => {
+  (personsWithInterests || []).forEach((p: any) => {
     if (Array.isArray(p.interests)) {
-      p.interests.forEach(interest => {
+      p.interests.forEach((interest: string) => {
         tagMap.set(interest, (tagMap.get(interest) || 0) + 1);
       });
     }
@@ -84,7 +95,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // 4. Garden Health Aggregate (Calculated from Persons ROI)
+  // 4. Garden Health Aggregate
   const { data: contacts } = await supabase
     .from('persons')
     .select('last_interaction_date, target_frequency_days, importance')
@@ -97,7 +108,7 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
   };
 
   const now = new Date();
-  (contacts || []).forEach(contact => {
+  (contacts || []).forEach((contact: any) => {
     const importanceValue = contact.importance || 'medium';
     // Match the ROI algorithm used in dashboardUtils
     const threshold = contact.target_frequency_days || (importanceValue === 'high' ? 14 : importanceValue === 'low' ? 90 : 30);
@@ -121,25 +132,87 @@ export async function getCommunityVitalSigns(): Promise<CommunityVitalSigns> {
 
   const totalHealth = (health.nurtured + health.drifting + health.neglected) || 1;
 
-  // 5. Mock Data for Bridge Activity & Top Connectors 
-  // (Since these tables/concepts are new and need full implementation)
+  // 5. Bridge Velocity (Real Data: Returns last 30 days)
+  // "Requests" -> New Contacts Added
+  // "Approvals" -> Interactions Logged
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysStr = thirtyDaysAgo.toISOString();
+
+  const { data: newContacts } = await supabase
+    .from('persons')
+    .select('created_at')
+    .gte('created_at', thirtyDaysStr) as { data: any[] | null };
+
+  const { data: recentInteractions } = await supabase
+    .from('interactions')
+    .select('date')
+    .gte('date', thirtyDaysStr) as { data: any[] | null };
+
+  const dateBuckets = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (29 - i));
+    return d.toISOString().split('T')[0];
+  });
+
+  const requestsMap = new Map<string, number>();
+  (newContacts || []).forEach((c: any) => {
+    if (c.created_at) {
+        const d = c.created_at.split('T')[0];
+        requestsMap.set(d, (requestsMap.get(d) || 0) + 1);
+    }
+  });
+
+  const approvalsMap = new Map<string, number>();
+  (recentInteractions || []).forEach((i: any) => {
+    if (i.date) {
+        const d = i.date.split('T')[0];
+        approvalsMap.set(d, (approvalsMap.get(d) || 0) + 1);
+    }
+  });
+
   const bridgeActivity = {
-    dates: Array.from({ length: 30 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (29 - i));
-      return d.toISOString().split('T')[0];
-    }),
-    requests: Array.from({ length: 30 }, () => Math.floor(Math.random() * 20) + 5),
-    approvals: Array.from({ length: 30 }, () => Math.floor(Math.random() * 15) + 2)
+    dates: dateBuckets,
+    requests: dateBuckets.map(d => requestsMap.get(d) || 0),
+    approvals: dateBuckets.map(d => approvalsMap.get(d) || 0)
   };
 
-  const topConnectors = [
-    { name: "Alex Rivera", avatar: null, referrals: 24 },
-    { name: "Jordan Smith", avatar: null, referrals: 18 },
-    { name: "Sarah Chen", avatar: null, referrals: 15 },
-    { name: "Marcus Thorne", avatar: null, referrals: 12 },
-    { name: "Elena Gilbert", avatar: null, referrals: 9 }
-  ];
+  // 6. Top Connectors (Real Data: Users with most total contacts)
+  const { data: topUsers } = await supabase
+    .from('user_stats')
+    .select('user_id, total_contacts')
+    .order('total_contacts', { ascending: false })
+    .limit(5) as { data: any[] | null };
+
+  let topConnectors: Connector[] = [];
+
+  if (topUsers && topUsers.length > 0) {
+    // Attempt to fetch real user details
+    const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
+    
+    if (!authError && authUsers) {
+        // Map any[] to avoid strict type issues with AuthUser
+        const userMap = new Map(authUsers.map((u: any) => [u.id, u] as [string, any]));
+        
+        topConnectors = topUsers.map((stat: any) => {
+            const user = userMap.get(stat.user_id);
+            const name = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || `User ${stat.user_id.substring(0,4)}`;
+            const avatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+            
+            return {
+                name,
+                avatar,
+                referrals: stat.total_contacts || 0
+            };
+        });
+    } else {
+        topConnectors = topUsers.map((stat: any) => ({
+            name: `User ${stat.user_id.substring(0,4)}...`,
+            avatar: null,
+            referrals: stat.total_contacts || 0
+        }));
+    }
+  }
 
   return {
     pulseScore: ((activeUsers || 0) / (totalUsers || 1)) * 100,

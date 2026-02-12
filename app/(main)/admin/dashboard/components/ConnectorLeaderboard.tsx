@@ -22,8 +22,8 @@ export default function ConnectorLeaderboard({ connectors }: ConnectorLeaderboar
             <Trophy className="h-5 w-5 text-amber-500" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Top Connectors</h3>
-            <p className="text-xs text-slate-400">People driving the most approved referrals</p>
+            <h3 className="text-lg font-bold text-white">Network Leaders</h3>
+            <p className="text-xs text-slate-400">Members managing the largest personal networks</p>
           </div>
         </div>
         <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
@@ -57,12 +57,12 @@ export default function ConnectorLeaderboard({ connectors }: ConnectorLeaderboar
               </div>
               <div>
                 <div className="text-sm font-bold text-slate-200">{person.name}</div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Master Fabricator</div>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Community Pillar</div>
               </div>
             </div>
             <div className="text-right">
               <div className="text-lg font-black text-emerald-400">{person.referrals}</div>
-              <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Approved</div>
+              <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Connections</div>
             </div>
           </motion.div>
         ))}
