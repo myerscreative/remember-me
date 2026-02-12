@@ -1,17 +1,9 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-// Use service role for admin access across all users
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Force dynamic to avoid static generation attempts and build errors
+export const dynamic = 'force-dynamic';
 
 interface RescueTask {
   user_id: string;
@@ -26,6 +18,16 @@ interface CronSummary {
 }
 
 export async function GET(req: NextRequest) {
+  // Use service role for admin access across all users
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
   // 1. Basic security check (use a secret token in production)
   const authHeader = req.headers.get('authorization');
   if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
