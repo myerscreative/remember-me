@@ -114,19 +114,6 @@ export default function LogInteractionModal({
       
       {/* Modal Container - Matches Lore Card */}
       <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-[90vh] sm:h-auto overflow-y-auto">
-        
-        {/* DEPLOYMENT CHECK BANNER */}
-        <div className="bg-pink-600 text-white text-xs font-black text-center py-2 uppercase tracking-widest animate-pulse">
-            ⚠️ Verifying Deployment v3.0 ⚠️<br/>
-            {new Date().toLocaleTimeString()}
-        </div>
-
-        {/* DEBUG BANNER */}
-        <div className="bg-yellow-500/10 border-b border-yellow-500/20 p-2">
-            <p className="text-[10px] font-bold text-yellow-500 text-center uppercase tracking-wider">
-                🐛 Debug Mode Active v2.1
-            </p>
-        </div>
 
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-800">
