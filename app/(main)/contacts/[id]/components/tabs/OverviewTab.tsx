@@ -13,7 +13,6 @@ import {
   X,
   Loader2,
   Edit2,
-  AlertCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,10 +66,9 @@ interface InteractionSuiteProps {
   contactId: string;
   onLog: (note: string, status: 'connected' | 'attempted', date: string, nextDate?: string) => Promise<void>;
   isLogging?: boolean;
-  isThin?: boolean;
 }
   
-const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSuiteProps) => {
+const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [status, setStatus] = useState<'connected' | 'attempted' | null>(null);
   const [note, setNote] = useState('');
@@ -110,8 +108,8 @@ const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSu
   }, [debouncedNote, contactId]);
 
   const resonanceColor = !resonance ? 'border-slate-800' : 
-    resonance.score < 60 ? 'border-orange-500 shadow-orange-900/20' : 
-    resonance.score < 85 ? 'border-slate-200 shadow-slate-900/20' : 
+    resonance.score < 60 ? 'border-slate-700 shadow-slate-900/10' : 
+    resonance.score < 85 ? 'border-slate-700 shadow-slate-900/10' : 
     'border-indigo-400 shadow-indigo-900/40 ring-2 ring-indigo-500/20';
 
   const handleLogInteraction = async () => {
@@ -162,21 +160,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSu
       "w-full bg-slate-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
       isExpanded ? resonanceColor : "border-slate-800"
     )}>
-      {/* Optional Nudge (Replacing Friction Warning) */}
-      {!note.trim() && isThin && isExpanded && (
-        <div className="bg-indigo-600/5 border-b border-indigo-500/10 px-5 py-2 flex items-center gap-2 animate-in fade-in duration-500">
-          <Sparkles size={12} className="text-indigo-400 opacity-60" />
-          <span className="text-[9px] font-black text-indigo-400/80 uppercase tracking-widest">
-            Invitation: Reference a specific memory to improve resonance.
-          </span>
-        </div>
-      )}
-      {resonance && resonance.score >= 85 && isExpanded && (
-        <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-5 py-2 flex items-center gap-2">
-          <Sparkles size={12} className="text-indigo-400" />
-          <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">High Resonance Active</span>
-        </div>
-      )}
+      {/* No banners or rules suggested here */}
       <div className={cn("p-5", isExpanded && "border-b border-slate-200/10")}>
         <div className="flex justify-between items-center mb-3">
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
@@ -226,7 +210,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSu
             {resonance && (
               <div className={cn(
                 "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter",
-                resonance.score < 60 ? "bg-orange-500/20 text-orange-400" :
+                resonance.score < 60 ? "bg-slate-800 text-slate-500" :
                 resonance.score < 85 ? "bg-slate-800 text-slate-400" :
                 "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
               )}>
@@ -305,12 +289,14 @@ const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSu
               disabled={isLogging || !status}
               className={cn(
                 "flex-1 py-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl",
-                resonance && resonance.score >= 85 
+                status === 'connected' 
                   ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/40 ring-2 ring-white/10" 
+                  : status === 'attempted'
+                  ? "bg-slate-700 hover:bg-slate-600 text-white"
                   : "bg-slate-800 hover:bg-slate-700 text-slate-300"
               )}
             >
-              {isLogging ? 'Logging...' : 'Save Interaction'}
+              {isLogging ? 'Logging...' : status === 'connected' ? '✓ Log Connection' : status === 'attempted' ? 'Log Attempt' : 'Log Interaction'}
             </button>
             <button 
               onClick={() => {
@@ -341,7 +327,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging, isThin }: InteractionSu
           
           <div className="space-y-3">
             <p className="text-xs text-slate-400 leading-relaxed italic">
-              "Add a quick detail you want to remember from this chat?"
+              &quot;Add a quick detail you want to remember from this chat?&quot;
             </p>
             <textarea
               value={enrichmentNote}

@@ -33,23 +33,21 @@ export class PreSendAuditor {
         messages: [
           {
             role: 'system',
-            content: `System Role: Senior Social Architect & Predictive Linguist.
+            content: `System Role: Strategic Connection Guide.
 
-Objective: Perform a pre-flight "Friction Audit" on the drafted message for a contact.
+Objective: Analyze a drafted message to ensure it is impactful, clear, and builds relationship equity.
 
-Evaluation Criteria (The PSPF Engine):
-1. Context Density (C): Does the message reference specific shared memories?
-2. Recipient Burden (B): Does the CTA require high cognitive effort?
-3. Relationship Phase (P): Is the tone appropriate for their current state (Nurtured vs. Neglected)?
-4. Learning Ledger Boost: If the message high similarity to a "Successful" hook (provided in context), boost the Resonance Score significantly.
+Evaluation Criteria:
+1. Context Clarity: Does it reference shared history or recent interactions?
+2. Connection Utility: Is the intent clear and easy to engage with?
+3. Relationship Stage: Does the tone match the current health of the connection?
+4. Lore Equity: Does this add valuable data to the relationship ledger?
 
-Resonance Score Formula: R = (C * P) / B (Internalized logic)
-
-JSON Output Format:
+Output Format (JSON):
 {
-  "resonance_score": (0-100),
-  "primary_friction_point": "e.g., High burden CTA",
-  "suggested_tweak": "One sentence to improve the score immediately"
+  "resonance_score": 0-100,
+  "primary_friction_point": "Concise area for improvement (e.g., Needs more context)",
+  "suggested_tweak": "A punchy, specific one-sentence improvement"
 }`,
           },
           {
