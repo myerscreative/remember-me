@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2, BookOpen, Mic, MicOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { appendStoryNote } from "@/app/actions/story-actions";
+import { addSharedMemory } from "@/app/actions/story-actions";
 import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -50,9 +50,9 @@ export function QuickAddNoteModal({
 
     setIsSaving(true);
     try {
-      const res = await appendStoryNote(selectedContact.id, cleanupTranscribedText(noteToSave));
+      const res = await addSharedMemory(selectedContact.id, cleanupTranscribedText(noteToSave));
       if (res.success) {
-        toast.success("Note Recorded! 🎙️");
+        toast.success("Note Analyzed & Profile Updated! 🧠✨");
         setNote("");
         setSelectedContact(null);
         setSearch("");
@@ -61,7 +61,7 @@ export function QuickAddNoteModal({
       } else {
         toast.error(res.error || "Failed to save note");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setIsSaving(false);
@@ -98,14 +98,12 @@ export function QuickAddNoteModal({
     recognitionRef.current.onend = () => setIsListening(false);
 
     recognitionRef.current.onresult = (event: any) => {
-      let interimTranscript = '';
+
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
           finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
         }
       }
 
