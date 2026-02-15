@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
 import { updateStoryFields } from '@/app/actions/story-actions'; 
 import { AudioInputButton } from '@/components/audio-input-button';
@@ -52,6 +52,9 @@ export function FamilyTab({ contact }: FamilyTabProps) {
   const [householdNotes, setHouseholdNotes] = useState(contact.family_notes || '');
   const [isEditingHousehold, setIsEditingHousehold] = useState(false);
   const [isEditingCircle, setIsEditingCircle] = useState(false);
+  
+  // Debounce timer for auto-save
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Helper to save members
   const saveMembers = async (newMembers: FamilyMember[]) => {
@@ -68,10 +71,28 @@ export function FamilyTab({ contact }: FamilyTabProps) {
     const newMembers = [...members];
     newMembers[index] = { ...newMembers[index], [field]: value };
     setMembers(newMembers); // Update local state immediately
+    
+    // Clear existing timer
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    
+    // Auto-save after a short delay (debounced)
+    // This ensures changes persist even if user doesn't blur the field
+    saveTimerRef.current = setTimeout(async () => {
+      const result = await updateFamilyMembers(contact.id, newMembers);
+      if (!result.success) {
+        console.error('Auto-save failed:', result.error);
+      }
+    }, 1000); // 1 second debounce
   };
 
   const handleSaveMember = async (index: number) => {
-    // Save on blur
+    // Save on blur - clear any pending auto-save timer first
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    
     const result = await updateFamilyMembers(contact.id, members);
     if (result.success) {
       toast.success('Saved');
@@ -80,12 +101,26 @@ export function FamilyTab({ contact }: FamilyTabProps) {
     }
   };
 
-  const handleAddMember = (type: FamilyMember['relationship'] = 'Child') => {
-    const newMember: FamilyMember = { name: '', relationship: type, notes: '' };
-    // Update local state ONLY. Do not save to server yet. 
-    // This prevents the "empty member" from being rejected/sanitized by the server 
-    // before the user has a chance to type.
-    setMembers([...members, newMember]);
+  const handleAddMember = async (type: FamilyMember['relationship'] = 'Child') => {
+    // Create a new member with a placeholder name that will pass validation
+    const placeholderName = type === 'Child' ? '' : '';
+    const newMember: FamilyMember = { 
+      name: placeholderName, 
+      relationship: type, 
+      notes: '' 
+    };
+    
+    // Update local state immediately for instant UI feedback
+    const newMembers = [...members, newMember];
+    setMembers(newMembers);
+    
+    // Immediately save to server to persist the new member
+    const result = await updateFamilyMembers(contact.id, newMembers);
+    
+    if (!result.success) {
+      toast.error("Failed to add member");
+      setMembers(members); // Revert on error
+    }
   };
 
   const handleRemoveMember = (index: number) => {

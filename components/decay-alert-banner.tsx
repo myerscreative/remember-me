@@ -106,29 +106,55 @@ export function DecayAlertBanner() {
     <>
       {/* Collapsed View */}
       <Card className="border border-indigo-500/20 bg-slate-900/40 backdrop-blur-sm shadow-lg mb-6 overflow-hidden transition-all hover:bg-slate-900/60 group">
-        <CardContent className="p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
-              <Leaf className="h-5 w-5 text-indigo-400" />
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                <Leaf className="h-5 w-5 text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">
+                  Contact your next 3 people
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Nurture your network today
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">
-                Contact your next 3 people
-              </h3>
-              <p className="text-xs text-slate-400">
-                Nurture your network today
-              </p>
-            </div>
+            
+            <Button 
+              onClick={() => setIsExpanded(true)}
+              variant="ghost"
+              size="sm"
+              className="text-indigo-400 hover:text-indigo-300 hover:bg-slate-800/50 text-xs font-semibold"
+            >
+              See all
+            </Button>
           </div>
-          
-          <Button 
-            onClick={() => setIsExpanded(true)}
-            variant="default"
-            size="sm"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white border-0 h-9 px-4 rounded-lg font-semibold shadow-md shadow-indigo-500/20"
-          >
-            View Suggestions
-          </Button>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {topSuggestions.map((relationship) => (
+              <Link 
+                key={relationship.person_id}
+                href={`/contacts/${relationship.person_id}`}
+                className="flex items-center gap-3 p-3 bg-slate-950/40 border border-slate-800/50 rounded-xl hover:border-indigo-500/30 hover:bg-slate-800/50 transition-all group/item"
+              >
+                <Avatar className="h-10 w-10 border border-slate-800 group-hover/item:border-indigo-500/30">
+                  <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-xs">
+                    {getInitials(relationship.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-white truncate group-hover/item:text-indigo-300 transition-colors">
+                    {relationship.name}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    {getSeverityText(relationship.last_contact_days)} ago
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

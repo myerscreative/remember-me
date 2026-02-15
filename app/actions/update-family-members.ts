@@ -7,11 +7,13 @@ import { z } from "zod";
 
 // ✅ SECURITY: Validation schemas for family members
 const familyMemberSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(100, "Name too long"),
+  name: z.string().trim().max(100, "Name too long"), // Allow empty names during editing
   relationship: z.string().trim().max(100, "Relationship too long").optional(),
   birthday: z.string().optional().nullable(),
   hobbies: z.string().trim().max(500, "Hobbies too long").optional().nullable(),
   interests: z.string().trim().max(500, "Interests too long").optional().nullable(),
+  notes: z.string().trim().max(1000, "Notes too long").optional().nullable(),
+  anniversary: z.string().optional().nullable(),
 });
 
 const updateFamilyMembersSchema = z.object({
@@ -38,11 +40,14 @@ export async function updateFamilyMembers(contactId: string, familyMembers: any[
 
     if (!user || !user.id) throw new Error("Unauthorized");
 
+    // Filter out members with empty names (cleanup step)
+    const membersWithNames = validatedFamilyMembers.filter(member => member.name && member.name.trim().length > 0);
+
     // Deduplicate family members by name (case-insensitive)
     const deduplicatedMembers: any[] = [];
     const seenNames = new Set<string>();
     
-    for (const member of validatedFamilyMembers) {
+    for (const member of membersWithNames) {
       const nameLower = member.name?.toLowerCase();
       if (nameLower && !seenNames.has(nameLower)) {
         deduplicatedMembers.push(member);
