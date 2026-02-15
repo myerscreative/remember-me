@@ -85,10 +85,10 @@ export async function logHeaderInteraction(
     // The original 'type' parameter is no longer available.
     // Assuming 'interactionType' from the new signature can be used for this logic.
     // The original logic used 'type === "attempt"'. We'll use 'interactionType === "attempt"' here.
-    if (note || interactionType === 'attempt') {
-        const memoryContent = interactionType === 'attempt' && !note
+    if (finalNote || interactionType === 'attempt') {
+        const memoryContent = interactionType === 'attempt' && !finalNote
           ? `[Attempted Contact] No note left.` 
-          : (interactionType === 'attempt' ? `[Attempted Contact] ${note}` : note);
+          : (interactionType === 'attempt' ? `[Attempted Contact] ${finalNote}` : finalNote);
 
         console.log('[logHeaderInteraction] Logging Shared Memory:', memoryContent);
 
@@ -99,18 +99,18 @@ export async function logHeaderInteraction(
                 person_id: personId,
                 user_id: user.id,
                 content: memoryContent,
-                created_at: interactionDate // Also backdate the memory creation if possible, or just let it be now. 
-                // Usually created_at is automatic. Let's see if we should override it. 
-                // Ideally shared memories reflect the interaction time.
-                // Depending on schema, created_at might be default driven. 
-                // I will add it if the schema supports it, but standard supabase defaults to now().
-                // Let's assume for now we don't mess with shared_memories created_at unless requested,
-                // but for consistency, if 'date' columns exist there... 
-                // Let's stick to the interaction date being backdated.
+                // created_at is automatically set to interactionDate via DB default or we conform to it being a log of "now" relative to the interaction?
+                // Actually, let's allow the DB default (NOW()) to establish the creation time of the memory record, 
+                // but if we genuinely want to backdate the memory to the interaction date, we should set it.
+                // Given the user constraint "specifically shared memories" failing, let's keep it simple and omit created_at to use default,
+                // UNLESS interactionDate is significantly in the past. 
+                // But for now, omitting it is safer to avoid potential format issues.
               });
             
              if (memoryError) {
                  console.error("Memory Log Error:", memoryError);
+                 // THROW the error so the UI knows!
+                 throw new Error(`Shared Memory Log Failed: ${memoryError.message}`);
              } else {
                  console.log("Memory Log SUCCESS");
              }

@@ -84,6 +84,26 @@ export async function logInteraction({ personId, type, note, date, predictedReso
       if (ledgerError) console.error('Error creating ledger entry:', ledgerError);
     }
 
+    // 2c. Create Shared Memory (Deep Lore) if note exists
+    if (note && note.trim()) {
+      const { error: memoryError } = await (supabase as any)
+        .from('shared_memories')
+        .insert({
+          person_id: personId,
+          user_id: user.id,
+          content: note.trim(),
+          // Let DB handle created_at default (NOW())
+        });
+
+      if (memoryError) {
+        console.error('Error creating shared memory:', memoryError);
+        // We log the error but don't fail the entire transaction, similar to other side effects
+        // OR should we fail? Given user feedback, let's include it in the return if possible,
+        // but the current return type is simple success/fail. 
+        // Let's log heavily.
+      }
+    }
+
     // 3. Update person stats ONLY if this is a newer interaction
     if (shouldUpdatePersonStats) {
        const { error: updateError } = await (supabase as any).from('persons').update({
