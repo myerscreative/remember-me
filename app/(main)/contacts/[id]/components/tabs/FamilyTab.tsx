@@ -82,7 +82,10 @@ export function FamilyTab({ contact }: FamilyTabProps) {
 
   const handleAddMember = (type: FamilyMember['relationship'] = 'Child') => {
     const newMember: FamilyMember = { name: '', relationship: type, notes: '' };
-    saveMembers([...members, newMember]);
+    // Update local state ONLY. Do not save to server yet. 
+    // This prevents the "empty member" from being rejected/sanitized by the server 
+    // before the user has a chance to type.
+    setMembers([...members, newMember]);
   };
 
   const handleRemoveMember = (index: number) => {
