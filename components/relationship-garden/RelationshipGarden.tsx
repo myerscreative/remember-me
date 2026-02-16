@@ -537,7 +537,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
         {/* Info Badge - Desktop Only */}
         {!hideInfoBadge && (
-          <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 border-slate-200/50 dark:border-slate-700/50 p-5 rounded-4xl shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
+          <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 p-5 rounded-4xl shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
             <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
             <div className="text-2xl font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm">
               {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -656,7 +656,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div
-            className="fixed z-[60] bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
+            className="fixed z-60 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
             style={{
               left: tooltip.x,
               top: tooltip.y,

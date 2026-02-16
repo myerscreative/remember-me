@@ -1,14 +1,12 @@
-import { useState, useRef, useOptimistic } from 'react';
+import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2, Star } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Briefcase, Cake, Repeat, Camera, Loader2 } from 'lucide-react';
 import { ImportanceSelector } from '@/components/shared/ImportanceSelector';
 import { ContactImportance } from '@/types/database.types';
 import { FREQUENCY_PRESETS, getDetailedRelationshipHealth as getRelationshipHealth } from '@/lib/relationship-health';
-import { getRelationshipStatus } from '@/app/(main)/network/utils/relationshipStatus';
 import { cn } from '@/lib/utils';
 import { InteractionLogger } from './InteractionLogger';
 import { getInitials } from '@/lib/utils/contact-helpers';
@@ -35,12 +33,10 @@ interface ProfileSidebarProps {
   };
   onFrequencyChange?: (days: number) => void;
   onImportanceChange?: (importance: ContactImportance) => void;
-  onContactAction?: (method: 'call' | 'email' | 'text') => void;
-  onLastContactChange?: (date: string, method: string) => void;
   onPhotoUpdate?: (url: string) => void;
 }
 
-export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange, onContactAction, onLastContactChange, onPhotoUpdate }: ProfileSidebarProps) {
+export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange, onPhotoUpdate }: ProfileSidebarProps) {
   const initials = getInitials(contact.firstName, contact.lastName);
   const fullName = `${contact.firstName} ${contact.lastName || ""}`.trim();
   const [isUploading, setIsUploading] = useState(false);
@@ -51,26 +47,6 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
   // Calculate Health
   const health = getRelationshipHealth(healthDate, contact.target_frequency_days || 30);
 
-  // Helper to format date
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  // Helper to format contact method
-  const formatMethod = (method?: string) => {
-    if (!method) return null;
-    const methods: Record<string, string> = { call: 'Call', email: 'Email', text: 'Text', meeting: 'Meeting' };
-    return methods[method.toLowerCase()] || method;
-  };
-
-  // Build last contact display string
-  const lastContactDisplay = () => {
-    const date = formatDate(contact.last_contact_date);
-    const method = formatMethod(contact.last_contact_method);
-    if (!date) return 'Never';
-    return method ? `${date} via ${method}` : date;
-  };
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -159,7 +135,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                     <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
                     <Avatar className={cn(
-                        "w-[124px] h-[124px] border-[4px] border-[#1a1b2e]",
+                        "w-[124px] h-[124px] border-4 border-[#1a1b2e]",
                         isUploading && "opacity-50"
                     )}>
                         <AvatarImage src={contact.photo_url || ""} className="object-cover" />
@@ -170,7 +146,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
                     {/* Status Dot */}
                     <div 
-                            className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-[4px] border-[#1a1b2e]" 
+                            className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e]" 
                             style={{ backgroundColor: health.color }} 
                     />
                     

@@ -101,34 +101,50 @@ export function DecayAlertBanner() {
 
   // Limit to top 3 suggestions
   const topSuggestions = decayingRelationships.slice(0, 3);
+  const firstNames = topSuggestions.map(s => s.name.split(' ')[0]);
+  
+  let suggestionText = "Time to reconnect";
+  if (firstNames.length === 1) {
+    suggestionText = `Reconnect with ${firstNames[0]}`;
+  } else if (firstNames.length === 2) {
+    suggestionText = `Reconnect with ${firstNames[0]} and ${firstNames[1]}`;
+  } else if (firstNames.length >= 3) {
+    suggestionText = `Reconnect with ${firstNames[0]}, ${firstNames[1]}, and ${firstNames[2]}`;
+  }
 
   return (
     <>
       {/* Collapsed View */}
-      <Card className="border border-indigo-500/20 bg-slate-900/40 backdrop-blur-sm shadow-lg mb-6 overflow-hidden transition-all hover:bg-slate-900/60 group">
+      <Card 
+        className="border border-indigo-500/30 bg-slate-900/40 backdrop-blur-sm shadow-xl mb-6 overflow-hidden transition-all hover:bg-slate-900/60 hover:scale-[1.01] hover:shadow-indigo-500/10 group cursor-pointer"
+        onClick={() => setIsExpanded(true)}
+      >
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
+              <div className="h-10 w-10 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(99,102,241,0.2)]">
                 <Leaf className="h-5 w-5 text-indigo-400" />
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">
-                  Contact your next 3 people
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-white tracking-tight group-hover:text-indigo-300 transition-colors">
+                  {suggestionText}
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-medium">
                   Nurture your network today
                 </p>
               </div>
             </div>
             
             <Button 
-              onClick={() => setIsExpanded(true)}
-              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(true);
+              }}
+              variant="secondary"
               size="sm"
-              className="text-indigo-400 hover:text-indigo-300 hover:bg-slate-800/50 text-xs font-semibold"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white border-0 text-xs font-bold px-4 rounded-lg shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
             >
-              See all
+              View Suggestions
             </Button>
           </div>
 
@@ -137,7 +153,8 @@ export function DecayAlertBanner() {
               <Link 
                 key={relationship.person_id}
                 href={`/contacts/${relationship.person_id}`}
-                className="flex items-center gap-3 p-3 bg-slate-950/40 border border-slate-800/50 rounded-xl hover:border-indigo-500/30 hover:bg-slate-800/50 transition-all group/item"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-3 p-3 bg-slate-950/40 border border-slate-800/50 rounded-xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all group/item z-10"
               >
                 <Avatar className="h-10 w-10 border border-slate-800 group-hover/item:border-indigo-500/30">
                   <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-xs">

@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { INTERACTION_TYPES, type InteractionType } from '@/lib/relationship-health';
 import { logInteraction } from '@/app/actions/logInteraction';
-import { getRecentInteractions } from '@/app/actions/get-recent-interactions';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 
@@ -43,15 +42,14 @@ export default function LogInteractionModal({
   onSuccess, 
   onUpdateImportance,
   onUpdateFrequency,
-  initialNote = '',
-  initialMethod
+  initialNote = ''
 }: LogInteractionModalProps) {
   const [selectedType, setSelectedType] = useState<InteractionType>('in-person');
   const [note, setNote] = useState(initialNote);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [recentInteractions, setRecentInteractions] = useState<any[]>([]);
-  const [loadingInteractions, setLoadingInteractions] = useState(false);
+  const [recentInteractions] = useState<any[]>([]);
+  const [loadingInteractions] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const noteInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -105,7 +103,7 @@ export default function LogInteractionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop with Blur XL */}
       <div 
         className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl transition-all duration-300"
@@ -230,7 +228,7 @@ export default function LogInteractionModal({
                  type="date"
                  value={date}
                  onChange={(e) => setDate(e.target.value)}
-                 className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all [color-scheme:dark]"
+                 className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all scheme-dark"
              />
           </div>
 

@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRef, useCallback } from "react";
 import { Search, Settings, Plus, Users, Zap, List, Rows, Brain, X, ArrowUpDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -23,7 +22,6 @@ import {
 import { SearchResultCard } from "@/app/(main)/contacts/components/SearchResultCard";
 import { ConnectNowModal } from "@/components/contacts/ConnectNowModal";
 import { ErrorFallback } from "@/components/error-fallback";
-import { mockContacts } from "@/app/(main)/network/mockContacts"; 
 import { sortContacts, SortOption, SortDirection } from "@/lib/utils/contact-sorting";
 import { ContactListTable } from "@/components/people/ContactListTable";
 
@@ -44,7 +42,7 @@ export default function HomePage() {
   const [selectedConnectedPerson, setSelectedConnectedPerson] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [showArchived, setShowArchived] = useState(false);
+  const [showArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCompactView, setIsCompactView] = useState(true);
   
@@ -527,7 +525,7 @@ export default function HomePage() {
           {/* Quick Capture Button */}
           <Link
             href="/quick-capture"
-            className="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Zap className="h-4 w-4" />
             <span>Quick Capture</span>
