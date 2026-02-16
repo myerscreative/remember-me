@@ -103,14 +103,6 @@ export function DecayAlertBanner() {
   const topSuggestions = decayingRelationships.slice(0, 3);
   const firstNames = topSuggestions.map(s => s.name.split(' ')[0]);
   
-  let suggestionText = "Time to reconnect";
-  if (firstNames.length === 1) {
-    suggestionText = `Reconnect with ${firstNames[0]}`;
-  } else if (firstNames.length === 2) {
-    suggestionText = `Reconnect with ${firstNames[0]} and ${firstNames[1]}`;
-  } else if (firstNames.length >= 3) {
-    suggestionText = `Reconnect with ${firstNames[0]}, ${firstNames[1]}, and ${firstNames[2]}`;
-  }
 
   return (
     <>
@@ -126,10 +118,17 @@ export function DecayAlertBanner() {
                 <Leaf className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-white tracking-tight group-hover:text-indigo-300 transition-colors">
-                  {suggestionText}
+                <h3 className="text-lg md:text-xl font-black text-white tracking-tight group-hover:text-indigo-300 transition-colors leading-tight">
+                  Reconnect with{" "}
+                  {firstNames.length > 0 ? (
+                    firstNames.map((name, i) => (
+                      <span key={`${name}-${i}`} className="text-indigo-400">
+                        {name}{i < firstNames.length - 1 ? (i === firstNames.length - 2 ? " & " : ", ") : ""}
+                      </span>
+                    ))
+                  ) : "your network"}
                 </h3>
-                <p className="text-xs text-slate-400 font-medium">
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1 opacity-70">
                   Nurture your network today
                 </p>
               </div>
