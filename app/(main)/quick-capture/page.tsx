@@ -9,6 +9,7 @@ import { Zap, Mic, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { VoiceEntryModal } from "@/components/voice-entry-modal";
 import toast, { Toaster } from "react-hot-toast";
+import { addSharedMemory } from "@/app/actions/story-actions";
 
 export default function QuickCapturePage() {
   const router = useRouter();
@@ -16,12 +17,16 @@ export default function QuickCapturePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [contactName, setContactName] = useState("");
+  const [voiceData, setVoiceData] = useState<any>(null);
 
   const handleVoiceData = (data: any) => {
-    // Extract the relevant information from voice data
+    // Store the structured data
+    setVoiceData((prev: any) => ({ ...prev, ...data }));
+    
+    // Extract the relevant information from voice data for the notes field
     let capturedNotes = "";
     if (data.name) capturedNotes += `Met with: ${data.name}\n`;
-    if (data.whereMet) capturedNotes += `Location: ${data.whereMet}\n`;
+    if (data.whereMet) capturedNotes += `First Location: ${data.whereMet}\n`;
     if (data.whyStayInContact) capturedNotes += `Why important: ${data.whyStayInContact}\n`;
     if (data.whatInteresting) capturedNotes += `What stood out: ${data.whatInteresting}\n`;
     if (data.whatsImportant) capturedNotes += `Important to them: ${data.whatsImportant}\n`;
@@ -72,28 +77,53 @@ export default function QuickCapturePage() {
             (p.last_name || "").toLowerCase() === (lastName || "").toLowerCase()
         );
 
+        // Prepare person data from voice capture if available
+        const personFields: any = {
+          notes: notes.trim(),
+          last_contact: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        if (voiceData) {
+          if (voiceData.email) personFields.email = voiceData.email;
+          if (voiceData.phone) personFields.phone = voiceData.phone;
+          if (voiceData.linkedin) personFields.linkedin = voiceData.linkedin;
+          if (voiceData.whereMet) personFields.where_met = voiceData.whereMet;
+          if (voiceData.introducedBy) personFields.who_introduced = voiceData.introducedBy;
+          if (voiceData.whyStayInContact) personFields.why_stay_in_contact = voiceData.whyStayInContact;
+          if (voiceData.whatInteresting) personFields.what_found_interesting = voiceData.whatInteresting;
+          if (voiceData.whatsImportant) personFields.most_important_to_them = voiceData.whatsImportant;
+          if (voiceData.firstImpression) personFields.first_impression = voiceData.firstImpression;
+          if (voiceData.memorableMoment) personFields.memorable_moment = voiceData.memorableMoment;
+          if (voiceData.familyMembers) personFields.family_members = voiceData.familyMembers;
+          
+          if (voiceData.interests) {
+            const interestList = typeof voiceData.interests === 'string' 
+              ? voiceData.interests.split(',').map((i: string) => i.trim()).filter(Boolean)
+              : voiceData.interests;
+            if (interestList.length > 0) {
+              personFields.interests = interestList;
+            }
+          }
+        }
+
         if (match) {
           personId = match.id;
-          // Update the notes
+          // Update the person with both notes and structured data
           await (supabase as any)
             .from("persons")
-            .update({
-              notes: notes.trim(),
-              last_contact: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
+            .update(personFields)
             .eq("id", personId);
         } else {
-          // Create new contact
+          // Create new contact with all available fields
           const { data: newPerson } = await (supabase as any)
             .from("persons")
             .insert({
+              ...personFields,
               user_id: user.id,
               first_name: firstName,
               last_name: lastName,
               name: contactName.trim(),
-              notes: notes.trim(),
-              last_contact: new Date().toISOString(),
             })
             .select()
             .single();
@@ -103,6 +133,7 @@ export default function QuickCapturePage() {
 
         // Create interaction record
         if (personId) {
+          // 1. Create interaction record for timeline
           await (supabase as any).from("interactions").insert({
             user_id: user.id,
             person_id: personId,
@@ -111,6 +142,12 @@ export default function QuickCapturePage() {
             title: "Quick capture note",
             notes: notes.trim(),
           });
+
+          // 2. Add shared memory to trigger full AI analysis and profile update
+          // This will extract even more details and update the AI summary
+          if (notes.trim()) {
+            await addSharedMemory(personId, notes.trim());
+          }
         }
 
         router.push(`/contacts/${personId}`);
@@ -144,7 +181,7 @@ export default function QuickCapturePage() {
                   Quick Capture
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Capture meeting notes while they're fresh
+                  Capture meeting notes while they&apos;re fresh
                 </p>
               </div>
             </div>
@@ -158,7 +195,7 @@ export default function QuickCapturePage() {
               </p>
               <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
                 <li>• Use voice capture for hands-free entry</li>
-                <li>• Add context: where you met, what stood out, what's important to them</li>
+                <li>• Add context: where you met, what stood out, what&apos;s important to them</li>
                 <li>• Save within 5 minutes while memory is fresh</li>
               </ul>
             </CardContent>
@@ -187,7 +224,7 @@ export default function QuickCapturePage() {
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Quick notes about the meeting...&#10;&#10;What stood out? What's important to them? What did you discuss?"
+              placeholder="Quick notes about the meeting...&#10;&#10;What stood out? What&apos;s important to them? What did you discuss?"
               className="min-h-[250px] rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 text-base resize-none focus:border-cyan-400 dark:focus:border-cyan-600 focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-900"
               disabled={isSaving}
               autoFocus

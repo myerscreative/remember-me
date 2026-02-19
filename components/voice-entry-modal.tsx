@@ -20,6 +20,7 @@ interface ParsedContactData {
   memorableMoment?: string;
   familyMembers?: Array<{ name: string; relationship: string }>;
   tags?: string;
+  interests?: string;
   misc?: string;
 }
 
@@ -121,7 +122,7 @@ export function VoiceEntryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -137,7 +138,7 @@ export function VoiceEntryModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 pb-32">
           {/* Error Display */}
           {error && (
             <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -161,77 +162,77 @@ export function VoiceEntryModal({
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Name:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "Sarah Kim" or "John Smith"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;Sarah Kim&quot; or &quot;John Smith&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Email:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "sarah@example.com"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;sarah@example.com&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Phone:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "555-123-4567"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;555-123-4567&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">LinkedIn:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "linkedin.com/in/username"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;linkedin.com/in/username&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Where we met:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "AI Summit in San Diego"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;AI Summit in San Diego&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Who introduced:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "John Park introduced us"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;John Park introduced us&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Why stay in contact:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "Building a startup that could align with FlowDoors"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;Building a startup that could align with FlowDoors&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
-                        <span className="font-medium text-gray-700 dark:text-gray-300">What's interesting:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "Deep expertise in user empathy"</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">What&apos;s interesting:</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;Deep expertise in user empathy&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
-                        <span className="font-medium text-gray-700 dark:text-gray-300">What's important to them:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "Passionate about sustainable design"</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">What&apos;s important to them:</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;Passionate about sustainable design&quot;</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold">•</span>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Tags:</span>
-                        <span className="text-gray-600 dark:text-gray-400"> "UX Designer, Tesla, Startup"</span>
+                        <span className="text-gray-600 dark:text-gray-400"> &quot;UX Designer, Tesla, Startup&quot;</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  You don't need to include everything - just say what you know naturally!
+                  You don&apos;t need to include everything - just say what you know naturally!
                 </p>
               </div>
               <VoiceRecorder
@@ -341,7 +342,7 @@ export function VoiceEntryModal({
                 )}
                 {parsedData.whatInteresting && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">What's Interesting</label>
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">What&apos;s Interesting</label>
                     <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                       {parsedData.whatInteresting}
                     </div>
@@ -349,7 +350,7 @@ export function VoiceEntryModal({
                 )}
                 {parsedData.whatsImportant && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">What's Important to Them</label>
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">What&apos;s Important to Them</label>
                     <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                       {parsedData.whatsImportant}
                     </div>
@@ -373,6 +374,14 @@ export function VoiceEntryModal({
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Tags</label>
                     <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                       {parsedData.tags}
+                    </div>
+                  </div>
+                )}
+                {parsedData.interests && (
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Interests</label>
+                    <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
+                      {parsedData.interests}
                     </div>
                   </div>
                 )}
