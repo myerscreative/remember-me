@@ -173,11 +173,11 @@ export default function DashboardPage() {
                         isTriageActive ? "bg-orange-600" : "border-orange-200 text-orange-600"
                     )}
                 >
-                    {isTriageActive ? "Exit" : "Triage"}
+                    {isTriageActive ? "Exit" : "Nurture"}
                 </Button>
             </div>
 
-          {/* Triage View Override */}
+          {/* Nurture View Override */}
           {isTriageActive ? (
             <TriageMode 
               contacts={needingAttention.map(c => ({

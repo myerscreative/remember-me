@@ -683,14 +683,14 @@ export default function GardenPage() {
               counts={categoryCounts}
             />
 
-            {/* Triage Link - Garden Rescue */}
+            {/* Nurture Link - Needs Nurture */}
             <div className="relative group">
               <Link
                 href="/triage"
                 className="flex items-center justify-between px-4 py-3.5 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-xl hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-all font-bold shadow-sm border border-orange-200/50 dark:border-orange-900/50 animate-pulse-subtle"
               >
                 <span className="flex items-center gap-2">
-                  🚨 Garden Rescue
+                  🌱 Needs Nurture
                 </span>
                 
                 <Popover>
@@ -703,8 +703,8 @@ export default function GardenPage() {
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-3 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
-                    <p className="leading-relaxed">
-                      Garden Rescue surfaces your most neglected connections so you can quickly bring them back to health.
+                    <p className="text-sm font-medium text-orange-800/80 dark:text-orange-200/70 mt-3 pr-8">
+                      Needs Nurture surfaces the seeds that are thirstiest, so you can quickly water them back to health.
                     </p>
                   </PopoverContent>
                 </Popover>
@@ -783,7 +783,7 @@ export default function GardenPage() {
                     className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
                     title="Rapidly prioritize contacts"
                   >
-                    🚨 Triage
+                    🌱 Needs Nurture
                   </Link>
                   <button
                     onClick={() => setViewMode('garden')}
@@ -839,7 +839,7 @@ export default function GardenPage() {
                           className="px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors flex items-center gap-2 font-medium text-sm mr-2"
                           title="Rapidly prioritize contacts"
                         >
-                          🚨 Triage
+                          🌱 Needs Nurture
                         </Link>
                         <button
                           onClick={() => setViewMode('garden')}

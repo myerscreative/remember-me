@@ -49,7 +49,7 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
       const result = await logInteraction({
         personId: activeCard.id,
         type: "text", // Default for quick water
-        note: "Quick water from Triage Mode",
+        note: "Quick water from Nurture View",
       });
 
       if (result.success) {
@@ -85,7 +85,7 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
     <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto py-4 px-4 overflow-hidden">
       <div className="text-center space-y-1">
         <h2 className="text-2xl font-black uppercase tracking-tighter text-orange-600 dark:text-orange-400">
-          Quick Triage
+          Quick Nurture
         </h2>
         <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
             {cards.length - currentIndex} Thirsty Contacts Remaining

@@ -210,7 +210,7 @@ export function SocialForecast() {
                             onClick={() => router.push("/triage")}
                             className="w-full bg-white text-indigo-600 hover:bg-indigo-50 font-bold border-none"
                         >
-                            Open Triage Center
+                            View Nurture List
                         </Button>
                     </motion.div>
                 )}

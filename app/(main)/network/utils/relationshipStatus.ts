@@ -54,7 +54,7 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
      // Check Severity for Drifting vs Neglected
      // Buffer of 30 days past threshold = Neglected
      if (daysAgo >= threshold + 30) {
-        return { label: "Rescue this neglected connection", colorClass: "text-red-500 dark:text-red-400 font-semibold text-[12px] font-sans" };
+        return { label: "Nurture this connection", colorClass: "text-red-500 dark:text-red-400 font-semibold text-[12px] font-sans" };
      } else {
         return { label: "Reconnect with this drifting contact", colorClass: "text-amber-500 dark:text-amber-400 font-semibold text-[12px] font-sans" };
      }

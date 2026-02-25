@@ -89,7 +89,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
         <button className="flex items-center gap-2 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-full transition-all group">
           <Heart className="h-5 w-5 text-rose-500 group-hover:scale-110 transition-transform" />
           <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest hidden sm:inline">
-            {initialContacts ? "Start Rescue" : "Drift Rescue"}
+            {initialContacts ? "Start Nurturing" : "Revive Connections"}
           </span>
           {activeContacts.length > 0 && (
               <span className="flex h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
@@ -103,7 +103,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                     <div className="p-2 bg-rose-500/10 rounded-lg">
                         <Heart className="h-5 w-5 text-rose-500" />
                     </div>
-                    <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Relationship Rescue</SheetTitle>
+                    <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Connection Revival</SheetTitle>
                 </div>
                 <SheetDescription className="text-slate-500 font-medium">
                     {activeContacts.length} connections currently drifting. Send a &quot;Low-Stakes Ping&quot; to reset the decay timer.
@@ -165,7 +165,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20"
                                         >
                                             {isRescuing === contact.id ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                                            Send & Rescue
+                                            Send & Nurture
                                         </Button>
                                         <Button 
                                             variant="outline"

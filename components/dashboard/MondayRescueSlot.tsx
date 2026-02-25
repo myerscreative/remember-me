@@ -56,14 +56,14 @@ export function MondayRescueSlot() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Monday Morning Rescue</span>
+                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Monday Morning Watering</span>
                   <span className="px-1.5 py-0.5 bg-rose-500/20 text-rose-400 text-[8px] font-black rounded uppercase animate-pulse">At Risk</span>
                 </div>
                 <h2 className="text-2xl font-black text-white uppercase tracking-tight leading-none mb-2">
                   {rescues.length} HIGH-VALUE CONNECTIONS DRIFTING
                 </h2>
                 <p className="text-indigo-200/60 text-sm font-medium max-w-md">
-                  We&apos;ve pre-calculated 5 high-resonance pings based on shared memories. Rescue your network pulse now.
+                  We&apos;ve pre-calculated 5 high-resonance pings based on shared memories. Water your network pulse now.
                 </p>
               </div>
             </div>
