@@ -20,6 +20,7 @@ export default function NetworkSearchBar({ onSearch }: NetworkSearchBarProps) {
     <div className="flex items-center mx-4 md:mx-8 my-4">
       <div className="relative flex-1">
         <input
+          id="network-search-input"
           type="text"
           placeholder="Search by interest, skill, location..."
           className="w-full pl-10 pr-4 py-2 border border-[#e5e7eb] rounded-md focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1]"

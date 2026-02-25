@@ -30,7 +30,7 @@ export function NetworkDomainBar({ domains, selectedDomainId, onSelectDomain }: 
   });
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 py-4 animate-in fade-in slide-in-from-top-4 duration-700">
+    <div id="network-domain-bar" className="flex flex-wrap justify-center gap-4 py-4 animate-in fade-in slide-in-from-top-4 duration-700">
       {sortedDomains.map(domain => {
         const Icon = ICON_MAP[domain.icon] || Users;
         const isSelected = selectedDomainId === domain.id;

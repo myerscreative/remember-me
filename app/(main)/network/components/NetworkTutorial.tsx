@@ -4,43 +4,41 @@ import { useState } from 'react';
 import { 
   X, 
   Search, 
-  LayoutGrid, 
   Tag, 
   Heart,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Step {
   title: string;
   description: string;
+  detailedDescription: string;
   icon: React.ElementType;
   color: string;
 }
 
 const steps: Step[] = [
   {
-    title: "Find your Seeds",
-    description: "Search by interests, skills, or even where you first met.",
+    title: "Search & Filter",
+    description: "Search for specific people, or browse by broad life areas like Family or Work.",
+    detailedDescription: "Use the search bar to find exactly who you're looking for by name, skill, or location. Alternatively, click the categories below the search bar to quickly filter your network into broad groups like Family, Work, or College.",
     icon: Search,
     color: "text-blue-500 bg-blue-500/10"
   },
   {
-    title: "Map your Garden",
-    description: "Browse wide categories like Family, Work, or Travel.",
-    icon: LayoutGrid,
-    color: "text-purple-500 bg-purple-500/10"
-  },
-  {
     title: "Inspect the Roots",
     description: "Select a domain to reveal sub-tags and see your collective.",
+    detailedDescription: "Once you select a broad category, use the sub-tags to filter your view further. This reveals the specific overlapping communities you belong to within that broader area.",
     icon: Tag,
     color: "text-pink-500 bg-pink-500/10"
   },
   {
     title: "Nurture Connections",
     description: "Log interactions to keep your important relationships flourishing.",
+    detailedDescription: "Use the Quick Capture feature to note when you last interacted with someone. This helps you keep track of who you are staying in touch with and which relationships might need a little tending to.",
     icon: Heart,
     color: "text-red-500 bg-red-500/10"
   }
@@ -53,6 +51,7 @@ interface NetworkTutorialProps {
 
 export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [expandedInfo, setExpandedInfo] = useState<number | null>(null);
 
   if (!isOpen) return null;
 
@@ -90,9 +89,21 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
               const Icon = step.icon;
               const isNurture = step.title === "Nurture Connections";
               return (
-                <div 
+                <button 
                   key={i} 
-                  className={`flex gap-4 px-4 py-2.5 rounded-xl border transition-all hover:shadow-md group ${
+                  onClick={() => {
+                    onClose(dontShowAgain);
+                    if (step.title === "Search & Filter" || step.title === "Inspect the Roots") {
+                      setTimeout(() => {
+                        document.getElementById('network-search-input')?.focus();
+                        const el = document.getElementById('network-domain-bar');
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                      }, 100);
+                    }
+                  }}
+                  className={`flex w-full text-left gap-4 px-4 py-2.5 rounded-xl border transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 overflow-hidden group ${
                     isNurture 
                       ? "border-red-500/30 bg-red-500/5 dark:bg-red-500/10 scale-[1.02] shadow-sm" 
                       : "border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800"
@@ -101,13 +112,26 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
                   <div className={`shrink-0 p-2 h-10 w-10 rounded-lg flex items-center justify-center ${step.color} group-hover:scale-110 transition-transform`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="font-bold text-gray-900 dark:text-gray-100">{step.title}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  <div className="space-y-1 w-full">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100">{step.title}</h4>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setExpandedInfo(i);
+                        }}
+                        className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/20 transition-colors"
+                        title={`More info about ${step.title}`}
+                      >
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed pr-6">
                       {step.description}
                     </p>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -134,6 +158,45 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
             </Button>
           </div>
         </div>
+
+        {/* Info Modal */}
+        {expandedInfo !== null && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 animate-in zoom-in-95 duration-200">
+              <button 
+                onClick={() => setExpandedInfo(null)}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors bg-gray-50 dark:bg-gray-800/50 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="flex items-center gap-3 mb-4 pr-8">
+                <div className={`shrink-0 p-2 h-10 w-10 rounded-lg flex items-center justify-center ${steps[expandedInfo].color}`}>
+                  {(() => {
+                    const Icon = steps[expandedInfo].icon;
+                    return <Icon className="w-5 h-5" />;
+                  })()}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+                  {steps[expandedInfo].title}
+                </h3>
+              </div>
+              
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
+                {steps[expandedInfo].detailedDescription}
+              </p>
+              
+              <div className="mt-6">
+                <Button 
+                  onClick={() => setExpandedInfo(null)} 
+                  className="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 shadow-none font-semibold"
+                >
+                  Got it
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
