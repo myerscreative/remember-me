@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, Suspense, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { networkService, NetworkData, SubTribe } from './components/NetworkDataService';
 import NetworkSearchBar from './components/NetworkSearchBar';
 import { TribeView } from './components/TribeView';
@@ -9,17 +9,27 @@ import { LogInteractionModal } from './components/LogInteractionModal';
 import { NetworkDomainBar } from './components/NetworkDomainBar';
 import { NetworkSubTribeDrawer } from './components/NetworkSubTribeDrawer';
 import { NetworkTutorial, TutorialButton } from './components/NetworkTutorial';
+import { NetworkSearchView } from './components/NetworkSearchView';
+import { NetworkInspectView } from './components/NetworkInspectView';
+import { NetworkNurtureView } from './components/NetworkNurtureView';
 import { Loader2 } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+
+type ViewMode = 'search' | 'inspect' | 'nurture' | null;
 
 function NetworkContent() {
   const [data, setData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   
   // Tutorial State
   const [showTutorial, setShowTutorial] = useState(false);
   
+  // URL-driven view state
+  const activeView = (searchParams.get('view') as ViewMode) || null;
+
   // New Domain Logic
   const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null);
   const [selectedSubTribeId, setSelectedSubTribeId] = useState<string | null>(null);
@@ -53,10 +63,22 @@ function NetworkContent() {
     loadData();
   }, [searchParams]);
 
-  const handleNurtureTribe = (tribe: SubTribe) => {
+  const handleNurtureTribe = useCallback((tribe: SubTribe) => {
     setNurtureTribe(tribe);
     setIsNurtureModalOpen(true);
-  };
+  }, []);
+
+  const handleNavigateToView = useCallback((view: ViewMode) => {
+    if (view) {
+      router.push(`/network?view=${view}`);
+    } else {
+      router.push('/network');
+    }
+  }, [router]);
+
+  const handleBackToGarden = useCallback(() => {
+    router.push('/network');
+  }, [router]);
   
   // Derived state for the UI
   const selectedDomainGroup = useMemo(() => {
@@ -64,25 +86,13 @@ function NetworkContent() {
       return data.domains.find(d => d.domain.id === selectedDomainId);
   }, [data, selectedDomainId]);
   
-  // Transform selected SubTribe into Legacy "Tribe" format for TribeView compatibility
-  // Or simpler: Reuse TribeView but pass specific data
+  // Transform selected SubTribe into format for TribeView
   const displayedTribes = useMemo(() => {
     if (!data) return [];
 
     // 1. Search Mode overrides everything
     if (searchTerm) {
         const term = searchTerm.toLowerCase();
-        // Fallback to legacy style filtering
-        // TODO: Refactor legacy search logic to be cleaner or reuse a helper
-        // For now, let's just do a quick scan of all contacts in all domains
-        // Alternatively, reuse the existing logic if we kept the `tribes` data?
-        // Actually NetworkDataService returns `tribes` property still? 
-        // In my last edit I REMOVED `tribes` from NetworkData interface return but I might have kept the method.
-        // Let's check `NetworkDataService`. Ah, I removed `tribes` from the interface in the `replace_file_content` call.
-        // So we need to reconstruct flat tribes if searching.
-        
-        // Let's group all contacts by some logic or just show "Search Results" tribe?
-        // Let's create a single "Search Results" tribe.
         const allContacts = data.contacts;
         const matching = allContacts.filter(c => 
              c.name.toLowerCase().includes(term) ||
@@ -107,14 +117,9 @@ function NetworkContent() {
     if (selectedDomainId && selectedSubTribeId && selectedDomainGroup) {
         const subTribe = selectedDomainGroup.subTribes.find(st => st.id === selectedSubTribeId);
         if (subTribe) {
-             // SubTribe already has the correct format, just return it
              return [subTribe];
         }
     }
-    
-    // 3. Just Domain selected -> Show nothing? Or show all in domain?
-    // Prompt says: "When a user clicks Travel, expand ... sub-tags ... Once a sub-tag is selected, show the contacts"
-    // So if just domain is selected, we show sub-tags drawer (handled below), but main view might be empty or "Select a tag" state.
     
     return [];
   }, [data, searchTerm, selectedDomainId, selectedSubTribeId, selectedDomainGroup]);
@@ -128,6 +133,48 @@ function NetworkContent() {
      );
   }
 
+  // If a sub-view is active, render that instead of the default garden map
+  if (activeView && data) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            {activeView === 'search' && (
+              <NetworkSearchView
+                key="search"
+                data={data}
+                onBack={handleBackToGarden}
+                onNurtureTribe={handleNurtureTribe}
+              />
+            )}
+            {activeView === 'inspect' && (
+              <NetworkInspectView
+                key="inspect"
+                data={data}
+                onBack={handleBackToGarden}
+                onNurtureTribe={handleNurtureTribe}
+              />
+            )}
+            {activeView === 'nurture' && (
+              <NetworkNurtureView
+                key="nurture"
+                data={data}
+                onBack={handleBackToGarden}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+
+        <LogInteractionModal 
+          isOpen={isNurtureModalOpen} 
+          onClose={() => setIsNurtureModalOpen(false)} 
+          tribe={nurtureTribe} 
+        />
+      </div>
+    );
+  }
+
+  // Default: Garden Map view
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
@@ -147,16 +194,10 @@ function NetworkContent() {
           )}
         </div>
 
-        {/* Search Input - Always visible? Or hidden when domain active? 
-            Prompt: "Default: When no domain is selected, show the Search Bar. 
-            On Selection: Clicking a Domain... reveal only sub-tags"
-            
-            Let's keep Search Bar always accessible but maybe less prominent if domain selected.
-        */}
+        {/* Search Input */}
         <div className="max-w-xl mx-auto">
           <NetworkSearchBar onSearch={(val) => {
               setSearchTerm(val);
-              // Clear domain selection if searching?
               if (val) {
                   setSelectedDomainId(null);
                   setSelectedSubTribeId(null);
@@ -171,7 +212,7 @@ function NetworkContent() {
                 selectedDomainId={selectedDomainId}
                 onSelectDomain={(id) => {
                     setSelectedDomainId(id);
-                    setSelectedSubTribeId(null); // Reset sub-selection
+                    setSelectedSubTribeId(null);
                 }}
             />
         )}
@@ -218,6 +259,7 @@ function NetworkContent() {
             localStorage.setItem('hideTribeSearchTutorial', 'true');
           }
         }}
+        onNavigate={handleNavigateToView}
       />
     </div>
   );

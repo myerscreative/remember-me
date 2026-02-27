@@ -18,6 +18,7 @@ interface Step {
   detailedDescription: string;
   icon: React.ElementType;
   color: string;
+  route: 'search' | 'inspect' | 'nurture';
 }
 
 const steps: Step[] = [
@@ -26,30 +27,34 @@ const steps: Step[] = [
     description: "Search for specific people, or browse by broad life areas like Family or Work.",
     detailedDescription: "Use the search bar to find exactly who you're looking for by name, skill, or location. Alternatively, click the categories below the search bar to quickly filter your network into broad groups like Family, Work, or College.",
     icon: Search,
-    color: "text-blue-500 bg-blue-500/10"
+    color: "text-blue-500 bg-blue-500/10",
+    route: 'search'
   },
   {
     title: "Inspect the Roots",
     description: "Select a domain to reveal sub-tags and see your collective.",
     detailedDescription: "Once you select a broad category, use the sub-tags to filter your view further. This reveals the specific overlapping communities you belong to within that broader area.",
     icon: Tag,
-    color: "text-pink-500 bg-pink-500/10"
+    color: "text-pink-500 bg-pink-500/10",
+    route: 'inspect'
   },
   {
     title: "Nurture Connections",
     description: "Log interactions to keep your important relationships flourishing.",
     detailedDescription: "Use the Quick Capture feature to note when you last interacted with someone. This helps you keep track of who you are staying in touch with and which relationships might need a little tending to.",
     icon: Heart,
-    color: "text-red-500 bg-red-500/10"
+    color: "text-red-500 bg-red-500/10",
+    route: 'nurture'
   }
 ];
 
 interface NetworkTutorialProps {
   isOpen: boolean;
   onClose: (dontShowAgain: boolean) => void;
+  onNavigate: (view: 'search' | 'inspect' | 'nurture') => void;
 }
 
-export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
+export function NetworkTutorial({ isOpen, onClose, onNavigate }: NetworkTutorialProps) {
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [expandedInfo, setExpandedInfo] = useState<number | null>(null);
 
@@ -93,15 +98,7 @@ export function NetworkTutorial({ isOpen, onClose }: NetworkTutorialProps) {
                   key={i} 
                   onClick={() => {
                     onClose(dontShowAgain);
-                    if (step.title === "Search & Filter" || step.title === "Inspect the Roots") {
-                      setTimeout(() => {
-                        document.getElementById('network-search-input')?.focus();
-                        const el = document.getElementById('network-domain-bar');
-                        if (el) {
-                          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                      }, 100);
-                    }
+                    onNavigate(step.route);
                   }}
                   className={`flex w-full text-left gap-4 px-4 py-2.5 rounded-xl border transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 overflow-hidden group ${
                     isNurture 
