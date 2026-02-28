@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { X, Phone, Mail, MessageSquare, Calendar } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
+import { BloomEffect } from '@/components/bloom/BloomEffect';
+import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface LogInteractionModalProps {
   isOpen: boolean;
@@ -19,6 +21,7 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
   const [notes, setNotes] = useState('');
   const [nextGoal, setNextGoal] = useState(''); // New state
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBloom, setShowBloom] = useState(false);
 
   if (!isOpen) return null;
 
@@ -66,8 +69,14 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
         // We don't throw here to avoid blocking the modal close if interaction was saved
       }
 
-      toast.success("Interaction logged");
-      onClose();
+      setShowBloom(true);
+      const affirmation = getRandomAffirmation();
+      toast.success(affirmation, { icon: '🌱' });
+      
+      setTimeout(() => {
+        setShowBloom(false);
+        onClose();
+      }, 1500);
     } catch (error) {
        console.error("Error logging interaction:", error);
        toast.error("Failed to log interaction");
@@ -151,10 +160,13 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
 
         {/* Footer */}
         <div className="p-4 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800">
-           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-           <Button onClick={handleSubmit} disabled={isSubmitting}>
-             {isSubmitting ? 'Saving...' : 'Save Log'}
-           </Button>
+           <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
+           <div className="relative">
+             <Button onClick={handleSubmit} disabled={isSubmitting} className="relative z-10">
+               {isSubmitting ? 'Saving...' : 'Save Log'}
+             </Button>
+             <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+           </div>
         </div>
 
       </div>

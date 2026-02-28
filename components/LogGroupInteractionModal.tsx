@@ -5,6 +5,8 @@ import { X, Droplets, Loader2 } from 'lucide-react';
 import { nurtureTribe } from '@/app/actions/nurture-tribe';
 import toast from 'react-hot-toast';
 import { useGameStats } from '@/hooks/useGameStats';
+import { BloomEffect } from '@/components/bloom/BloomEffect';
+import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface Contact {
   id: string;
@@ -29,13 +31,17 @@ const TRIBE_TEMPLATES: Record<string, string> = {
 export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, tribeName, contacts }: LogGroupInteractionModalProps) {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showBloom, setShowBloom] = useState(false);
   const { addXP } = useGameStats();
 
   useEffect(() => {
     if (isOpen) {
       const template = TRIBE_TEMPLATES[tribeName] || TRIBE_TEMPLATES.Default;
       const initialNotes = template.replace('[Name]', 'everyone');
-      setNotes(initialNotes);
+      const timer = setTimeout(() => {
+        setNotes(initialNotes);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, tribeName]);
 
@@ -47,15 +53,20 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
     const res = await nurtureTribe(contactIds, 'other', notes);
     
     if (res.success) {
+      setShowBloom(true);
       const xp = (res as any).xpAwarded || 0;
+      const affirmation = getRandomAffirmation();
       if (xp > 0) {
         addXP(xp);
-        toast.success(`Tribe Watered! 🌿 (+${xp} XP)`);
+        toast.success(`${affirmation} (+${xp} XP)`, { icon: '🌿' });
       } else {
-        toast.success("Tribe Watered! 🌿");
+        toast.success(affirmation, { icon: '🌿' });
       }
       onSuccess?.();
-      onClose();
+      setTimeout(() => {
+        setShowBloom(false);
+        onClose();
+      }, 1500);
     } else {
       toast.error(res.error || "Failed to water tribe");
     }
@@ -108,14 +119,17 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
 
         {/* Footer */}
         <div className="p-4 border-t border-[#1E293B] flex justify-end">
-          <button
-            onClick={handleWaterTribe}
-            disabled={loading}
-            className="flex items-center gap-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#0F172A] px-6 py-2 font-black uppercase tracking-widest text-sm disabled:opacity-50 transition-all rounded-none shadow-none"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Droplets className="w-4 h-4" />}
-            Water Tribe
-          </button>
+          <div className="relative">
+            <button
+              onClick={handleWaterTribe}
+              disabled={loading}
+              className="flex items-center gap-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#0F172A] px-6 py-2 font-black uppercase tracking-widest text-sm disabled:opacity-50 transition-all rounded-none shadow-none relative z-10"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Droplets className="w-4 h-4" />}
+              Water Tribe
+            </button>
+            <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+          </div>
         </div>
       </div>
     </div>

@@ -6,6 +6,8 @@ import { INTERACTION_TYPES, type InteractionType } from '@/lib/relationship-heal
 import { logInteraction } from '@/app/actions/logInteraction';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
+import { BloomEffect } from '@/components/bloom/BloomEffect';
+import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface LogInteractionModalProps {
   contact: {
@@ -24,14 +26,6 @@ interface LogInteractionModalProps {
   initialMethod?: InteractionType; 
 }
 
-const SUCCESS_SEEDS = [
-  "Relationship successfully watered! 🌱",
-  "You just planted a seed of connection. ✨",
-  "Relationship Nourished! Moved to the inner circle. 🌸",
-  "Intentionality pays off. Your garden is growing. 🌿",
-  "Connection refreshed. That large leaf is blooming again! 🍃"
-];
-
 // Reordered for UI: Call, Email, Text (Row 1) - In Person, Social, Other (Row 2)
 const ORDERED_TYPES: InteractionType[] = ['call', 'email', 'text', 'in-person', 'social', 'other'];
 
@@ -48,6 +42,7 @@ export default function LogInteractionModal({
   const [note, setNote] = useState(initialNote);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBloom, setShowBloom] = useState(false);
   const [recentInteractions] = useState<any[]>([]);
   const [loadingInteractions] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -75,14 +70,18 @@ export default function LogInteractionModal({
       });
 
       if (result.success) {
+        setShowBloom(true);
         // ... (existing success logic)
-        const randomMessage = SUCCESS_SEEDS[Math.floor(Math.random() * SUCCESS_SEEDS.length)];
+        const randomMessage = getRandomAffirmation();
         toast.success(randomMessage, { icon: '🌱', duration: 4000 });
         await loadInteractions();
-        setNote('');
-        setDate(new Date().toISOString().split('T')[0]); // Reset date to today
-        onSuccess?.();
+        
+        // Wait a bit for the bloom to show before calling onSuccess or closing
         setTimeout(() => {
+          setNote('');
+          setDate(new Date().toISOString().split('T')[0]); // Reset date to today
+          onSuccess?.();
+          setShowBloom(false);
           onClose();
         }, 1500);
       } else {
@@ -284,25 +283,28 @@ export default function LogInteractionModal({
           )}
 
           {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3.5 px-4 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold tracking-wide rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin text-white/80" />
-                <span className="text-white/90">Logging...</span>
-              </>
-            ) : (
-              <>
-                <span className="relative z-10 flex items-center gap-2">
-                   🌱 Log Connection
-                </span>
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-              </>
-            )}
-          </button>
+          <div className="relative">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3.5 px-4 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold tracking-wide rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 relative overflow-hidden group z-10"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin text-white/80" />
+                  <span className="text-white/90">Logging...</span>
+                </>
+              ) : (
+                <>
+                  <span className="relative z-10 flex items-center gap-2">
+                    🌱 Log Connection
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                </>
+              )}
+            </button>
+            <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+          </div>
           {/* Error Display */}
           {lastError && (
               <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg animate-in fade-in slide-in-from-bottom-2">

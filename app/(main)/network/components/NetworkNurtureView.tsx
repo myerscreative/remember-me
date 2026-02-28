@@ -27,12 +27,17 @@ interface CategorizedContact {
 
 export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
   const [logContact, setLogContact] = useState<NetworkContact | null>(null);
+  const [nurturedIds, setNurturedIds] = useState<Set<string>>(new Set());
+  const [permanentlyRemoved, setPermanentlyRemoved] = useState<Set<string>>(new Set());
 
   // Filter and categorize contacts
   const categorized = useMemo(() => {
     const results: CategorizedContact[] = [];
 
     data.contacts.forEach(contact => {
+      // If it's permanently removed, skip entirely
+      if (permanentlyRemoved.has(contact.id)) return;
+      
       const status = getRelationshipStatus(contact);
 
       // Check for drifting (amber) or neglected (red) based on the colorClass
@@ -52,7 +57,25 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
     });
 
     return results;
-  }, [data.contacts]);
+  }, [data.contacts, permanentlyRemoved]);
+
+  const handleNurtured = (contactId: string) => {
+    setNurturedIds(prev => new Set(prev).add(contactId));
+    
+    // Clear log contact modal
+    setLogContact(null);
+
+    // After 1.5 seconds, remove the bloom and permanently hide the item
+    // so it doesn't show up again on this view
+    setTimeout(() => {
+      setNurturedIds(prev => {
+        const next = new Set(prev);
+        next.delete(contactId);
+        return next;
+      });
+      setPermanentlyRemoved(prev => new Set(prev).add(contactId));
+    }, 1500);
+  };
 
   const neglectedCount = categorized.filter(c => c.category === 'neglected').length;
   const driftingCount = categorized.filter(c => c.category === 'drifting').length;
@@ -111,6 +134,8 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
             const lastDate = contact.last_interaction_date
               ? format(parseISO(contact.last_interaction_date), 'MMM d')
               : 'Never';
+            
+            const isNurtured = nurturedIds.has(contact.id);
 
             return (
               <motion.div
@@ -120,22 +145,29 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
                 transition={{ delay: i * 0.04 }}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-xl border transition-all",
-                  category === 'neglected'
+                  category === 'neglected' && !isNurtured
                     ? "bg-red-500/5 border-red-500/15 hover:border-red-500/30"
-                    : "bg-amber-500/5 border-amber-500/15 hover:border-amber-500/30"
+                    : category === 'drifting' && !isNurtured
+                    ? "bg-amber-500/5 border-amber-500/15 hover:border-amber-500/30"
+                    : "bg-emerald-500/10 border-emerald-500 shadow-lg shadow-emerald-500/20 animate-bloom-glow"
                 )}
               >
                 {/* Avatar with health dot */}
                 <Link href={`/contacts/${contact.id}`} className="shrink-0 relative">
                   <Avatar className="h-10 w-10 border-2 border-slate-700">
                     <AvatarImage src={contact.photo_url || undefined} />
-                    <AvatarFallback className="bg-slate-800 text-slate-300 text-xs font-bold">
+                    <AvatarFallback className={cn(
+                        "text-xs font-bold",
+                        isNurtured ? "bg-emerald-800 text-emerald-100" : "bg-slate-800 text-slate-300"
+                    )}>
                       {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className={cn(
                     "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-slate-950",
-                    category === 'neglected' ? 'bg-red-500' : 'bg-amber-500'
+                    isNurtured ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]' 
+                    : category === 'neglected' ? 'bg-red-500' 
+                    : 'bg-amber-500'
                   )} />
                 </Link>
 
@@ -146,12 +178,16 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
                     <CalendarDays className="w-3 h-3" />
                     <span>{lastDate}</span>
                     <span className="text-slate-600">·</span>
-                    <span className={cn(
-                      "font-medium",
-                      category === 'neglected' ? 'text-red-400' : 'text-amber-400'
-                    )}>
-                      {daysAgo}d ago
-                    </span>
+                    {isNurtured ? (
+                        <span className="font-medium text-emerald-400">Nurtured!</span>
+                    ) : (
+                        <span className={cn(
+                        "font-medium",
+                        category === 'neglected' ? 'text-red-400' : 'text-amber-400'
+                        )}>
+                        {daysAgo}d ago
+                        </span>
+                    )}
                   </div>
                 </Link>
 
@@ -160,17 +196,24 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setLogContact(contact);
+                    if (!isNurtured) setLogContact(contact);
                   }}
+                  disabled={isNurtured}
                   className={cn(
                     "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all",
-                    category === 'neglected'
+                    isNurtured 
+                      ? "bg-slate-800 text-emerald-400 opacity-80 cursor-default"
+                      : category === 'neglected'
                       ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"
                       : "bg-emerald-600/80 hover:bg-emerald-500 text-white shadow-md shadow-emerald-900/20"
                   )}
                 >
-                  <MessageSquarePlus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Log</span>
+                  {isNurtured ? (
+                      <Heart className="w-3.5 h-3.5 fill-emerald-500 text-emerald-500" />
+                  ) : (
+                      <MessageSquarePlus className="w-3.5 h-3.5" />
+                  )}
+                  <span className="hidden sm:inline">{isNurtured ? 'Done' : 'Log'}</span>
                 </button>
               </motion.div>
             );
@@ -183,6 +226,7 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
         <LogInteractionModal
           isOpen={!!logContact}
           onClose={() => setLogContact(null)}
+          onNurtured={handleNurtured}
           tribe={{
             id: logContact.id,
             name: logContact.name,

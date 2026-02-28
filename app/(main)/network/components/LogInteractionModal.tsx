@@ -10,17 +10,21 @@ import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 // Note: You'll need to implement the actual server action for bulk logging
 import { logGroupInteraction } from "@/app/actions/log-group-interaction"; 
+import { BloomEffect } from "@/components/bloom/BloomEffect";
+import { getRandomAffirmation } from "@/lib/bloom/affirmations";
 
 interface LogInteractionModalProps {
   isOpen: boolean;
   onClose: () => void;
   tribe: SubTribe | null;
+  onNurtured?: (id: string) => void;
 }
 
-export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionModalProps) {
+export function LogInteractionModal({ isOpen, onClose, tribe, onNurtured }: LogInteractionModalProps) {
   const [notes, setNotes] = useState('');
   const [nextGoal, setNextGoal] = useState(''); // New state
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBloom, setShowBloom] = useState(false);
 
   const handleSubmit = async () => {
     if (!tribe) return;
@@ -36,10 +40,24 @@ export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionMo
       });
 
       if (result.success) {
-        toast.success(`Nurtured ${tribe.memberCount} people in ${tribe.name}!`);
-        onClose();
-        setNotes('');
-        setNextGoal(''); // Clear nextGoal after successful submission
+        setShowBloom(true);
+        const affirmation = getRandomAffirmation();
+        toast.success(affirmation, {
+            icon: '🌱'
+        });
+        
+        // Let the bloom show for a split second before notifying the parent
+        setTimeout(() => {
+          if (tribe) {
+            tribe.members.forEach(member => {
+              onNurtured?.(member.id);
+            });
+          }
+          onClose();
+          setNotes('');
+          setNextGoal(''); // Clear nextGoal after successful submission
+          setShowBloom(false);
+        }, 300);
       } else {
         toast.error('Failed to log interaction');
       }
@@ -94,10 +112,13 @@ export function LogInteractionModal({ isOpen, onClose, tribe }: LogInteractionMo
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Log Interaction
-          </Button>
+          <div className="relative">
+             <Button onClick={handleSubmit} disabled={isSubmitting} className="relative z-10">
+               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+               Log Interaction
+             </Button>
+             <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

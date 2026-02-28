@@ -22,6 +22,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getDriftingContacts, rescueContact, DriftingContact } from '@/app/actions/drift-rescue-actions';
 import { toast } from 'react-hot-toast';
+import { BloomEffect } from '@/components/bloom/BloomEffect';
+import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface DriftRescueProps {
   initialContacts?: DriftingContact[];
@@ -32,6 +34,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
   const [contacts, setContacts] = useState<DriftingContact[]>(initialContacts || []);
   const [loading, setLoading] = useState(false);
   const [isRescuing, setIsRescuing] = useState<string | null>(null);
+  const [rescuedId, setRescuedId] = useState<string | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -53,15 +56,23 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
     setIsRescuing(contact.id);
     try {
       await rescueContact(contact.id, contact.suggestedHook);
-      setCompleted(prev => new Set(prev).add(contact.id));
-      toast.success(`Rescued ${contact.name}!`, {
-          icon: '✨',
+      
+      const affirmation = getRandomAffirmation();
+      toast.success(affirmation, {
+          icon: '🌱',
           style: {
               background: '#4f46e5',
               color: '#fff',
               fontWeight: 'bold'
           }
       });
+      
+      setRescuedId(contact.id);
+      setTimeout(() => {
+        setCompleted(prev => new Set(prev).add(contact.id));
+        setRescuedId(null);
+      }, 1500);
+      
     } catch {
       toast.error("Rescue attempt failed");
     } finally {
@@ -138,7 +149,13 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                 transition={{ duration: 0.3, delay: index * 0.05 }}
                             >
                                 <Card className="p-5 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative">
-                                    <div className="flex justify-between items-start mb-4">
+                                    <div className="absolute inset-x-0 bottom-4 flex justify-center pointer-events-none z-50">
+                                      <BloomEffect 
+                                        isActive={rescuedId === contact.id} 
+                                        onComplete={() => {}} 
+                                      />
+                                    </div>
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
                                         <div>
                                             <h4 className="text-lg font-black text-slate-900 dark:text-white leading-none mb-1">{contact.name}</h4>
                                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">

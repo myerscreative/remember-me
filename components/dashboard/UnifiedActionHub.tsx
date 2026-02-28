@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Lightbulb, MapPin, X, Sparkles, Copy, Check } from "lucide-react";
+import { Lightbulb, X, Sparkles } from "lucide-react";
 import { getInitials } from "@/lib/utils/contact-helpers";
 import { cn } from "@/lib/utils";
 import { Person } from "@/types/database.types";
@@ -18,10 +18,11 @@ import { updatePersonMemory } from "@/app/actions/update-person-memory";
 import { logInteraction } from "@/app/actions/logInteraction";
 import { getRecentInteractions, type InteractionHistoryItem } from "@/app/actions/get-interactions";
 import { type InteractionType } from "@/lib/relationship-health";
-import { getConnections, type ConnectionWithDetails } from "@/app/actions/get-connections";
+import { getConnections } from "@/app/actions/get-connections";
 import { HistoryTimeline } from "./HistoryTimeline";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { BloomEffect } from '@/components/bloom/BloomEffect';
+import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface UnifiedActionHubProps {
   person: Person;
@@ -31,11 +32,10 @@ interface UnifiedActionHubProps {
 }
 
 export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMethod }: UnifiedActionHubProps & { initialMethod?: InteractionType }) {
-  const router = useRouter();
+  const [showBloom, setShowBloom] = useState(false);
   const [note, setNote] = useState("");
   const [nextGoal, setNextGoal] = useState(""); // New state for next goal
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copied, setCopied] = useState(false);
   
   // Set default method
   const [selectedType, setSelectedType] = useState<InteractionType>('call');
@@ -47,12 +47,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const [aiStatus, setAiStatus] = useState<string | null>(null);
   const [isGeneratingStatus, setIsGeneratingStatus] = useState(false);
   const [generatedScript, setGeneratedScript] = useState<string>("");
-  const [goalUsed, setGoalUsed] = useState<string | null>(null); // Track if goal was used
-  const [isGeneratingScript, setIsGeneratingScript] = useState(false);
   const [contextBrief, setContextBrief] = useState<string | null>(null);
   const [isGeneratingBrief, setIsGeneratingBrief] = useState(false);
-  const [mutuals, setMutuals] = useState<ConnectionWithDetails[]>([]);
-  const [isLoadingMutuals, setIsLoadingMutuals] = useState(false);
   
   const noteInputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -94,13 +90,19 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
           }
 
           if (interactionResult.success) {
-              toast.success("Connection Logged & Status Updated! 🌱");
+              setShowBloom(true);
+              const affirmation = getRandomAffirmation();
+              toast.success(affirmation, { icon: '🌱', duration: 4000 });
               onAction(selectedType, note);
-              setNote("");
-              setDate(new Date().toISOString().split('T')[0]); // Reset date
-              setNextGoal(""); // Clear next goal
-              setContextBrief(null); // Invalidate brief to force refresh with new context
-              onClose();
+              
+              setTimeout(() => {
+                setNote("");
+                setDate(new Date().toISOString().split('T')[0]); // Reset date
+                setNextGoal(""); // Clear next goal
+                setContextBrief(null); // Invalidate brief to force refresh with new context
+                setShowBloom(false);
+                onClose();
+              }, 1500);
           } else {
               toast.error("Failed to log interaction");
           }
@@ -122,11 +124,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 setHistory(logs);
                 
                 // 1. Fetch Mutuals (Parallel)
-                setIsLoadingMutuals(true);
                 const mutualsRes = await getConnections(person.id);
                 const mutualsData = mutualsRes.success && mutualsRes.data ? mutualsRes.data : [];
-                setMutuals(mutualsData);
-                setIsLoadingMutuals(false);
 
                 // Sort mutuals by health (recency)
                 const sortedMutuals = [...mutualsData].sort((a, b) => {
@@ -166,7 +165,6 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     const sortedLogs = [...logs].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
                     const latestNextGoal = sortedLogs.length > 0 ? sortedLogs[0].next_goal_note : null;
 
-                    setIsGeneratingScript(true);
                     try {
                         const scriptRes = await fetch('/api/generate-script', {
                             method: 'POST',
@@ -185,13 +183,9 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                         const scriptData = await scriptRes.json();
                         if (scriptData.script) {
                              setGeneratedScript(scriptData.script);
-                             // Store effectively if we used a goal for UI labeling
-                             if (latestNextGoal) setGoalUsed(latestNextGoal); 
                         }
                     } catch (e) {
                         console.error("Error generating script:", e);
-                    } finally {
-                        setIsGeneratingScript(false);
                     }
                 }
 
@@ -235,9 +229,6 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const [optimisticLastContact, setOptimisticLastContact] = useState<string | null>(person.last_interaction_date);
 
   // 1. SMART SCRIPT DYNAMICS
-  const interests = React.useMemo(() => {
-      return person.interests || (person.what_found_interesting ? person.what_found_interesting.split(',').map(s => s.trim()) : []);
-  }, [person.interests, person.what_found_interesting]);
   
 
 
@@ -250,13 +241,6 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const statusColor = !lastContactDate ? "text-slate-400" : (isFading ? "text-orange-400" : "text-emerald-400");
   const statusBorder = !lastContactDate ? "border-slate-500/30" : (isFading ? "border-orange-500/30" : "border-emerald-500/30");
   const statusBg = !lastContactDate ? "bg-slate-500/10" : (isFading ? "bg-orange-500/10" : "bg-emerald-500/10");
-
-  const handleCopyScript = () => {
-      navigator.clipboard.writeText(generatedScript);
-      setCopied(true);
-      toast.success("Copied!");
-      setTimeout(() => setCopied(false), 2000);
-  };
 
   // Reordered for UI: Call, Email, Text (Row 1) - In Person, Social, Other (Row 2)
   const ORDERED_TYPES: InteractionType[] = ['call', 'email', 'text', 'in-person', 'social', 'other'];
@@ -280,7 +264,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
              <div className="relative">
                 <Avatar className="h-10 w-10 border-2 border-white/10 shadow-sm">
                   <AvatarImage src={person.photo_url || undefined} alt={person.name} className="object-cover" />
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium text-sm">
+                  <AvatarFallback className="bg-linear-to-br from-indigo-500 to-purple-600 text-white font-medium text-sm">
                     {getInitials(person.name)}
                   </AvatarFallback>
                 </Avatar>
@@ -413,25 +397,28 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                  </div>
 
                  {/* Complete Action Button */}
-                 <Button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="w-full h-12 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold tracking-wide rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group relative overflow-hidden text-base animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
-                        <span>Logging...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="relative z-10 flex items-center gap-2">
-                           🌱 Log Connection
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                      </>
-                    )}
-                  </Button>
+                 <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="w-full h-12 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold tracking-wide rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group relative overflow-hidden text-base z-10"
+                    >
+                        {isSubmitting ? (
+                        <>
+                            <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                            <span>Logging...</span>
+                        </>
+                        ) : (
+                        <>
+                            <span className="relative z-10 flex items-center gap-2">
+                            🌱 Log Connection
+                            </span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        </>
+                        )}
+                    </Button>
+                    <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+                 </div>
                </>
              ) : (
                 <div className="space-y-4 h-[340px] overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
