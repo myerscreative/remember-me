@@ -65,7 +65,7 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
     // Clear log contact modal
     setLogContact(null);
 
-    // After 1.5 seconds, remove the bloom and permanently hide the item
+    // After 2.5 seconds, remove the bloom and permanently hide the item
     // so it doesn't show up again on this view
     setTimeout(() => {
       setNurturedIds(prev => {
@@ -74,7 +74,7 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
         return next;
       });
       setPermanentlyRemoved(prev => new Set(prev).add(contactId));
-    }, 1500);
+    }, 2500);
   };
 
   const neglectedCount = categorized.filter(c => c.category === 'neglected').length;

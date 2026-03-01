@@ -66,7 +66,7 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
       setTimeout(() => {
         setShowBloom(false);
         onClose();
-      }, 1500);
+      }, 2500);
     } else {
       toast.error(res.error || "Failed to water tribe");
     }

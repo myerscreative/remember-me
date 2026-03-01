@@ -62,7 +62,7 @@ export function useWeeklyBloom() {
     try {
       const { error } = await supabase
         .from('weekly_blooms')
-        .update({ is_viewed: true } as any)
+        .update({ is_viewed: true })
         .eq('id', bloom.id);
 
       if (error) throw error;

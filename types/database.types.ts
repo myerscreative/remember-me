@@ -602,6 +602,37 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        weekly_blooms: {
+        Row: {
+          id: string
+          user_id: string
+          week_date: string
+          status: 'ready' | 'stagnant'
+          highlight_contact_id: string | null
+          is_viewed: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          week_date: string
+          status: 'ready' | 'stagnant'
+          highlight_contact_id?: string | null
+          is_viewed?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          week_date?: string
+          status?: 'ready' | 'stagnant'
+          highlight_contact_id?: string | null
+          is_viewed?: boolean
+          created_at?: string
+          updated_at?: string
+        }
       }
     }
     Views: {
@@ -712,6 +743,10 @@ export type PersonInteractionCount = Database['public']['Views']['person_interac
 export type UserStats = Database['public']['Tables']['user_stats']['Row']
 export type UserStatsInsert = Database['public']['Tables']['user_stats']['Insert']
 export type UserStatsUpdate = Database['public']['Tables']['user_stats']['Update']
+
+export type WeeklyBloom = Database['public']['Tables']['weekly_blooms']['Row']
+export type WeeklyBloomInsert = Database['public']['Tables']['weekly_blooms']['Insert']
+export type WeeklyBloomUpdate = Database['public']['Tables']['weekly_blooms']['Update']
 
 // Inter-contact relationship types (new family/connections feature)
 export type ContactImportance = 'high' | 'medium' | 'low';

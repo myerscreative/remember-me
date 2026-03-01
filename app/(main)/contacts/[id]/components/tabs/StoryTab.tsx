@@ -1,29 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
-  Check, 
-  X, 
-  Edit2, 
-  Plus, 
-  Circle, 
-  CheckCircle, 
-  ShoppingBag,
-  Loader2,
-  Heart
+  Map, 
+  HeartHandshake, 
+  BookOpen, 
+  Star, 
+  Plus 
 } from 'lucide-react';
-import { GiftIcon } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { AudioInputButton } from '@/components/audio-input-button';
-import { updateStoryFields } from '@/app/actions/story-actions';
-import { addGiftIdea, toggleGiftStatus } from '@/app/actions/gift-actions';
 
-interface GiftIdea {
+export interface NarrativeCard {
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  cardColor: string;
+}
+
+export interface SharedMemory {
   id: string;
-  item: string;
-  status: 'idea' | 'purchased' | 'given';
-  created_at: string;
+  date: Date;
+  text: string;
+  isMilestone: boolean;
+  imageUrl?: string;
 }
 
 interface StoryTabProps {
@@ -32,350 +31,126 @@ interface StoryTabProps {
 }
 
 export function StoryTab({ contact, onEdit }: StoryTabProps) {
-  const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Record<string, string>>({});
+  const memories: SharedMemory[] = contact.memories || [];
 
-  const coreValues = Array.isArray(contact.core_values) ? contact.core_values : [];
-  
-  const startEdit = (section: string, value: string) => {
-    setEditingSection(section);
-    setEditValues({ [section]: value });
-  };
-
-  const cancelEdit = () => {
-    setEditingSection(null);
-    setEditValues({});
-  };
-
-  const saveEdit = async (field: string) => {
-    const value = editValues[field];
-    try {
-      const result = await updateStoryFields(contact.id, { [field]: value });
-      if (result.success) {
-        toast.success('Updated successfully');
-        setEditingSection(null);
-      } else {
-        toast.error('Failed to update');
-      }
-    } catch {
-      toast.error('An error occurred');
+  const narrativeCards: NarrativeCard[] = [
+    {
+      title: "Where We Met",
+      icon: <Map className="w-5 h-5" />,
+      content: contact.where_met || "No story added yet.",
+      cardColor: "bg-purple-950/40 text-purple-100 border-slate-200",
+    },
+    {
+      title: "Why We Stay in Contact",
+      icon: <HeartHandshake className="w-5 h-5 text-indigo-300" />,
+      content: contact.why_stay_in_contact || "No story added yet.",
+      cardColor: "bg-indigo-950/40 text-indigo-100 border-slate-200",
+    },
+    {
+      title: "What Matters to Them",
+      icon: <BookOpen className="w-5 h-5 text-teal-300" />,
+      content: contact.most_important_to_them || "No story added yet.",
+      cardColor: "bg-teal-950/40 text-teal-100 border-slate-200",
     }
-  };
+  ];
 
   return (
-    <div className="flex flex-col gap-4 pb-20 text-slate-200">
-
-      {/* HOW WE MET */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <DisplaySection
-          emoji="📍"
-          title="how we met"
-          content={contact.where_met}
-          isEditing={editingSection === 'where_met'}
-          editValue={editValues['where_met']}
-          onEdit={() => startEdit('where_met', contact.where_met || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('where_met')}
-          onChange={(val) => setEditValues({ where_met: val })}
-          placeholder="Where did you meet? What was your first impression?"
-        />
-      </div>
-
-      {/* WHY WE STAY CONNECTED */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <DisplaySection
-          emoji="💭"
-          title="why we stay connected"
-          content={contact.why_stay_in_contact}
-          isEditing={editingSection === 'why_stay_in_contact'}
-          editValue={editValues['why_stay_in_contact']}
-          onEdit={() => startEdit('why_stay_in_contact', contact.why_stay_in_contact || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('why_stay_in_contact')}
-          onChange={(val) => setEditValues({ why_stay_in_contact: val })}
-          placeholder="Why do we stay in touch? What value does this connection bring?"
-        />
-      </div>
-
-      {/* WHAT MATTERS TO THEM */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <DisplaySection
-          emoji="💎"
-          title="what matters to them"
-          content={contact.most_important_to_them}
-          isEditing={editingSection === 'most_important_to_them'}
-          editValue={editValues['most_important_to_them']}
-          onEdit={() => startEdit('most_important_to_them', contact.most_important_to_them || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('most_important_to_them')}
-          onChange={(val) => setEditValues({ most_important_to_them: val })}
-          placeholder="What are they working on? Family, business, hobbies, health, faith..."
-          multiline
-        />
-      </div>
-
-      {/* CAREER & BUSINESS */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
-          💼 career & business
-        </label>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            {(contact.job_title || contact.company) ? (
-              <p className="text-slate-300 text-sm leading-relaxed">
-                {contact.job_title && <span className="font-medium">{contact.job_title}</span>}
-                {contact.job_title && contact.company && <span className="text-slate-500"> at </span>}
-                {contact.company && <span>{contact.company}</span>}
-              </p>
-            ) : (
-              <p className="text-slate-500 text-sm italic">not set</p>
+    <div className="relative min-h-[60vh] pb-24 flex flex-col pt-2">
+      {/* Narrative Foundation Cards (Fixed Context) */}
+      <div className="flex flex-col gap-4 mb-10">
+        {narrativeCards.map((card, idx) => (
+          <div 
+            key={idx} 
+            className={cn(
+              "rounded-xl p-4 border shadow-sm",
+              card.cardColor
             )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              {card.icon}
+              <h3 className="text-sm font-semibold tracking-wide uppercase opacity-90">{card.title}</h3>
+            </div>
+            <p className="text-sm leading-relaxed opacity-95 whitespace-pre-wrap">
+              {card.content}
+            </p>
           </div>
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="p-3 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
-              title="Edit Career Info"
-            >
-              <Edit2 size={16} />
-            </button>
-          )}
-        </div>
+        ))}
       </div>
 
-      {/* CORE VALUES */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <label className="text-indigo-400 text-xs font-bold mb-2 flex items-center gap-2 lowercase tracking-tight">
-          <Heart size={13} className="text-pink-500" /> core values
-        </label>
-        {coreValues.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {coreValues.map(value => (
-              <span key={value} className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
-                {value}
-              </span>
-            ))}
+      {/* Shared Memories & Milestones Feed */}
+      <div className="flex flex-col">
+        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 ml-2">
+          Shared Memories
+        </h3>
+        
+        {memories.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-dashed border-slate-700 rounded-xl bg-slate-900/50">
+            <p className="text-slate-400 text-sm leading-relaxed">
+              The Story begins here.<br/>Add a shared memory to deepen the connection.
+            </p>
           </div>
         ) : (
-          <p className="text-slate-500 text-sm italic">not set</p>
+          <div className="flex flex-col gap-6 border-l-2 border-slate-800 ml-4 pl-4 relative">
+            {memories.sort((a, b) => b.date.getTime() - a.date.getTime()).map((memory) => (
+              <div key={memory.id} className="relative">
+                {/* Timeline Dot */}
+                <div className={cn(
+                  "absolute -left-[23px] top-4 w-3 h-3 rounded-full border-2 border-slate-950 z-10",
+                  memory.isMilestone ? "bg-indigo-500 scale-125" : "bg-slate-600"
+                )} />
+                
+                {/* Milestone Star Indicator */}
+                {memory.isMilestone && (
+                  <div className="absolute -left-[45px] top-3">
+                    <Star className="w-5 h-5 fill-indigo-400 text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                  </div>
+                )}
+
+                <div 
+                  className={cn(
+                    "rounded-xl p-4 border border-slate-200 bg-slate-900",
+                    memory.isMilestone && "shadow-[0_0_20px_rgba(99,102,241,0.15)] bg-slate-900/90"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-medium text-slate-400">
+                      {memory.date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </span>
+                    {memory.isMilestone && (
+                      <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+                        Milestone
+                      </span>
+                    )}
+                  </div>
+                  
+                  {memory.imageUrl && (
+                    <div className="mb-4 rounded-lg overflow-hidden border border-slate-800">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={memory.imageUrl} alt="Memory" className="w-full h-auto object-cover max-h-48" />
+                    </div>
+                  )}
+                  
+                  <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                    {memory.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* PERSONALITY & MOTIVATIONS */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-        <DisplaySection
-          emoji="🎯"
-          title="personality & motivations"
-          content={contact.personality_notes}
-          isEditing={editingSection === 'personality_notes'}
-          editValue={editValues['personality_notes']}
-          onEdit={() => startEdit('personality_notes', contact.personality_notes || '')}
-          onCancel={cancelEdit}
-          onSave={() => saveEdit('personality_notes')}
-          onChange={(val) => setEditValues({ personality_notes: val })}
-          placeholder="What drives them? How do they make decisions?"
-          multiline
-        />
-      </div>
-
-      {/* GIFT VAULT */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm mt-4">
-        <label className="text-indigo-400 text-xs font-bold mb-3 flex items-center gap-2 lowercase tracking-tight">
-          <GiftIcon className="w-3 h-3" /> gift vault
-        </label>
-        <GiftVault contactId={contact.id} initialGifts={contact.gift_ideas || []} />
-      </div>
+      {/* Floating Action Button (FAB) */}
+      <button 
+        className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-indigo-500 hover:scale-105 active:scale-95 transition-all z-50 border border-indigo-400/50 shadow-indigo-600/30"
+        title="Add Memory"
+        onClick={() => {
+          // Placeholder for FAB interaction
+          console.log('Open Add Memory modal');
+        }}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   );
-}
-
-// Display Section Component
-interface DisplaySectionProps {
-  emoji: string;
-  title: string;
-  content?: string;
-  isEditing: boolean;
-  editValue: string;
-  onEdit: () => void;
-  onCancel: () => void;
-  onSave: () => void;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  multiline?: boolean;
-}
-
-function DisplaySection({
-  emoji,
-  title,
-  content,
-  isEditing,
-  editValue,
-  onEdit,
-  onCancel,
-  onSave,
-  onChange,
-  placeholder,
-  multiline = false
-}: DisplaySectionProps) {
-  if (isEditing) {
-    return (
-      <div className="group">
-        <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
-          {emoji} {title}
-        </label>
-        <div className="relative">
-          {multiline ? (
-            <textarea
-              value={editValue}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-              className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-xl p-3.5 pr-10 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none leading-relaxed"
-              autoFocus
-            />
-          ) : (
-            <input
-              type="text"
-              value={editValue}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-              className="w-full bg-slate-900/30 border border-indigo-500/50 rounded-lg p-3 pr-10 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
-              autoFocus
-            />
-          )}
-          <div className="absolute right-1 bottom-1">
-            <AudioInputButton 
-              onTranscript={(text) => onChange(editValue ? `${editValue} ${text}` : text)}
-              size="sm"
-            />
-          </div>
-        </div>
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={onSave}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition-colors"
-          >
-            <Check size={14} /> Save
-          </button>
-          <button
-            onClick={onCancel}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-colors"
-          >
-            <X size={14} /> Cancel
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="group relative">
-      <label className="text-indigo-400 text-xs font-bold mb-2 block lowercase tracking-tight">
-        {emoji} {title}
-      </label>
-      {content ? (
-        <div className="relative">
-          <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap pr-8">{content}</p>
-          <button
-            onClick={onEdit}
-            className="absolute -top-2 -right-2 p-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
-            title="Edit"
-          >
-            <Edit2 size={16} />
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={onEdit}
-          className="text-slate-500 hover:text-indigo-400 text-sm italic transition-colors"
-        >
-          + Add {title.toLowerCase()}
-        </button>
-      )}
-    </div>
-  );
-}
-
-// Gift Vault Component
-function GiftVault({ contactId, initialGifts }: { contactId: string, initialGifts: GiftIdea[] }) {
-    const [gifts, setGifts] = useState<GiftIdea[]>(initialGifts);
-    const [newGift, setNewGift] = useState('');
-    const [isAdding, setIsAdding] = useState(false);
-
-    const handleAdd = async () => {
-        if (!newGift.trim()) return;
-        setIsAdding(true);
-        const tempId = Math.random().toString();
-        const optimisticGift: GiftIdea = {
-            id: tempId,
-            item: newGift,
-            status: 'idea',
-            created_at: new Date().toISOString()
-        };
-        setGifts([...gifts, optimisticGift]);
-
-        const result = await addGiftIdea(contactId, newGift);
-        if (!result.success) {
-            toast.error("Failed to add gift");
-            setGifts(gifts);
-        } else {
-             setIsAdding(false);
-             setNewGift('');
-        }
-    };
-
-    const handleToggle = async (id: string, currentStatus: GiftIdea['status']) => {
-        const nextStatus: GiftIdea['status'] = currentStatus === 'idea' ? 'purchased' : (currentStatus === 'purchased' ? 'given' : 'idea');
-
-        const updatedGifts = gifts.map(g => g.id === id ? { ...g, status: nextStatus } : g);
-        setGifts(updatedGifts);
-
-        await toggleGiftStatus(contactId, id, nextStatus);
-    };
-
-    return (
-        <div className="space-y-3">
-             <div className="flex gap-2">
-                 <input
-                    className="flex-1 bg-slate-900/30 border border-slate-800/50 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/70 transition-all"
-                    placeholder="Add a gift idea..."
-                    value={newGift}
-                    onChange={(e) => setNewGift(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                 />
-                 <button
-                    onClick={handleAdd}
-                    disabled={!newGift.trim() || isAdding}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition-colors disabled:opacity-50"
-                 >
-                    {isAdding ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                 </button>
-             </div>
-
-             <div className="space-y-2">
-                 {gifts.length > 0 ? (
-                     gifts.map((gift) => (
-                         <div key={gift.id} className="flex items-center justify-between p-2.5 bg-slate-900/30 border border-slate-800/50 rounded-lg group hover:border-slate-700/50 transition-colors">
-                             <div className="flex items-center gap-2.5">
-                                 <button onClick={() => handleToggle(gift.id, gift.status)} className="text-slate-500 hover:text-indigo-400 transition-colors">
-                                     {gift.status === 'idea' && <Circle size={16} />}
-                                     {gift.status === 'purchased' && <ShoppingBag size={16} className="text-emerald-500" />}
-                                     {gift.status === 'given' && <CheckCircle size={16} className="text-slate-600" />}
-                                 </button>
-                                 <span className={cn("text-sm font-medium", gift.status === 'given' ? 'text-slate-600 line-through' : 'text-slate-300')}>
-                                     {gift.item}
-                                 </span>
-                             </div>
-                             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-600">
-                                 {gift.status}
-                             </span>
-                         </div>
-                     ))
-                 ) : (
-                    <div className="text-center py-3 border border-dashed border-slate-800/50 rounded-lg">
-                        <p className="text-xs text-slate-600">No gift ideas yet.</p>
-                    </div>
-                 )}
-             </div>
-        </div>
-    );
 }

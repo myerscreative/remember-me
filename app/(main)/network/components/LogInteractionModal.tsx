@@ -57,7 +57,7 @@ export function LogInteractionModal({ isOpen, onClose, tribe, onNurtured }: LogI
           setNotes('');
           setNextGoal(''); // Clear nextGoal after successful submission
           setShowBloom(false);
-        }, 300);
+        }, 2500);
       } else {
         toast.error('Failed to log interaction');
       }
