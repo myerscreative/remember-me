@@ -102,7 +102,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                 setContextBrief(null); // Invalidate brief to force refresh with new context
                 setShowBloom(false);
                 onClose();
-              }, 1500);
+              }, 2500);
           } else {
               toast.error("Failed to log interaction");
           }

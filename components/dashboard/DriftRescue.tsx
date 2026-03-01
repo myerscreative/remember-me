@@ -71,7 +71,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
       setTimeout(() => {
         setCompleted(prev => new Set(prev).add(contact.id));
         setRescuedId(null);
-      }, 1500);
+      }, 2500);
       
     } catch {
       toast.error("Rescue attempt failed");

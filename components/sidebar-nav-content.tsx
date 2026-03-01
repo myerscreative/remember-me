@@ -6,6 +6,7 @@ import { Users, Bell, Activity, Settings, Sparkles, Calendar, Brain, Flame, Tree
 import { NetworkIcon } from "./icons/NetworkIcon";
 import { cn } from "@/lib/utils";
 import { useGameStats } from "@/hooks/useGameStats";
+import { useWeeklyBloom } from "@/hooks/useWeeklyBloom";
 
 const navGroups = [
   // Group 1: Core
@@ -87,6 +88,9 @@ interface SidebarNavContentProps {
 export function SidebarNavContent({ onNavItemClick }: SidebarNavContentProps) {
   const pathname = usePathname();
   const { stats } = useGameStats();
+  const { bloom } = useWeeklyBloom();
+
+  const showNetworkBadge = bloom && !bloom.is_viewed;
 
   return (
     <nav className="flex-1 p-4 overflow-y-auto scrollbar-hide">
@@ -118,6 +122,13 @@ export function SidebarNavContent({ onNavItemClick }: SidebarNavContentProps) {
                     <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/60 group-hover:text-sidebar-primary")} />
                     <span className="text-sm">{item.label}</span>
                   </div>
+                  
+                  {item.label === "Network" && showNetworkBadge && (
+                    <span className="relative z-10 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
                   
                   {showStreak && (
                     <span className="relative z-10 flex items-center gap-1 text-[10px] font-bold text-orange-500 bg-orange-950/30 px-1.5 py-0.5 rounded-full border border-orange-500/20 group-hover:border-orange-500/40 transition-colors">

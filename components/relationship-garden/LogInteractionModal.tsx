@@ -5,9 +5,8 @@ import { X, Loader2 } from 'lucide-react';
 import { INTERACTION_TYPES, type InteractionType } from '@/lib/relationship-health';
 import { logInteraction } from '@/app/actions/logInteraction';
 import { toast } from 'sonner';
+import { NurtureJubilee } from '@/components/celebration/NurtureJubilee';
 import { cn } from "@/lib/utils";
-import { BloomEffect } from '@/components/bloom/BloomEffect';
-import { getRandomAffirmation } from '@/lib/bloom/affirmations';
 
 interface LogInteractionModalProps {
   contact: {
@@ -42,7 +41,7 @@ export default function LogInteractionModal({
   const [note, setNote] = useState(initialNote);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showBloom, setShowBloom] = useState(false);
+  const [showJubilee, setShowJubilee] = useState(false);
   const [recentInteractions] = useState<any[]>([]);
   const [loadingInteractions] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -70,20 +69,18 @@ export default function LogInteractionModal({
       });
 
       if (result.success) {
-        setShowBloom(true);
+        setShowJubilee(true);
         // ... (existing success logic)
-        const randomMessage = getRandomAffirmation();
-        toast.success(randomMessage, { icon: '🌱', duration: 4000 });
         await loadInteractions();
         
-        // Wait a bit for the bloom to show before calling onSuccess or closing
+        // Wait 3 seconds total (2.5s display + 0.5s fade out)
         setTimeout(() => {
           setNote('');
-          setDate(new Date().toISOString().split('T')[0]); // Reset date to today
+          setDate(new Date().toISOString().split('T')[0]);
+          setShowJubilee(false);
           onSuccess?.();
-          setShowBloom(false);
           onClose();
-        }, 1500);
+        }, 3000);
       } else {
         const errorMsg = result.error || 'Failed to log interaction';
         toast.error(errorMsg);
@@ -102,7 +99,7 @@ export default function LogInteractionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       {/* Backdrop with Blur XL */}
       <div 
         className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl transition-all duration-300"
@@ -303,7 +300,13 @@ export default function LogInteractionModal({
                 </>
               )}
             </button>
-            <BloomEffect isActive={showBloom} onComplete={() => setShowBloom(false)} />
+            <NurtureJubilee 
+              isActive={showJubilee} 
+              contactName={contact.name}
+              onComplete={() => {
+                // We handle closure via the timeout in handleSubmit to ensure timing control
+              }} 
+            />
           </div>
           {/* Error Display */}
           {lastError && (

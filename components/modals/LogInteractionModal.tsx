@@ -76,7 +76,7 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
       setTimeout(() => {
         setShowBloom(false);
         onClose();
-      }, 1500);
+      }, 2500);
     } catch (error) {
        console.error("Error logging interaction:", error);
        toast.error("Failed to log interaction");

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useWeeklyBloom } from "@/hooks/useWeeklyBloom";
 import { Users, Activity, Search, TreePine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +24,7 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
   },
   {
     href: "/",
-    label: "People",
+    label: "Network", // Changed from "People" to "Network"
     icon: Users,
     activeColor: "text-purple-600",
     inactiveColor: "text-gray-600",
@@ -40,6 +41,8 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { bloom } = useWeeklyBloom();
+  const showNetworkBadge = bloom && !bloom.is_viewed;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-sidebar border-t border-sidebar-border md:hidden pb-safe">
@@ -85,6 +88,12 @@ export function BottomNav() {
             >
               <div className="relative">
                   <Icon className="h-5 w-5" />
+                  {item.label === "Network" && showNetworkBadge && (
+                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
               </div>
               <span className="text-xs font-medium">{item.label}</span>
             </Link>

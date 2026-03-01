@@ -28,7 +28,7 @@ export function BloomEffect({ isActive, onComplete, className }: BloomEffectProp
       const timer = setTimeout(() => {
         setShouldRender(false);
         onComplete?.();
-      }, 1500); // 1.5s total duration matches our longest motion
+      }, 2500); // 2.5s total duration for a more relaxed, rewarding feel
 
       return () => {
         clearTimeout(startTimer);
@@ -46,11 +46,11 @@ export function BloomEffect({ isActive, onComplete, className }: BloomEffectProp
           <motion.div
             initial={{ scale: 0.8, opacity: 0.8 }}
             animate={{ 
-              scale: 2.5, 
+              scale: 3.5, 
               opacity: 0,
             }}
             transition={{ 
-              duration: 0.8, 
+              duration: 1.8, 
               ease: "easeOut" 
             }}
             className="absolute inset-0 m-auto w-full h-full rounded-full border-4 border-emerald-400"
@@ -72,12 +72,12 @@ export function BloomEffect({ isActive, onComplete, className }: BloomEffectProp
             animate={{ 
               opacity: [0, 1, 1, 0],
               scale: [0.2, 1.2, 1, 0.8],
-              y: -80, // Float up
-              x: randomX, // Slight drift left or right
+              y: -120, // Float up, higher since it's slower
+              x: randomX, // Slight drift
               rotate: 15
             }}
             transition={{ 
-              duration: 1.2, 
+              duration: 2.2, 
               ease: "easeOut",
               times: [0, 0.2, 0.8, 1]
             }}
