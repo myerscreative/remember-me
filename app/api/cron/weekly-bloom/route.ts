@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     if (usersError) throw usersError;
 
-    const summary = [];
+    const summary: Array<{ userId: string; status: 'ready' | 'stagnant'; highlightContactId: string | null }> = [];
     const now = new Date();
     // Sunday of this week
     const sunday = startOfWeek(now, { weekStartsOn: 0 });
