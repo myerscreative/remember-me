@@ -62,7 +62,7 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
     // Get all contacts for this user
     const { data: allContacts, error } = await (supabase as any)
       .from('persons')
-      .select('*')
+      .select('*, status')
       .eq('user_id', user.id);
 
     if (error) {
@@ -83,18 +83,7 @@ export async function getDashboardStats(): Promise<{ data: DashboardStats | null
       highPriority: contacts.filter(c => c.importance === 'high').length,
       mediumPriority: contacts.filter(c => c.importance === 'medium').length,
       lowPriority: contacts.filter(c => c.importance === 'low').length,
-      needingAttention: contacts.filter(c => {
-        const lastInteractionDate = c.last_interaction_date; // We keep this for now but should ideally fetch from 'interactions' table separately if needed
-        if (!lastInteractionDate) return true;
-        
-        const lastInteraction = new Date(lastInteractionDate);
-        const daysSince = Math.floor((Date.now() - lastInteraction.getTime()) / (1000 * 60 * 60 * 24));
-        
-        const importance = c.importance;
-        const threshold = c.target_frequency_days || (importance === 'high' ? 14 : importance === 'low' ? 90 : 30);
-        
-        return daysSince >= threshold;
-      }).length,
+      needingAttention: contacts.filter(c => c.status === 'Neglected' || c.status === 'Drifting').length,
       recentlyAdded: contacts.filter(c => {
         const created = new Date(c.created_at);
         return created >= thirtyDaysAgo;
@@ -183,7 +172,7 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
   try {
     const { data: contacts, error } = await (supabase as any)
       .from('persons')
-      .select('*')
+      .select('*, status')
       .eq('user_id', user.id)
       .or('archived.eq.false,archived.is.null,archive_status.eq.false,archive_status.is.null');
 
@@ -193,7 +182,6 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
     }
 
     const contactsList = contacts || [];
-    const now = Date.now();
 
     const health: RelationshipHealth = {
       healthy: 0,
@@ -203,23 +191,16 @@ export async function getRelationshipHealth(): Promise<{ data: RelationshipHealt
     };
 
     contactsList.forEach(contact => {
-      if (!contact.last_interaction_date) {
-        health.noData++;
-        health.needsAttention++;
-        return;
-      }
+      const status = contact.status || 'Nurtured';
 
-      const lastInteraction = new Date(contact.last_interaction_date).getTime();
-      const daysSince = Math.floor((now - lastInteraction) / (1000 * 60 * 60 * 24));
-      const importanceValue = contact.importance;
-      const threshold = contact.target_frequency_days || (importanceValue === 'high' ? 14 : importanceValue === 'low' ? 90 : 30);
-
-      if (daysSince <= threshold) {
+      if (status === 'Nurtured') {
         health.healthy++;
-      } else if (daysSince <= threshold * 1.5) {
+      } else if (status === 'Drifting') {
         health.warning++;
-      } else {
+      } else if (status === 'Neglected') {
         health.needsAttention++;
+      } else {
+        health.noData++;
       }
     });
 
@@ -277,7 +258,7 @@ export async function getTopContacts(limit: number = 10): Promise<{ data: TopCon
 /**
  * Get contacts needing attention (using Phase 1 function)
  */
-export async function getContactsNeedingAttention(daysThreshold: number = 30): Promise<{ data: any[]; error: Error | null }> {
+export async function getContactsNeedingAttention(): Promise<{ data: any[]; error: Error | null }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -301,24 +282,9 @@ export async function getContactsNeedingAttention(daysThreshold: number = 30): P
       return { data: [], error: new Error(error.message) };
     }
 
-    const now = new Date();
     const processedData = (data || [])
         .filter((contact: any) => {
-            if (!contact.last_interaction_date) return true; // Should be handled by "New" logic, but safety first
-
-            const lastDate = new Date(contact.last_interaction_date);
-            const diffTime = Math.abs(now.getTime() - lastDate.getTime());
-            const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            const importance = contact.importance;
-            let threshold = contact.target_frequency_days || 30; // Default to target frequency or 30 days
-            
-            if (!contact.target_frequency_days) {
-                 if (importance === 'high') threshold = 14;
-                 else if (importance === 'low') threshold = 90;
-            }
-
-            return daysAgo >= threshold;
+            return contact.status === 'Neglected' || contact.status === 'Drifting' || !contact.last_interaction_date;
         })
         .map((contact: any) => {
             return {

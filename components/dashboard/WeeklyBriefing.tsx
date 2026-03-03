@@ -3,12 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { getWeeklySummary, WeeklySummary } from '@/lib/dashboard/getWeeklySummary';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Sparkles, ArrowRight, Activity, Sprout } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Sparkles } from 'lucide-react';
 import { getInitialsFromFullName } from '@/lib/utils/contact-helpers';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import MemoryCard from './MemoryCard';
+import { SharedMemoryCard, RelationshipStatus } from '@/types/memory';
 
 export function WeeklyBriefing() {
   const [summaries, setSummaries] = useState<WeeklySummary[]>([]);
@@ -26,7 +25,7 @@ export function WeeklyBriefing() {
 
   if (loading) {
     return (
-      <Card className="border-slate-200 shadow-sm animate-pulse">
+      <Card className="border-slate-200/10 bg-slate-900/40 backdrop-blur-md shadow-sm animate-pulse">
         <CardContent className="p-6 h-32 flex items-center justify-center">
             <div className="flex items-center gap-2 text-slate-400">
                 <Sparkles className="w-4 h-4 animate-spin"/>
@@ -49,57 +48,34 @@ export function WeeklyBriefing() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {summaries.slice(0, 4).map((summary) => (
-          <Card key={summary.person_id} className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-slate-100">
-                        <AvatarImage src={summary.photo_url || undefined} />
-                        <AvatarFallback className="bg-slate-100 text-slate-600 font-bold">
-                            {getInitialsFromFullName(summary.name)}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <h4 className="font-bold text-slate-900 text-sm">{summary.name}</h4>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={cn(
-                                "w-1.5 h-1.5 rounded-full",
-                                summary.current_health === 'blooming' ? "bg-green-500" :
-                                summary.current_health === 'nourished' ? "bg-lime-500" :
-                                summary.current_health === 'thirsty' ? "bg-amber-500" : "bg-orange-500"
-                            )} />
-                            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                                {summary.current_health}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 text-slate-400 hover:text-indigo-600"
-                    onClick={() => router.push(`/contacts/${summary.person_id}`)}
-                >
-                    <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
+        {summaries.slice(0, 4).map((summary) => {
+          // Map WeeklySummary to SharedMemoryCard
+          const statusMap: Record<string, RelationshipStatus> = {
+            blooming: 'Nurtured',
+            nourished: 'Nurtured',
+            thirsty: 'Drifting',
+            fading: 'Neglected',
+          };
 
-              {summary.notes.length > 0 && (
-                  <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
-                      <p className="text-xs text-slate-600 line-clamp-2 italic">
-                          "{summary.notes[0]}"
-                      </p>
-                      {summary.notes.length > 1 && (
-                          <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                              +{summary.notes.length - 1} more notes
-                          </p>
-                      )}
-                  </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+          const memory: SharedMemoryCard = {
+            id: summary.person_id,
+            contactName: summary.name,
+            initials: getInitialsFromFullName(summary.name),
+            status: statusMap[summary.current_health] || 'Nurtured',
+            statusLabel: summary.current_health.toUpperCase(),
+            content: summary.notes[0] || "No recent activity logged.",
+            isQuickLog: summary.notes[0]?.toLowerCase().includes('quick log') || false,
+            timestamp: new Date(), // Placeholder as actual timestamp per note isn't in WeeklySummary
+          };
+
+          return (
+            <MemoryCard 
+              key={memory.id} 
+              memory={memory} 
+              onClick={() => router.push(`/contacts/${memory.id}`)}
+            />
+          );
+        })}
       </div>
     </div>
   );

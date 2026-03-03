@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { getCriticalDrifters, Drifter } from '@/lib/dashboard/getDrifters';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Zap } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -38,7 +37,7 @@ export function CriticalNudges() {
         {drifters.slice(0, 3).map((drifter) => (
           <div 
              key={drifter.id} 
-             className="w-full bg-amber-50 border border-amber-200/60 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm"
+             className="w-full bg-amber-950/20 border border-amber-500/20 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm backdrop-blur-sm"
           >
              <div className="flex items-center gap-3 w-full sm:w-auto">
                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -48,8 +47,8 @@ export function CriticalNudges() {
                     </AvatarFallback>
                 </Avatar>
                 <div>
-                    <h4 className="font-bold text-slate-800 text-sm">{drifter.name}</h4>
-                    <p className="text-[11px] font-medium text-amber-600/80 uppercase tracking-wide">
+                    <h4 className="font-bold text-slate-100 text-sm">{drifter.name}</h4>
+                    <p className="text-[11px] font-medium text-amber-500/80 uppercase tracking-wide">
                         {drifter.days_overdue > 0 
                             ? `Overdue by ${drifter.days_overdue} day${drifter.days_overdue > 1 ? 's' : ''}` 
                             : 'Drifting away today'

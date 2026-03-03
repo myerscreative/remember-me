@@ -12,11 +12,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
 import { GardenPreview } from '@/components/dashboard/GardenPreview';
 import { NeedsNurtureList } from "@/components/dashboard/NeedsNurtureList";
+import { DailyBriefing } from "@/components/dashboard/DailyBriefing";
 import { getDailyBriefing } from '@/app/actions/get-daily-briefing';
 import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,71 @@ export default function DashboardPage() {
   const [selectedTribe, setSelectedTribe] = useState<TribeHealth | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTriageActive, setIsTriageActive] = useState(false);
+  const [driftedContacts, setDriftedContacts] = useState<any[]>([]);
+
+  const loadDashboardData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const [
+        statsResult,
+        attentionResult,
+        tribesResult,
+        healthResult,
+        briefingResult,
+        mapResult,
+      ] = await Promise.all([
+        getDashboardStats(),
+        getContactsNeedingAttention(),
+        getTribeHealth(),
+        getRelationshipHealth(),
+        getDailyBriefing(),
+        getAllMapContacts(),
+      ]);
+
+      const supabaseClient = createClient();
+
+      if (mapResult.data) {
+         setAllContacts(mapResult.data);
+      }
+      
+      if (mapResult.error) {
+          console.error("Map Sync Error:", mapResult.error);
+          toast.error(`Map Sync Failed: ${mapResult.error}`);
+      }
+
+      if (statsResult.error) throw statsResult.error;
+      if (attentionResult.error) console.error("Error fetching attention list:", attentionResult.error);
+
+      setStats(statsResult.data);
+      setNeedingAttention((attentionResult.data || []).slice(0, 10));
+      setTribeHealth(tribesResult.data || []);
+      setRelationshipHealth(healthResult.data);
+
+      if (user?.id) {
+        const { data: drifted } = await supabaseClient
+          .from('persons')
+          .select('id, name')
+          .eq('user_id', user.id)
+          .in('status', ['Drifting', 'Neglected'])
+          .or('archive_status.is.null,archive_status.eq.false')
+          .limit(10);
+        setDriftedContacts(drifted || []);
+      }
+
+      // Suppress unused warning if briefingResult is not needed here
+      if (briefingResult) {
+        // ... handled in briefing page
+      }
+
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+      setError(error instanceof Error ? error : new Error("Failed to load dashboard data"));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -62,68 +128,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [
-        statsResult,
-        attentionResult,
-        tribesResult,
-        healthResult,
-        ,
-        briefingResult,
-        mapResult
-      ] = await Promise.all([
-        getDashboardStats(),
-        getContactsNeedingAttention(30),
-        getTribeHealth(),
-        getRelationshipHealth(),
-        Promise.resolve({ data: [] }),
-        getDailyBriefing(),
-        getAllMapContacts() // Server-side Force Sync
-      ]);
-
-      // Set Map Data directly from server results
-      if (mapResult.data) {
-         setAllContacts(mapResult.data);
-      }
-      
-      
-      if (mapResult.error) {
-          console.error("Map Sync Error:", mapResult.error);
-          toast.error(`Map Sync Failed: ${mapResult.error}`);
-      }
-
-      // Check for critical errors
-      if (statsResult.error) throw statsResult.error;
-      
-      if (attentionResult.error) console.error("Error fetching attention list:", attentionResult.error);
-
-      setStats(statsResult.data);
-      setNeedingAttention((attentionResult.data || []).slice(0, 10)); // Top 10 for list
-      setTribeHealth(tribesResult.data || []);
-      setRelationshipHealth(healthResult.data);
-
-      // Generate Narrative if briefing exists (lightweight fetch)
-      if (briefingResult?.data) {
-          // Optional: Fetch narrative here if we want it on dashboard too, 
-          // but for now let's keep it on the Briefing page to save tokens/load time 
-          // unless user explicitly asked for it on Dashboard.
-          // User asked for "Narrative Briefing... show up in here in the full thing". 
-          // Usually that means the dedicated page.
-      }
-
-    } catch (error) {
-      console.error("Error loading dashboard data:", error);
-      setError(error instanceof Error ? error : new Error("Failed to load dashboard data"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [loadDashboardData]);
 
 
 
@@ -293,6 +298,9 @@ export default function DashboardPage() {
                           </CardContent>
                       </Card>
                   </div>
+
+                  {/* Daily Briefing - Relationship Drift Alerts */}
+                  <DailyBriefing driftedContacts={driftedContacts} />
 
                   {/* Critical Drifters (Urgent) */}
                   <CriticalNudges />

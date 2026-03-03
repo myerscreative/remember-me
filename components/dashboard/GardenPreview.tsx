@@ -9,32 +9,23 @@ interface GardenPreviewProps {
 
 const GOLDEN_ANGLE = 137.508 * (Math.PI / 180);
 
-// Get color based on days since contact and target frequency
-function getColorForDays(days: number, targetFrequencyDays?: number | null): string {
-  const targetDays = targetFrequencyDays || 30;
-  if (days < targetDays) return '#10b981';   // Green - Blooming
-  if (days < targetDays * 1.5) return '#84cc16';   // Lime - Nourished
-  if (days < targetDays * 2.5) return '#fbbf24';  // Yellow - Thirsty
-  return '#f97316';  // Orange - Fading
-}
-
 export function GardenPreview({ contacts }: GardenPreviewProps) {
   const router = useRouter();
 
-  // Calculate positions using same algorithm as Garden page
+  // Calculate positions using status-based rings
   const seedPositions = useMemo(() => {
-    // 1. Bucket by frequency
+    // 1. Bucket by persistent status
     const buckets = {
-      high: [] as any[],
-      medium: [] as any[],
-      low: [] as any[],
+      nurtured: [] as any[],
+      drifting: [] as any[],
+      neglected: [] as any[],
     };
 
     contacts.forEach(contact => {
-      const targetFreq = contact.target_frequency_days || 999;
-      if (targetFreq <= 14) buckets.high.push(contact);
-      else if (targetFreq <= 45) buckets.medium.push(contact);
-      else buckets.low.push(contact);
+      const status = contact.status?.toLowerCase() || 'nurtured';
+      if (status === 'drifting') buckets.drifting.push(contact);
+      else if (status === 'neglected') buckets.neglected.push(contact);
+      else buckets.nurtured.push(contact);
     });
 
     // 2. Calculate positions for each ring
@@ -55,9 +46,9 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
         
-        const lastDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
-        const days = lastDate ? Math.floor((new Date().getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)) : 999;
-        const color = getColorForDays(days, contact.target_frequency_days);
+        // Color based on status
+        const status = contact.status || 'Nurtured';
+        const color = status === 'Nurtured' ? '#10b981' : status === 'Drifting' ? '#fbbf24' : '#f97316';
         
         const nameParts = (contact.name || '').split(' ');
         const initials = nameParts.length >= 2
@@ -68,10 +59,10 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
       });
     };
 
-    // Scale down for preview (Garden uses 80-900, we'll use smaller scale)
-    const p1 = calculateRing(buckets.high, 20, 55, 0);
-    const p2 = calculateRing(buckets.medium, 70, 125, p1.length * GOLDEN_ANGLE);
-    const p3 = calculateRing(buckets.low, 140, 225, (p1.length + p2.length) * GOLDEN_ANGLE);
+    // Scale for preview rings
+    const p1 = calculateRing(buckets.nurtured, 20, 60, 0);
+    const p2 = calculateRing(buckets.drifting, 80, 140, p1.length * GOLDEN_ANGLE);
+    const p3 = calculateRing(buckets.neglected, 160, 230, (p1.length + p2.length) * GOLDEN_ANGLE);
 
     return [...p1, ...p2, ...p3];
   }, [contacts]);

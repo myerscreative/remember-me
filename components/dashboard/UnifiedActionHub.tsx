@@ -286,7 +286,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
           </Button>
         </div>
 
-        <div className="flex mx-6 mt-4 mb-2 bg-slate-100 dark:bg-slate-900/50 rounded-lg p-1 border border-border/40">
+        <div className="flex mx-6 mt-4 mb-2 bg-slate-900/50 rounded-lg p-1 border border-border/40">
            <button
              onClick={() => setActiveTab('log')}
              className={cn(
@@ -334,7 +334,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             "p-2 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-1 h-16 relative group",
                             isActive 
                               ? "border-[#8B5CF6] bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.3)]" 
-                              : "border-border bg-card hover:bg-accent hover:border-slate-400 dark:hover:border-slate-700"
+                              : "border-border bg-slate-900/30 hover:bg-slate-900/50 hover:border-slate-400 dark:hover:border-slate-700"
                           )}
                         >
                           <span className="text-xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>
@@ -359,7 +359,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] transition-all text-sm scheme-dark"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-slate-900/50 text-slate-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] transition-all text-sm scheme-dark"
                     />
                  </div>
 
@@ -375,7 +375,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="What did you talk about? Add a specific detail..."
                             rows={2}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
+                            className="w-full px-4 py-3 rounded-xl border border-border bg-slate-900/50 text-slate-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
                         />
                     </div>
                  </div>

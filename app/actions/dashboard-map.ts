@@ -16,7 +16,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
 
     const { data: contacts, error, count: totalCount } = await (supabase as any)
       .from('persons')
-      .select('id, name, last_interaction_date, importance, target_frequency_days, is_favorite, person_tags(tags(name))', { count: 'exact' })
+      .select('id, name, last_interaction_date, importance, target_frequency_days, is_favorite, status, person_tags(tags(name))', { count: 'exact' })
       .eq('user_id', user.id);
 
     if (error) {
@@ -32,6 +32,7 @@ export async function getAllMapContacts(): Promise<{ data: any[]; totalCount: nu
         lastContact: c.last_interaction_date,
         target_frequency_days: c.target_frequency_days,
         is_favorite: c.is_favorite,
+        status: c.status || 'Nurtured',
         // FORCE SYNC LOGIC: If date exists, it IS active.
         importance: c.importance || (c.last_interaction_date ? 'medium' : null), 
         intensity: c.importance || (c.last_interaction_date ? 'medium' : null), 

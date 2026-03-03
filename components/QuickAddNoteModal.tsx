@@ -166,8 +166,8 @@ export function QuickAddNoteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-slate-50 dark:bg-[#0f172a]">
-        <DialogHeader className="p-6 bg-white dark:bg-[#1e293b] border-b border-slate-100 dark:border-slate-800">
+      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-slate-950">
+        <DialogHeader className="p-6 bg-slate-900 border-b border-slate-800">
           <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
             <BookOpen className="h-5 w-5 text-indigo-500" />
             Quick Story Note
@@ -183,7 +183,7 @@ export function QuickAddNoteModal({
                   placeholder="Search contact..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-12 bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-800 focus:ring-indigo-500 rounded-xl"
+                  className="pl-10 h-12 bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl"
                 />
               </div>
 
@@ -197,7 +197,7 @@ export function QuickAddNoteModal({
                     <button
                       key={contact.id}
                       onClick={() => setSelectedContact({ id: contact.id!, name: contact.name! })}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white dark:hover:bg-[#1e293b] hover:shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all text-left"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-800 transition-all text-left"
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={contact.photo_url || undefined} />
@@ -217,7 +217,7 @@ export function QuickAddNoteModal({
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300">
+              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800 shadow-sm transition-all duration-300">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10 border-2 border-slate-100 dark:border-slate-700">
                     <AvatarFallback className={cn("bg-linear-to-br text-white font-semibold", getGradient(selectedContact.name || ""))}>
@@ -239,7 +239,7 @@ export function QuickAddNoteModal({
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   className={cn(
-                    "min-h-[180px] bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-800 focus:ring-indigo-500 rounded-xl resize-none p-4 pb-12 transition-all duration-300",
+                    "min-h-[180px] bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl resize-none p-4 pb-12 transition-all duration-300 text-slate-200",
                     isListening && "border-blue-400 ring-2 ring-blue-400/20"
                   )}
                   autoFocus

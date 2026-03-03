@@ -109,6 +109,7 @@ export async function logInteraction({ personId, type, note, date, predictedReso
        const { error: updateError } = await (supabase as any).from('persons').update({
         last_interaction_date: interactionDate,
         last_contact: interactionDate.split('T')[0], 
+        health_status: 'NURTURED'
       }).eq('id', personId).eq('user_id', user.id);
 
       if (updateError) {
