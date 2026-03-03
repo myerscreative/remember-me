@@ -37,18 +37,21 @@ export function CriticalNudges() {
         {drifters.slice(0, 3).map((drifter) => (
           <div 
              key={drifter.id} 
-             className="w-full bg-amber-950/20 border border-amber-500/20 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm backdrop-blur-sm"
+             className="w-full bg-slate-950/40 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-amber-500/30 group/nudge"
           >
-             <div className="flex items-center gap-3 w-full sm:w-auto">
-                <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                    <AvatarImage src={drifter.photo_url || undefined} />
-                    <AvatarFallback className="bg-amber-100 text-amber-700 font-bold">
-                        {getInitialsFromFullName(drifter.name)}
-                    </AvatarFallback>
-                </Avatar>
+             <div className="flex items-center gap-4 w-full sm:w-auto">
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-full bg-amber-500/20 blur-[2px] opacity-0 group-hover/nudge:opacity-100 transition-opacity duration-500" />
+                  <Avatar className="h-10 w-10 border border-white/10 shadow-lg relative">
+                      <AvatarImage src={drifter.photo_url || undefined} />
+                      <AvatarFallback className="bg-slate-800 text-amber-500 font-black">
+                          {getInitialsFromFullName(drifter.name)}
+                      </AvatarFallback>
+                  </Avatar>
+                </div>
                 <div>
-                    <h4 className="font-bold text-slate-100 text-sm">{drifter.name}</h4>
-                    <p className="text-[11px] font-medium text-amber-500/80 uppercase tracking-wide">
+                    <h4 className="font-black text-slate-100 text-sm tracking-tight">{drifter.name}</h4>
+                    <p className="text-[10px] font-black text-amber-500/90 uppercase tracking-widest">
                         {drifter.days_overdue > 0 
                             ? `Overdue by ${drifter.days_overdue} day${drifter.days_overdue > 1 ? 's' : ''}` 
                             : 'Drifting away today'
@@ -60,10 +63,10 @@ export function CriticalNudges() {
              <Button 
                 size="sm"
                 onClick={() => setSelectedDrifter(drifter)}
-                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-9 shadow-sm px-4 shrink-0 transition-all hover:scale-105"
+                className="w-full sm:w-auto bg-white/5 hover:bg-amber-500/20 border border-white/5 hover:border-amber-500/40 text-slate-300 hover:text-white font-black text-xs h-9 shadow-lg px-6 shrink-0 transition-all duration-300 active:scale-95 group/btn"
              >
-                <Zap className="w-3 h-3 mr-2" />
-                Nudge
+                <Zap className="w-3.5 h-3.5 mr-2 text-amber-500 group-hover/btn:animate-pulse" />
+                NUDGE
              </Button>
           </div>
         ))}

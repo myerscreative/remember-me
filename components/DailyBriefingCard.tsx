@@ -36,7 +36,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
 
   return (
     <>
-      <Card className="border border-border bg-card shadow-xl relative overflow-hidden group">
+      <Card className="border border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-2xl relative overflow-hidden group rounded-3xl">
         {/* Glass Header */}
         <div className="absolute top-0 left-0 right-0 h-16 bg-linear-to-b from-primary/10 to-transparent pointer-events-none" />
         

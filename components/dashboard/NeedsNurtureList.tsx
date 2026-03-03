@@ -87,13 +87,13 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
       )}
 
       {/* List */}
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-in-out">
+      <div className="bg-slate-950/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ease-in-out">
         {filteredContacts.length > 0 ? (
-          <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
+          <div>
             {filteredContacts.map((contact) => (
               <div 
                 key={contact.id}
-                className="group flex items-center justify-between px-3 py-2 hover:bg-muted/50 transition-colors cursor-pointer"
+                className="group flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors cursor-pointer border-b border-white/5 last:border-0"
                 onClick={() => {
                     setSelectedContact(contact);
                     setIsSharedMemoryOpen(true);
@@ -148,7 +148,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                     {contact.latest_next_goal ? (
                         <span className="text-indigo-400 font-semibold italic flex items-center gap-1.5">
                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                           "{contact.latest_next_goal}"
+                           &quot;{contact.latest_next_goal}&quot;
                         </span>
                     ) : (
                         getRelationshipStatus(contact).label

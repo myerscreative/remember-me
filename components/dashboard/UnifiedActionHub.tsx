@@ -255,7 +255,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-border/50 text-foreground shadow-2xl overflow-hidden p-0 gap-0">
+      <DialogContent className="sm:max-w-md bg-slate-950/40 backdrop-blur-2xl border-white/10 text-foreground shadow-2xl overflow-hidden p-0 gap-0 rounded-3xl">
         <DialogTitle className="sr-only">Log Interaction with {person.name}</DialogTitle>
         
         {/* Header Section */}
@@ -334,7 +334,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             "p-2 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-1 h-16 relative group",
                             isActive 
                               ? "border-[#8B5CF6] bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.3)]" 
-                              : "border-border bg-slate-900/30 hover:bg-slate-900/50 hover:border-slate-400 dark:hover:border-slate-700"
+                              : "border-border bg-slate-950/40 backdrop-blur-xl hover:bg-slate-900/50 hover:border-slate-400 dark:hover:border-slate-700"
                           )}
                         >
                           <span className="text-xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>

@@ -25,11 +25,11 @@ export function WeeklyBriefing() {
 
   if (loading) {
     return (
-      <Card className="border-slate-200/10 bg-slate-900/40 backdrop-blur-md shadow-sm animate-pulse">
+      <Card className="border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-2xl animate-pulse rounded-2xl">
         <CardContent className="p-6 h-32 flex items-center justify-center">
-            <div className="flex items-center gap-2 text-slate-400">
-                <Sparkles className="w-4 h-4 animate-spin"/>
-                <span className="text-sm font-medium">Analyzing weekly context...</span>
+            <div className="flex items-center gap-3 text-slate-400">
+                <Sparkles className="w-5 h-5 animate-spin text-indigo-500/50"/>
+                <span className="text-sm font-black uppercase tracking-widest opacity-50">Analyzing weekly context...</span>
             </div>
         </CardContent>
       </Card>
