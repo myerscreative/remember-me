@@ -41,8 +41,14 @@ export const Seedling = ({ name, status, index }: SeedlingProps) => {
         {name.split(' ').map(n => n[0]).join('')}
         
         {/* Tooltip on Hover */}
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-800 px-2 py-1 rounded text-[10px] text-white z-10 pointer-events-none">
-          {name} • {status}
+        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 whitespace-nowrap bg-slate-900/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-200 shadow-2xl z-20 pointer-events-none">
+          <span className="text-white">{name}</span>
+          <span className="mx-1.5 text-slate-500">/</span>
+          <span className={`
+            ${status === 'Nurtured' ? 'text-emerald-400' : 
+              status === 'Drifting' ? 'text-amber-400' : 
+              'text-rose-400'}
+          `}>{status.toUpperCase()}</span>
         </div>
       </div>
     </motion.div>
