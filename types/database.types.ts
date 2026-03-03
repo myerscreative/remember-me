@@ -602,7 +602,8 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
-        weekly_blooms: {
+      }
+      weekly_blooms: {
         Row: {
           id: string
           user_id: string
