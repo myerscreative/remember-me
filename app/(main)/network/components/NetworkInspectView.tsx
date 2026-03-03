@@ -86,7 +86,7 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
 
         {activeDomains.map((group) => {
           const isExpanded = expandedDomainId === group.domain.id;
-          const emoji = ICON_MAP[group.domain.icon] || '📁';
+          const emoji = (group.domain.icon && ICON_MAP[group.domain.icon]) || '📁';
 
           return (
             <div key={group.domain.id} className="space-y-2">
@@ -102,7 +102,7 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                  style={{ backgroundColor: `${group.domain.color}15` }}
+                  style={{ backgroundColor: group.domain.color ? `${group.domain.color}15` : undefined }}
                 >
                   {emoji}
                 </div>

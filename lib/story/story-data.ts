@@ -35,11 +35,10 @@ export interface TimelineItem {
 export async function getContactFacts(contactId: string): Promise<ContactFact[]> {
   const supabase = createClient();
   
-  // Note: Type assertion needed until contact_facts table is created via migration
-  const { data, error } = await (supabase as ReturnType<typeof createClient>)
-    .from('contact_facts' as 'persons')
+  const { data, error } = await supabase
+    .from('contact_facts')
     .select('*')
-    .eq('contact_id' as 'id', contactId)
+    .eq('contact_id', contactId)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -67,7 +66,16 @@ export async function getContactInteractions(contactId: string): Promise<Interac
     return [];
   }
 
-  return data || [];
+  // Map to the Interaction interface to handle field name differences
+  return (data as any[] || []).map(item => ({
+    id: item.id,
+    person_id: item.person_id,
+    user_id: item.user_id,
+    type: item.type,
+    note: item.notes || item.note || null,
+    notes: item.notes,
+    created_at: item.created_at
+  }));
 }
 
 /**

@@ -32,7 +32,7 @@ export function NetworkDomainBar({ domains, selectedDomainId, onSelectDomain }: 
   return (
     <div id="network-domain-bar" className="flex flex-wrap justify-center gap-4 py-4 animate-in fade-in slide-in-from-top-4 duration-700">
       {sortedDomains.map(domain => {
-        const Icon = ICON_MAP[domain.icon] || Users;
+        const Icon = (domain.icon && ICON_MAP[domain.icon]) || Users;
         const isSelected = selectedDomainId === domain.id;
         
         return (
@@ -47,7 +47,7 @@ export function NetworkDomainBar({ domains, selectedDomainId, onSelectDomain }: 
                 : "bg-transparent border-transparent hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400"
             )}
             style={{ 
-               color: isSelected ? domain.color : undefined 
+               color: (isSelected && domain.color) ? domain.color : undefined 
             }}
           >
             <Icon className="w-4 h-4" />

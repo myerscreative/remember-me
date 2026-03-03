@@ -166,7 +166,7 @@ export default function TriageEnrichmentList({ initialContacts }: TriageEnrichme
                  </p>
                </div>
             ) : (
-              `No contacts found matching "${query}"`
+              `No contacts found matching &quot;${query}&quot;`
             )}
           </div>
         )}

@@ -10,8 +10,8 @@ export interface NetworkContact extends Person {
 export interface TagDomain {
   id: string;
   name: string;
-  icon: string;
-  color: string;
+  icon: string | null;
+  color: string | null;
 }
 
 export interface SubTribe {
@@ -66,15 +66,12 @@ export class NetworkDataService {
     if (contactsError) throw contactsError;
 
     // 3. Transform to inject interests/tags into the contact object
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contacts: NetworkContact[] = (contactsData || []).map((c: any) => {
         // Map interests with details
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const interestDetails = c.person_interests?.map((pi: any) => pi.interests).filter(Boolean) || [];
         const interestNames = interestDetails.map((i: any) => i.name);
         
         // Map tags with details
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tagDetails = c.person_tags?.map((pt: any) => pt.tags).filter(Boolean) || [];
         const tagNames = tagDetails.map((t: any) => t.name);
 
@@ -99,11 +96,11 @@ export class NetworkDataService {
     if (relError) throw relError;
 
     // 5. Group by Domain
-    const domainGroups = this.groupContactsByDomain(contacts, domains || []);
+    const domainGroups = this.groupContactsByDomain(contacts, (domains as TagDomain[]) ?? []);
 
     return {
       contacts,
-      relationships: relationships || [],
+      relationships: (relationships as any) || [],
       domains: domainGroups
     };
   }
@@ -134,8 +131,6 @@ export class NetworkDataService {
     };
 
     contacts.forEach(contact => {
-       const mappedSubTribes = new Set<string>(); // avoid double counting member in same subtribe for this contact
-
        // Helper to process items
        const processItems = (items: { id: string, name: string, domain_id: string | null }[] | undefined) => {
           if (!items) return;

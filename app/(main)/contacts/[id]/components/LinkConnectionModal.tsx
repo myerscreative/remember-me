@@ -71,7 +71,7 @@ export function LinkConnectionModal({
           .limit(5);
 
         if (error) throw error;
-        setSearchResults(data || []);
+        setSearchResults((data as Person[]) ?? []);
       } catch (error) {
         console.error("Error searching people:", error);
       } finally {
@@ -170,7 +170,7 @@ export function LinkConnectionModal({
                   ))
                 ) : searchTerm ? (
                   <div className="text-center py-8 text-slate-500 text-sm">
-                    No people found matching "{searchTerm}"
+                    No people found matching &quot;{searchTerm}&quot;
                   </div>
                 ) : (
                   <div className="text-center py-8 text-slate-600 text-sm">

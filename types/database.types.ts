@@ -326,9 +326,11 @@ export interface Database {
           date: string
           title: string | null
           notes: string | null
-          next_goal_note: string | null // Added
+          next_goal_note: string | null
           location: string | null
           duration_minutes: number | null
+          is_inbound: boolean
+          outreach_id: string | null
           created_at: string
           updated_at: string
         }
@@ -340,9 +342,11 @@ export interface Database {
           date?: string
           title?: string | null
           notes?: string | null
-          next_goal_note?: string | null // Added
+          next_goal_note?: string | null
           location?: string | null
           duration_minutes?: number | null
+          is_inbound?: boolean
+          outreach_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -354,9 +358,11 @@ export interface Database {
           date?: string
           title?: string | null
           notes?: string | null
-          next_goal_note?: string | null // Added
+          next_goal_note?: string | null
           location?: string | null
           duration_minutes?: number | null
+          is_inbound?: boolean
+          outreach_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -569,6 +575,174 @@ export interface Database {
         }
         Relationships: []
       }
+      tag_domains: {
+        Row: {
+          id: string
+          name: string
+          icon: string | null
+          color: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          icon?: string | null
+          color?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          icon?: string | null
+          color?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          id: string
+          user_id: string
+          display_name: string | null
+          default_network_view: string
+          show_birthdays_on_network: boolean
+          auto_favorite_new_contacts: boolean
+          network_zoom_level: number
+          email_notifications: boolean
+          birthday_reminders: boolean
+          birthday_reminder_days: number
+          contact_reminders: boolean
+          default_reminder_time: string
+          reminder_frequency: string
+          quiet_hours_start: string
+          quiet_hours_end: string
+          theme: string
+          compact_mode: boolean
+          show_last_contact: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          display_name?: string | null
+          default_network_view?: string
+          show_birthdays_on_network?: boolean
+          auto_favorite_new_contacts?: boolean
+          network_zoom_level?: number
+          email_notifications?: boolean
+          birthday_reminders?: boolean
+          birthday_reminder_days?: number
+          contact_reminders?: boolean
+          default_reminder_time?: string
+          reminder_frequency?: string
+          quiet_hours_start?: string
+          quiet_hours_end?: string
+          theme?: string
+          compact_mode?: boolean
+          show_last_contact?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          display_name?: string | null
+          default_network_view?: string
+          show_birthdays_on_network?: boolean
+          auto_favorite_new_contacts?: boolean
+          network_zoom_level?: number
+          email_notifications?: boolean
+          birthday_reminders?: boolean
+          birthday_reminder_days?: number
+          contact_reminders?: boolean
+          default_reminder_time?: string
+          reminder_frequency?: string
+          quiet_hours_start?: string
+          quiet_hours_end?: string
+          theme?: string
+          compact_mode?: boolean
+          show_last_contact?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      learning_ledger: {
+        Row: {
+          id: string
+          outreach_id: string
+          contact_id: string
+          user_id: string
+          predicted_resonance: number | null
+          actual_outcome: boolean
+          response_time_ms: number | null
+          sentiment_delta: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          outreach_id: string
+          contact_id: string
+          user_id: string
+          predicted_resonance?: number | null
+          actual_outcome?: boolean
+          response_time_ms?: number | null
+          sentiment_delta?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          outreach_id?: string
+          contact_id?: string
+          user_id?: string
+          predicted_resonance?: number | null
+          actual_outcome?: boolean
+          response_time_ms?: number | null
+          sentiment_delta?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      weekly_rescues: {
+        Row: {
+          id: string
+          user_id: string
+          contact_id: string
+          suggested_hook: string
+          relationship_value_score: number
+          week_date: string
+          status: 'pending' | 'sent' | 'skipped'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          contact_id: string
+          suggested_hook: string
+          relationship_value_score?: number
+          week_date?: string
+          status?: 'pending' | 'sent' | 'skipped'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          contact_id?: string
+          suggested_hook?: string
+          relationship_value_score?: number
+          week_date?: string
+          status?: 'pending' | 'sent' | 'skipped'
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       meeting_notifications: {
         Row: {
           id: string
@@ -612,6 +786,51 @@ export interface Database {
           notification_dismissed?: boolean
           notification_dismissed_at?: string | null
           matched_contacts_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          id: string
+          user_id: string
+          person_id: string | null
+          title: string
+          description: string | null
+          due_date: string
+          due_time: string | null
+          completed: boolean
+          priority: 'low' | 'medium' | 'high'
+          category: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          person_id?: string | null
+          title: string
+          description?: string | null
+          due_date: string
+          due_time?: string | null
+          completed?: boolean
+          priority?: 'low' | 'medium' | 'high'
+          category?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          person_id?: string | null
+          title?: string
+          description?: string | null
+          due_date?: string
+          due_time?: string | null
+          completed?: boolean
+          priority?: 'low' | 'medium' | 'high'
+          category?: string | null
           created_at?: string
           updated_at?: string
         }

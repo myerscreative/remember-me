@@ -12,7 +12,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 export default function NewReminderPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [contacts, setContacts] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<{id: string, name: string, first_name: string, last_name: string | null}[]>([]);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -32,13 +32,13 @@ export default function NewReminderPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await (supabase as any)
+    const { data } = await supabase
       .from('persons')
       .select('id, name, first_name, last_name')
       .eq('user_id', user.id)
       .order('name');
 
-    setContacts(data || []);
+    setContacts((data as any[]) ?? []);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -50,7 +50,7 @@ export default function NewReminderPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('reminders')
         .insert({
           user_id: user.id,
