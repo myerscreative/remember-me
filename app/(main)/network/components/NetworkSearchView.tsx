@@ -12,6 +12,7 @@ interface NetworkSearchViewProps {
   data: NetworkData;
   onBack: () => void;
   onNurtureTribe: (tribe: SubTribe) => void;
+  initialSearchTerm?: string;
 }
 
 const RECENTLY_VIEWED_KEY = 'remember-me-recently-viewed';
@@ -25,9 +26,9 @@ function getRecentlyViewed(): string[] {
   }
 }
 
-export function NetworkSearchView({ data, onBack, onNurtureTribe }: NetworkSearchViewProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedTerm, setDebouncedTerm] = useState('');
+export function NetworkSearchView({ data, onBack, onNurtureTribe, initialSearchTerm = '' }: NetworkSearchViewProps) {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const [debouncedTerm, setDebouncedTerm] = useState(initialSearchTerm);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus on mount

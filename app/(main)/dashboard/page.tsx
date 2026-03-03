@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
 import { GardenPreview } from '@/components/dashboard/GardenPreview';
@@ -245,16 +246,17 @@ export default function DashboardPage() {
                  {/* Stats Summary */}
                  <div className="space-y-2">
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Overview</h3>
-                    <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-none">
-                        <CardContent className="p-4 space-y-4">
-                            <div className="flex justify-between items-center">
+                    <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-none overflow-hidden">
+                        <CardContent className="p-0">
+                            <Link href="/network" className="flex justify-between items-center p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <span className="text-sm font-medium text-slate-500">Total</span>
                                 <span className="text-lg font-bold text-slate-900 dark:text-white">{stats?.totalContacts || 0}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
+                            </Link>
+                            <div className="h-px bg-slate-200 dark:bg-slate-800" />
+                            <Link href="/network?has_lore=true" className="flex justify-between items-center p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <span className="text-sm font-medium text-slate-500">Context</span>
                                 <span className="text-lg font-bold text-slate-700 dark:text-slate-300">{stats?.withContext || 0}</span>
-                            </div>
+                            </Link>
                         </CardContent>
                     </Card>
                  </div>
@@ -285,18 +287,22 @@ export default function DashboardPage() {
 
                   {/* Mobile Quick Stats - Only visible on mobile */}
                   <div className="lg:hidden grid grid-cols-2 gap-3">
-                      <Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-                          <CardContent className="p-3 text-center">
-                              <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Total</div>
-                              <div className="text-2xl font-black text-purple-900 dark:text-purple-100">{stats?.totalContacts || 0}</div>
-                          </CardContent>
-                      </Card>
-                      <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-                          <CardContent className="p-3 text-center">
-                              <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Context</div>
-                              <div className="text-2xl font-black text-blue-900 dark:text-blue-100">{stats?.withContext || 0}</div>
-                          </CardContent>
-                      </Card>
+                      <Link href="/network">
+                        <Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800 active:scale-95 transition-transform h-full">
+                            <CardContent className="p-3 text-center">
+                                <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Total</div>
+                                <div className="text-2xl font-black text-purple-900 dark:text-purple-100">{stats?.totalContacts || 0}</div>
+                            </CardContent>
+                        </Card>
+                      </Link>
+                      <Link href="/network?has_lore=true">
+                        <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800 active:scale-95 transition-transform h-full">
+                            <CardContent className="p-3 text-center">
+                                <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Context</div>
+                                <div className="text-2xl font-black text-blue-900 dark:text-blue-100">{stats?.withContext || 0}</div>
+                            </CardContent>
+                        </Card>
+                      </Link>
                   </div>
 
                   {/* Daily Briefing - Relationship Drift Alerts */}

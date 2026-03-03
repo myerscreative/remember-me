@@ -2,15 +2,29 @@
 
 import { motion } from 'framer-motion';
 import { useGardenPhysics, ContactStatus } from '@/hooks/useGardenPhysics';
+import { SeedTooltip } from './SeedTooltip';
 
 interface SeedlingProps {
   id: string;
   name: string;
   status: ContactStatus;
   index: number;
+  daysSinceLastContact: number;
+  lastInteractionType: string;
+  isActive?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export const Seedling = ({ name, status, index }: SeedlingProps) => {
+export const Seedling = ({ 
+  id,
+  name, 
+  status, 
+  index, 
+  daysSinceLastContact,
+  lastInteractionType,
+  isActive,
+  onClick 
+}: SeedlingProps) => {
   const { x, y } = useGardenPhysics(status, index);
 
   return (
@@ -29,7 +43,8 @@ export const Seedling = ({ name, status, index }: SeedlingProps) => {
         damping: 15,
         mass: 1 
       }}
-      className="absolute cursor-pointer group"
+      className={`absolute cursor-pointer group ${isActive ? 'z-50' : 'z-10'}`}
+      onClick={onClick}
     >
       {/* The Contact Avatar */}
       <div className={`
@@ -37,19 +52,22 @@ export const Seedling = ({ name, status, index }: SeedlingProps) => {
         ${status === 'Nurtured' ? 'border-emerald-400 bg-slate-900 text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.3)]' : 
           status === 'Drifting' ? 'border-orange-400 bg-slate-900 text-orange-400' : 
           'border-red-500/50 bg-slate-950 text-slate-500'}
+        ${isActive ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-950' : ''}
       `}>
         {name.split(' ').map(n => n[0]).join('')}
         
-        {/* Tooltip on Hover */}
-        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 whitespace-nowrap bg-slate-900/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-200 shadow-2xl z-20 pointer-events-none">
-          <span className="text-white">{name}</span>
-          <span className="mx-1.5 text-slate-500">/</span>
-          <span className={`
-            ${status === 'Nurtured' ? 'text-emerald-400' : 
-              status === 'Drifting' ? 'text-amber-400' : 
-              'text-rose-400'}
-          `}>{status.toUpperCase()}</span>
-        </div>
+        {/* Active Tooltip (Tap/Click) */}
+        {isActive && (
+          <SeedTooltip 
+            data={{
+              contactId: id,
+              name,
+              status,
+              daysSinceLastContact,
+              lastInteractionType
+            }}
+          />
+        )}
       </div>
     </motion.div>
   );

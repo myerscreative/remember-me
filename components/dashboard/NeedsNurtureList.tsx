@@ -2,16 +2,17 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, ChevronRight, Cake } from "lucide-react";
+import { AlertCircle, Cake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getGradient, getInitials, formatBirthday } from "@/lib/utils/contact-helpers";
 import { getMethodIcon, getLastSeenText } from "@/lib/utils/interaction-utils";
 import { UnifiedActionHub } from "@/components/dashboard/UnifiedActionHub";
+import { ReachOutPanel } from "@/components/contacts/ReachOutPanel";
 import { getRelationshipStatus } from "@/app/(main)/network/utils/relationshipStatus";
 import { getMicroSummaryForList } from "@/lib/utils/summary-levels";
+import { NurtureDrawer } from "@/components/nurture/NurtureDrawer";
 
 interface NeedsNurtureListProps {
   contacts: any[]; // Using any to accommodate the supabase join structure broadly for now
@@ -21,7 +22,11 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
   const router = useRouter();
   const [activeTribe, setActiveTribe] = useState("All");
   const [selectedContact, setSelectedContact] = useState<any | null>(null);
+  
+  // Modals state
+  const [isNurtureDrawerOpen, setIsNurtureDrawerOpen] = useState(false);
   const [isSharedMemoryOpen, setIsSharedMemoryOpen] = useState(false);
+  const [isReachOutOpen, setIsReachOutOpen] = useState(false);
 
   // Extract unique tribes from contacts
   const tribes = useMemo(() => {
@@ -96,7 +101,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 className="group flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors cursor-pointer border-b border-white/5 last:border-0"
                 onClick={() => {
                     setSelectedContact(contact);
-                    setIsSharedMemoryOpen(true);
+                    setIsNurtureDrawerOpen(true);
                 }}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -140,10 +145,20 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className={cn(
-                    "text-xs font-sans",
-                     getRelationshipStatus(contact).colorClass
-                  )}>
+                  <span 
+                    className={cn(
+                        "text-xs font-sans",
+                        getRelationshipStatus(contact).colorClass
+                    )}
+                    onClick={(e) => {
+                        const status = getRelationshipStatus(contact);
+                        if (status.label === "Initiate your first reach-out") {
+                            e.stopPropagation();
+                            setSelectedContact(contact);
+                            setIsReachOutOpen(true);
+                        }
+                    }}
+                  >
                     {/* Logic Update: Check for 'next_goal_note' on latest interaction first. */}
                     {contact.latest_next_goal ? (
                         <span className="text-indigo-400 font-semibold italic flex items-center gap-1.5">
@@ -185,7 +200,7 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
             isOpen={isSharedMemoryOpen}
             onClose={() => setIsSharedMemoryOpen(false)}
             person={selectedContact}
-            onAction={(type, note) => {
+            onAction={(type) => {
                 // Determine template based on action type
                 // In a perfect world we would open a 'LogInteractionModal', 
                 // but for now let's just route them to the contact page with a query param 
@@ -197,6 +212,38 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
                 setIsSharedMemoryOpen(false);
                 router.push(`/contacts/${selectedContact.id}?action=${type}`);
             }}
+        />
+      )}
+
+      {/* Nurture Drawer */}
+      {selectedContact && (
+        <NurtureDrawer
+          isOpen={isNurtureDrawerOpen}
+          onOpenChange={setIsNurtureDrawerOpen}
+          data={{
+            contactId: selectedContact.id,
+            name: selectedContact.name || selectedContact.first_name,
+            whyStayInContact: selectedContact.latest_next_goal || "They are a valued connection in your network.",
+            lastSharedMemory: {
+              content: selectedContact.notes || "how you first met last year",
+              date: selectedContact.last_interaction_date || new Date().toISOString()
+            },
+            preferredChannel: 'SMS'
+          }}
+          onAction={(channel) => {
+            // Once they act on it, we might open the Action Hub to log it, or redirect.
+            console.log(`Initiated ${channel} to ${selectedContact.name}`);
+            // isNurtureDrawerOpen automatically closes from the component
+          }}
+        />
+      )}
+
+      {/* Reach Out Panel */}
+      {selectedContact && (
+        <ReachOutPanel
+          isOpen={isReachOutOpen}
+          onClose={() => setIsReachOutOpen(false)}
+          contact={selectedContact}
         />
       )}
     </div>

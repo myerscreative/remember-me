@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Sprout } from 'lucide-react';
-
+import { NurtureDrawer } from '@/components/nurture/NurtureDrawer';
 // Constants
 const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
 
@@ -58,6 +58,15 @@ function adjustBrightness(color: string, percent: number) {
 export default function SeedMapWidget({ contacts = [], className = '', totalCount, activeCount: propActiveCount }: SeedMapWidgetProps) {
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, contact: null });
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Nurture Drawer State
+  const [isNurtureDrawerOpen, setIsNurtureDrawerOpen] = useState(false);
+  const [selectedNurtureContact, setSelectedNurtureContact] = useState<any | null>(null);
+
+  const handleLeafClick = (contact: any) => {
+    setSelectedNurtureContact(contact);
+    setIsNurtureDrawerOpen(true);
+  };
 
   // Layout Logic (Ported & Scaled from RelationshipGarden)
   const { leafPositions, calculatedActiveCount } = useMemo(() => {
@@ -199,6 +208,7 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
                              setHoveredId(null);
                              setTooltip(prev => ({ ...prev, visible: false }));
                         }}
+                        onClick={() => handleLeafClick(leaf)}
                     >
                          {/* Leaf Shape - Path from Leaf.tsx */}
                          <g transform="translate(-21, -24)"> 
@@ -278,6 +288,28 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
             {displayTotalCount} TOTAL / <span className="text-emerald-500">{displayActiveCount} ACTIVE</span>
          </div>
       </div>
+
+      {/* Nurture Drawer */}
+      {selectedNurtureContact && (
+        <NurtureDrawer
+          isOpen={isNurtureDrawerOpen}
+          onOpenChange={setIsNurtureDrawerOpen}
+          data={{
+            contactId: selectedNurtureContact.id,
+            name: selectedNurtureContact.name || selectedNurtureContact.first_name,
+            whyStayInContact: selectedNurtureContact.latest_next_goal || "They are a valued connection in your network.",
+            lastSharedMemory: {
+              content: selectedNurtureContact.notes || "how you first met last year",
+              date: selectedNurtureContact.last_interaction_date || new Date().toISOString()
+            },
+            preferredChannel: 'SMS'
+          }}
+          onAction={(channel) => {
+            console.log(`Sending a ${channel} to ${selectedNurtureContact.name}...`);
+            // In a real flow, this could open the email client, sms, or navigate to a deep link.
+          }}
+        />
+      )}
     </div>
   );
 }

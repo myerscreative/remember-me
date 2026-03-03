@@ -11,7 +11,7 @@ import { GardenHub } from './components/GardenHub';
 import { Loader2 } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
-type ViewMode = 'search' | 'inspect' | 'nurture' | null;
+type ViewMode = 'search' | 'inspect' | 'nurture' | 'lore' | null;
 
 function NetworkContent() {
   const [data, setData] = useState<NetworkData | null>(null);
@@ -20,7 +20,8 @@ function NetworkContent() {
   const router = useRouter();
 
   // URL-driven view state
-  const activeView = (searchParams.get('view') as ViewMode) || null;
+  const activeView = (searchParams.get('view') as ViewMode) || (searchParams.get('has_lore') === 'true' ? 'search' : null);
+  const initialSearchTerm = searchParams.get('has_lore') === 'true' ? 'has:lore' : ''; // Using a special prefix or similar
 
   // Nurture modal state
   const [nurtureTribe, setNurtureTribe] = useState<SubTribe | null>(null);
@@ -77,6 +78,7 @@ function NetworkContent() {
                 data={data}
                 onBack={handleBackToGarden}
                 onNurtureTribe={handleNurtureTribe}
+                initialSearchTerm={initialSearchTerm}
               />
             )}
             {activeView === 'inspect' && (
