@@ -195,6 +195,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       tags: {
         Row: {
@@ -218,6 +219,7 @@ export interface Database {
           color?: string
           created_at?: string
         }
+        Relationships: []
       }
       person_tags: {
         Row: {
@@ -235,6 +237,7 @@ export interface Database {
           tag_id?: string
           created_at?: string
         }
+        Relationships: []
       }
       relationships: {
         Row: {
@@ -267,6 +270,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       attachments: {
         Row: {
@@ -311,6 +315,7 @@ export interface Database {
           transcription?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       interactions: {
         Row: {
@@ -355,6 +360,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       user_stats: {
         Row: {
@@ -390,6 +396,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       contact_facts: {
         Row: {
@@ -416,6 +423,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       inter_contact_relationships: {
         Row: {
@@ -445,6 +453,7 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       interests: {
         Row: {
@@ -462,6 +471,7 @@ export interface Database {
           name?: string
           created_at?: string
         }
+        Relationships: []
       }
       person_interests: {
         Row: {
@@ -479,6 +489,7 @@ export interface Database {
           interest_id?: string
           created_at?: string
         }
+        Relationships: []
       }
       shared_memories: {
         Row: {
@@ -505,6 +516,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       calendar_preferences: {
         Row: {
@@ -555,6 +567,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       meeting_notifications: {
         Row: {
@@ -602,6 +615,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       weekly_blooms: {
         Row: {
@@ -634,6 +648,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
     }
     Views: {
@@ -645,6 +660,7 @@ export interface Database {
           last_contact: string | null
           current_health: 'nurtured' | 'drifting' | 'neglected'
         }
+        Relationships: []
       }
       persons_with_tags: {
         Row: {
@@ -696,6 +712,7 @@ export interface Database {
           tag_names: string[] | null
           tag_colors: string[] | null
         }
+        Relationships: []
       }
       person_interaction_counts: {
         Row: {
@@ -706,6 +723,7 @@ export interface Database {
           call_count: number
           email_count: number
         }
+        Relationships: []
       }
     }
     Functions: Record<string, never>
