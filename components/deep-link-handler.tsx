@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type { PluginListenerHandle } from "@capacitor/core";
 
 /**
  * Handles deep links when the app is opened via a URL (Universal Links on iOS, App Links on Android).
@@ -11,7 +12,7 @@ export function DeepLinkHandler() {
   const router = useRouter();
 
   useEffect(() => {
-    let remove: (() => void) | undefined;
+    let listenerHandle: PluginListenerHandle | undefined;
 
     async function setup() {
       try {
@@ -19,7 +20,7 @@ export function DeepLinkHandler() {
         const { Capacitor } = await import("@capacitor/core");
         if (!Capacitor.isNativePlatform()) return;
 
-        remove = await App.addListener(
+        listenerHandle = await App.addListener(
           "appUrlOpen",
           (event: { url: string }) => {
             // Extract path from URL, e.g. https://example.com/contacts/123 -> /contacts/123
@@ -42,7 +43,7 @@ export function DeepLinkHandler() {
 
     setup();
     return () => {
-      remove?.();
+      void listenerHandle?.remove();
     };
   }, [router]);
 

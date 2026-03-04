@@ -177,8 +177,8 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
                   color={color} 
                   size={seedSize}
                   isHighlighted={hoveredId === contact.name}
-                  onPointerEnter={(e) => handleMouseEnter(e, contact)}
-                  onPointerLeave={handleMouseLeave}
+                  onMouseEnter={(e) => handleMouseEnter(e, contact)}
+                  onMouseLeave={handleMouseLeave}
                 />
               </motion.div>
             ))}

@@ -363,7 +363,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
   }, [filteredContacts]);
 
-  const handleLeafEnter = (e: React.PointerEvent, contact: Contact) => {
+  const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
     // Clear any pending hide timeout
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
@@ -384,7 +384,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     });
   };
 
-  const handleLeafMove = (e: React.PointerEvent) => {
+  const handleLeafMove = (e: React.MouseEvent) => {
 
     // Clamp position to ensure tooltip stays on screen
     const tooltipWidth = 200;
@@ -635,9 +635,9 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                   color={color} 
                   initials={contact.initials}
                   scale={isHighlighted ? scale * 1.5 : (isHovered ? scale * 1.3 : scale)} 
-                  onPointerEnter={(e) => handleLeafEnter(e, contact)}
-                  onPointerMove={handleLeafMove}
-                  onPointerLeave={handleLeafLeave}
+                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
+                  onMouseMove={handleLeafMove}
+                  onMouseLeave={handleLeafLeave}
                   onClick={() => {
                     // Hide tooltip immediately on click to prevent overlap with modal
                     setTooltip(prev => ({ ...prev, visible: false }));
