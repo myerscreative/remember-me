@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     
-    // Use the same redirect URI as used in the initiation route
-    const origin = request.nextUrl.origin;
-    const redirectUri = `${origin}/api/auth/google/callback`;
+    // Use the same canonical redirect URI as used in the initiation route
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
     if (!clientId || !clientSecret) {
       return NextResponse.redirect(

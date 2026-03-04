@@ -1,6 +1,11 @@
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
+const authBaseUrl =
+  process.env.AUTH_URL ||
+  process.env.NEXTAUTH_URL ||
+  process.env.NEXT_PUBLIC_BASE_URL;
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -17,10 +22,14 @@ export const authOptions: NextAuthOptions = {
           prompt: 'consent',
           access_type: 'offline',
           response_type: 'code',
+          ...(authBaseUrl
+            ? { redirect_uri: `${authBaseUrl}/api/auth/callback/google` }
+            : {}),
         },
       },
     }),
   ],
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   
   callbacks: {
     async jwt({ token, account, user }) {
