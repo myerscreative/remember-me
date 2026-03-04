@@ -138,7 +138,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
                         "w-[124px] h-[124px] border-4 border-[#1a1b2e]",
                         isUploading && "opacity-50"
                     )}>
-                        <AvatarImage src={contact.photo_url || ""} alt={contact.first_name && contact.last_name ? `${contact.first_name} ${contact.last_name}` : "Contact photo"} className="object-cover" />
+                        <AvatarImage src={contact.photo_url || ""} alt={contact.firstName && contact.lastName ? `${contact.firstName} ${contact.lastName}` : "Contact photo"} className="object-cover" />
                         <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
                         {initials}
                         </AvatarFallback>
