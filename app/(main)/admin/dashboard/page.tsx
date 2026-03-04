@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -12,17 +13,7 @@ import {
   Info
 } from 'lucide-react';
 import { getCommunityVitalSigns, CommunityVitalSigns } from '@/services/adminAnalytics';
-import PulseChart from './components/PulseChart';
-import BridgeVelocityChart from './components/BridgeVelocityChart';
-import SkillCloud from './components/SkillCloud';
-import ConnectorLeaderboard from './components/ConnectorLeaderboard';
 import { useSocialFriction } from '@/hooks/useSocialFriction';
-import { PivotCard } from './components/PivotCard';
-import { BridgeVelocityInfo } from './components/BridgeVelocityInfo';
-import { SocialForecast } from '@/components/dashboard/SocialForecast';
-import { LearningLedgerSection } from '@/components/learning-ledger-section';
-import { DriftRescue } from '@/components/dashboard/DriftRescue';
-import { MondayRescueSlot } from '@/components/dashboard/MondayRescueSlot';
 import { 
   Sheet, 
   SheetContent, 
@@ -34,6 +25,53 @@ import {
 import { Brain } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
+
+const chartPlaceholder = () => <div className="h-64 animate-pulse rounded-2xl bg-slate-800/50" />;
+
+const PulseChart = dynamic(() => import('./components/PulseChart').then((m) => m.default), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+
+const BridgeVelocityChart = dynamic(() => import('./components/BridgeVelocityChart').then((m) => m.default), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+
+const SkillCloud = dynamic(() => import('./components/SkillCloud').then((m) => m.default), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+
+const ConnectorLeaderboard = dynamic(() => import('./components/ConnectorLeaderboard').then((m) => m.default), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+
+const BridgeVelocityInfo = dynamic(() => import('./components/BridgeVelocityInfo').then((m) => ({ default: m.BridgeVelocityInfo })), {
+  ssr: false,
+});
+
+const PivotCard = dynamic(() => import('./components/PivotCard').then((m) => ({ default: m.PivotCard })), {
+  ssr: false,
+});
+
+const SocialForecast = dynamic(() => import('@/components/dashboard/SocialForecast').then((m) => ({ default: m.SocialForecast })), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+
+const LearningLedgerSection = dynamic(() => import('@/components/learning-ledger-section').then((m) => ({ default: m.LearningLedgerSection })), {
+  ssr: false,
+});
+
+const DriftRescue = dynamic(() => import('@/components/dashboard/DriftRescue').then((m) => ({ default: m.DriftRescue })), {
+  ssr: false,
+});
+
+const MondayRescueSlot = dynamic(() => import('@/components/dashboard/MondayRescueSlot').then((m) => ({ default: m.MondayRescueSlot })), {
+  ssr: false,
+});
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<CommunityVitalSigns | null>(null);

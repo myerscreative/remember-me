@@ -22,7 +22,7 @@ export async function addContactFact({ contactId, category, content }: AddFactIn
 
   try {
     // Type assertion needed until `supabase gen types` is run after migration
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('contact_facts')
       .insert({
@@ -55,7 +55,7 @@ export async function deleteContactFact(factId: string, contactId: string) {
 
   try {
     // Type assertion needed until `supabase gen types` is run after migration
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('contact_facts')
       .delete()

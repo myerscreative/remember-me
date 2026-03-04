@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Leaf from './Leaf';
 import { FilterType } from './CategoryFilters';
 import { GardenGuideModal } from '../garden/GardenGuideModal';
+import { cn } from '@/lib/utils';
 
 // GOLDEN ANGLE - Nature's perfect packing angle (137.5°)
 const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
@@ -362,8 +363,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
   }, [filteredContacts]);
 
-  const handleLeafEnter = (e: React.MouseEvent, contact: Contact) => {
-    console.log('Leaf Enter:', contact.name);
+  const handleLeafEnter = (e: React.PointerEvent, contact: Contact) => {
     // Clear any pending hide timeout
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
@@ -376,8 +376,6 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     const xPos = Math.min(e.clientX + 15, window.innerWidth - tooltipWidth - 10);
     const yPos = Math.max(10, e.clientY - 70); // Ensure it doesn't go above viewport
 
-    console.log('Setting tooltip position:', { x: xPos, y: yPos, contact: contact.name });
-
     setTooltip({
       visible: true,
       x: xPos,
@@ -386,8 +384,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
     });
   };
 
-  const handleLeafMove = (e: React.MouseEvent) => {
-    console.log('Leaf Move');
+  const handleLeafMove = (e: React.PointerEvent) => {
 
     // Clamp position to ensure tooltip stays on screen
     const tooltipWidth = 200;
@@ -403,7 +400,6 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
   };
 
   const handleLeafLeave = () => {
-    console.log('Leaf Leave');
     // Delay hiding to allow user to move mouse to tooltip
     hideTimeoutRef.current = setTimeout(() => {
       setTooltip(prev => ({ ...prev, visible: false }));
@@ -476,7 +472,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onPointerLeave={handleMouseUp}
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         {/* Floating Miniature Zoom UI */}
@@ -525,7 +521,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
               <button
                 onClick={handleSetDefaultZoom}
-                className={`w-7 h-7 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95 ${saved ? 'text-green-500 dark:text-green-400 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : ''}`}
+                className={cn("flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 transition-all hover:bg-slate-100 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700", saved && "border-green-200 bg-green-50 text-green-500 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400")}
                 title="Save as Default"
               >
                 {saved ? <Sparkles className="w-3 h-3" /> : <Save className="w-3 h-3" />}
@@ -639,9 +635,9 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                   color={color} 
                   initials={contact.initials}
                   scale={isHighlighted ? scale * 1.5 : (isHovered ? scale * 1.3 : scale)} 
-                  onMouseEnter={(e) => handleLeafEnter(e, contact)}
-                  onMouseMove={handleLeafMove}
-                  onMouseLeave={handleLeafLeave}
+                  onPointerEnter={(e) => handleLeafEnter(e, contact)}
+                  onPointerMove={handleLeafMove}
+                  onPointerLeave={handleLeafLeave}
                   onClick={() => {
                     // Hide tooltip immediately on click to prevent overlap with modal
                     setTooltip(prev => ({ ...prev, visible: false }));
@@ -661,8 +657,8 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
               left: tooltip.x,
               top: tooltip.y,
             }}
-            onMouseEnter={handleTooltipEnter}
-            onMouseLeave={handleTooltipLeave}
+            onPointerEnter={handleTooltipEnter}
+            onPointerLeave={handleTooltipLeave}
             onClick={() => {
               if (tooltip.contact) {
                 setTooltip(prev => ({ ...prev, visible: false }));

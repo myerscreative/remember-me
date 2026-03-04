@@ -133,7 +133,7 @@ export function GroupInteractionModal({
                     }`}
                   >
                     <Avatar className="h-7 w-7 shrink-0">
-                      <AvatarImage src={contact.photo_url || undefined} />
+                      <AvatarImage src={contact.photo_url || undefined} alt={contact.first_name && contact.last_name ? `${contact.first_name} ${contact.last_name}` : contact.name} />
                       <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs">
                         {contact.first_name?.[0] || contact.name[0]}
                       </AvatarFallback>

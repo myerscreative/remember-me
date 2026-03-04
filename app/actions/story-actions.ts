@@ -346,7 +346,6 @@ export async function updateStoryFields(contactId: string, fields: { where_met?:
         body: JSON.stringify({ contactId: validatedContactId }),
       }).catch(err => console.error('Background AI refresh failed:', err));
     } catch {
-      console.log('Could not trigger background AI refresh');
     }
 
     revalidatePath(`/contacts/${validatedContactId}`);
@@ -377,7 +376,6 @@ export async function addSharedMemory(person_id: string, content: string) {
 
       if (!user || !user.id) throw new Error("Unauthorized");
       
-      console.log('📝 [DEBUG] addSharedMemory: Adding for person', validatedPersonId, 'User:', user.id);
 
       const { error } = await (supabase as any)
         .from('shared_memories')
@@ -406,7 +404,6 @@ export async function addSharedMemory(person_id: string, content: string) {
           body: JSON.stringify({ contactId: validatedPersonId }),
         }).catch(err => console.error('Background AI refresh failed:', err));
       } catch {
-        console.log('Could not trigger background AI refresh');
       }
 
       revalidatePath(`/contacts/${validatedPersonId}`);

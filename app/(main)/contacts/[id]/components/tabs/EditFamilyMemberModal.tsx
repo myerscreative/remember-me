@@ -79,7 +79,6 @@ export function EditFamilyMemberModal({
 
       const result = await updateFamilyMembers(contactId, updatedMembers);
       if (result.success) {
-        console.log('Saved family members:', updatedMembers);
         toast.success(memberIndex !== null ? 'Member updated' : 'Member added');
         if (onSuccess) onSuccess(updatedMembers);
         onClose();

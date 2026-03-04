@@ -168,7 +168,7 @@ export default function EditContactPage({
         // Insert new tags
         for (const tagName of tagArray) {
           // First, get or create the tag
-          let { data: existingTag } = await (supabase as any)
+          const { data: existingTag } = await (supabase as any)
             .from("tags")
             .select("id")
             .eq("name", tagName)
@@ -265,7 +265,7 @@ export default function EditContactPage({
                     <span>Quick Voice Entry</span>
                   </div>
                   <span className="text-white/80 text-sm font-normal hidden sm:inline">
-                    "Update Sarah's profession..."
+                    &quot;Update Sarah&apos;s profession...&quot;
                   </span>
                 </div>
               </Button>
@@ -421,7 +421,7 @@ export default function EditContactPage({
                 {/* What's important to them? */}
                 <div className="space-y-2">
                   <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
-                    What's important to them?
+                    What&apos;s important to them?
                   </Label>
                   <Textarea
                     id="whatsImportant"
@@ -525,7 +525,7 @@ export default function EditContactPage({
         </div>
 
         {/* Save Contact Button - Desktop */}
-        <div className="hidden md:block fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6" style={{ marginLeft: '16rem' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-50 hidden border-t border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800 md:ml-64 md:block">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Button
               type="submit"

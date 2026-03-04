@@ -18,7 +18,7 @@ export async function deleteContact(contactId: string) {
 
     // Soft delete: set deleted_at timestamp instead of actually deleting
     // Contact can be recovered within 30 days
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('persons')
       .update({ deleted_at: new Date().toISOString() })
@@ -60,7 +60,7 @@ export async function restoreContact(contactId: string) {
     const validatedId = validateUUID(contactId);
 
     // Restore contact by clearing deleted_at
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('persons')
       .update({ deleted_at: null })

@@ -68,7 +68,7 @@ function FaceMatchGameContent() {
         availablePool = allContacts.filter(c => c.group === filterValue);
         // Fallback if not enough contacts in group
         if (availablePool.length < 4) {
-            console.warn('Not enough contacts in group, using all contacts');
+            if (process.env.NODE_ENV === 'development') console.warn('Not enough contacts in group, using all contacts');
             availablePool = allContacts;
         }
     } else if (filterType === 'recent') {
@@ -125,6 +125,28 @@ function FaceMatchGameContent() {
     }
   }, [loading, allContacts, generateQuestions]);
 
+  // Timer countdown (must be before early returns for hooks order)
+  useEffect(() => {
+    if (gameState.gameStatus !== 'playing' || gameState.showFeedback) return;
+
+    const timer = setInterval(() => {
+      setGameState(prev => {
+        if (prev.timeLeft <= 1) {
+          return {
+            ...prev,
+            timeLeft: 30,
+            currentQuestion: prev.currentQuestion + 1,
+            streak: 0,
+            gameStatus: prev.currentQuestion + 1 >= prev.totalQuestions ? 'complete' : 'playing',
+          };
+        }
+        return { ...prev, timeLeft: prev.timeLeft - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState.gameStatus, gameState.showFeedback]);
+
   if (loading) {
       return (
         <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
@@ -145,29 +167,6 @@ function FaceMatchGameContent() {
         </div>
       );
   }
-
-  // Timer countdown
-  useEffect(() => {
-    if (gameState.gameStatus !== 'playing' || gameState.showFeedback) return;
-
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        if (prev.timeLeft <= 1) {
-          // Time's up - move to next question
-          return {
-            ...prev,
-            timeLeft: 30,
-            currentQuestion: prev.currentQuestion + 1,
-            streak: 0,
-            gameStatus: prev.currentQuestion + 1 >= prev.totalQuestions ? 'complete' : 'playing',
-          };
-        }
-        return { ...prev, timeLeft: prev.timeLeft - 1 };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState.gameStatus, gameState.showFeedback]);
 
   function handleAnswer(selectedIndex: number) {
     if (gameState.showFeedback) return;

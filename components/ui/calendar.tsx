@@ -38,7 +38,6 @@ export function Calendar({
   React.useEffect(() => {
     const now = new Date();
     setToday(now);
-    console.log('Calendar initialized. Detected today:', now.toString());
   }, [])
   
   // Initialize currentMonth to selected date if provided, otherwise today (once available) or now

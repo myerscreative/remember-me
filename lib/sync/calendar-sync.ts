@@ -49,7 +49,6 @@ export class CalendarSyncService {
         } as Partial<Meeting>);
       }
 
-      console.log(`Synced ${events.length} calendar events for user ${userId}`);
     } catch (error) {
       console.error('Calendar sync error:', error);
       throw error;

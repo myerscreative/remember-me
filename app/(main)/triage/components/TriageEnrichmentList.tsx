@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Check, Send, Loader2 } from 'lucide-react';
 import { updateContact } from '@/app/actions/update-contact';
+import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export type TriageContact = {
@@ -111,7 +112,7 @@ export default function TriageEnrichmentList({ initialContacts }: TriageEnrichme
                 </div>
                 
                 <div>
-                  <div className={`font-medium transition-colors ${isEnriched ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                  <div className={cn("font-medium transition-colors", isEnriched ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white")}>
                     {contact.name}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400">

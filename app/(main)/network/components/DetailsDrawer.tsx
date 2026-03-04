@@ -1,8 +1,9 @@
 import React from 'react';
 import { X, Mail, Phone, MessageSquare, MapPin } from 'lucide-react';
+import Image from 'next/image';
 import { Contact } from '../mockContacts';
 import { calculateDaysAgo, getContactStatus, formatRelativeTime, getMethodIcon, getMethodLabel } from '../utils/dateUtils';
-import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface DetailsDrawerProps {
   contact: Contact | null;
@@ -28,13 +29,13 @@ export default function DetailsDrawer({ contact, isOpen, onClose }: DetailsDrawe
     <>
       {/* Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={cn("fixed inset-0 z-[100] bg-black/20 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "pointer-events-none opacity-0")}
         onClick={onClose}
       />
       
       {/* Drawer */}
       <div 
-        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white shadow-2xl z-[101] transform transition-transform duration-300 ease-in-out overflow-y-auto ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={cn("fixed top-0 right-0 h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-[400px] z-[101]", isOpen ? "translate-x-0" : "translate-x-full")}
       >
         <div className="p-6">
           {/* Header */}
@@ -90,7 +91,7 @@ export default function DetailsDrawer({ contact, isOpen, onClose }: DetailsDrawe
           {/* Last Contact */}
           <section className="mb-8 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
             <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wider">Last Contact</h4>
-            <div className={`p-3 rounded-lg border ${statusColorClass} flex items-center gap-3`}>
+            <div className={cn("flex items-center gap-3 rounded-lg border p-3", statusColorClass)}>
               <span className="text-xl">{methodIcon}</span>
               <div>
                 <p className="font-semibold text-sm">

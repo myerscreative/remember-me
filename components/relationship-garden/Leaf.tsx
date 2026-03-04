@@ -49,9 +49,9 @@ export default function Leaf({
         padding: '4px', // Extra touch area
       }}
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseMove}
+      onPointerEnter={onMouseEnter}
+      onPointerLeave={onMouseLeave}
+      onPointerMove={onMouseMove}
     >
       <svg 
         viewBox="0 0 42 48" 

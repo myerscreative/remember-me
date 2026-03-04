@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { GameHeader } from '@/components/game/GameHeader';
 import { ProgressBar } from '@/components/game/ProgressBar';
 import { ResultsScreen } from '@/components/game/ResultsScreen';
+import { cn } from '@/lib/utils';
 
 interface Contact {
   id: string;
@@ -262,7 +263,7 @@ function InterestMatchGameContent() {
                   }`}>
                     {contact.initials}
                   </div>
-                  <p className={`font-semibold text-center ${isSelected && !showFeedback ? 'text-white' : 'text-slate-900'}`}>
+                  <p className={cn("text-center font-semibold", isSelected && !showFeedback ? "text-white" : "text-slate-900")}>
                     {contact.name}
                   </p>
                   {showCorrect && (

@@ -12,29 +12,29 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
     href: "/dashboard",
     label: "Dashboard",
     icon: Activity,
-    activeColor: "text-purple-600",
-    inactiveColor: "text-gray-600",
+    activeColor: "text-primary",
+    inactiveColor: "text-muted-foreground",
   },
   {
     href: "/garden",
     label: "Garden",
     icon: TreePine,
-    activeColor: "text-green-600",
-    inactiveColor: "text-gray-600",
+    activeColor: "text-primary",
+    inactiveColor: "text-muted-foreground",
   },
   {
     href: "/",
-    label: "Network", // Changed from "People" to "Network"
+    label: "Network",
     icon: Users,
-    activeColor: "text-purple-600",
-    inactiveColor: "text-gray-600",
+    activeColor: "text-primary",
+    inactiveColor: "text-muted-foreground",
   },
   {
     href: "#search",
     label: "Search",
     icon: Search,
-    activeColor: "text-gray-900",
-    inactiveColor: "text-gray-600",
+    activeColor: "text-foreground",
+    inactiveColor: "text-muted-foreground",
     isSearch: true,
   },
 ];
@@ -45,8 +45,8 @@ export function BottomNav() {
   const showNetworkBadge = bloom && !bloom.is_viewed;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-sidebar border-t border-sidebar-border md:hidden pb-safe">
-      <div className="flex items-center justify-around h-16 max-w-7xl mx-auto">
+    <nav className="fixed inset-x-0 bottom-0 z-50 md:hidden flex h-16 items-center justify-around mx-auto max-w-7xl border-t border-sidebar-border bg-sidebar pb-safe">
+      <div className="flex h-16 min-touch-h w-full items-center justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -56,22 +56,19 @@ export function BottomNav() {
                   <button
                       key="search-trigger"
                       onClick={() => {
-                          // Trigger search (e.g., focus search input or open modal)
                           const searchInput = document.querySelector('input[placeholder*="search"]') as HTMLInputElement;
                           if (searchInput) {
                               searchInput.focus();
                               searchInput.scrollIntoView({ behavior: 'smooth' });
                           } else {
-                              // If no search input, maybe navigate to contacts page
                               window.location.href = "/";
                           }
                       }}
                       className={cn(
-                          "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors relative",
-                          "text-gray-600 dark:text-gray-400"
+                          "relative flex flex-1 flex-col items-center justify-center gap-1 min-touch-h text-muted-foreground transition-colors active:opacity-80"
                       )}
                   >
-                      <Search className="h-5 w-5" />
+                      <Search className="size-5" />
                       <span className="text-xs font-medium">{item.label}</span>
                   </button>
               );
@@ -82,16 +79,16 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors relative",
-                isActive ? item.activeColor : `${item.inactiveColor} dark:text-gray-400`
+                "relative flex flex-1 flex-col items-center justify-center gap-1 min-touch-h transition-colors active:opacity-80",
+                isActive ? item.activeColor : item.inactiveColor
               )}
             >
               <div className="relative">
-                  <Icon className="h-5 w-5" />
+                  <Icon className="size-5" />
                   {item.label === "Network" && showNetworkBadge && (
-                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    <span className="absolute -right-1 -top-1 flex size-2">
+                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
                     </span>
                   )}
               </div>

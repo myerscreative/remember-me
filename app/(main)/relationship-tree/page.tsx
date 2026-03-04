@@ -2,7 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Filter, Eye, EyeOff } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { ArrowLeft, Filter, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { 
   ContactHealth, 
   TreeHealthStatus, 
@@ -14,12 +16,33 @@ import {
   calculateTreeHealth, 
   calculateTreeStats 
 } from './utils/treeHealthUtils';
-import RelationshipTree from './components/RelationshipTree';
-import TreeStatsPanel from './components/TreeStats';
-import TreeFilters from './components/TreeFilters';
-import ActionPanel from './components/ActionPanel';
-
 import { useGameData, GameContact } from '@/hooks/useGameData';
+
+const treeLoading = () => (
+  <div className="flex items-center justify-center min-h-[400px] text-slate-500">
+    <Loader2 className="h-8 w-8 animate-spin" />
+  </div>
+);
+
+const RelationshipTree = dynamic(() => import('./components/RelationshipTree').then((m) => m.default), {
+  ssr: false,
+  loading: treeLoading,
+});
+
+const TreeStatsPanel = dynamic(() => import('./components/TreeStats').then((m) => m.default), {
+  ssr: false,
+  loading: () => <div className="h-32 animate-pulse rounded-xl bg-slate-100" />,
+});
+
+const TreeFilters = dynamic(() => import('./components/TreeFilters').then((m) => m.default), {
+  ssr: false,
+  loading: () => <div className="h-24 animate-pulse rounded-xl bg-slate-100" />,
+});
+
+const ActionPanel = dynamic(() => import('./components/ActionPanel').then((m) => m.default), {
+  ssr: false,
+  loading: () => <div className="h-40 animate-pulse rounded-xl bg-slate-100" />,
+});
 
 // Mock data transformer - adapted for Real Data
 function transformContactsToTreeFormat(contacts: GameContact[]): ContactHealth[] {
@@ -101,18 +124,15 @@ export default function RelationshipTreePage() {
   const handleContactClick = (contact: ContactHealthType) => {
     setSelectedContactId(contact.contactId);
     // In production, this would open a contact details drawer/modal
-    console.log('Selected contact:', contact.name);
   };
 
   const handleWaterContact = (contact: ContactHealthType) => {
     // In production, this would open a message composer or log interaction
-    console.log('Watering contact:', contact.name);
     alert(`Reaching out to ${contact.name}...`);
   };
 
   const handleWaterAll = () => {
     // In production, this would open a batch message modal
-    console.log('Watering all contacts needing attention');
     alert(`Preparing to reach out to ${contactsNeedingAttention.length} contacts...`);
   };
 
@@ -146,14 +166,14 @@ export default function RelationshipTreePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLabels(!showLabels)}
-              className={`p-2 rounded-lg transition-colors ${showLabels ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={cn("rounded-lg p-2 transition-colors", showLabels ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100")}
               title={showLabels ? 'Hide labels' : 'Show labels'}
             >
               {showLabels ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-lg transition-colors ${showFilters ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={cn("rounded-lg p-2 transition-colors", showFilters ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100")}
               title="Toggle filters"
             >
               <Filter className="w-5 h-5" />

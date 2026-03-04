@@ -87,7 +87,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
         {/* Avatar */}
         <div className="relative">
           <Avatar className="h-12 w-12 border-2 border-[#3d4758]">
-            <AvatarImage src={contact.photo_url || undefined} className="object-cover" />
+            <AvatarImage src={contact.photo_url || undefined} alt={contact.name} className="object-cover" />
             <AvatarFallback className="bg-[#2d3748] text-white font-semibold text-[17px]">
               {initials}
             </AvatarFallback>
@@ -167,7 +167,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
         <div className="flex items-center gap-3">
            <div className="relative shrink-0">
               <Avatar className="h-12 w-12 border-2 border-[#3d4758]">
-                <AvatarImage src={contact.photo_url || undefined} className="object-cover" />
+                <AvatarImage src={contact.photo_url || undefined} alt={contact.name} className="object-cover" />
                 <AvatarFallback className="bg-[#2d3748] text-white font-semibold text-[17px]">
                   {initials}
                 </AvatarFallback>

@@ -1,11 +1,22 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { generateWebRecallQuestions, WebRecallQuestion } from '@/app/actions/game-web-recall';
-import { WebRecallGame } from '@/components/practice/WebRecallGame';
 import { useGameStats } from '@/hooks/useGameStats';
+
+const WebRecallGame = dynamic(
+  () => import('@/components/practice/WebRecallGame').then((m) => ({ default: m.WebRecallGame })),
+  {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-[320px] text-slate-500">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  ),
+});
 
 function WebRecallGamePageContent() {
   const router = useRouter();

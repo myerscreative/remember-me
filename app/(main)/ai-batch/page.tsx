@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   batchGenerateSummaries,
   getContactsNeedingAI,
@@ -254,7 +255,7 @@ export default function AIBatchPage() {
                         onClick={loadData}
                         className="text-xs h-8"
                       >
-                        <RefreshCw className={`h-3 w-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={cn("mr-1 h-3 w-3", isLoading && "animate-spin")} />
                         Refresh Counts
                       </Button>
                     </div>

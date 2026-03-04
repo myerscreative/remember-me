@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Heart, Star, Edit2, Plus, Sparkles, Save, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 interface StoryGridProps {
@@ -154,7 +155,12 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
             </div>
           ) : (
             <div
-              className={`text-[15px] leading-relaxed cursor-pointer pb-1 ${isEmpty ? 'text-gray-400 dark:text-gray-500 italic py-4 border-2 border-dashed border-gray-200 dark:border-gray-700/50 rounded-lg flex items-center justify-center gap-2 hover:border-indigo-300 dark:hover:border-indigo-400/50' : 'text-gray-900 dark:text-gray-100'}`}
+              className={cn(
+              "cursor-pointer pb-1 text-[15px] leading-relaxed",
+              isEmpty
+                ? "flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-4 italic text-gray-400 hover:border-indigo-300 dark:border-gray-700/50 dark:text-gray-500 dark:hover:border-indigo-400/50"
+                : "text-gray-900 dark:text-gray-100"
+            )}
               onClick={() => handleEdit(field, value)}
             >
               {isEmpty ? (

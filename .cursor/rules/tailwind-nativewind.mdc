@@ -1,0 +1,42 @@
+---
+description: Tailwind / NativeWind styling (class order, dark mode, mobile touch targets)
+alwaysApply: false
+---
+
+# Tailwind / NativeWind Best Practices
+
+Use for Next.js + Capacitor (web in WebView) and future Expo/RN with NativeWind.
+
+## Class ordering
+
+Apply classes in this order for consistency:
+
+1. **Layout / position** – `relative`, `absolute`, `fixed`, `sticky`, `inset-*`, `top-*`, `left-*`, `z-*`
+2. **Flex / grid** – `flex`, `grid`, `flex-col`, `flex-row`, `flex-1`, `flex-wrap`, `items-*`, `justify-*`, `gap-*`
+3. **Spacing** – `m-*`, `p-*`, `space-*`
+4. **Sizing** – `w-*`, `h-*`, `min-w-*`, `min-h-*`, `max-w-*`, `size-*`
+5. **Typography** – `text-*`, `font-*`, `tracking-*`, `leading-*`, `truncate`
+6. **Colors / borders / backgrounds** – `bg-*`, `text-*`, `border-*`, `ring-*`
+7. **Effects** – `shadow-*`, `opacity-*`, `backdrop-blur-*`, `rounded-*`
+8. **Transitions / interactivity** – `transition-*`, `hover:`, `active:`, `focus:`, `dark:`, `disabled:`
+
+Use semantic tokens: `bg-background`, `text-foreground`, `border-border`, `bg-card`, `text-muted-foreground`, etc.
+
+## Dark mode
+
+- Use `dark:` variants for theme-aware styles. Dark mode is driven by the `.dark` class on `html` (class strategy).
+- Avoid hardcoded colors; prefer `text-muted-foreground dark:text-muted-foreground` or rely on semantic tokens.
+- Ensure backgrounds and text contrast in both modes.
+
+## Mobile / native feel (Capacitor, PWA, future Expo)
+
+- **Touch targets** – Minimum 44×44px (`min-h-11 min-w-11` or `min-touch`). Use for buttons, nav items, form controls.
+- **Safe areas** – Use `pt-safe`, `pb-safe`, `pl-safe`, `pr-safe`, `safe-insets-x`, `safe-insets-y` for notch/home indicator.
+- **Padding** – Use `px-4`–`px-6` on mobile; avoid cramped `px-2` for primary actions.
+- **Font scaling** – Allow system font scaling; avoid `text-[10px]` or very small fixed sizes for important text.
+- **Touch feedback** – Add `active:opacity-80` or `active:scale-[0.98]` for tap feedback where appropriate.
+- **Avoid web-only utilities** – Skip `cursor-*` for touch-only UIs; avoid relying solely on `hover:` for critical feedback.
+
+## NativeWind (React Native) notes
+
+When using NativeWind in Expo: same class order; replace `div`/`span` with `View`/`Text`; use `className` on native components. NativeWind does not support all web utilities (e.g. `backdrop-blur`, `box-shadow`).

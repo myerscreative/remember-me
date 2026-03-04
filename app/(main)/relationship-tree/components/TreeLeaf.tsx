@@ -48,8 +48,8 @@ export default function TreeLeaf({
       style={{
         transform: `translate(${contact.position.x}px, ${contact.position.y}px)`,
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handleMouseEnter}
+      onPointerLeave={handleMouseLeave}
       onClick={handleClick}
     >
       {/* Drop Shadow Filter defined globally in Tree, applied here */}

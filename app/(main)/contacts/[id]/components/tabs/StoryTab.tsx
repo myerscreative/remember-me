@@ -126,7 +126,7 @@ export function StoryTab({ contact, onEdit }: StoryTabProps) {
                   {memory.imageUrl && (
                     <div className="mb-4 rounded-lg overflow-hidden border border-slate-800">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={memory.imageUrl} alt="Memory" className="w-full h-auto object-cover max-h-48" />
+                      <img src={memory.imageUrl} alt={memory.text ? `Story memory: ${memory.text.slice(0, 80)}${memory.text.length > 80 ? "…" : ""}` : "Story memory image"} className="w-full h-auto object-cover max-h-48" />
                     </div>
                   )}
                   
@@ -146,7 +146,6 @@ export function StoryTab({ contact, onEdit }: StoryTabProps) {
         title="Add Memory"
         onClick={() => {
           // Placeholder for FAB interaction
-          console.log('Open Add Memory modal');
         }}
       >
         <Plus className="w-6 h-6" />

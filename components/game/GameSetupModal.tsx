@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Users, Briefcase, Heart, Clock, Globe, Tag, MapPin, Building2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface GameSetupModalProps {
   isOpen: boolean;
@@ -115,66 +116,72 @@ export function GameSetupModal({ isOpen, onClose, onStart, gameTitle }: GameSetu
           <div className="grid grid-cols-6 gap-2">
             <button
               onClick={() => handleFilterTypeChange('all')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'all'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "all"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <Users className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">All</div>
             </button>
             <button
               onClick={() => handleFilterTypeChange('group')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'group'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "group"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <Briefcase className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">Group</div>
             </button>
             <button
               onClick={() => handleFilterTypeChange('tag')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'tag'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "tag"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <Tag className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">Tag</div>
             </button>
             <button
               onClick={() => handleFilterTypeChange('location')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'location'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "location"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <MapPin className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">City</div>
             </button>
             <button
               onClick={() => handleFilterTypeChange('company')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'company'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "company"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <Building2 className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">Org</div>
             </button>
             <button
               onClick={() => handleFilterTypeChange('recent')}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${
-                filterType === 'recent'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-              }`}
+              className={cn(
+                "rounded-xl border-2 p-3 text-center transition-all",
+                filterType === "recent"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+              )}
             >
               <Clock className="w-5 h-5 mx-auto mb-1" />
               <div className="font-semibold text-xs">Recent</div>
@@ -193,19 +200,20 @@ export function GameSetupModal({ isOpen, onClose, onStart, gameTitle }: GameSetu
                     <button
                       key={group.id}
                       onClick={() => setSelectedValue(group.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                      className={cn(
+                        "flex items-center justify-between rounded-xl border p-3 transition-all",
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-                      }`}
+                          ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                          : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+                      )}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                        <div className={cn("rounded-lg p-2", isSelected ? "bg-indigo-100" : "bg-slate-100")}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <span className="font-semibold">{group.name}</span>
                       </div>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isSelected ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                      <span className={cn("rounded-full px-2 py-1 text-xs font-medium", isSelected ? "bg-indigo-100" : "bg-slate-100")}>
                         {group.count}
                       </span>
                     </button>
@@ -226,14 +234,15 @@ export function GameSetupModal({ isOpen, onClose, onStart, gameTitle }: GameSetu
                     <button
                       key={tag.id}
                       onClick={() => setSelectedValue(tag.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                      className={cn(
+                        "flex items-center justify-between rounded-xl border p-3 transition-all",
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-                      }`}
+                          ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                          : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+                      )}
                     >
                       <span className="font-semibold text-sm">{tag.name}</span>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isSelected ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                      <span className={cn("rounded-full px-2 py-1 text-xs font-medium", isSelected ? "bg-indigo-100" : "bg-slate-100")}>
                         {tag.count}
                       </span>
                     </button>
@@ -254,17 +263,18 @@ export function GameSetupModal({ isOpen, onClose, onStart, gameTitle }: GameSetu
                     <button
                       key={location.id}
                       onClick={() => setSelectedValue(location.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                      className={cn(
+                        "flex items-center justify-between rounded-xl border p-3 transition-all",
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-                      }`}
+                          ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                          : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+                      )}
                     >
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4" />
                         <span className="font-semibold text-sm">{location.name}</span>
                       </div>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isSelected ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                      <span className={cn("rounded-full px-2 py-1 text-xs font-medium", isSelected ? "bg-indigo-100" : "bg-slate-100")}>
                         {location.count}
                       </span>
                     </button>
@@ -285,17 +295,18 @@ export function GameSetupModal({ isOpen, onClose, onStart, gameTitle }: GameSetu
                     <button
                       key={company.id}
                       onClick={() => setSelectedValue(company.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                      className={cn(
+                        "flex items-center justify-between rounded-xl border p-3 transition-all",
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'
-                      }`}
+                          ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                          : "border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+                      )}
                     >
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
                         <span className="font-semibold text-sm">{company.name}</span>
                       </div>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isSelected ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                      <span className={cn("rounded-full px-2 py-1 text-xs font-medium", isSelected ? "bg-indigo-100" : "bg-slate-100")}>
                         {company.count}
                       </span>
                     </button>

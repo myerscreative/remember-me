@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useOptimistic, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useOptimistic } from 'react';
+import { BackButton } from '@/components/back-button';
 import { Person } from '@/types/database.types';
 import { getDetailedRelationshipHealth as getRelationshipHealth, FREQUENCY_PRESETS } from '@/lib/relationship-health';
 import { formatBirthday, getInitials } from '@/lib/utils/contact-helpers';
@@ -66,9 +66,13 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
       
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center px-6 mb-6">
-         <Link href="/" className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
+         <BackButton
+            fallbackHref="/"
+            className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors"
+            size="icon"
+         >
             <ChevronLeft size={28} />
-         </Link>
+         </BackButton>
          <div className="flex gap-4">
             <button onClick={onToggleFavorite} className="text-gray-400 hover:text-yellow-400 transition-colors">
                 <Star size={24} className={cn(contact.is_favorite && "fill-yellow-400 text-yellow-400")} />

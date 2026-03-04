@@ -175,7 +175,7 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, initialSearchT
                     className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-slate-600 transition-all group"
                   >
                     <Avatar className="h-9 w-9 border border-slate-600">
-                      <AvatarImage src={contact.photo_url || undefined} />
+                      <AvatarImage src={contact.photo_url || undefined} alt={contact.name} />
                       <AvatarFallback className="bg-indigo-900 text-indigo-300 text-xs font-bold">
                         {(contact.first_name?.[0] || '') + (contact.last_name?.[0] || '')}
                       </AvatarFallback>

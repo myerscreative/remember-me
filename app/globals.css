@@ -95,6 +95,12 @@
   --sidebar-accent-foreground: oklch(0.25 0.02 85);
   --sidebar-border: oklch(0.93 0.005 85);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Safe area insets for Expo/Capacitor/iOS (notch, home indicator). env() in WebView; 0 on desktop. */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
 }
 
 .dark {
@@ -223,10 +229,26 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
 @layer utilities {
+  /* Touch targets: min 44×44px for native-feel taps */
+  .min-touch {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .min-touch-h {
+    min-height: 44px;
+  }
+  .min-touch-w {
+    min-width: 44px;
+  }
+  /* Tap highlight for cleaner native feel */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
   .scrollbar-hide,
   .no-scrollbar {
     -ms-overflow-style: none;
@@ -235,6 +257,26 @@
   .scrollbar-hide::-webkit-scrollbar,
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+  .pt-safe {
+    padding-top: var(--safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+  .pl-safe {
+    padding-left: var(--safe-area-inset-left);
+  }
+  .pr-safe {
+    padding-right: var(--safe-area-inset-right);
+  }
+  .safe-insets-x {
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+  }
+  .safe-insets-y {
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
   }
 }
 
@@ -252,6 +294,19 @@
 
 .animate-pulse-subtle {
   animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 /* Custom scrollbar styling */

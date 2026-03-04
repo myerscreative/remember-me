@@ -1,0 +1,15 @@
+---
+description: Next.js / React / TypeScript standards (App Router, Tailwind, a11y, naming)
+alwaysApply: true
+---
+
+# Next.js / React / TypeScript Standards
+
+- **App Router**: Use App Router; Server Components by default; use Client Components only when needed (interactivity, hooks, browser APIs).
+- **Composition**: Prefer composition over inheritance; build UIs from small, composable pieces.
+- **Tailwind**: Mobile-first; utility classes only (no custom CSS unless unavoidable); use `cn()` from `@/lib/utils` for conditional/merged classes (not template literals). Order classes: layout/position → flex/grid → spacing → sizing → typography → colors/borders → effects → transitions/interactivity. Prefer Tailwind over inline styles (e.g. `md:ml-64` not `style={{ marginLeft: '16rem' }}`); keep inline only for dynamic values (e.g. `width: \`${progress}%\``). For mobile/Capacitor, use `min-touch`, safe-area utilities, and semantic tokens for dark mode. See tailwind-nativewind rule for details.
+- **Components**: Prefer shadcn/ui or Radix primitives; use early returns; type props and state properly.
+- **Accessibility**: Semantic HTML; ARIA only when needed; visible focus states for keyboard users.
+- **Performance**: Memoize when it prevents unnecessary renders (e.g. expensive children, stable callbacks in deps); avoid redundant re-renders.
+- **Naming**: PascalCase for components; descriptive const names; kebab-case for file names.
+- **Clean code**: Small, single-responsibility functions; remove `console.log` and debug code before committing.

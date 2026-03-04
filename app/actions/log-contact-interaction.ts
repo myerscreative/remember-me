@@ -39,7 +39,7 @@ export async function logContactInteraction(
     const validatedData = validationResult.data;
 
     // 1. Insert Interaction Record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error: interactionError } = await (supabase as any)
       .from('interactions')
       .insert({
@@ -53,7 +53,7 @@ export async function logContactInteraction(
     if (interactionError) throw interactionError;
 
     // 2. Update Person Status
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error: updateError } = await (supabase as any)
       .from('persons')
       .update({

@@ -48,7 +48,6 @@ export const levelingService = {
     // 1. Update user profile level/title
     // 2. Apply bulk interest/health bonus to persons with low interaction
     // (Actual implementation depends on table schemas)
-    console.log(`Persisting level ${newLevel} for user ${userId}`);
     return true;
   }
 };

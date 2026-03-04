@@ -143,7 +143,7 @@ export default function DeduplicatePage() {
                     {[group.keeper, ...group.duplicates].slice(0, 3).map(person => (
                        <div key={person.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-100">
                            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600 overflow-hidden">
-                              {person.photo_url ? <img src={person.photo_url} className="w-full h-full object-cover" /> : person.name.slice(0,1)}
+                              {person.photo_url ? <img src={person.photo_url} alt={person.name} className="w-full h-full object-cover" /> : person.name.slice(0,1)}
                            </div>
                            <div className="overflow-hidden">
                               <div className="font-medium text-sm truncate">{person.name}</div>

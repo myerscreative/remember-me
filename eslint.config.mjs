@@ -9,12 +9,19 @@ const eslintConfig = defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "warn",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "react/no-unescaped-entities": "warn",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-namespace": "off",
       "@typescript-eslint/require-await": "off",
     },
   },
   // Override default ignores of eslint-config-next.
+  // Allow console in dev scripts and test utilities
+  {
+    files: ["scripts/**", "proxy.ts", "test-server.js", "debug-db.ts"],
+    rules: { "no-console": "off" },
+  },
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, Check } from 'lucide-react';
 import { updatePersonImportance } from '@/app/actions/update-importance';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 
 export type TriageContact = {
   id: string;
@@ -120,7 +121,7 @@ export default function TriageList({ initialContacts }: TriageListProps) {
                 </div>
                 
                 <div>
-                  <div className={`font-medium transition-colors ${isPlanted ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                  <div className={cn("font-medium transition-colors", isPlanted ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white")}>
                     {contact.name}
                     {isPlanted && <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-500/50">Planted</span>}
                   </div>
@@ -131,37 +132,40 @@ export default function TriageList({ initialContacts }: TriageListProps) {
               </div>
 
               {/* Toggle Group */}
-              <div className={`flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 transition-opacity ${isPlanted ? 'pointer-events-none' : ''}`}>
+              <div className={cn("flex rounded-lg border border-slate-200 bg-slate-100 p-1 transition-opacity dark:border-slate-700 dark:bg-slate-800", isPlanted && "pointer-events-none")}>
                 <button
                   onClick={() => handleImportanceChange(contact.id, 'low')}
                   disabled={isPlanted}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    contact.importance === 'low'
-                      ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+                    contact.importance === "low"
+                      ? "bg-white text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200"
+                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  )}
                 >
                   Casual
                 </button>
                 <button
                   onClick={() => handleImportanceChange(contact.id, 'medium')}
                   disabled={isPlanted}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    contact.importance === 'medium'
-                      ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+                    contact.importance === "medium"
+                      ? "bg-white text-blue-600 shadow-sm dark:bg-slate-700 dark:text-blue-400"
+                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  )}
                 >
                   Medium
                 </button>
                 <button
                   onClick={() => handleImportanceChange(contact.id, 'high')}
                   disabled={isPlanted}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    contact.importance === 'high'
-                      ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shadow-sm ring-1 ring-amber-200 dark:ring-amber-800'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-all ring-1",
+                    contact.importance === "high"
+                      ? "bg-amber-100 text-amber-700 shadow-sm ring-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:ring-amber-800"
+                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  )}
                 >
                   High
                 </button>

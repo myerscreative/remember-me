@@ -1,15 +1,17 @@
-import { ArrowLeft } from 'lucide-react';
+import React from "react";
+import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface GameHeaderProps {
+export interface GameHeaderProps {
   score: number;
   streak?: number;
   timeLeft?: number;
   onBack: () => void;
   title?: string;
-  icon?: string; // Emoji
+  icon?: string;
 }
 
-export function GameHeader({ score, streak, timeLeft, onBack, title, icon }: GameHeaderProps) {
+function GameHeaderComponent({ score, streak, timeLeft, onBack, title, icon }: GameHeaderProps) {
   return (
     <div className="max-w-2xl mx-auto mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -42,7 +44,7 @@ export function GameHeader({ score, streak, timeLeft, onBack, title, icon }: Gam
           )}
 
            {timeLeft !== undefined && (
-            <div className={`px-4 py-2 rounded-xl shadow-sm min-w-[80px] text-center ${timeLeft <= 10 ? 'bg-red-50 text-red-600 animate-pulse border border-red-200' : 'bg-white text-slate-700'}`}>
+            <div className={cn("min-w-[80px] rounded-xl px-4 py-2 text-center shadow-sm", timeLeft <= 10 ? "animate-pulse border border-red-200 bg-red-50 text-red-600" : "bg-white text-slate-700")}>
               <span className="text-xs text-slate-500 uppercase font-bold block">Time</span>
               <div className="text-xl font-bold">{timeLeft}s</div>
             </div>
@@ -52,3 +54,5 @@ export function GameHeader({ score, streak, timeLeft, onBack, title, icon }: Gam
     </div>
   );
 }
+
+export const GameHeader = React.memo(GameHeaderComponent);

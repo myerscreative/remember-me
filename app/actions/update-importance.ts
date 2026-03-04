@@ -22,7 +22,7 @@ export async function updatePersonImportance(
       };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('persons')
       .update({ importance: validationResult.data })

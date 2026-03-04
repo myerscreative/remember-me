@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { BackButton } from '@/components/back-button';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Edit, Settings, Star } from 'lucide-react';
 import { ContactImportance } from '@/types/database.types';
@@ -19,12 +19,16 @@ export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileH
     <header className="h-[65px] flex items-center justify-between px-8 bg-sidebar border-b border-sidebar-border sticky top-0 z-10 hidden md:flex">
       {/* Left: Back Button */}
       <div className="flex-1">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="hidden md:flex text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pl-0 hover:bg-transparent">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to Contacts
-          </Button>
-        </Link>
+        <BackButton
+          fallbackHref="/"
+          variant="ghost"
+          size="sm"
+          className="hidden md:flex text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pl-0 hover:bg-transparent"
+          aria-label="Back to contacts"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Back to Contacts
+        </BackButton>
       </div>
 
       {/* Center: Title */}

@@ -148,9 +148,8 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
               onKeyDown={handleKeyDown}
               placeholder={isListening ? "Listening..." : "Type or edit..."}
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border-2 border-indigo-200 dark:border-indigo-900/50 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all text-sm leading-relaxed"
+              className="min-h-[80px] w-full resize-none rounded-xl border-2 border-indigo-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-700 placeholder:text-slate-400 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50 dark:border-indigo-900/50 dark:bg-slate-900/50 dark:text-slate-300 dark:placeholder:text-slate-500"
               disabled={isProcessing || isListening}
-              style={{ minHeight: '80px' }}
             />
             
             {/* Action Buttons */}

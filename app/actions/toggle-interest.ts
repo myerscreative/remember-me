@@ -14,7 +14,7 @@ export async function toggleInterest(personId: string, interestName: string) {
     const normalizedName = validatedInterestName.toLowerCase().trim();
 
     // 1. Ensure the interest exists in the global table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let { data: interest, error: findError } = await (supabase as any)
       .from('interests')
       .select()
@@ -23,7 +23,7 @@ export async function toggleInterest(personId: string, interestName: string) {
 
     if (!interest) {
       // Attempt to insert
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: newInterest, error: insertError } = await (supabase as any)
         .from('interests')
         .insert({ name: normalizedName })
@@ -34,7 +34,7 @@ export async function toggleInterest(personId: string, interestName: string) {
         // Check if it's a unique constraint violation (someone else just added it)
         if (insertError.code === '23505') {
           // Retry fetch
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const { data: retryInterest, error: retryError } = await (supabase as any)
             .from('interests')
             .select()
@@ -56,7 +56,7 @@ export async function toggleInterest(personId: string, interestName: string) {
     }
 
     // 2. Check if the link already exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: existing, error: fetchError } = await (supabase as any)
       .from('person_interests')
       .select()
@@ -71,7 +71,7 @@ export async function toggleInterest(personId: string, interestName: string) {
 
     if (existing) {
       // Remove it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: deleteError } = await (supabase as any)
         .from('person_interests')
         .delete()
@@ -83,7 +83,7 @@ export async function toggleInterest(personId: string, interestName: string) {
       }
     } else {
       // Add it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: insertError } = await (supabase as any)
         .from('person_interests')
         .insert({ person_id: validatedPersonId, interest_id: interest.id })

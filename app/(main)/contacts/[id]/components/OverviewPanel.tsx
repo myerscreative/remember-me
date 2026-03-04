@@ -435,7 +435,7 @@ export function OverviewPanel({
                             <div className="last:mb-0">
                                 <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
                                 <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-[#2d3748] pl-3 italic">
-                                    "{contact.deep_lore}"
+                                    &quot;{contact.deep_lore}&quot;
                                 </p>
                             </div>
                           )}

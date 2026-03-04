@@ -233,7 +233,7 @@ export function FactMatchGame({ onBack }: FactMatchGameProps) {
                         >
                             <span className="flex items-center gap-3">
                                 {option.photo ? (
-                                    <img src={option.photo} className="w-10 h-10 rounded-full object-cover border border-gray-200" alt="" />
+                                    <img src={option.photo} alt={option.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
                                 ) : (
                                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
                                         {option.initials}

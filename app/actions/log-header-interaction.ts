@@ -19,7 +19,6 @@ export async function logHeaderInteraction(
     // Adjusting to throw an error as per the provided change.
     throw new Error('Not authenticated');
   }
-  console.log(`[logHeaderInteraction] User Authenticated: ${user.id}`);
 
   try {
     // 1. Structured Interaction Log
@@ -55,7 +54,6 @@ export async function logHeaderInteraction(
         
         // Check for specific column error to give better feedback if schema is still wrong
         if (insertError.message.includes('column "date" does not exist')) {
-             console.log("[logHeaderInteraction] Schema Mismatch detected. Trying fallback to 'interaction_date'...");
              // Fallback attempt
              const { data: fallbackData, error: fallbackError } = await (supabase as any)
               .from('interactions')
@@ -72,13 +70,11 @@ export async function logHeaderInteraction(
                 console.error("[logHeaderInteraction] Fallback Insert Failed:", fallbackError);
                 throw new Error(`Failed to insert interaction (Fallback): ${fallbackError.message}`);
               }
-              console.log('[logHeaderInteraction] Fallback Insert SUCCESS:', fallbackData);
         } else {
              console.error("[logHeaderInteraction] Critical Insert Error:", insertError);
              throw new Error(`Failed to insert interaction: ${insertError.message}`);
         }
     } else {
-        console.log('[logHeaderInteraction] Insert Primary SUCCESS:', insertData);
     }
 
     // 2. Shared Memory Log (User Narrative)
@@ -90,7 +86,6 @@ export async function logHeaderInteraction(
           ? `[Attempted Contact] No note left.` 
           : (interactionType === 'attempt' ? `[Attempted Contact] ${finalNote}` : finalNote);
 
-        console.log('[logHeaderInteraction] Logging Shared Memory:', memoryContent);
 
         if (memoryContent) {
              const { error: memoryError } = await (supabase as any)
@@ -112,7 +107,6 @@ export async function logHeaderInteraction(
                  // THROW the error so the UI knows!
                  throw new Error(`Shared Memory Log Failed: ${memoryError.message}`);
              } else {
-                 console.log("Memory Log SUCCESS");
              }
         }
     }

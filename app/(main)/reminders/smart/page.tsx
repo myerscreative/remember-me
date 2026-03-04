@@ -277,7 +277,7 @@ export default function SmartRemindersPage() {
                           className="h-14 w-14 shrink-0 cursor-pointer"
                           onClick={() => router.push(`/contacts/${reminder.id}`)}
                         >
-                          <AvatarImage src={reminder.photo_url || undefined} />
+                          <AvatarImage src={reminder.photo_url || undefined} alt={reminder.name} />
                           <AvatarFallback
                             className={cn(
                               "bg-linear-to-br text-white font-semibold",

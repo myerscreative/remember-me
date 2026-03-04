@@ -16,30 +16,30 @@ export function MobileHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="md:hidden sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border px-4 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full md:hidden flex min-h-14 items-center justify-between px-4 pl-safe pr-safe pt-safe border-b border-border bg-background/80 backdrop-blur-md">
       <div className="flex items-center gap-2">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="min-touch md:hidden active:opacity-80">
+              <Menu className="size-5" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 bg-sidebar border-r border-sidebar-border">
-            <SheetHeader className="p-6 border-b border-sidebar-border">
+          <SheetContent side="left" className="flex flex-col w-72 p-0 border-r border-sidebar-border bg-sidebar">
+            <SheetHeader className="flex p-6 border-b border-sidebar-border">
               <SheetTitle className="text-left">
-                 <h2 className="text-xl font-bold bg-linear-to-r from-sidebar-foreground to-sidebar-foreground/60 bg-clip-text text-transparent">ReMember Me</h2>
+                 <h2 className="text-xl font-bold text-sidebar-foreground">ReMember Me</h2>
               </SheetTitle>
             </SheetHeader>
-            <div className="h-[calc(100vh-80px)] overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
                 <SidebarNavContent onNavItemClick={() => setOpen(false)} />
             </div>
           </SheetContent>
         </Sheet>
         
         <div className="flex items-center gap-2">
-           <Activity className="h-5 w-5 text-purple-600" />
-           <span className="font-bold text-sm">Dashboard</span>
+           <Activity className="size-5 text-primary" />
+           <span className="text-sm font-bold text-foreground">Dashboard</span>
         </div>
       </div>
       

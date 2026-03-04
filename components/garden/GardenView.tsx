@@ -95,7 +95,7 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onPointerLeave={handleMouseUp}
         >
             <motion.div
                 className="relative"

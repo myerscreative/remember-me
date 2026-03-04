@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Archive,
-  ArchiveRestore,
-  X,
-} from "lucide-react";
+import { Archive, ArchiveRestore, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 interface ArchiveContactDialogProps {
   contactId: string;
@@ -161,7 +158,7 @@ export function ArchiveContactDialog({
           <Button
             onClick={handleArchive}
             disabled={loading}
-            className={isArchived ? "flex-1 bg-green-600 hover:bg-green-700" : "flex-1 bg-orange-600 hover:bg-orange-700"}
+            className={cn("flex-1", isArchived ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700")}
           >
             {loading ? (
               <div className="flex items-center gap-2">

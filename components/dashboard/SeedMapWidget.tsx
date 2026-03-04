@@ -200,11 +200,11 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
                         key={leaf.id}
                         transform={`translate(${leaf.x}, ${leaf.y}) rotate(${leaf.rotation - 90}) scale(${leafScale})`} // -90 adjustment because path points 'Up' but atan2 is from 'Right'
                         className="cursor-pointer transition-all duration-300"
-                        onMouseEnter={(e: any) => {
+                        onPointerEnter={(e: React.PointerEvent) => {
                              setHoveredId(leaf.id);
                              setTooltip({ visible: true, x: e.clientX, y: e.clientY, contact: leaf });
                         }}
-                        onMouseLeave={() => {
+                        onPointerLeave={() => {
                              setHoveredId(null);
                              setTooltip(prev => ({ ...prev, visible: false }));
                         }}
@@ -305,7 +305,6 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
             preferredChannel: 'SMS'
           }}
           onAction={(channel) => {
-            console.log(`Sending a ${channel} to ${selectedNurtureContact.name}...`);
             // In a real flow, this could open the email client, sms, or navigate to a deep link.
           }}
         />

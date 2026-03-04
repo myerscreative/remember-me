@@ -154,7 +154,7 @@ export function LinkConnectionModal({
                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#1a1f2e] transition-colors text-left group"
                     >
                       <Avatar className="h-10 w-10 border border-slate-700">
-                        <AvatarImage src={person.photo_url || undefined} />
+                        <AvatarImage src={person.photo_url || undefined} alt={person.name} />
                         <AvatarFallback className="bg-slate-800 text-slate-300">
                           {getInitials(person.first_name, person.last_name)}
                         </AvatarFallback>
@@ -184,7 +184,7 @@ export function LinkConnectionModal({
             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex items-center gap-4 bg-[#1a1f2e] p-4 rounded-xl border border-slate-700">
                 <Avatar className="h-12 w-12 border-2 border-slate-600">
-                  <AvatarImage src={selectedPerson.photo_url || undefined} />
+                  <AvatarImage src={selectedPerson.photo_url || undefined} alt={selectedPerson.name} />
                   <AvatarFallback className="bg-slate-800 text-slate-300">
                     {getInitials(selectedPerson.first_name, selectedPerson.last_name)}
                   </AvatarFallback>

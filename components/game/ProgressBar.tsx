@@ -1,14 +1,21 @@
-interface ProgressBarProps {
-    current: number;
-    total: number;
-    colorFrom?: string;
-    colorTo?: string;
+import React from "react";
+
+export interface ProgressBarProps {
+  current: number;
+  total: number;
+  colorFrom?: string;
+  colorTo?: string;
 }
 
-export function ProgressBar({ current, total, colorFrom = 'from-indigo-500', colorTo = 'to-purple-500' }: ProgressBarProps) {
-    const progress = Math.min(100, Math.max(0, (current / total) * 100));
+function ProgressBarComponent({
+  current,
+  total,
+  colorFrom = "from-indigo-500",
+  colorTo = "to-purple-500",
+}: ProgressBarProps) {
+  const progress = Math.min(100, Math.max(0, (current / total) * 100));
 
-    return (
+  return (
         <div className="max-w-2xl mx-auto mb-2">
             <div className="bg-white rounded-full h-3 overflow-hidden shadow-inner w-full">
                 <div
@@ -21,5 +28,7 @@ export function ProgressBar({ current, total, colorFrom = 'from-indigo-500', col
                 <span>{Math.round(progress)}% Complete</span>
             </div>
         </div>
-    );
+  );
 }
+
+export const ProgressBar = React.memo(ProgressBarComponent);

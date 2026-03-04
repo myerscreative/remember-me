@@ -94,7 +94,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
     try {
       const supabase = createClient();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error } = await (supabase as any)
         .from("persons")
         .update(updates)

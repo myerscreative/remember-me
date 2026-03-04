@@ -7,6 +7,7 @@ import { GameHeader } from "@/components/game/GameHeader";
 import { ProgressBar } from "@/components/game/ProgressBar";
 import { ResultsScreen } from "@/components/game/ResultsScreen";
 import { WebRecallQuestion } from "@/app/actions/game-web-recall";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface WebRecallGameProps {
@@ -119,12 +120,12 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
         colorTo="to-purple-500"
       />
 
-      <main className="max-w-2xl mx-auto mt-8 flex flex-col items-center">
+      <main className="max-w-2xl mx-auto mt-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-700">
         {/* Hero Visual: Floating Avatars & Connection Web */}
         <div className="relative w-full h-64 mb-12 flex items-center justify-center overflow-hidden">
           {/* Pulsating Line */}
           <motion.div
-            className={`absolute h-1 rounded-full ${showFeedback ? (currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? 'bg-green-500' : 'bg-orange-500') : 'bg-indigo-500'}`}
+            className={cn("absolute h-1 rounded-full", showFeedback ? (currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "bg-green-500" : "bg-orange-500") : "bg-indigo-500")}
             initial={{ width: 0, opacity: 0.5 }}
             animate={{ 
               width: "200px", 
@@ -149,7 +150,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
               scale: { duration: 0.5 }
             }}
           >
-            <div className={`w-24 h-24 rounded-full border-4 ${showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? 'border-green-500 shadow-[0_0_20px_#22c55e]' : 'border-slate-700'} overflow-hidden bg-slate-800 flex items-center justify-center transition-colors duration-300`}>
+            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-slate-800 transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-slate-700")}>
               {currentQuestion.contactA.photoUrl ? (
                 <img src={currentQuestion.contactA.photoUrl} alt={currentQuestion.contactA.name} className="w-full h-full object-cover" />
               ) : (
@@ -173,7 +174,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
               scale: { duration: 0.5 }
             }}
           >
-            <div className={`w-24 h-24 rounded-full border-4 ${showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? 'border-green-500 shadow-[0_0_20px_#22c55e]' : 'border-slate-700'} overflow-hidden bg-slate-800 flex items-center justify-center transition-colors duration-300`}>
+            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-slate-800 transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-slate-700")}>
               {currentQuestion.contactB.photoUrl ? (
                 <img src={currentQuestion.contactB.photoUrl} alt={currentQuestion.contactB.name} className="w-full h-full object-cover" />
               ) : (
@@ -286,16 +287,6 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
             </div>
         </div>
       </main>
-
-      <style jsx>{`
-        main {
-          animation: fadeIn 0.8s ease-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

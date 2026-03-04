@@ -1,6 +1,7 @@
 import React from 'react';
 import { Contact } from '../mockContacts';
 import { calculateDaysAgo, formatRelativeTime, getMethodIcon } from '../utils/dateUtils';
+import { cn } from '@/lib/utils';
 
 interface SuggestionPanelProps {
   suggestions: Contact[];
@@ -36,7 +37,7 @@ export default function SuggestionPanel({ suggestions }: SuggestionPanelProps) {
                  <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
                  <p className="text-xs text-gray-500 truncate">{contact.role}</p>
                  {/* Last Contact Info */}
-                 <p className={`text-[10px] mt-0.5 flex items-center gap-1 ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-400'}`}>
+                 <p className={cn("mt-0.5 flex items-center gap-1 text-[10px]", isOverdue ? "font-medium text-red-600" : "text-gray-400")}>
                     {icon} {timeText} {isOverdue && '⚠️'} {isRecent && '✓'}
                  </p>
                </div>

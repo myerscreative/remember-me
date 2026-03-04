@@ -118,6 +118,28 @@ export default function FactMatchGame() {
         generateQuestions();
     }
   }, [loading, allContacts, generateQuestions]);
+
+  // Timer countdown (must be before early returns for hooks order)
+  useEffect(() => {
+    if (gameState.gameStatus !== 'playing' || gameState.showFeedback) return;
+
+    const timer = setInterval(() => {
+      setGameState(prev => {
+        if (prev.timeLeft <= 1) {
+          return {
+            ...prev,
+            timeLeft: 30,
+            currentQuestion: prev.currentQuestion + 1,
+            streak: 0,
+            gameStatus: prev.currentQuestion + 1 >= prev.totalQuestions ? 'complete' : 'playing',
+          };
+        }
+        return { ...prev, timeLeft: prev.timeLeft - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState.gameStatus, gameState.showFeedback]);
   
   if (loading) {
       return (
@@ -139,28 +161,6 @@ export default function FactMatchGame() {
         </div>
       );
   }
-
-  // Timer countdown
-  useEffect(() => {
-    if (gameState.gameStatus !== 'playing' || gameState.showFeedback) return;
-
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        if (prev.timeLeft <= 1) {
-          return {
-            ...prev,
-            timeLeft: 30,
-            currentQuestion: prev.currentQuestion + 1,
-            streak: 0,
-            gameStatus: prev.currentQuestion + 1 >= prev.totalQuestions ? 'complete' : 'playing',
-          };
-        }
-        return { ...prev, timeLeft: prev.timeLeft - 1 };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState.gameStatus, gameState.showFeedback]);
 
   function handleAnswer(selectedIndex: number) {
     if (gameState.showFeedback) return;

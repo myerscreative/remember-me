@@ -24,7 +24,7 @@ export async function GET() {
       .single();
     
     // Cast to any to avoid "Property does not exist on type 'never'" until types are regenerated
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const safePrefs = prefs as any;
 
     if (dbError && dbError.code !== 'PGRST116') { // PGRST116 is "Row not found"

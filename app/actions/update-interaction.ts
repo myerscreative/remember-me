@@ -36,7 +36,7 @@ export async function updateInteraction(
     const { interactionId: validatedId, ...updateData } = validationResult.data;
 
     // Update the interaction (RLS policies will ensure user can only update their own)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('interactions')
       .update({

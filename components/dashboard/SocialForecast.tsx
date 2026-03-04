@@ -1,47 +1,55 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Sun, 
-  Cloud, 
-  CloudLightning, 
-  ChevronDown, 
-  ChevronUp, 
+import {
+  Sun,
+  Cloud,
+  CloudLightning,
+  ChevronDown,
+  ChevronUp,
   AlertTriangle,
   ArrowRight,
   RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getSocialForecast, ForecastData } from "@/app/actions/get-social-forecast";
+import type { ForecastData } from "@/app/actions/get-social-forecast";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { useSocialForecast } from "@/hooks/useSocialForecast";
+
+const WEATHER_CONFIG = {
+  sunny: {
+    icon: Sun,
+    color: "text-amber-500",
+    bg: "bg-linear-to-br from-blue-500/10 via-cyan-400/5 to-transparent",
+    border: "border-blue-200/50 dark:border-blue-800/50",
+    text: "Conditions are prime for growth.",
+    advice: "Keep blooming! Your network is expanding naturally.",
+  },
+  overcast: {
+    icon: Cloud,
+    color: "text-slate-400",
+    bg: "bg-linear-to-br from-slate-400/10 via-gray-300/5 to-transparent",
+    border: "border-slate-200 dark:border-slate-800",
+    text: "You are in maintenance mode.",
+    advice: "You are replacing decay with new seeds. Stay consistent.",
+  },
+  stormy: {
+    icon: CloudLightning,
+    color: "text-indigo-600 dark:text-indigo-400",
+    bg: "bg-linear-to-br from-indigo-600/10 via-slate-700/5 to-transparent shadow-indigo-500/5",
+    border: "border-indigo-200/50 dark:border-indigo-800/50",
+    text: "Infrastructure is at risk.",
+    advice: "Decay is outpacing growth. Time for course correction.",
+  },
+} as const;
 
 export function SocialForecast() {
   const router = useRouter();
-  const [data, setData] = useState<ForecastData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading } = useSocialForecast();
   const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    fetchForecast();
-  }, []);
-
-  const fetchForecast = async () => {
-    setIsLoading(true);
-    try {
-      const { data: forecast, error } = await getSocialForecast();
-      if (error) throw error;
-      setData(forecast);
-    } catch (error) {
-      console.error("Forecast Error:", error);
-      toast.error("Failed to load social forecast");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -57,34 +65,7 @@ export function SocialForecast() {
 
   const { weatherState, forecastedHealth, currentHealth, decayCount, atRiskContacts } = data;
   const delta = forecastedHealth - currentHealth;
-
-  const config = {
-    sunny: {
-      icon: Sun,
-      color: "text-amber-500",
-      bg: "bg-linear-to-br from-blue-500/10 via-cyan-400/5 to-transparent",
-      border: "border-blue-200/50 dark:border-blue-800/50",
-      text: "Conditions are prime for growth.",
-      advice: "Keep blooming! Your network is expanding naturally."
-    },
-    overcast: {
-      icon: Cloud,
-      color: "text-slate-400",
-      bg: "bg-linear-to-br from-slate-400/10 via-gray-300/5 to-transparent",
-      border: "border-slate-200 dark:border-slate-800",
-      text: "You are in maintenance mode.",
-      advice: "You are replacing decay with new seeds. Stay consistent."
-    },
-    stormy: {
-      icon: CloudLightning,
-      color: "text-indigo-600 dark:text-indigo-400",
-      bg: "bg-linear-to-br from-indigo-600/10 via-slate-700/5 to-transparent shadow-indigo-500/5",
-      border: "border-indigo-200/50 dark:border-indigo-800/50",
-      text: "Infrastructure is at risk.",
-      advice: "Decay is outpacing growth. Time for course correction."
-    }
-  }[weatherState];
-
+  const config = WEATHER_CONFIG[weatherState];
   const Icon = config.icon;
 
   return (
@@ -114,7 +95,7 @@ export function SocialForecast() {
                   In 30 days, your Nurtured core will be <span className={cn("inline-flex items-center px-2 py-0.5 rounded-md bg-white/80 dark:bg-slate-800/80 shadow-xs mx-1", delta >= 0 ? "text-emerald-600" : "text-red-600")}>{forecastedHealth}</span> contacts.
                 </p>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Net Trajectory: <span className={delta >= 0 ? "text-emerald-500" : "text-red-500"}>{delta > 0 ? "+" : ""}{delta} contacts</span>
+                    Net Trajectory: <span className={cn(delta >= 0 ? "text-emerald-500" : "text-red-500")}>{delta > 0 ? "+" : ""}{delta} contacts</span>
                 </p>
               </div>
             </div>

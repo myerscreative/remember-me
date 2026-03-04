@@ -232,7 +232,6 @@ export function NeedsNurtureList({ contacts = [] }: NeedsNurtureListProps) {
           }}
           onAction={(channel) => {
             // Once they act on it, we might open the Action Hub to log it, or redirect.
-            console.log(`Initiated ${channel} to ${selectedContact.name}`);
             // isNurtureDrawerOpen automatically closes from the component
           }}
         />

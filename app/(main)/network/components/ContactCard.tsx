@@ -1,10 +1,11 @@
-import React from 'react';
-import Image from 'next/image';
-import { Contact } from '../mockContacts';
-import { MatchLevel } from '../utils/matchUtils';
-import { Plus, Info } from 'lucide-react';
-import { calculateDaysAgo, getContactStatus, formatRelativeTime, getShortRelativeTime, getMethodIcon, getMethodLabel } from '../utils/dateUtils';
-import { getMicroSummaryForList } from '@/lib/utils/summary-levels';
+import React from "react";
+import Image from "next/image";
+import { Contact } from "../mockContacts";
+import { MatchLevel } from "../utils/matchUtils";
+import { Plus, Info } from "lucide-react";
+import { calculateDaysAgo, getContactStatus, formatRelativeTime, getShortRelativeTime, getMethodIcon, getMethodLabel } from "../utils/dateUtils";
+import { getMicroSummaryForList } from "@/lib/utils/summary-levels";
+import { cn } from "@/lib/utils";
 
 interface ContactCardProps {
   contact: Contact;
@@ -74,7 +75,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
 
   return (
     <div
-      className={`group rounded-xl ${borderColor} ${bgColor} p-4 cursor-pointer transition-all hover:shadow-lg ${opacityClass} relative`}
+      className={cn("group relative cursor-pointer rounded-xl p-4 transition-all hover:shadow-lg", borderColor, bgColor, opacityClass)}
       onClick={() => onSelect(contact)}
       role="button"
       aria-pressed={isSelected}
@@ -120,14 +121,14 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
       
       {/* Compact/Standard Last Contact Info */}
       {viewMode === 'compact' && (
-        <div className={`mt-1 text-center text-[10px] font-medium ${showStatusWarning ? 'text-red-600' : 'text-gray-500'}`}>
+        <div className={cn("mt-1 text-center text-[10px] font-medium", showStatusWarning ? "text-red-600" : "text-gray-500")}>
           {methodIcon} {shortTime}
         </div>
       )}
       
       {viewMode === 'standard' && (
         <>
-          <div className={`mt-2 text-center text-xs font-medium py-1 px-2 rounded-full border ${statusColorClass} inline-block w-full truncate`}>
+          <div className={cn("mt-2 inline-block w-full truncate rounded-full border px-2 py-1 text-center text-xs font-medium", statusColorClass)}>
              {methodIcon} {methodLabel} {shortTime} {status === 'overdue' && '⚠️'}
           </div>
           {/* Shared Interest Label */}
@@ -154,7 +155,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
       {/* Match badge */}
       {showBadge && (
         <div
-          className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${badgeColor} text-white shadow-sm ring-2 ring-white`}
+          className={cn("absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ring-2 ring-white", badgeColor)}
         >
           {badgeText}
         </div>
@@ -171,7 +172,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
       {viewMode === 'detailed' && (
         <div className="mt-3 space-y-2">
            {/* Last Contact Box */}
-           <div className={`text-xs p-2 rounded-lg border ${statusColorClass} flex flex-col items-center gap-1`}>
+           <div className={cn("flex flex-col items-center gap-1 rounded-lg border p-2 text-xs", statusColorClass)}>
              <div className="font-semibold flex items-center gap-1">
                {methodIcon} {methodLabel}
              </div>
@@ -201,7 +202,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
               return (
                 <span
                   key={idx}
-                  className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-xs ${tagClass}`}
+                  className={cn("inline-flex items-center gap-0.5 rounded-md px-2 py-0.5 text-xs", tagClass)}
                 >
                   {!isMatch && <Plus className="w-3 h-3 mr-1" />}
                   {content}

@@ -65,7 +65,7 @@ export function DiscoveryCard({
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xs">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={bridgePhotoUrl || undefined} />
+                    <AvatarImage src={bridgePhotoUrl || undefined} alt={bridgeName} />
                     <AvatarFallback className={cn("text-[8px] text-white", getGradient(bridgeName))}>
                       {getInitials(bridgeName)}
                     </AvatarFallback>

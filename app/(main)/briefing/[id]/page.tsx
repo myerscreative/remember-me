@@ -221,7 +221,7 @@ export default function BriefingPage({
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">What's Important to Them</h2>
+                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">What&apos;s Important to Them</h2>
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{contact.most_important_to_them}</p>
               </CardContent>

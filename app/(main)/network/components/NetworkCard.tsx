@@ -2,7 +2,6 @@
 
 import { Person } from '@/types/database.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { CalendarDays, Cake, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
@@ -16,27 +15,25 @@ interface NetworkCardProps {
   highlight?: string;
 }
 
-export function NetworkCard({ contact, highlight }: NetworkCardProps) {
-  // Helper to highlight text
-  const HighlightText = ({ text }: { text: string }) => {
-    if (!highlight || !text) return <>{text}</>;
-    
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
-    return (
-      <>
-        {parts.map((part, i) => 
-          part.toLowerCase() === highlight.toLowerCase() ? (
-            <span key={i} className="bg-yellow-200 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 px-0.5 rounded">
-              {part}
-            </span>
-          ) : (
-            part
-          )
-        )}
-      </>
-    );
-  };
+function highlightText(text: string, highlight?: string) {
+  if (!highlight || !text) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span key={i} className="bg-yellow-200 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 px-0.5 rounded">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
 
+export function NetworkCard({ contact, highlight }: NetworkCardProps) {
   const initials = contact.first_name?.[0] + (contact.last_name?.[0] || '');
 
   // Format dates helper
@@ -44,7 +41,7 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
     if (!dateString) return null;
     try {
       return format(parseISO(dateString), 'MMM d, yyyy');
-    } catch (e) {
+    } catch {
       return dateString;
     }
   };
@@ -57,7 +54,7 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
       <Card className="group relative overflow-hidden p-3 hover:shadow-md transition-all duration-300 border-white/20 bg-white/40 dark:bg-black/20 hover:bg-white/60 dark:hover:bg-black/40 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 border-2 border-white/20">
-            <AvatarImage src={contact.photo_url || undefined} />
+            <AvatarImage src={contact.photo_url || undefined} alt={contact.name ?? "Contact"} />
             <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs font-bold">
               {initials}
             </AvatarFallback>
@@ -66,14 +63,14 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
                <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
-                <HighlightText text={contact.name} />
+                {highlightText(contact.name, highlight)}
               </h4>
             </div>
             
             {/* Context - Only show if very relevant or searching, otherwise keep it clean */}
             {(contact.where_met || contact.relationship_summary) && highlight && (
               <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1">
-                <HighlightText text={contact.where_met || contact.relationship_summary || ''} />
+                {highlightText(contact.where_met || contact.relationship_summary || '', highlight)}
               </p>
             )}
             

@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
         token_expiry: expiryDate.toISOString(),
         last_sync_at: new Date().toISOString(),
         notification_time: 30, // Default to 30 minutes
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       } as any, {
         onConflict: "user_id",
       });

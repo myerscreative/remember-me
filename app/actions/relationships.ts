@@ -28,7 +28,7 @@ export async function getRelationshipsForContact(contactId: string): Promise<{
     // Get relationships where this contact is either A or B
     // Note: Cast to any because inter_contact_relationships table
     // not in generated types until migration runs
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: relData, error: relError } = await (supabase as any)
       .from('inter_contact_relationships')
       .select('*')
@@ -50,7 +50,7 @@ export async function getRelationshipsForContact(contactId: string): Promise<{
     );
 
     // Fetch linked contact data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: contacts, error: contactsError } = await (supabase as any)
       .from('persons')
       .select('id, name, first_name, last_name, photo_url, last_interaction_date, importance')
@@ -113,7 +113,7 @@ export async function createRelationship(
 
   try {
     // Check if relationship already exists (in either direction)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: existing } = await (supabase as any)
       .from('inter_contact_relationships')
       .select('id')
@@ -125,7 +125,7 @@ export async function createRelationship(
       return { success: false, error: 'Relationship already exists between these contacts' };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data, error } = await (supabase as any)
       .from('inter_contact_relationships')
       .insert({
@@ -166,7 +166,7 @@ export async function deleteRelationship(relationshipId: string): Promise<{ succ
 
   try {
     // Get the relationship first to know which contacts to revalidate
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: rel } = await (supabase as any)
       .from('inter_contact_relationships')
       .select('contact_id_a, contact_id_b')
@@ -174,7 +174,7 @@ export async function deleteRelationship(relationshipId: string): Promise<{ succ
       .eq('user_id', user.id)
       .single();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from('inter_contact_relationships')
       .delete()
@@ -214,7 +214,7 @@ export async function searchContactsForLinking(
 
   try {
     // Get already linked contact IDs
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: existingRels } = await (supabase as any)
       .from('inter_contact_relationships')
       .select('contact_id_a, contact_id_b')
@@ -222,14 +222,14 @@ export async function searchContactsForLinking(
       .or(`contact_id_a.eq.${currentContactId},contact_id_b.eq.${currentContactId}`);
 
     const linkedIds = new Set<string>([currentContactId]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     existingRels?.forEach((rel: any) => {
       linkedIds.add(rel.contact_id_a);
       linkedIds.add(rel.contact_id_b);
     });
 
     // Search for contacts matching query, excluding already linked
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: contacts, error } = await (supabase as any)
       .from('persons')
       .select('id, name, photo_url')

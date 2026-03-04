@@ -137,13 +137,6 @@ export default function NewContactPage() {
         interests: formData.interests.split(',').map(s => s.trim()).filter(Boolean),
       };
 
-      console.log("💾 [Save Debug] Form data being saved:", {
-        email: personData.email,
-        phone: personData.phone,
-        linkedin: personData.linkedin,
-        name: personData.name
-      });
-
       // Insert person
       const { data: newPerson, error: personError } = await (supabase as any)
         .from("persons")
@@ -266,8 +259,6 @@ export default function NewContactPage() {
   };
 
   const handleVoiceDataApply = (data: ParsedContactData) => {
-    console.log("🎤 [Voice Debug] handleVoiceDataApply called with data:", data);
-
     // Parse name into first and last name
     let parsedFirstName = "";
     let parsedLastName = "";
@@ -277,11 +268,8 @@ export default function NewContactPage() {
       parsedLastName = nameParts.slice(1).join(" ") || "";
     }
 
-    console.log("🎤 [Voice Debug] Extracted email:", data.email, "phone:", data.phone, "linkedin:", data.linkedin);
-
     // Merge voice data into form, preserving existing data where fields are already filled
     setFormData((prev) => {
-      console.log("🎤 [Voice Debug] Previous formData:", { email: prev.email, phone: prev.phone, linkedin: prev.linkedin });
       const newFormData = {
         firstName: prev.firstName || parsedFirstName || "",
         lastName: prev.lastName || parsedLastName || "",
@@ -305,7 +293,6 @@ export default function NewContactPage() {
         notes: prev.notes || data.notes || "",
         misc: prev.misc || data.notes || "", // Keep misc for backward compat
       };
-      console.log("🎤 [Voice Debug] New formData:", { email: newFormData.email, phone: newFormData.phone, linkedin: newFormData.linkedin });
       return newFormData;
     });
   };
@@ -739,7 +726,7 @@ export default function NewContactPage() {
       </div>
 
       {/* Save Contact Button - Desktop */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6 shadow-lg" style={{ marginLeft: '16rem' }}>
+      <div className="fixed bottom-0 left-0 right-0 z-[60] hidden border-t border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800 md:ml-64 md:block">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button
             type="submit"

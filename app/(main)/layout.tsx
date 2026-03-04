@@ -1,7 +1,8 @@
-import type { Metadata, Viewport } from "next";
-import "../globals.css";
+import type { Metadata } from "next";
 import { BottomNav } from "@/components/bottom-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { DeepLinkHandler } from "@/components/deep-link-handler";
+import { SplashScreenHandler } from "@/components/splash-screen-handler";
 import { ThemeProvider } from "../providers/theme-provider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { Toaster } from "sonner";
@@ -10,21 +11,6 @@ import { MobileHeader } from "@/components/mobile-header";
 export const metadata: Metadata = {
   title: "ReMember Me - Keep Track of People Who Matter",
   description: "A personal CRM to help you remember important details about the people in your life",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "ReMember Me",
-  },
-};
-
-export const viewport: Viewport = {
-  themeColor: "#8b5cf6",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  colorScheme: "dark light",
 };
 
 export default function MainLayout({
@@ -33,36 +19,15 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var localTheme = localStorage.getItem('theme');
-                  var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (localTheme === 'dark' || (!localTheme && sysTheme)) {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.style.colorScheme = 'dark';
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.style.colorScheme = 'light';
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
-      <body className="antialiased max-w-full overflow-x-hidden">
-        <SessionProvider>
+    <SessionProvider>
+          <DeepLinkHandler />
+          <SplashScreenHandler />
           <ThemeProvider>
-            <div className="flex flex-col min-h-screen md:flex-row">
+            <div className="flex min-h-screen flex-col md:flex-row">
               <SidebarNav />
-              <div className="flex-1 md:ml-64 flex flex-col">
+              <div className="flex min-h-screen flex-1 flex-col md:ml-64">
                 <MobileHeader />
-                <main className="flex-1">
+                <main className="flex-1 pb-20 md:min-h-0 md:pb-0">
                   {children}
                 </main>
                 <BottomNav />
@@ -73,7 +38,5 @@ export default function MainLayout({
             }} />
           </ThemeProvider>
         </SessionProvider>
-      </body>
-    </html>
   );
 }

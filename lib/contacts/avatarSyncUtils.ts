@@ -196,7 +196,7 @@ export async function previewAvatarSync(
   }
 
   // Get all existing contacts for this user
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { data: existingContacts, error: fetchError } = await (supabase as any)
     .from('persons')
     .select('id, name, email, photo_url')

@@ -40,9 +40,9 @@ export default function Seed({
         transform: isHighlighted ? 'scale(1.8)' : 'scale(1)',
       }}
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseMove}
+      onPointerEnter={onMouseEnter}
+      onPointerLeave={onMouseLeave}
+      onPointerMove={onMouseMove}
     />
   );
 }

@@ -43,7 +43,7 @@ export function CriticalNudges() {
                 <div className="relative">
                   <div className="absolute -inset-1 rounded-full bg-amber-500/20 blur-[2px] opacity-0 group-hover/nudge:opacity-100 transition-opacity duration-500" />
                   <Avatar className="h-10 w-10 border border-white/10 shadow-lg relative">
-                      <AvatarImage src={drifter.photo_url || undefined} />
+                      <AvatarImage src={drifter.photo_url || undefined} alt={drifter.name} />
                       <AvatarFallback className="bg-slate-800 text-amber-500 font-black">
                           {getInitialsFromFullName(drifter.name)}
                       </AvatarFallback>

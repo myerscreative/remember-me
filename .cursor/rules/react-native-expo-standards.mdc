@@ -1,0 +1,19 @@
+---
+description: React Native / Expo standards (SDK 51+, NativeWind, expo-router, a11y, performance)
+alwaysApply: false
+---
+
+# React Native / Expo Standards
+
+- **Components**: Always use functional components + hooks. No class components.
+- **Expo**: Prefer Expo APIs over bare React Native when possible (expo-router, expo-secure-store, etc.).
+- **Navigation**: Use expo-router for file-based navigation; no react-navigation unless specified.
+- **Styling**: Use NativeWind (Tailwind for RN) with utility classes; avoid StyleSheet.create unless for dynamic styles. Use cn() or className merging.
+- **Views**: Use `<View>`, `<Text>`, `<ScrollView>`, `<FlatList>` correctly; add flex-1, safe area insets via SafeAreaView or expo-safe-area-context.
+- **Performance**: Avoid unnecessary re-renders (use memo, useCallback, useMemo); profile with Flipper or React DevTools; prefer Hermes engine.
+- **Accessibility**: Add accessible=true, accessibilityLabel, accessibilityHint; support VoiceOver/TalkBack.
+- **State**: Prefer Zustand, Jotai, or React Query for data; no heavy Redux unless complex.
+- **Types**: Strict TypeScript; use infer for props, avoid any.
+- **Testing**: Suggest Detox or Jest + @testing-library/react-native for E2E/unit tests.
+- **Platform**: Use Platform.OS checks sparingly; prefer cross-platform solutions.
+- **Clean code**: Small files/components (<300 lines), single responsibility, remove dead code/logs.

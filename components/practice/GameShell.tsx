@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ArrowLeft, Clock, Trophy, Flame } from "lucide-react";
+import React from "react";
+import { ArrowLeft, Trophy, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GameStats } from "@/hooks/useGameStats";
+import { cn } from "@/lib/utils";
+import { useGameTimer, formatGameTime } from "@/hooks/useGameTimer";
 
-interface GameShellProps {
+export interface GameShellProps {
   title: string;
   durationSeconds: number;
   currentScore: number;
@@ -13,45 +14,19 @@ interface GameShellProps {
   onTimeUp: () => void;
   onExit: () => void;
   children: React.ReactNode;
-  isActive: boolean; // Is game running?
+  isActive: boolean;
 }
 
-export function GameShell({ 
-  title, 
-  durationSeconds, 
-  currentScore, 
-  onTimeUp, 
-  onExit, 
+export function GameShell({
+  title,
+  durationSeconds,
+  currentScore,
+  onTimeUp,
+  onExit,
   children,
-  isActive 
+  isActive,
 }: GameShellProps) {
-  const [timeLeft, setTimeLeft] = useState(durationSeconds);
-
-  useEffect(() => {
-    if (!isActive) return;
-    
-    setTimeLeft(durationSeconds);
-    
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          onTimeUp();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isActive, durationSeconds, onTimeUp]);
-
-  // Format time mm:ss
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
+  const timeLeft = useGameTimer(durationSeconds, isActive, onTimeUp);
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
@@ -64,13 +39,13 @@ export function GameShell({
         <div className="flex divide-x divide-gray-200 dark:divide-gray-700">
             <div className="px-6 flex flex-col items-center">
                 <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Time</span>
-                <span className={`text-2xl font-black font-mono ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-gray-800 dark:text-gray-100'}`}>
-                    {formatTime(timeLeft)}
+                <span className={cn("text-2xl font-black font-mono", timeLeft < 10 ? "animate-pulse text-red-500" : "text-gray-800 dark:text-gray-100")}>
+                    {formatGameTime(timeLeft)}
                 </span>
             </div>
             <div className="px-6 flex flex-col items-center">
                 <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Score</span>
-                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 animate-in zoom-in duration-300 key={currentScore}">
+                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 animate-in zoom-in duration-300">
                     {currentScore}
                 </span>
             </div>

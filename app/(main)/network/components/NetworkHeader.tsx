@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface NetworkHeaderProps {
   viewMode: 'compact' | 'standard' | 'detailed';
@@ -18,19 +19,19 @@ export default function NetworkHeader({ viewMode, setViewMode }: NetworkHeaderPr
         </a>
         <div className="w-px h-8 bg-gray-200 mx-2 self-center"></div>
         <button
-          className={`px-3 py-1 rounded-md ${viewMode === 'compact' ? 'bg-[#6366f1] text-white' : 'bg-white text-[#111827]'} border border-[#e5e7eb]`}
+          className={cn("rounded-md border border-[#e5e7eb] px-3 py-1", viewMode === "compact" ? "bg-[#6366f1] text-white" : "bg-white text-[#111827]")}
           onClick={() => setViewMode('compact')}
         >
           🔍 Compact
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${viewMode === 'standard' ? 'bg-[#6366f1] text-white' : 'bg-white text-[#111827]'} border border-[#e5e7eb]`}
+          className={cn("rounded-md border border-[#e5e7eb] px-3 py-1", viewMode === "standard" ? "bg-[#6366f1] text-white" : "bg-white text-[#111827]")}
           onClick={() => setViewMode('standard')}
         >
           📋 Standard
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${viewMode === 'detailed' ? 'bg-[#6366f1] text-white' : 'bg-white text-[#111827]'} border border-[#e5e7eb]`}
+          className={cn("rounded-md border border-[#e5e7eb] px-3 py-1", viewMode === "detailed" ? "bg-[#6366f1] text-white" : "bg-white text-[#111827]")}
           onClick={() => setViewMode('detailed')}
         >
           📄 Detailed

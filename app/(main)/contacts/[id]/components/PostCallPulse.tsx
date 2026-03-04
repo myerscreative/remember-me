@@ -26,7 +26,6 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
 
   // Mount Safety Check
   useEffect(() => {
-    console.log("PostCallPulse Mounted for:", name);
   }, [name]);
 
   // Extract entities & milestones as user types
@@ -163,7 +162,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
 
       <header className="mb-8">
         <h2 className="text-2xl font-bold text-white">How was the catch-up with {name}?</h2>
-        <p className="text-slate-400 text-sm mt-1">Capture the lore while it's fresh.</p>
+        <p className="text-slate-400 text-sm mt-1">Capture the lore while it&apos;s fresh.</p>
         
         {/* Mode Switcher */}
         <div className="flex gap-2 mt-4">
@@ -206,7 +205,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                 ) : (
                   <div className="w-full max-w-md">
                     <p className="text-center text-slate-400 mb-8">
-                      Speak naturally. We'll transcribe and extract the details.
+                      Speak naturally. We&apos;ll transcribe and extract the details.
                     </p>
                     <VoiceRecorder 
                         onRecordingComplete={handleRecordingComplete}
@@ -258,7 +257,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                         >
                             <div className="w-2 h-2 rounded-full bg-indigo-500" />
                             <div className="flex flex-col items-start">
-                                <span className="text-indigo-300 text-xs font-bold">+ Add '{entity.value}'</span>
+                                <span className="text-indigo-300 text-xs font-bold">+ Add &apos;{entity.value}&apos;</span>
                                 <span className="text-[10px] text-slate-500 uppercase">{entity.type}</span>
                             </div>
                         </button>
@@ -277,7 +276,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-indigo-300 uppercase tracking-wide">Milestone Detected</p>
-                                <p className="text-sm text-white font-medium">"{milestoneSuggestion.detectedDate}"</p>
+                                <p className="text-sm text-white font-medium">&quot;{milestoneSuggestion.detectedDate}&quot;</p>
                             </div>
                         </div>
                         <button 

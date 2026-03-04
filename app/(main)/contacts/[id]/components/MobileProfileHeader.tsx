@@ -1,10 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/back-button";
 import { cn } from "@/lib/utils";
-import { InteractionType, FREQUENCY_PRESETS } from "@/lib/relationship-health";
-import { ContactImportance } from "@/types/database.types";
+import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 import { ArrowLeft, Star, Edit, Check, Camera, Phone, Mail, RefreshCw, MessageCircle } from "lucide-react";
-import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { useState, useRef } from "react";
 
@@ -42,11 +41,12 @@ export function MobileProfileHeader({
       <div className="px-4 pt-2 pb-3 relative z-10">
         {/* Top Row: Nav & Actions */}
         <div className="flex justify-between items-center mb-3">
-            <Link href="/">
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full h-8 w-8 -ml-2">
-                    <ArrowLeft className="h-5 w-5" />
-                </Button>
-            </Link>
+            <BackButton
+                fallbackHref="/"
+                className="text-white hover:bg-white/20 rounded-full h-8 w-8 -ml-2"
+            >
+                <ArrowLeft className="h-5 w-5" />
+            </BackButton>
             
             <div className="flex gap-1">
                 <Button
@@ -76,7 +76,7 @@ export function MobileProfileHeader({
             {/* Avatar */}
             <div className="relative shrink-0" onClick={onAvatarClick}>
                  <Avatar className="h-16 w-16 border-2 border-white/30 shadow-md">
-                    <AvatarImage src={contact.photo_url} className="object-cover" />
+                    <AvatarImage src={contact.photo_url} alt={`${contact.firstName ?? ""} ${contact.lastName ?? ""}`.trim() || "Contact photo"} className="object-cover" />
                     <AvatarFallback className="bg-indigo-700 text-white/70 text-lg">
                         {(contact.firstName?.[0] || "")}
                     </AvatarFallback>

@@ -65,8 +65,8 @@ export default function NurtureSidebar({ contacts, onQuickLog, onHover }: Nurtur
             nurtureList.map(contact => (
               <div 
                 key={contact.id}
-                onMouseEnter={() => onHover?.(contact.id.toString())}
-                onMouseLeave={() => onHover?.(null)}
+                onPointerEnter={() => onHover?.(contact.id.toString())}
+                onPointerLeave={() => onHover?.(null)}
                 className="group flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-orange-200 dark:hover:border-orange-900/50 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">

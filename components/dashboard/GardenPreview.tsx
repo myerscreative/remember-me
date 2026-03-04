@@ -2,9 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import type { DashboardMapContact } from "@/types/dashboard";
+
+interface SeedPosition {
+  x: number;
+  y: number;
+  color: string;
+  initials: string;
+  name: string;
+}
 
 interface GardenPreviewProps {
-  contacts: any[];
+  contacts: DashboardMapContact[];
 }
 
 const GOLDEN_ANGLE = 137.508 * (Math.PI / 180);
@@ -12,30 +21,33 @@ const GOLDEN_ANGLE = 137.508 * (Math.PI / 180);
 export function GardenPreview({ contacts }: GardenPreviewProps) {
   const router = useRouter();
 
-  // Calculate positions using status-based rings
-  const seedPositions = useMemo(() => {
-    // 1. Bucket by persistent status
+  const seedPositions = useMemo((): SeedPosition[] => {
     const buckets = {
-      nurtured: [] as any[],
-      drifting: [] as any[],
-      neglected: [] as any[],
+      nurtured: [] as DashboardMapContact[],
+      drifting: [] as DashboardMapContact[],
+      neglected: [] as DashboardMapContact[],
     };
 
-    contacts.forEach(contact => {
-      const status = contact.status?.toLowerCase() || 'nurtured';
-      if (status === 'drifting') buckets.drifting.push(contact);
-      else if (status === 'neglected') buckets.neglected.push(contact);
+    contacts.forEach((contact) => {
+      const status = contact.status?.toLowerCase() ?? "nurtured";
+      if (status === "drifting") buckets.drifting.push(contact);
+      else if (status === "neglected") buckets.neglected.push(contact);
       else buckets.nurtured.push(contact);
     });
 
-    // 2. Calculate positions for each ring
-    const calculateRing = (items: any[], minR: number, maxR: number, offset: number) => {
+    const calculateRing = (
+      items: DashboardMapContact[],
+      minR: number,
+      maxR: number,
+      offset: number
+    ): SeedPosition[] => {
+      const now = new Date();
+      const msPerDay = 1000 * 60 * 60 * 24;
       const sorted = [...items].sort((a, b) => {
         const lastA = a.last_interaction_date ? new Date(a.last_interaction_date) : null;
         const lastB = b.last_interaction_date ? new Date(b.last_interaction_date) : null;
-        const now = new Date();
-        const daysA = lastA ? Math.floor((now.getTime() - lastA.getTime()) / (1000 * 60 * 60 * 24)) : 999;
-        const daysB = lastB ? Math.floor((now.getTime() - lastB.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+        const daysA = lastA ? Math.floor((now.getTime() - lastA.getTime()) / msPerDay) : 999;
+        const daysB = lastB ? Math.floor((now.getTime() - lastB.getTime()) / msPerDay) : 999;
         return daysA - daysB;
       });
 
@@ -45,16 +57,14 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
         const angle = i * GOLDEN_ANGLE + offset;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
-        
-        // Color based on status
-        const status = contact.status || 'Nurtured';
-        const color = status === 'Nurtured' ? '#10b981' : status === 'Drifting' ? '#fbbf24' : '#f97316';
-        
-        const nameParts = (contact.name || '').split(' ');
-        const initials = nameParts.length >= 2
-          ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
-          : (contact.name || '?').slice(0, 2).toUpperCase();
-
+        const status = contact.status ?? "Nurtured";
+        const color =
+          status === "Nurtured" ? "#10b981" : status === "Drifting" ? "#fbbf24" : "#f97316";
+        const nameParts = (contact.name ?? "").split(" ");
+        const initials =
+          nameParts.length >= 2
+            ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+            : (contact.name ?? "?").slice(0, 2).toUpperCase();
         return { x, y, color, initials, name: contact.name };
       });
     };
@@ -79,7 +89,7 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
       </div>
       
       {/* Garden visualization */}
-      <div className="h-[300px] relative bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-lg border border-border/50 overflow-hidden">
+      <div className="h-[300px] relative bg-linear-to-br from-slate-900/50 to-slate-800/50 rounded-lg border border-border/50 overflow-hidden">
         <svg viewBox="-250 -250 500 500" className="w-full h-full">
           {seedPositions.map((seed, i) => (
             <g key={i}>
@@ -95,8 +105,7 @@ export function GardenPreview({ contacts }: GardenPreviewProps) {
                 y={seed.y}
                 textAnchor="middle"
                 dominantBaseline="central"
-                className="text-[6px] font-bold fill-white"
-                style={{ pointerEvents: 'none' }}
+                className="pointer-events-none text-[6px] font-bold fill-white"
               >
                 {seed.initials}
               </text>

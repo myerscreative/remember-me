@@ -19,7 +19,7 @@ export async function toggleTag(personId: string, tagName: string) {
     const normalizedName = validatedTagName.toLowerCase().trim();
 
     // 1. Ensure the tag exists in the global table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let { data: tag, error } = await (supabase as any)
       .from('tags')
       .select()
@@ -33,7 +33,7 @@ export async function toggleTag(personId: string, tagName: string) {
 
     if (!tag) {
       // Attempt to insert
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: newTag, error: insertError } = await (supabase as any)
         .from('tags')
         .insert({ name: normalizedName, user_id: user.id })
@@ -44,7 +44,7 @@ export async function toggleTag(personId: string, tagName: string) {
         // Check if it's a unique constraint violation
         if (insertError.code === '23505') {
           // Retry fetch
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const { data: retryTag, error: retryError } = await (supabase as any)
             .from('tags')
             .select()
@@ -66,7 +66,7 @@ export async function toggleTag(personId: string, tagName: string) {
     }
 
     // 2. Check if the link already exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data: existing, error: fetchError } = await (supabase as any)
       .from('person_tags')
       .select()
@@ -81,7 +81,7 @@ export async function toggleTag(personId: string, tagName: string) {
 
     if (existing) {
       // Remove it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: deleteError } = await (supabase as any)
         .from('person_tags')
         .delete()
@@ -93,7 +93,7 @@ export async function toggleTag(personId: string, tagName: string) {
       }
     } else {
       // Add it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: insertError } = await (supabase as any)
         .from('person_tags')
         .insert({ person_id: validatedPersonId, tag_id: tag.id })

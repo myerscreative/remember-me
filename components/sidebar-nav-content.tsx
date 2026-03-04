@@ -108,7 +108,7 @@ export function SidebarNavContent({ onNavItemClick }: SidebarNavContentProps) {
                   href={item.href}
                   onClick={onNavItemClick}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group relative overflow-hidden",
+                    "group relative flex min-h-11 items-center justify-between overflow-hidden rounded-lg px-3 py-2.5 transition-all duration-200 active:opacity-80",
                     isActive
                       ? "text-sidebar-primary-foreground font-medium shadow-lg shadow-purple-900/10"
                       : "text-sidebar-foreground hover:text-sidebar-primary hover:bg-sidebar-accent"
@@ -119,7 +119,7 @@ export function SidebarNavContent({ onNavItemClick }: SidebarNavContentProps) {
                   )}
                   
                   <div className="flex items-center gap-3 relative z-10">
-                    <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/60 group-hover:text-sidebar-primary")} />
+                    <Icon className={cn("size-4 shrink-0", isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/60 group-hover:text-sidebar-primary")} />
                     <span className="text-sm">{item.label}</span>
                   </div>
                   

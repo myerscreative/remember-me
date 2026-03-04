@@ -2,49 +2,65 @@
 
 import React, { useState } from "react";
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface Contact {
+export interface MemoryFlashcardContact {
   id: string;
   first_name: string;
   name: string;
-  story?: {
-    whatMatters?: string;
-  };
+  story?: { whatMatters?: string };
 }
 
-export const MemoryFlashcard = ({ 
-  contact, 
+export interface MemoryFlashcardProps {
+  contact: MemoryFlashcardContact;
+  factType: string;
+  onRememberedAction?: () => void;
+}
+
+export function MemoryFlashcard({
+  contact,
   factType,
-  onRememberedAction 
-}: { 
-  contact: Contact, 
-  factType: string,
-  onRememberedAction?: () => void
-}) => {
+  onRememberedAction,
+}: MemoryFlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const firstName = contact.first_name || contact.name.split(" ")[0];
+
   return (
-    <div 
-      className="w-full h-80 perspective-1000 cursor-pointer"
+    <div
+      className="w-full h-80 cursor-pointer perspective-[1000px]"
       onClick={() => setIsFlipped(!isFlipped)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setIsFlipped((prev) => !prev);
+        }
+      }}
     >
-      <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+      <div
+        className={cn(
+          "relative h-full w-full transition-transform duration-500 transform-3d",
+          isFlipped && "transform-[rotateY(180deg)]"
+        )}
+      >
         {/* Front: The Question */}
-        <div className="absolute inset-0 backface-hidden bg-slate-900 border border-slate-800 rounded-4xl flex flex-col items-center justify-center p-8 text-center shadow-2xl">
+        <div className="absolute inset-0 backface-hidden bg-slate-900 border border-slate-800 rounded-3xl flex flex-col items-center justify-center p-8 text-center shadow-2xl">
           <p className="text-indigo-400 text-sm font-black uppercase tracking-[0.2em] mb-4">{factType}</p>
           <h3 className="text-2xl font-bold text-white mb-2">What is important to</h3>
           <h2 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-purple-400 mb-6">
-            {contact.first_name || contact.name.split(' ')[0]}
+            {firstName}
           </h2>
           <p className="mt-8 text-slate-500 text-sm italic font-medium">Tap to reveal memory...</p>
           
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-500 w-1/3 animate-shimmer" />
+            <div className="h-full w-1/3 animate-shimmer rounded-full bg-indigo-500" />
           </div>
         </div>
 
         {/* Back: The Answer (The Story) */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180 bg-indigo-950 border border-indigo-500/50 rounded-4xl flex flex-col items-center justify-center p-8 text-center shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)] bg-indigo-950 border border-indigo-500/50 rounded-3xl flex flex-col items-center justify-center p-8 text-center shadow-2xl overflow-hidden">
           {/* Decorative Glow */}
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
@@ -53,7 +69,8 @@ export const MemoryFlashcard = ({
           <div className="relative z-10 max-w-sm">
              <span className="text-4xl text-indigo-400/30 absolute -top-4 -left-6 serif font-serif">&ldquo;</span>
              <p className="text-xl text-white italic font-medium leading-relaxed">
-               {contact.story?.whatMatters || "You haven't added a 'What Matters' story for this contact yet. Focus on their current goals or passions."}
+               {contact.story?.whatMatters ??
+                 "You haven't added a 'What Matters' story for this contact yet. Focus on their current goals or passions."}
              </p>
              <span className="text-4xl text-indigo-400/30 absolute -bottom-8 -right-4 serif font-serif">&rdquo;</span>
           </div>
@@ -72,28 +89,6 @@ export const MemoryFlashcard = ({
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .transform-style-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-          transform: rotateY(180deg);
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(300%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite ease-in-out;
-        }
-      `}</style>
     </div>
   );
-};
+}

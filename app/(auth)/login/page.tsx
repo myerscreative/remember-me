@@ -358,7 +358,7 @@ function LoginForm() {
 
                   if (signInError) {
                     // If sign in fails, try sign up
-                    console.log("Dev sign in failed, attempting sign up...", signInError);
+                    if (process.env.NODE_ENV === 'development') console.log("Dev sign in failed, attempting sign up...", signInError);
                     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                       email: devEmail,
                       password: devPassword,

@@ -31,7 +31,6 @@ export function IntroDrawer({
   );
 
   const handleSend = () => {
-    console.log(`Sending intro request to bridge ${bridgeContactId}`);
     toast.success(`Message sent to ${bridgeName}!`);
     onOpenChange(false);
   };
@@ -57,7 +56,7 @@ export function IntroDrawer({
               <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 mb-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar className="h-10 w-10 border border-white dark:border-gray-700">
-                    <AvatarImage src={bridgePhotoUrl || undefined} />
+                    <AvatarImage src={bridgePhotoUrl || undefined} alt={bridgeName} />
                     <AvatarFallback className={cn("text-white text-xs", getGradient(bridgeName))}>
                       {getInitials(bridgeName)}
                     </AvatarFallback>

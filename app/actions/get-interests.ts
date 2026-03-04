@@ -11,7 +11,7 @@ export async function getInterestsForContact(contactId: string) {
   const supabase = await createClient()
 
   // Fetch person_interests join with interests
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { data, error } = await (supabase as any)
     .from('person_interests')
     .select(`
@@ -28,7 +28,7 @@ export async function getInterestsForContact(contactId: string) {
     return []
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return data.map((item: any) => ({
     id: item.interests.id,
     name: item.interests.name
@@ -38,7 +38,7 @@ export async function getInterestsForContact(contactId: string) {
 export async function searchInterests(query: string) {
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { data, error } = await (supabase as any)
     .from('interests')
     .select('id, name')

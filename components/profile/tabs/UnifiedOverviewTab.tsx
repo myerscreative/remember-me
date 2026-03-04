@@ -5,22 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Quote, MapPin, Heart, Star, Sparkles, Edit2, Plus, Save, X, User } from 'lucide-react';
+import { Quote, MapPin, Heart, Star, Sparkles, Edit2, Plus, Save, User } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
-interface ContactWithStory {
-    id: string;
-    aiSummary?: string;
-    story?: {
-        whereWeMet?: string;
-        whyStayInContact?: string;
-        whatsImportant?: string;
-    };
-    interests?: string[];
-    familyMembers?: Array<{ name: string; relationship: string }>;
-    [key: string]: any;
+export interface ContactWithStory {
+  id: string;
+  aiSummary?: string;
+  story?: {
+    whereWeMet?: string;
+    whyStayInContact?: string;
+    whatsImportant?: string;
+  };
+  interests?: string[];
+  familyMembers?: Array<{ name: string; relationship: string }>;
 }
+
+type StoryField = 'whereWeMet' | 'whyStayInContact' | 'whatsImportant';
 
 interface UnifiedOverviewTabProps {
     contact: ContactWithStory;
@@ -46,53 +48,53 @@ export function UnifiedOverviewTab({ contact }: UnifiedOverviewTabProps) {
       setEditValue("");
   };
 
-  const handleSave = async (field: string) => {
-      setIsSaving(true);
-      try {
-          const supabase = createClient();
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) throw new Error("Not authenticated");
+  const handleSave = async (field: StoryField) => {
+    setIsSaving(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
-          const updateData: any = {};
-          
-          if (field === 'whereWeMet') updateData.where_met = editValue;
-          if (field === 'whyStayInContact') updateData.why_stay_in_contact = editValue;
-          if (field === 'whatsImportant') updateData.most_important_to_them = editValue;
+      const updateData =
+        field === 'whereWeMet'
+          ? { where_met: editValue }
+          : field === 'whyStayInContact'
+            ? { why_stay_in_contact: editValue }
+            : { most_important_to_them: editValue };
 
-          const { error } = await (supabase as any)
-            .from('persons')
-            .update(updateData)
-            .eq('id', contact.id)
-            .eq('user_id', user.id);
+      const { error } = await supabase
+        .from('persons')
+        .update(updateData)
+        .eq('id', contact.id)
+        .eq('user_id', user.id);
 
-           if (error) throw error;
+      if (error) throw error;
 
-           setLocalStory(prev => ({ ...prev, [field]: editValue }));
-           setEditingCard(null);
-           toast.success("Updated successfully");
-      } catch (error) {
-          console.error("Error saving story:", error);
-          toast.error("Failed to save changes");
-      } finally {
-          setIsSaving(false);
-      }
+      setLocalStory((prev) => ({ ...prev, [field]: editValue }));
+      setEditingCard(null);
+      toast.success("Updated successfully");
+    } catch {
+      toast.error("Failed to save changes");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const renderEditableCard = (
-      title: string, 
-      icon: React.ReactNode, 
-      field: 'whereWeMet' | 'whyStayInContact' | 'whatsImportant', 
-      value: string,
-      placeholder: string,
-      fullWidth = false
+    title: string,
+    icon: React.ReactNode,
+    field: StoryField,
+    value: string,
+    placeholder: string,
+    fullWidth = false
   ) => {
       const isEditing = editingCard === field;
       const isEmpty = !value || value.trim() === "";
 
       return (
-        <Card className={`group relative ${fullWidth ? 'md:col-span-2 bg-amber-50/50 dark:bg-amber-950/10 border-amber-200/50 dark:border-amber-800/30' : ''}`}>
+        <Card className={cn("group relative", fullWidth && "border-amber-200/50 bg-amber-50/50 dark:border-amber-800/30 dark:bg-amber-950/10 md:col-span-2")}>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className={`text-sm font-medium flex items-center gap-2 ${fullWidth ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground'}`}>
+            <CardTitle className={cn("flex items-center gap-2 text-sm font-medium", fullWidth ? "text-amber-700 dark:text-amber-500" : "text-muted-foreground")}>
               {icon} {title}
             </CardTitle>
             {!isEditing && (
@@ -126,7 +128,7 @@ export function UnifiedOverviewTab({ contact }: UnifiedOverviewTabProps) {
                 </div>
             ) : (
                 <div 
-                    className={`text-sm whitespace-pre-wrap ${isEmpty ? 'text-muted-foreground/60 italic cursor-pointer hover:text-primary transition-colors' : ''}`}
+                    className={cn("whitespace-pre-wrap text-sm", isEmpty && "cursor-pointer italic text-muted-foreground/60 transition-colors hover:text-primary")}
                     onClick={() => handleEdit(field, value)}
                 >
                     {isEmpty ? (
