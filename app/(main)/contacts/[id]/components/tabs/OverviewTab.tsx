@@ -361,7 +361,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
 const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdit?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="mt-12 border-t border-slate-900 pt-2">
+    <div className="border-t border-slate-900 pt-2">
       <div className="flex items-center gap-2">
         <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-6 text-slate-500 hover:text-slate-300 transition-colors group">
           <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Contact Info & Metadata</span>
@@ -483,6 +483,108 @@ export function OverviewTab({
 
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto space-y-8 bg-slate-950 pb-36">
+      {/* Metadata Folder */}
+      <section className="px-4">
+        <MetadataFolder onEdit={onEdit}>
+          <div className="space-y-10 animate-in slide-in-from-bottom-2 duration-500">
+            <div className="grid grid-cols-1 gap-4">
+              <MetadataItem icon={<Mail size={18} />} label="Primary Email" value={contact.email || 'Not set'} />
+              <MetadataItem icon={<Phone size={18} />} label="Phone Line" value={contact.phone || 'Not set'} />
+              <MetadataItem icon={<MapPin size={18} />} label="Base Hub" value={[contact.city, contact.state].filter(Boolean).join(', ') || 'Not set'} />
+            </div>
+
+            {/* Tags Section */}
+            <div className="space-y-5">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
+                  <Tag size={13} className="text-indigo-500" /> Tags
+                </label>
+                <button
+                  onClick={() => setIsTagsOpen(!isTagsOpen)}
+                  className="text-indigo-400 hover:text-indigo-300 text-[10px] font-black tracking-widest transition-colors"
+                >
+                  {isTagsOpen ? 'CANCEL' : '+ ADD'}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {tags.map(tag => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                  >
+                    {tag}
+                    <button onClick={() => handleRemoveTag(tag)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                      <X size={14} />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              {isTagsOpen && (
+                <div className="flex gap-3 animate-in fade-in slide-in-from-top-1">
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
+                    placeholder="Identify with tag..."
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    autoFocus
+                  />
+                  <Button onClick={handleAddTag} disabled={submittingTag} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
+                    {submittingTag ? <Loader2 size={18} className="animate-spin" /> : 'Add'}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Interests Section */}
+            <div className="space-y-5">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
+                  <Sparkles size={13} className="text-indigo-500" /> Interests
+                </label>
+                <button
+                  onClick={() => setIsInterestsOpen(!isInterestsOpen)}
+                  className="text-indigo-400 hover:text-indigo-300 text-[10px] font-black tracking-widest transition-colors"
+                >
+                  {isInterestsOpen ? 'CANCEL' : '+ ADD'}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {interests.map(interest => (
+                  <Badge
+                    key={interest}
+                    variant="secondary"
+                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                  >
+                    {interest}
+                    <button onClick={() => handleRemoveInterest(interest)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                      <X size={14} />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              {isInterestsOpen && (
+                <div className="flex gap-3 animate-in fade-in slide-in-from-top-1">
+                  <input
+                    type="text"
+                    value={interestInput}
+                    onChange={(e) => setInterestInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
+                    placeholder="Favorite interest..."
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    autoFocus
+                  />
+                  <Button onClick={handleAddInterest} disabled={submittingInterest} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
+                    {submittingInterest ? <Loader2 size={18} className="animate-spin" /> : 'Add'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </MetadataFolder>
+      </section>
       
       {/* Quick Actions */}
       <section className="grid grid-cols-3 gap-4 px-4 pt-4">
@@ -565,106 +667,6 @@ export function OverviewTab({
           )}
         </section>
         
-        {/* Metadata Folder */}
-        <MetadataFolder onEdit={onEdit}>
-          <div className="space-y-10 animate-in slide-in-from-bottom-2 duration-500">
-            <div className="grid grid-cols-1 gap-4">
-              <MetadataItem icon={<Mail size={18} />} label="Primary Email" value={contact.email || 'Not set'} />
-              <MetadataItem icon={<Phone size={18} />} label="Phone Line" value={contact.phone || 'Not set'} />
-              <MetadataItem icon={<MapPin size={18} />} label="Base Hub" value={[contact.city, contact.state].filter(Boolean).join(', ') || 'Not set'} />
-            </div>
-
-            {/* Tags Section */}
-            <div className="space-y-5">
-              <div className="flex items-center justify-between px-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
-                  <Tag size={13} className="text-indigo-500" /> Tags
-                </label>
-                <button 
-                  onClick={() => setIsTagsOpen(!isTagsOpen)}
-                  className="text-indigo-400 hover:text-indigo-300 text-[10px] font-black tracking-widest transition-colors"
-                >
-                  {isTagsOpen ? 'CANCEL' : '+ ADD'}
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {tags.map(tag => (
-                  <Badge 
-                    key={tag} 
-                    variant="secondary" 
-                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
-                  >
-                    {tag}
-                    <button onClick={() => handleRemoveTag(tag)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                      <X size={14} />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              {isTagsOpen && (
-                <div className="flex gap-3 animate-in fade-in slide-in-from-top-1">
-                  <input 
-                    type="text" 
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-                    placeholder="Identify with tag..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
-                    autoFocus
-                  />
-                  <Button onClick={handleAddTag} disabled={submittingTag} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
-                    {submittingTag ? <Loader2 size={18} className="animate-spin" /> : 'Add'}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Interests Section */}
-            <div className="space-y-5">
-              <div className="flex items-center justify-between px-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
-                  <Sparkles size={13} className="text-indigo-500" /> Interests
-                </label>
-                <button 
-                  onClick={() => setIsInterestsOpen(!isInterestsOpen)}
-                  className="text-indigo-400 hover:text-indigo-300 text-[10px] font-black tracking-widest transition-colors"
-                >
-                  {isInterestsOpen ? 'CANCEL' : '+ ADD'}
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {interests.map(interest => (
-                  <Badge 
-                    key={interest} 
-                    variant="secondary" 
-                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
-                  >
-                    {interest}
-                    <button onClick={() => handleRemoveInterest(interest)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                      <X size={14} />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              {isInterestsOpen && (
-                <div className="flex gap-3 animate-in fade-in slide-in-from-top-1">
-                  <input 
-                    type="text" 
-                    value={interestInput}
-                    onChange={(e) => setInterestInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
-                    placeholder="Favorite interest..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
-                    autoFocus
-                  />
-                  <Button onClick={handleAddInterest} disabled={submittingInterest} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
-                    {submittingInterest ? <Loader2 size={18} className="animate-spin" /> : 'Add'}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </MetadataFolder>
       </div>
     </div>
   );
