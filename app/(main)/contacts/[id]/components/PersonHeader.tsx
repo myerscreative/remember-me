@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface PersonHeaderProps {
   contact: Person;
@@ -106,10 +107,17 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                </Avatar>
 
                {/* Status Dot */}
-               <div 
-                    className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e]" 
-                    style={{ backgroundColor: health.color }} 
-               />
+               <Popover>
+                 <PopoverTrigger asChild>
+                   <div 
+                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e] cursor-pointer" 
+                        style={{ backgroundColor: health.color }} 
+                   />
+                 </PopoverTrigger>
+                 <PopoverContent side="bottom" sideOffset={8} className="w-64 text-sm bg-slate-900 border-slate-800 text-slate-300">
+                   Relationship Health: {health.label}. This is based on the frequency and quality of your recent interactions.
+                 </PopoverContent>
+               </Popover>
                
                {/* Hover Upload Icon */}
                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -119,10 +127,11 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         </div>
 
         {/* Identity Section */}
-        <div className="text-center space-y-2 mb-8">
+        <div className="text-center space-y-1 mb-8">
            <h1 className="text-3xl font-bold text-white tracking-tight">
              {contact.first_name} {contact.last_name}
            </h1>
+           <div className="text-[10px] text-slate-400 font-medium">Score: 0</div>
            
            {contact.birthday && (
              <div className="flex items-center justify-center gap-2 text-[#818cf8] font-medium">

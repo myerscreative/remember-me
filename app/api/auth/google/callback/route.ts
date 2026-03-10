@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { encryptToken } from "@/lib/utils/encryption";
+import { authenticateRequest } from "@/lib/supabase/auth";
 import type { Database } from "@/types/database.types";
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
 
 /**
  * Google OAuth Callback Route
@@ -71,14 +77,9 @@ export async function GET(request: NextRequest) {
     const expiryDate = new Date();
     expiryDate.setSeconds(expiryDate.getSeconds() + expires_in);
 
-    // Store tokens in database using Service Role to bypass RLS
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-    
-    // Get user from state or current session
-    const userId = state;
+    // Resolve the Supabase user id (preferred: active session, fallback: validated state)
+    const { user } = await authenticateRequest(request);
+    const userId = user?.id || (state && isUuid(state) ? state : null);
     if (!userId) {
       return NextResponse.redirect(
         `${request.nextUrl.origin}/meeting-prep?error=missing_user_id`
@@ -87,11 +88,13 @@ export async function GET(request: NextRequest) {
 
     // Encrypt tokens before storing in database
     let encryptedAccessToken: string;
-    let encryptedRefreshToken: string;
+    let encryptedRefreshToken: string | null = null;
 
     try {
       encryptedAccessToken = encryptToken(access_token);
-      encryptedRefreshToken = encryptToken(refresh_token);
+      if (refresh_token) {
+        encryptedRefreshToken = encryptToken(refresh_token);
+      }
     } catch (encryptError) {
       console.error("Token encryption error:", encryptError);
       return NextResponse.redirect(
@@ -99,21 +102,85 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { error: dbError } = await supabase
-      .from("calendar_preferences")
-      .upsert({
-        user_id: userId,
-        provider: "google",
-        calendar_enabled: true,
-        access_token_encrypted: encryptedAccessToken,
-        refresh_token_encrypted: encryptedRefreshToken,
-        token_expiry: expiryDate.toISOString(),
-        last_sync_at: new Date().toISOString(),
-        notification_time: 30, // Default to 30 minutes
-       
-      } as any, {
-        onConflict: "user_id",
+    let dbError: unknown = null;
+
+    // Primary path: use authenticated user session + RLS (no service role needed)
+    if (user?.id) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        return NextResponse.redirect(
+          `${request.nextUrl.origin}/meeting-prep?error=config_missing`
+        );
+      }
+
+      const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll() {
+            // No-op in callback route
+          },
+        },
       });
+
+      const { data: existing } = await supabase
+        .from("calendar_preferences")
+        .select("refresh_token_encrypted")
+        .eq("user_id", userId)
+        .maybeSingle<{ refresh_token_encrypted: string | null }>();
+
+      const { error } = await supabase
+        .from("calendar_preferences")
+        .upsert({
+          user_id: userId,
+          provider: "google",
+          calendar_enabled: true,
+          access_token_encrypted: encryptedAccessToken,
+          refresh_token_encrypted: encryptedRefreshToken ?? existing?.refresh_token_encrypted ?? null,
+          token_expiry: expiryDate.toISOString(),
+          last_sync_at: new Date().toISOString(),
+          notification_time: 30,
+        } as any, {
+          onConflict: "user_id",
+        });
+      dbError = error;
+    } else {
+      // Fallback path if callback arrives without a session cookie
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!supabaseUrl || !serviceRoleKey) {
+        return NextResponse.redirect(
+          `${request.nextUrl.origin}/meeting-prep?error=config_missing`
+        );
+      }
+
+      const supabase = createClient<Database>(supabaseUrl, serviceRoleKey);
+
+      const { data: existing } = await supabase
+        .from("calendar_preferences")
+        .select("refresh_token_encrypted")
+        .eq("user_id", userId)
+        .maybeSingle<{ refresh_token_encrypted: string | null }>();
+
+      const { error } = await supabase
+        .from("calendar_preferences")
+        .upsert({
+          user_id: userId,
+          provider: "google",
+          calendar_enabled: true,
+          access_token_encrypted: encryptedAccessToken,
+          refresh_token_encrypted: encryptedRefreshToken ?? existing?.refresh_token_encrypted ?? null,
+          token_expiry: expiryDate.toISOString(),
+          last_sync_at: new Date().toISOString(),
+          notification_time: 30,
+        } as any, {
+          onConflict: "user_id",
+        });
+      dbError = error;
+    }
 
     if (dbError) {
       console.error("Database error:", dbError);

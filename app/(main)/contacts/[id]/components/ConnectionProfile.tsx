@@ -15,6 +15,7 @@ import { OverviewTab } from './tabs/OverviewTab';
 import Image from 'next/image';
 import { Camera, Edit2 } from 'lucide-react';
 import { EditContactModal } from './EditContactModal';
+import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
   return (
@@ -55,11 +56,7 @@ export default function ConnectionProfile({
     contact, 
     onDataUpdate,
     synopsis,
-    onRefreshAISummary,
-    health,
-    lastContact,
-    summaryLevel,
-    sharedMemory
+    onRefreshAISummary
 }: ConnectionProfileProps) {
   const router = useRouter();
 
@@ -217,10 +214,13 @@ export default function ConnectionProfile({
                 <Camera size={32} className="text-white drop-shadow-lg" />
               </div>
             </div>
-            <div className={cn(
-              "absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm",
-              healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-orange-500" : "bg-red-500"
-            )}>
+            <div 
+              id="tour-health-score"
+              className={cn(
+                "absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm",
+                healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-orange-500" : "bg-red-500"
+              )}
+            >
               {Math.round(healthScore)}
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function ConnectionProfile({
               onEdit={() => setIsEditModalOpen(true)}
             />
           )}
-          {activeTab === 'Story' && <StoryTab contact={contact} onEdit={() => setIsEditModalOpen(true)} />}
+          {activeTab === 'Story' && <StoryTab contact={contact} />}
           {activeTab === 'Family' && <FamilyTab contact={contact} />}
           {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
         </div>
@@ -274,6 +274,14 @@ export default function ConnectionProfile({
         onClose={() => setIsEditModalOpen(false)}
         contact={contact}
         onSuccess={handleEditSuccess}
+      />
+
+      <OnboardingOverlay 
+        contactName={contact.name}
+        onStepChange={(tab) => setActiveTab(tab)}
+        onClose={() => {
+          // You could optionally trigger a toast here like "Tour complete!"
+        }}
       />
     </div>
   );

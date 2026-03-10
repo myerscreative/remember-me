@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { updateFamilyMembers } from '@/app/actions/update-family-members';
 import { updateStoryFields } from '@/app/actions/story-actions'; 
 import { AudioInputButton } from '@/components/audio-input-button';
-import { X, Heart, User, Home, Edit2, Check } from 'lucide-react';
+import { X, Heart, User, Home, Edit2, Check, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import Image from "next/image";
@@ -236,9 +236,14 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                          <div className="flex-1">
                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Name</label>
                             {linkedContact ? (
-                              <Link href={`/contacts/${linkedContact.person.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between">
+                              <Link href={`/contacts/${linkedContact.person.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
                                  {partner.name}
-                                 <span className="text-[10px] uppercase tracking-wider text-slate-500">View Profile ↗</span>
+                                 <span className="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
+                              </Link>
+                            ) : partner.id ? (
+                              <Link href={`/contacts/${partner.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
+                                 {partner.name}
+                                 <span className="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
                               </Link>
                             ) : (
                               <input 
@@ -348,7 +353,11 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                              <div className="flex gap-3 mb-3">
                                  {linkedContact ? (
                                     <Link href={`/contacts/${linkedContact.person.id}`} className="flex-1 bg-transparent text-indigo-400 font-bold hover:text-indigo-300 transition-colors flex items-center gap-1 border-b border-transparent">
-                                       {child.name} ↗
+                                       {child.name} <ChevronRight size={14} className="opacity-70" />
+                                    </Link>
+                                 ) : child.id ? (
+                                    <Link href={`/contacts/${child.id}`} className="flex-1 bg-transparent text-indigo-400 font-bold hover:text-indigo-300 transition-colors flex items-center gap-1 border-b border-transparent">
+                                       {child.name} <ChevronRight size={14} className="opacity-70" />
                                     </Link>
                                  ) : (
                                     <input 

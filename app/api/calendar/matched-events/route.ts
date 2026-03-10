@@ -1,39 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentSession } from '@/lib/auth/session';
 import { GoogleCalendarService } from '@/lib/calendar/google-calendar';
 import { EmailMatcher } from '@/lib/matching/email-matcher';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database.types';
+import { createClient } from '@/lib/supabase/server';
+import { authenticateRequest } from '@/lib/supabase/auth';
+import { decryptToken, isEncrypted } from '@/lib/utils/encryption';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get authenticated session
-    const session = await getCurrentSession();
-    
-    if (!session?.accessToken) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError) {
+      return authError;
     }
 
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
     const days = parseInt(searchParams.get('days') || '7');
 
+    const supabase = await createClient();
+    const { data: prefs, error: prefsError } = await supabase
+      .from('calendar_preferences')
+      .select('access_token_encrypted, provider')
+      .eq('user_id', user.id)
+      .maybeSingle<{ access_token_encrypted: string | null; provider: string | null }>();
+
+    if (prefsError) {
+      console.error('Error fetching calendar preferences:', prefsError);
+      return NextResponse.json({ error: 'Failed to read calendar connection' }, { status: 500 });
+    }
+
+    if (!prefs?.access_token_encrypted || prefs.provider !== 'google') {
+      return NextResponse.json({ error: 'Calendar connection required' }, { status: 401 });
+    }
+
+    const rawAccessToken = prefs.access_token_encrypted;
+    const accessToken = isEncrypted(rawAccessToken)
+      ? decryptToken(rawAccessToken)
+      : rawAccessToken;
+
     // Fetch calendar events
-    const calendarService = new GoogleCalendarService(session.accessToken);
+    const calendarService = new GoogleCalendarService(accessToken);
     const events = await calendarService.getUpcomingEvents(days);
 
-    // Get user's contacts from Supabase using service role key
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    // Get user's contacts from Supabase
     const { data: contacts, error: contactsError } = await supabase
       .from('persons')
       .select('id, name, email, job_title, company, photo_url')
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (contactsError) {
       console.error('Error fetching contacts:', contactsError);

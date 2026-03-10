@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { authenticateRequest } from "@/lib/supabase/auth";
 
 /**
  * Google OAuth Initiation Route
@@ -8,20 +7,15 @@ import { authOptions } from "@/lib/auth/auth-options";
  */
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate user
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-       return NextResponse.json(
-        { error: "Unauthorized - Please log in" },
-        { status: 401 }
-      );
+    // Authenticate user with Supabase so state matches auth.users UUID
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError) {
+      return authError;
     }
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Check for required environment variables
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    
     // Use configured base URL in production to avoid host mismatch (www/non-www)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
     const redirectUri = `${baseUrl}/api/auth/google/callback`;

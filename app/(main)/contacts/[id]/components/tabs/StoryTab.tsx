@@ -28,10 +28,9 @@ export interface SharedMemory {
 
 interface StoryTabProps {
   contact: any;
-  onEdit?: () => void;
 }
 
-export function StoryTab({ contact, onEdit }: StoryTabProps) {
+export function StoryTab({ contact }: StoryTabProps) {
   const memories: SharedMemory[] = contact.memories || [];
 
   const narrativeCards: NarrativeCard[] = [
@@ -61,7 +60,10 @@ export function StoryTab({ contact, onEdit }: StoryTabProps) {
   return (
     <div className="relative min-h-[60vh] pb-24 flex flex-col pt-2">
       {/* Narrative Foundation Cards (Fixed Context) */}
-      <div className="flex flex-col gap-4 mb-10">
+      <div 
+        id="tour-story-cards"
+        className="flex flex-col gap-4 mb-10"
+      >
         {narrativeCards.map((card, idx) => (
           <div 
             key={idx} 

@@ -39,6 +39,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<any>(null);
   const [showInitialMode, setShowInitialMode] = useState<'text' | 'voice'>('text');
+  const [isSynthesizeSuccess, setIsSynthesizeSuccess] = useState(false);
 
   const contactName = `${contact.first_name} ${contact.last_name || ''}`.trim();
 
@@ -139,6 +140,11 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
 
       setShowReviewModal(false);
       setPendingChanges(null);
+
+      // Trigger success state on the button
+      setIsSynthesizeSuccess(true);
+      setTimeout(() => setIsSynthesizeSuccess(false), 2500);
+
       toast.success('Changes saved successfully!');
       router.refresh();
     } catch (error) {
@@ -156,8 +162,10 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
         </div>
       )}
 
-      {/* Quick Voice Brain Dump Button */}
-      <div className="bg-linear-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl">
+      <div 
+        id="tour-brain-dump-button"
+        className="bg-linear-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl"
+      >
         <h3 className="text-white text-lg font-bold mb-2 flex items-center gap-2">
           <Mic className="w-5 h-5" />
           Voice Brain Dump
@@ -223,13 +231,17 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
           </h3>
           <button
             onClick={handleReprocessMemories}
-            disabled={isReprocessing || allMemories.length === 0}
-            className="text-[10px] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+            disabled={isReprocessing || allMemories.length === 0 || isSynthesizeSuccess}
+            className={`text-[10px] disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${isSynthesizeSuccess ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`}
           >
-            {isReprocessing ? (
+            {isSynthesizeSuccess ? (
               <>
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Processing...
+                <Sparkles className="w-3 h-3" /> Story Updated!
+              </>
+            ) : isReprocessing ? (
+              <>
+                <Sparkles className="w-3 h-3 animate-spin" />
+                Synthesizing...
               </>
             ) : (
               <>
