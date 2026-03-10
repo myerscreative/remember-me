@@ -7,10 +7,13 @@ import {
   Tag,
   Heart,
   Sparkles,
-  Info,
-  X
+  X,
+  Upload,
+  Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { QuickAddBar } from './QuickAddBar';
+import { ContactImporter } from './ContactImporter';
 
 interface ToolCard {
   title: string;
@@ -75,6 +78,7 @@ interface GardenHubProps {
 
 export function GardenHub({ onNavigate }: GardenHubProps) {
   const [expandedInfo, setExpandedInfo] = useState<number | null>(null);
+  const [isImporterOpen, setIsImporterOpen] = useState(false);
 
   return (
     <motion.div
@@ -112,6 +116,33 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           Four ways to tend to your connections and help your relationships grow.
         </motion.p>
       </div>
+
+      {/* Quick Add Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="w-full"
+      >
+        <QuickAddBar />
+      </motion.div>
+
+      {/* Primary Actions */}
+      <motion.div
+         initial={{ opacity: 0, scale: 0.95 }}
+         animate={{ opacity: 1, scale: 1 }}
+         transition={{ duration: 0.4, delay: 0.3 }}
+         className="w-full flex justify-center mb-4"
+      >
+          <Button 
+            onClick={() => setIsImporterOpen(true)}
+            variant="outline" 
+            className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800"
+          >
+              <Upload className="w-4 h-4" />
+              Import iPhone Contacts
+          </Button>
+      </motion.div>
 
       {/* Tool Cards — Staggered */}
       <motion.div
@@ -201,6 +232,11 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Importer Modal */}
+      {isImporterOpen && (
+        <ContactImporter onCloseAction={() => setIsImporterOpen(false)} />
       )}
     </motion.div>
   );
