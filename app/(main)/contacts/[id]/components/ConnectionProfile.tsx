@@ -218,9 +218,11 @@ export default function ConnectionProfile({
               </div>
             </div>
             <div className={cn(
-              "absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-slate-950 shadow-md",
-              healthScore > 80 ? "bg-emerald-500" : healthScore > 40 ? "bg-orange-500" : "bg-red-500"
-            )} />
+              "absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm",
+              healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-orange-500" : "bg-red-500"
+            )}>
+              {Math.round(healthScore)}
+            </div>
           </div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none">{name}</h1>

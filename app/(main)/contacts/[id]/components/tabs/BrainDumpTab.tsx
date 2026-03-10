@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PostCallPulse } from '../PostCallPulse';
-import { Mic, Plus, Loader2 } from 'lucide-react';
+import { Mic, Plus, Loader2, Sparkles } from 'lucide-react';
 import { addSharedMemory } from '@/app/actions/story-actions';
 import { ReviewChangesModal } from '../ReviewChangesModal';
 import { updateStoryFields } from '@/app/actions/story-actions';
@@ -157,7 +157,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       )}
 
       {/* Quick Voice Brain Dump Button */}
-      <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl">
+      <div className="bg-linear-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl">
         <h3 className="text-white text-lg font-bold mb-2 flex items-center gap-2">
           <Mic className="w-5 h-5" />
           Voice Brain Dump
@@ -170,7 +170,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
             setShowInitialMode('voice');
             setShowPostCallPulse(true);
           }}
-          className="w-full bg-white text-indigo-600 font-bold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-white text-indigo-600 font-bold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 animate-pulse"
         >
           <Mic className="w-5 h-5" />
           Start Brain Dump
@@ -233,7 +233,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
               </>
             ) : (
               <>
-                🤖 Reprocess All
+                <Sparkles className="w-3 h-3" /> Synthesize Memories
               </>
             )}
           </button>

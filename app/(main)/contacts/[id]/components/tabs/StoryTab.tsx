@@ -13,7 +13,8 @@ import { cn } from '@/lib/utils';
 export interface NarrativeCard {
   title: string;
   icon: React.ReactNode;
-  content: string;
+  content: string | undefined | null;
+  placeholder: string;
   cardColor: string;
 }
 
@@ -37,19 +38,22 @@ export function StoryTab({ contact, onEdit }: StoryTabProps) {
     {
       title: "Where We Met",
       icon: <Map className="w-5 h-5" />,
-      content: contact.where_met || "No story added yet.",
+      content: contact.where_met,
+      placeholder: "College? A mutual friend's wedding? The office?",
       cardColor: "bg-purple-950/40 text-purple-100 border-slate-200",
     },
     {
       title: "Why We Stay in Contact",
       icon: <HeartHandshake className="w-5 h-5 text-indigo-300" />,
-      content: contact.why_stay_in_contact || "No story added yet.",
+      content: contact.why_stay_in_contact,
+      placeholder: "Shared values? They always make me laugh?",
       cardColor: "bg-indigo-950/40 text-indigo-100 border-slate-200",
     },
     {
       title: "What Matters to Them",
       icon: <BookOpen className="w-5 h-5 text-teal-300" />,
-      content: contact.most_important_to_them || "No story added yet.",
+      content: contact.most_important_to_them,
+      placeholder: "Their kids? Career growth? Sustainability?",
       cardColor: "bg-teal-950/40 text-teal-100 border-slate-200",
     }
   ];
@@ -70,9 +74,15 @@ export function StoryTab({ contact, onEdit }: StoryTabProps) {
               {card.icon}
               <h3 className="text-sm font-semibold tracking-wide uppercase opacity-90">{card.title}</h3>
             </div>
-            <p className="text-sm leading-relaxed opacity-95 whitespace-pre-wrap">
-              {card.content}
-            </p>
+            {card.content ? (
+              <p className="text-sm leading-relaxed opacity-95 whitespace-pre-wrap">
+                {card.content}
+              </p>
+            ) : (
+              <p className="text-slate-500 italic text-sm leading-relaxed whitespace-pre-wrap">
+                {card.placeholder}
+              </p>
+            )}
           </div>
         ))}
       </div>

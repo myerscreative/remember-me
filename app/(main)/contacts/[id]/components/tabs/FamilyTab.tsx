@@ -229,18 +229,26 @@ export function FamilyTab({ contact }: FamilyTabProps) {
         {partners.length > 0 ? (
            partners.map((partner, idx) => {
              const realIdx = members.indexOf(partner);
+             const linkedContact = contact.connections?.find(c => c.person.name.toLowerCase() === partner.name.toLowerCase());
              return (
                  <div key={idx} className="space-y-4">
                     <div className="flex gap-4">
                          <div className="flex-1">
                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Name</label>
-                            <input 
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
-                                placeholder="Name"
-                                value={partner.name}
-                                onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
-                                onBlur={() => handleSaveMember(realIdx)}
-                            />
+                            {linkedContact ? (
+                              <Link href={`/contacts/${linkedContact.person.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between">
+                                 {partner.name}
+                                 <span className="text-[10px] uppercase tracking-wider text-slate-500">View Profile ↗</span>
+                              </Link>
+                            ) : (
+                              <input 
+                                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
+                                  placeholder="Name"
+                                  value={partner.name}
+                                  onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
+                                  onBlur={() => handleSaveMember(realIdx)}
+                              />
+                            )}
                          </div>
                          <div className="w-1/3">
                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Relationship</label>
@@ -327,6 +335,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
             {children.length > 0 ? (
                 children.map((child, idx) => {
                      const realIdx = members.indexOf(child);
+                     const linkedContact = contact.connections?.find(c => c.person.name.toLowerCase() === child.name.toLowerCase());
                      return (
                         <div key={idx} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl relative group">
                              <button 
@@ -337,12 +346,18 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                              </button>
 
                              <div className="flex gap-3 mb-3">
-                                 <input 
-                                    className="flex-1 bg-transparent text-white font-bold placeholder:text-slate-600 focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors" 
-                                    placeholder="Child Name"
-                                    value={child.name}
-                                    onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
-                                 />
+                                 {linkedContact ? (
+                                    <Link href={`/contacts/${linkedContact.person.id}`} className="flex-1 bg-transparent text-indigo-400 font-bold hover:text-indigo-300 transition-colors flex items-center gap-1 border-b border-transparent">
+                                       {child.name} ↗
+                                    </Link>
+                                 ) : (
+                                    <input 
+                                       className="flex-1 bg-transparent text-white font-bold placeholder:text-slate-600 focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors" 
+                                       placeholder="Child Name"
+                                       value={child.name}
+                                       onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
+                                    />
+                                 )}
                                   <input 
                                     type="date"
                                     className="bg-transparent text-xs text-slate-500 focus:outline-none w-24"
