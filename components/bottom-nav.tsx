@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWeeklyBloom } from "@/hooks/useWeeklyBloom";
-import { Users, Activity, Search, TreePine } from "lucide-react";
+import { Users, Activity, Search, TreePine, Sprout } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Bottom navigation component - Updated 2026-01-20
@@ -26,6 +26,13 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
     href: "/",
     label: "Network",
     icon: Users,
+    activeColor: "text-primary",
+    inactiveColor: "text-muted-foreground",
+  },
+  {
+    href: "/greenhouse",
+    label: "Feedback",
+    icon: Sprout,
     activeColor: "text-primary",
     inactiveColor: "text-muted-foreground",
   },
