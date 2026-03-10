@@ -4,7 +4,6 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
-import { cn } from '@/lib/utils';
 import { StoryTab } from './tabs/StoryTab';
 import { FamilyTab } from './tabs/FamilyTab';
 import { BrainDumpTab } from './tabs/BrainDumpTab';
@@ -12,9 +11,9 @@ import { AvatarCropModal } from './AvatarCropModal';
 import { logHeaderInteraction } from '@/app/actions/log-header-interaction';
 import { scheduleNextContact } from '@/app/actions/schedule-next-contact';
 import { OverviewTab } from './tabs/OverviewTab';
-import Image from 'next/image';
-import { Camera, Edit2 } from 'lucide-react';
+import { Edit2 } from 'lucide-react';
 import { EditContactModal } from './EditContactModal';
+import { ContactAvatar } from '@/components/contacts/ContactAvatar';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
@@ -146,7 +145,6 @@ export default function ConnectionProfile({
 
   const targetDays = contact.target_frequency_days || 30;
   const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.name;
-  const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   
   // Health Score Logic (Consistent with OverviewTab)
   const daysSince = contact.days_since_last_interaction ?? 30;
@@ -198,32 +196,12 @@ export default function ConnectionProfile({
 
         {/* Profile Identity - Shared across tabs */}
         <section className="flex flex-col items-center pt-10 pb-8 text-center border-b border-slate-900 mb-6">
-          <div className="relative group mb-6 cursor-pointer" onClick={handleAvatarClick}>
-            <div className={cn(
-              "w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-black text-white border-4 transition-all duration-500 shadow-2xl group-hover:scale-105",
-              healthScore > 80 ? "border-emerald-500" : healthScore > 40 ? "border-orange-500" : "border-red-500"
-            )}>
-              {contact.photo_url ? (
-                <div className="relative w-full h-full rounded-full overflow-hidden">
-                  <Image src={contact.photo_url} alt={name} fill className="object-cover" />
-                </div>
-              ) : (
-                initials
-              )}
-              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera size={32} className="text-white drop-shadow-lg" />
-              </div>
-            </div>
-            <div 
-              id="tour-health-score"
-              className={cn(
-                "absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm",
-                healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-orange-500" : "bg-red-500"
-              )}
-            >
-              {Math.round(healthScore)}
-            </div>
-          </div>
+          <ContactAvatar 
+            contact={contact}
+            healthScore={healthScore}
+            onAvatarClick={handleAvatarClick}
+          />
+
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none">{name}</h1>
             <button 
