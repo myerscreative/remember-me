@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Papa from 'papaparse';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, Check, Loader2, Phone, Mail, Smartphone, ChevronRight } from 'lucide-react';
@@ -49,40 +48,64 @@ export function ContactImporter({ onCloseAction }: { onCloseAction: () => void }
     }
   };
 
-  const parseCSV = (file: File) => {
-    return new Promise<void>((resolve, reject) => {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const parsed: ParsedContact[] = [];
-          results.data.forEach((row: any, index: number) => {
-            // Attempt to find common headers for First Name, Last Name, Name, Email, Phone
-            const fname = row['First Name'] || row['Given Name'] || '';
-            const lname = row['Last Name'] || row['Family Name'] || '';
-            const fullName = row['Name'] || `${fname} ${lname}`.trim();
-            const phone = row['Phone 1 - Value'] || row['Phone'] || row['Mobile Phone'] || '';
-            const email = row['E-mail 1 - Value'] || row['E-mail'] || row['Email'] || '';
+  const parseCSV = async (file: File) => {
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (lines.length < 2) return;
 
-            if (fullName) {
-              parsed.push({
-                id: `csv-${index}`,
-                name: fullName,
-                first_name: fname || undefined,
-                last_name: lname || undefined,
-                phone: phone || undefined,
-                email: email || undefined,
-                selected: true,
-              });
-            }
+      const parseCSVLine = (line: string) => {
+        const result: string[] = [];
+        let cell = '';
+        let quotes = false;
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"') {
+            quotes = !quotes;
+          } else if (line[i] === ',' && !quotes) {
+            result.push(cell.trim());
+            cell = '';
+          } else {
+            cell += line[i];
+          }
+        }
+        result.push(cell.trim());
+        return result.map(c => c.replace(/^"|"$/g, '').trim());
+      };
+
+      const headers = parseCSVLine(lines[0]);
+      const parsed: ParsedContact[] = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const rowData = parseCSVLine(lines[i]);
+        const row: Record<string, string> = {};
+        headers.forEach((h, index) => {
+          row[h] = rowData[index] || '';
+        });
+
+        const fname = row['First Name'] || row['Given Name'] || '';
+        const lname = row['Last Name'] || row['Family Name'] || '';
+        const fullName = row['Name'] || `${fname} ${lname}`.trim();
+        const phone = row['Phone 1 - Value'] || row['Phone'] || row['Mobile Phone'] || '';
+        const email = row['E-mail 1 - Value'] || row['E-mail'] || row['Email'] || '';
+
+        if (fullName) {
+          parsed.push({
+            id: `csv-${i}`,
+            name: fullName,
+            first_name: fname || undefined,
+            last_name: lname || undefined,
+            phone: phone || undefined,
+            email: email || undefined,
+            selected: true,
           });
-          setContacts(parsed);
-          setStep(3);
-          resolve();
-        },
-        error: (error) => reject(error),
-      });
-    });
+        }
+      }
+      
+      setContacts(parsed);
+      setStep(3);
+    } catch (error) {
+      throw error;
+    }
   };
 
   const parseVCF = async (file: File) => {
