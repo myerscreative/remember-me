@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { HelpCircle } from 'lucide-react';
 import { TreeStats, HEALTH_COLORS, HEALTH_LABELS } from '../types';
 import { getHealthScoreMessage } from '../utils/treeHealthUtils';
 
@@ -23,6 +25,9 @@ export default function TreeStatsPanel({ stats, className = '' }: TreeStatsProps
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌳</span>
           <h3 className="text-lg font-semibold text-gray-800">Tree Health</h3>
+          <Link href="/field-guide#garden-map" className="text-blue-500 hover:text-blue-600 transition-colors" title="Learn about Tree Health">
+            <HelpCircle size={14} />
+          </Link>
         </div>
         
         {/* Health Score Circle */}

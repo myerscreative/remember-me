@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Bell, Activity, Settings, Sparkles, Calendar, Brain, Flame, TreePine, ShieldAlert, Sprout } from "lucide-react";
+import { Users, Bell, Activity, Settings, Sparkles, Calendar, Brain, Flame, TreePine, ShieldAlert, Sprout, BookOpen } from "lucide-react";
 import { NetworkIcon } from "./icons/NetworkIcon";
 import { cn } from "@/lib/utils";
 import { useGameStats } from "@/hooks/useGameStats";
@@ -64,6 +64,12 @@ const navGroups = [
       href: "/reminders",
       label: "Reminders",
       icon: Bell,
+      inactiveColor: "text-gray-600",
+    },
+    {
+      href: "/field-guide",
+      label: "Field Guide",
+      icon: BookOpen,
       inactiveColor: "text-gray-600",
     },
     {

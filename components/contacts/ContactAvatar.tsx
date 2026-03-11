@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Popover,
   PopoverContent,
@@ -52,7 +51,6 @@ export function ContactAvatar({
 
   const handlePipClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    e.preventDefault();
   };
 
   return (
@@ -98,21 +96,13 @@ export function ContactAvatar({
           </button>
         </PopoverTrigger>
         
-        <AnimatePresence>
-          <PopoverContent 
-            side="right" 
-            align="end" 
-            sideOffset={12}
-            asChild
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, x: -10 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.9, x: -10 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="bg-slate-900 border-slate-700 rounded-xl p-4 shadow-2xl text-sm max-w-[250px] text-slate-200 border z-50"
-            >
-              <div className="space-y-3">
+        <PopoverContent 
+          side="right" 
+          align="end" 
+          sideOffset={12}
+          className="bg-slate-900 border-slate-700 rounded-xl p-4 shadow-2xl text-sm max-w-[250px] text-slate-200"
+        >
+          <div className="space-y-3">
                 <h3 className="font-bold text-base text-white border-b border-slate-800 pb-2">
                   Relationship Health Score
                 </h3>
@@ -136,11 +126,9 @@ export function ContactAvatar({
                 </div>
               </div>
               
-              {/* Custom Arrow */}
-              <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-slate-900 border-l border-b border-slate-700 rotate-45" />
-            </motion.div>
-          </PopoverContent>
-        </AnimatePresence>
+            {/* Custom Arrow */}
+            <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-slate-900 border-l border-b border-slate-700 rotate-45" />
+        </PopoverContent>
       </Popover>
     </div>
   );

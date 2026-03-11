@@ -13,7 +13,9 @@ import {
   X,
   Loader2,
   Edit2,
+  HelpCircle,
 } from 'lucide-react';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -50,7 +52,12 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
           <span className={`absolute text-xs font-black ${statusColor}`}>{score}</span>
         </div>
         <div>
-          <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Health Score</p>
+          <div className="flex items-center gap-1.5 mb-1">
+            <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Health Score</p>
+            <Link href="/field-guide#garden-map" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
+              <HelpCircle size={12} />
+            </Link>
+          </div>
           <p className="text-sm text-slate-200 font-bold">{statusLabel} State</p>
         </div>
       </div>
@@ -163,7 +170,12 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
       {/* No banners or rules suggested here */}
       <div className={cn("p-5", isExpanded && "border-b border-slate-200/10")}>
         <div className="flex justify-between items-center mb-3">
-          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
+          <div className="flex items-center gap-2">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
+            <Link href="/field-guide#brain-dump" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Deep Lore">
+              <HelpCircle size={12} />
+            </Link>
+          </div>
           {isExpanded && (
             <div className="flex items-center gap-1">
               <Popover>
