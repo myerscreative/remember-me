@@ -13,6 +13,7 @@ jest.mock('framer-motion', () => ({
 // Mock Lucide icons
 jest.mock('lucide-react', () => ({
   Camera: () => <div data-testid="camera-icon" />,
+  Info: () => <span data-testid="info-icon">i</span>,
 }));
 
 // Mock Next.js Image

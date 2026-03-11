@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Camera } from 'lucide-react';
+import { Camera, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ContactAvatarProps {
@@ -73,28 +73,28 @@ export function ContactAvatar({
         </div>
       </div>
 
-      {/* Health Score + Info icon */}
+      {/* Health Score with info badge overlay */}
       <div
-        className="absolute bottom-0 right-0 flex items-center gap-1 z-10"
+        className="absolute bottom-0 right-0 z-10"
         onClick={(e) => e.stopPropagation()}
       >
         <div
           id="tour-health-score"
           className={cn(
-            'w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
+            'relative w-12 h-12 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
             getHealthColor(healthScore)
           )}
         >
           {Math.round(healthScore)}
+          <Link
+            href="/field-guide#health-score"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute -top-0.5 -right-0.5 min-w-[44px] min-h-[44px] w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-white hover:bg-indigo-400 active:scale-95 transition-colors shadow-md -m-2"
+            aria-label="Learn about Health Score"
+          >
+            <Info className="w-3.5 h-3.5" strokeWidth={2.5} />
+          </Link>
         </div>
-        <Link
-          href="/field-guide#health-score"
-          onClick={(e) => e.stopPropagation()}
-          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-slate-700/80 hover:bg-slate-600 border-2 border-slate-600 flex items-center justify-center text-white font-bold text-sm transition-colors active:scale-95"
-          aria-label="Learn about Health Score"
-        >
-          i
-        </Link>
       </div>
     </div>
   );
