@@ -2,6 +2,9 @@
   "name": "remember-me",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.x"
+  },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -85,7 +88,8 @@
   },
   "optionalDependencies": {
     "@next/swc-linux-x64-gnu": "16.1.6",
-    "lightningcss-linux-x64-gnu": "1.30.2",
-    "lightningcss-linux-arm64-gnu": "1.30.2"
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.2.1",
+    "lightningcss-linux-arm64-gnu": "1.30.2",
+    "lightningcss-linux-x64-gnu": "1.30.2"
   }
 }
