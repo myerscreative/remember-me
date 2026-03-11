@@ -72,32 +72,26 @@ describe('ContactAvatar', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('stops propagation when clicking the health score pip', () => {
+  it('stops propagation when clicking the health score area', () => {
     const handleAvatarClick = jest.fn();
     render(
       <div onClick={handleAvatarClick}>
         <ContactAvatar contact={mockContact} healthScore={85} />
       </div>
     );
-    
+
     const pip = screen.getByText('85');
     fireEvent.click(pip);
-    
+
     // Parent onClick should NOT be called because of stopPropagation
     expect(handleAvatarClick).not.toHaveBeenCalled();
   });
 
-  it('opens popover on pip click', () => {
+  it('renders info link to field guide', () => {
     render(<ContactAvatar contact={mockContact} healthScore={85} />);
 
-    const pip = screen.getByText('85');
-    fireEvent.click(pip);
-
-    // Check for popover content
-    expect(screen.getByText('Relationship Health: 85')).toBeInTheDocument();
-    expect(
-      screen.getByText(/This score shows how nurtured this connection is/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Use the Brain Dump to boost it!/i)).toBeInTheDocument();
+    const infoLink = screen.getByRole('link', { name: /learn about health score/i });
+    expect(infoLink).toBeInTheDocument();
+    expect(infoLink).toHaveAttribute('href', '/field-guide#health-score');
   });
 });

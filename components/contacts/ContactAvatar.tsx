@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,14 +25,6 @@ export function ContactAvatar({
   onAvatarClick,
   className,
 }: ContactAvatarProps) {
-  const [popoverState, setPopoverState] = useState<{
-    open: boolean;
-    pipTop: number;
-    pipRight: number;
-  } | null>(null);
-  const pipRef = useRef<HTMLButtonElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
-
   const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.name;
   const initials = name
     .split(' ')
@@ -52,76 +44,6 @@ export function ContactAvatar({
     if (score >= 40) return 'border-orange-500';
     return 'border-red-500';
   };
-
-  const openPopover = () => {
-    if (popoverState?.open) {
-      setPopoverState(null);
-    } else if (pipRef.current && typeof document !== 'undefined') {
-      const rect = pipRef.current.getBoundingClientRect();
-      setPopoverState({
-        open: true,
-        pipTop: rect.top,
-        pipRight: rect.right,
-      });
-    }
-  };
-
-  const handlePipClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('Score Pip Clicked');
-    openPopover();
-  };
-
-  const handlePipTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('Score Pip Clicked (touch)');
-    openPopover();
-  };
-
-  useEffect(() => {
-    if (!popoverState?.open) return;
-    const handleClickAway = (e: Event) => {
-      const target = e.target as Node;
-      if (
-        pipRef.current &&
-        !pipRef.current.contains(target) &&
-        popoverRef.current &&
-        !popoverRef.current.contains(target)
-      ) {
-        setPopoverState(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickAway);
-    document.addEventListener('touchstart', handleClickAway);
-    return () => {
-      document.removeEventListener('mousedown', handleClickAway);
-      document.removeEventListener('touchstart', handleClickAway);
-    };
-  }, [popoverState?.open]);
-
-  const popoverContent = popoverState?.open && (
-    <div
-      ref={popoverRef}
-      onMouseLeave={() => setPopoverState(null)}
-      className="fixed w-64 p-3 rounded-xl border border-slate-700 bg-slate-900 text-white z-[9999] shadow-2xl"
-      style={{
-        bottom: typeof window !== 'undefined' ? window.innerHeight - popoverState.pipTop + 8 : 0,
-        left: typeof window !== 'undefined'
-          ? Math.max(8, Math.min(popoverState.pipRight - 256, window.innerWidth - 264))
-          : 0,
-      }}
-    >
-      <h3 className="font-bold text-base text-white mb-2">
-        Relationship Health: {Math.round(healthScore)}
-      </h3>
-      <p className="text-sm text-slate-300 leading-relaxed">
-        This score shows how nurtured this connection is. It drifts lower over
-        time if you don&apos;t stay in touch. Use the Brain Dump to boost it!
-      </p>
-    </div>
-  );
 
   return (
     <div className={cn('relative group mb-6', className)}>
@@ -151,26 +73,29 @@ export function ContactAvatar({
         </div>
       </div>
 
-      {/* Health Score Pip - 44x44 min touch target, touch-action for mobile */}
-      <button
-        ref={pipRef}
-        id="tour-health-score"
-        type="button"
-        onClick={handlePipClick}
-        onTouchStart={handlePipTouchStart}
-        style={{ touchAction: 'manipulation' }}
-        className={cn(
-          'absolute bottom-0 right-0 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm transition-transform hover:scale-110 active:scale-95 z-20',
-          getHealthColor(healthScore)
-        )}
+      {/* Health Score + Info icon */}
+      <div
+        className="absolute bottom-0 right-0 flex items-center gap-1 z-10"
+        onClick={(e) => e.stopPropagation()}
       >
-        {Math.round(healthScore)}
-      </button>
-
-      {/* Health Score Info Popover - Portal to body, bypasses overflow-hidden */}
-      {typeof document !== 'undefined' &&
-        popoverContent &&
-        createPortal(popoverContent, document.body)}
+        <div
+          id="tour-health-score"
+          className={cn(
+            'w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
+            getHealthColor(healthScore)
+          )}
+        >
+          {Math.round(healthScore)}
+        </div>
+        <Link
+          href="/field-guide#health-score"
+          onClick={(e) => e.stopPropagation()}
+          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-slate-700/80 hover:bg-slate-600 border-2 border-slate-600 flex items-center justify-center text-white font-bold text-sm transition-colors active:scale-95"
+          aria-label="Learn about Health Score"
+        >
+          i
+        </Link>
+      </div>
     </div>
   );
 }
