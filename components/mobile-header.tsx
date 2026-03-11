@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Activity } from "lucide-react";
+import Link from "next/link";
+import { Menu, Activity, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarNavContent } from "@/components/sidebar-nav-content";
 import {
@@ -44,7 +45,13 @@ export function MobileHeader() {
       </div>
       
       <div className="flex items-center gap-2">
-        {/* User profile or other quick actions could go here */}
+        <Link
+          href="/field-guide"
+          className="min-touch p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          aria-label="Field Guide / Help"
+        >
+          <HelpCircle className="size-5" />
+        </Link>
       </div>
     </header>
   );

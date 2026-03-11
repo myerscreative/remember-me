@@ -54,7 +54,7 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Health Score</p>
-            <Link href="/field-guide#garden-map" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
+            <Link href="/field-guide#health-score" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
               <HelpCircle size={12} />
             </Link>
           </div>

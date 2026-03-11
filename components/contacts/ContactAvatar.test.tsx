@@ -64,11 +64,11 @@ describe('ContactAvatar', () => {
   it('calls onAvatarClick when clicking the main avatar area', () => {
     const handleClick = jest.fn();
     render(<ContactAvatar contact={mockContact} healthScore={85} onAvatarClick={handleClick} />);
-    
-    // Click the avatar container (the one with initials)
-    const avatar = screen.getByText('JD').parentElement;
+
+    // Click the avatar container (the one with initials - getByText returns the containing div)
+    const avatar = screen.getByText('JD').closest('div[class*="rounded-full"]');
     fireEvent.click(avatar!);
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
@@ -87,15 +87,17 @@ describe('ContactAvatar', () => {
     expect(handleAvatarClick).not.toHaveBeenCalled();
   });
 
-  it('opens popover on pip click', async () => {
+  it('opens popover on pip click', () => {
     render(<ContactAvatar contact={mockContact} healthScore={85} />);
-    
+
     const pip = screen.getByText('85');
     fireEvent.click(pip);
-    
+
     // Check for popover content
-    expect(screen.getByText('Relationship Health Score')).toBeInTheDocument();
-    expect(screen.getByText(/represents the current state of your connection with/i)).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Relationship Health: 85')).toBeInTheDocument();
+    expect(
+      screen.getByText(/This score shows how nurtured this connection is/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Use the Brain Dump to boost it!/i)).toBeInTheDocument();
   });
 });
