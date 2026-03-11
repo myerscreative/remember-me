@@ -15,7 +15,17 @@ import {
   Edit2,
   HelpCircle,
 } from 'lucide-react';
-import Link from 'next/link';
+import { HealthScoreModal } from '@/components/contacts/HealthScoreModal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Brain } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -54,9 +64,14 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Health Score</p>
-            <Link href="/field-guide#health-score" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
-              <HelpCircle size={12} />
-            </Link>
+            <HealthScoreModal 
+              score={score} 
+              trigger={
+                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
+                  <HelpCircle size={12} />
+                </button>
+              }
+            />
           </div>
           <p className="text-sm text-slate-200 font-bold">{statusLabel} State</p>
         </div>
@@ -172,9 +187,34 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-2">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
-            <Link href="/field-guide#brain-dump" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Deep Lore">
-              <HelpCircle size={12} />
-            </Link>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Deep Lore">
+                  <HelpCircle size={12} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-950 border-slate-800 text-slate-200 sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
+                <DialogHeader className="p-6 pb-0">
+                  <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+                    <Brain className="size-5 text-purple-400" />
+                    The Brain Dump
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="p-6 space-y-4">
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    Record voice notes after hangouts to capture <span className="text-purple-300 font-medium">&quot;Deep Lore&quot;</span> and update their story.
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    The Brain Dump is your space to offload thoughts, memories, and details without worrying about formatting. Our AI will synthesize these into the relationship history.
+                  </p>
+                  <DialogClose asChild>
+                    <Button className="w-full h-12 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/40 transition-all active:scale-[0.98]">
+                      Got it
+                    </Button>
+                  </DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           {isExpanded && (
             <div className="flex items-center gap-1">

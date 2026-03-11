@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+
 import { Camera, Info } from 'lucide-react';
+import { HealthScoreModal } from './HealthScoreModal';
 import { cn } from '@/lib/utils';
 
 interface ContactAvatarProps {
@@ -95,14 +96,18 @@ export function ContactAvatar({
         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
           Health Score
         </span>
-        <Link
-          href="/field-guide#health-score"
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 hover:bg-indigo-500 border border-slate-600 text-slate-400 hover:text-white transition-colors"
-          aria-label="Learn about Health Score"
-        >
-          <Info className="w-3 h-3" strokeWidth={2.5} />
-        </Link>
+        <HealthScoreModal 
+          score={healthScore} 
+          trigger={
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 hover:bg-indigo-500 border border-slate-600 text-slate-400 hover:text-white transition-colors"
+              aria-label="Learn about Health Score"
+            >
+              <Info className="w-3 h-3" strokeWidth={2.5} />
+            </button>
+          }
+        />
       </div>
     </div>
   );

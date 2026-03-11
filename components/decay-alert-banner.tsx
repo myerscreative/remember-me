@@ -108,11 +108,11 @@ export function DecayAlertBanner() {
     <>
       {/* Collapsed View */}
       <Card 
-        className="border border-indigo-500/30 bg-slate-900/40 backdrop-blur-sm shadow-xl mb-6 overflow-hidden transition-all hover:bg-slate-900/60 hover:scale-[1.01] hover:shadow-indigo-500/10 group cursor-pointer"
+        className="border border-indigo-500/30 bg-slate-900/40 backdrop-blur-sm shadow-xl mb-4 overflow-hidden transition-all hover:bg-slate-900/60 hover:scale-[1.01] hover:shadow-indigo-500/10 group cursor-pointer"
         onClick={() => setIsExpanded(true)}
       >
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(99,102,241,0.2)]">
                 <Leaf className="h-5 w-5 text-indigo-400" />
@@ -141,35 +141,10 @@ export function DecayAlertBanner() {
               }}
               variant="secondary"
               size="sm"
-              className="bg-indigo-600 hover:bg-indigo-500 text-white border-0 text-xs font-bold px-4 rounded-lg shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white border-0 text-xs font-bold px-4 rounded-lg shadow-lg shadow-indigo-500/20 transition-all active:scale-95 ml-4"
             >
               View Suggestions
             </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {topSuggestions.map((relationship) => (
-              <Link 
-                key={relationship.person_id}
-                href={`/contacts/${relationship.person_id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-3 p-3 bg-slate-950/40 border border-slate-800/50 rounded-xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all group/item z-10"
-              >
-                <Avatar className="h-10 w-10 border border-slate-800 group-hover/item:border-indigo-500/30">
-                  <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-xs">
-                    {getInitials(relationship.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-white truncate group-hover/item:text-indigo-300 transition-colors">
-                    {relationship.name}
-                  </p>
-                  <p className="text-[10px] text-slate-500 font-medium">
-                    {getSeverityText(relationship.last_contact_days)} ago
-                  </p>
-                </div>
-              </Link>
-            ))}
           </div>
         </CardContent>
       </Card>
