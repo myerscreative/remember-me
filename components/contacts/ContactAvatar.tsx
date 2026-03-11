@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,7 +25,11 @@ export function ContactAvatar({
   onAvatarClick,
   className,
 }: ContactAvatarProps) {
-  const [showInfo, setShowInfo] = useState(false);
+  const [popoverState, setPopoverState] = useState<{
+    open: boolean;
+    pipTop: number;
+    pipRight: number;
+  } | null>(null);
   const pipRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -51,11 +56,21 @@ export function ContactAvatar({
   const handlePipClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setShowInfo((prev) => !prev);
+    console.log('Score Pip Clicked');
+    if (popoverState?.open) {
+      setPopoverState(null);
+    } else if (pipRef.current && typeof document !== 'undefined') {
+      const rect = pipRef.current.getBoundingClientRect();
+      setPopoverState({
+        open: true,
+        pipTop: rect.top,
+        pipRight: rect.right,
+      });
+    }
   };
 
   useEffect(() => {
-    if (!showInfo) return;
+    if (!popoverState?.open) return;
     const handleClickAway = (e: Event) => {
       const target = e.target as Node;
       if (
@@ -64,7 +79,7 @@ export function ContactAvatar({
         popoverRef.current &&
         !popoverRef.current.contains(target)
       ) {
-        setShowInfo(false);
+        setPopoverState(null);
       }
     };
     document.addEventListener('mousedown', handleClickAway);
@@ -73,7 +88,29 @@ export function ContactAvatar({
       document.removeEventListener('mousedown', handleClickAway);
       document.removeEventListener('touchstart', handleClickAway);
     };
-  }, [showInfo]);
+  }, [popoverState?.open]);
+
+  const popoverContent = popoverState?.open && (
+    <div
+      ref={popoverRef}
+      onMouseLeave={() => setPopoverState(null)}
+      className="fixed w-64 p-3 rounded-xl border border-slate-700 bg-slate-900 text-white z-[9999] shadow-2xl"
+      style={{
+        bottom: typeof window !== 'undefined' ? window.innerHeight - popoverState.pipTop + 8 : 0,
+        left: typeof window !== 'undefined'
+          ? Math.max(8, Math.min(popoverState.pipRight - 256, window.innerWidth - 264))
+          : 0,
+      }}
+    >
+      <h3 className="font-bold text-base text-white mb-2">
+        Relationship Health: {Math.round(healthScore)}
+      </h3>
+      <p className="text-sm text-slate-300 leading-relaxed">
+        This score shows how nurtured this connection is. It drifts lower over
+        time if you don&apos;t stay in touch. Use the Brain Dump to boost it!
+      </p>
+    </div>
+  );
 
   return (
     <div className={cn('relative group mb-6', className)}>
@@ -103,36 +140,24 @@ export function ContactAvatar({
         </div>
       </div>
 
-      {/* Health Score Pip - interactive, separate from avatar */}
+      {/* Health Score Pip - 44x44 min touch target, separate from avatar */}
       <button
         ref={pipRef}
         id="tour-health-score"
         type="button"
         onClick={handlePipClick}
         className={cn(
-          'absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm transition-transform hover:scale-110 active:scale-95 z-10',
+          'absolute bottom-0 right-0 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm transition-transform hover:scale-110 active:scale-95 z-10',
           getHealthColor(healthScore)
         )}
       >
         {Math.round(healthScore)}
       </button>
 
-      {/* Health Score Info Popover - above avatar */}
-      {showInfo && (
-        <div
-          ref={popoverRef}
-          onMouseLeave={() => setShowInfo(false)}
-          className="absolute bottom-full right-0 mb-2 w-64 p-3 rounded-xl border border-slate-700 bg-slate-900 text-white z-50 shadow-2xl"
-        >
-          <h3 className="font-bold text-base text-white mb-2">
-            Relationship Health: {Math.round(healthScore)}
-          </h3>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            This score shows how nurtured this connection is. It drifts lower over
-            time if you don&apos;t stay in touch. Use the Brain Dump to boost it!
-          </p>
-        </div>
-      )}
+      {/* Health Score Info Popover - Portal to body, bypasses overflow-hidden */}
+      {typeof document !== 'undefined' &&
+        popoverContent &&
+        createPortal(popoverContent, document.body)}
     </div>
   );
 }
