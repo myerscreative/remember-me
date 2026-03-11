@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   // Use default mode - deploy to Vercel with full functionality
@@ -94,12 +93,4 @@ const nextConfig: NextConfig = {
 };
 
 
-
-const pwaConfig = withPWA({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: true, // Temporarily disable PWA to fix deployment caching issue
-});
-
-export default pwaConfig(nextConfig);
+export default nextConfig;
