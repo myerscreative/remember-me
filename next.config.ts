@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Bypass SWC native binding errors on Vercel/mobile builds
+  experimental: {
+    swcPlugins: [],
+  },
   // Use default mode - deploy to Vercel with full functionality
   // Mobile app will call the deployed API
   images: {

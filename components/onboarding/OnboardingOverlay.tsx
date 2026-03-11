@@ -13,10 +13,10 @@ interface OnboardingOverlayProps {
 const steps = [
   {
     targetId: 'tour-health-score',
-    title: 'Relationship Pulse',
+    title: 'The Connection Pulse',
     icon: <HeartPulse className="w-5 h-5 text-indigo-300" />,
-    body: () => `This is the Relationship Pulse. It’s not a grade; it’s a reminder. When life gets busy, we’ll let you know who is drifting so you can reach out with intention.`,
-    buttonText: 'Got it.',
+body: () => `This is a real-time health score (0-100). It measures recency and depth. Every day without contact, this number 'drifts' down. Log a memory or a call to see it climb back up!`,
+    buttonText: 'Got it',
     tab: 'Overview',
   },
   {
@@ -96,7 +96,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
   const step = steps[currentStep];
 
   return (
-    <div className="fixed inset-0 z-100 pointer-events-none overflow-hidden">
+    <div className="fixed inset-0 z-100 flex flex-col items-center justify-center pointer-events-none overflow-hidden">
       {/* Background SVG with Spotlight hole using Mask */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
         <defs>
@@ -137,7 +137,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
         </div>
       </button>
 
-      {/* Tooltip Card */}
+      {/* Tooltip Card - centered, max-w-[90vw] for mobile */}
       <AnimatePresence mode="wait">
         {targetRect && (
           <motion.div
@@ -146,14 +146,9 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-            className="absolute p-6 bg-slate-900 border border-slate-700/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] w-[320px] pointer-events-auto"
-            style={{
-              left: Math.min(window.innerWidth - 340, Math.max(20, targetRect.left + targetRect.width / 2 - 160)),
-              top: targetRect.top + targetRect.height + 30 > window.innerHeight - 250 
-                ? targetRect.top - 240 // Show above if too low
-                : targetRect.top + targetRect.height + 30, // Show below normally
-            }}
+            className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none"
           >
+            <div className="w-full max-w-[min(90vw,320px)] p-6 bg-slate-900 border border-slate-700/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] pointer-events-auto">
             <div className="flex items-center gap-2 mb-3">
               <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
                 {step.icon}
@@ -167,7 +162,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
             
             <button
               onClick={handleNext}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
+              className="w-full min-h-[44px] bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
             >
               {step.buttonText}
             </button>
@@ -188,6 +183,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Step {currentStep + 1} of {steps.length}
               </span>
+            </div>
             </div>
           </motion.div>
         )}

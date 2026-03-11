@@ -53,10 +53,7 @@ export function ContactAvatar({
     return 'border-red-500';
   };
 
-  const handlePipClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('Score Pip Clicked');
+  const openPopover = () => {
     if (popoverState?.open) {
       setPopoverState(null);
     } else if (pipRef.current && typeof document !== 'undefined') {
@@ -67,6 +64,20 @@ export function ContactAvatar({
         pipRight: rect.right,
       });
     }
+  };
+
+  const handlePipClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('Score Pip Clicked');
+    openPopover();
+  };
+
+  const handlePipTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('Score Pip Clicked (touch)');
+    openPopover();
   };
 
   useEffect(() => {
@@ -140,14 +151,16 @@ export function ContactAvatar({
         </div>
       </div>
 
-      {/* Health Score Pip - 44x44 min touch target, separate from avatar */}
+      {/* Health Score Pip - 44x44 min touch target, touch-action for mobile */}
       <button
         ref={pipRef}
         id="tour-health-score"
         type="button"
         onClick={handlePipClick}
+        onTouchStart={handlePipTouchStart}
+        style={{ touchAction: 'manipulation' }}
         className={cn(
-          'absolute bottom-0 right-0 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm transition-transform hover:scale-110 active:scale-95 z-10',
+          'absolute bottom-0 right-0 min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm transition-transform hover:scale-110 active:scale-95 z-20',
           getHealthColor(healthScore)
         )}
       >
