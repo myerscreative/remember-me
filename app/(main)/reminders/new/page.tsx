@@ -8,7 +8,6 @@ import { ArrowLeft, Save } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { format } from "date-fns";
 import { DatePicker } from "@/components/ui/date-picker";
-import { ColorPicker } from "@/components/ui/color-picker";
 
 export default function NewReminderPage() {
   const router = useRouter();
@@ -22,7 +21,6 @@ export default function NewReminderPage() {
     due_time: '09:00',
     person_id: '',
     priority: 'medium' as 'low' | 'medium' | 'high',
-    color: '#8b5cf6',
   });
 
   useEffect(() => {
@@ -62,7 +60,6 @@ export default function NewReminderPage() {
           due_time: formData.due_time || null,
           person_id: formData.person_id || null,
           priority: formData.priority,
-          color: formData.color,
         });
 
       if (error) throw error;
@@ -195,20 +192,6 @@ export default function NewReminderPage() {
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Color */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Color
-              </label>
-              <div className="flex items-center gap-3">
-                <ColorPicker
-                  value={formData.color}
-                  onChange={(color) => setFormData({ ...formData, color })}
-                  compact={false}
-                />
-              </div>
             </div>
 
             {/* Priority */}
