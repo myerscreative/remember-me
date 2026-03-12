@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { DatePicker } from "@/components/ui/date-picker";
+import { ColorPicker } from "@/components/ui/color-picker";
 
 interface Reminder {
   id: string;
@@ -31,6 +32,7 @@ interface Reminder {
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
   category?: string;
+  color?: string;
   created_at: string;
   user_id: string;
 }
@@ -50,9 +52,32 @@ export default function RemindersPage() {
     description: '',
     due_date: '',
     due_time: '',
-    priority: 'medium' as 'low' | 'medium' | 'high'
+    priority: 'medium' as 'low' | 'medium' | 'high',
+    color: '#8b5cf6',
   });
   const [saving, setSaving] = useState(false);
+  const [celebratingId, setCelebratingId] = useState<string | null>(null);
+  const [burstParticles, setBurstParticles] = useState<{ id: number; tx: number; ty: number; color: string; size: number }[]>([]);
+
+  const triggerCelebration = useCallback(() => {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate([40, 20, 70]);
+    }
+    const colors = ["#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#fbbf24", "#fcd34d", "#a78bfa", "#c4b5fd"];
+    const particles = Array.from({ length: 12 }, (_, i) => {
+      const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+      const distance = 28 + Math.random() * 20;
+      return {
+        id: Date.now() + i,
+        tx: Math.cos(angle) * distance,
+        ty: Math.sin(angle) * distance,
+        color: colors[i % colors.length],
+        size: 4 + Math.random() * 5,
+      };
+    });
+    setBurstParticles(particles);
+    setTimeout(() => setBurstParticles([]), 700);
+  }, []);
 
   useEffect(() => {
     loadReminders();
@@ -123,6 +148,7 @@ export default function RemindersPage() {
         due_time: '14:00',
         completed: false,
         priority: 'high',
+        color: '#8b5cf6',
         created_at: new Date().toISOString(),
         user_id: 'mock-user',
         person_name: 'John Doe'
@@ -133,6 +159,7 @@ export default function RemindersPage() {
         due_date: format(new Date(Date.now() + 86400000), 'yyyy-MM-dd'),
         completed: false,
         priority: 'medium',
+        color: '#22c55e',
         created_at: new Date().toISOString(),
         user_id: 'mock-user'
       },
@@ -143,6 +170,7 @@ export default function RemindersPage() {
         due_time: '10:00',
         completed: true,
         priority: 'low',
+        color: '#60a5fa',
         created_at: new Date().toISOString(),
         user_id: 'mock-user'
       }
@@ -150,8 +178,13 @@ export default function RemindersPage() {
   }
 
   async function toggleComplete(reminderId: string, currentStatus: boolean) {
+    if (!currentStatus) {
+      triggerCelebration();
+      setCelebratingId(reminderId);
+      setTimeout(() => setCelebratingId(null), 300);
+    }
+
     const supabase = createClient();
-    
     const { error } = await (supabase as any)
       .from('reminders')
       .update({ completed: !currentStatus })
@@ -162,8 +195,7 @@ export default function RemindersPage() {
       return;
     }
 
-    // Update local state
-    setReminders((reminders as any[]).map((r: any) => 
+    setReminders((reminders as any[]).map((r: any) =>
       r.id === reminderId ? { ...r, completed: !currentStatus } : r
     ));
   }
@@ -193,7 +225,8 @@ export default function RemindersPage() {
       description: reminder.description || '',
       due_date: reminder.due_date,
       due_time: reminder.due_time || '',
-      priority: reminder.priority
+      priority: reminder.priority,
+      color: reminder.color || '#8b5cf6',
     });
   }
 
@@ -210,7 +243,8 @@ export default function RemindersPage() {
         description: editForm.description.trim() || null,
         due_date: editForm.due_date,
         due_time: editForm.due_time || null,
-        priority: editForm.priority
+        priority: editForm.priority,
+        color: editForm.color,
       })
       .eq('id', editingReminder.id);
 
@@ -231,7 +265,8 @@ export default function RemindersPage() {
             description: editForm.description.trim() || null,
             due_date: editForm.due_date,
             due_time: editForm.due_time || null,
-            priority: editForm.priority
+            priority: editForm.priority,
+            color: editForm.color,
           } 
         : r
     ));
@@ -443,81 +478,114 @@ export default function RemindersPage() {
                                   ? 'border-gray-200 dark:border-gray-700 opacity-60' 
                                   : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'
                                 }`}
+                      style={{
+                        borderLeftWidth: reminder.color ? "4px" : undefined,
+                        borderLeftColor: reminder.color || undefined,
+                      }}
                     >
                       <div className="p-4">
                         <div className="flex items-start gap-3">
-                          {/* Checkbox */}
-                          <button
-                            onClick={() => toggleComplete(reminder.id, reminder.completed)}
-                            className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                                      ${reminder.completed
-                                        ? 'bg-green-500 border-green-500'
-                                        : 'border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-400'
-                                      }`}
+                          {/* Content — click opens edit (no negative margin to avoid overlapping checkbox) */}
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => openEditModal(reminder)}
+                            onKeyDown={(e) => e.key === "Enter" && openEditModal(reminder)}
+                            className="flex-1 min-w-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg p-1"
                           >
-                            {reminder.completed && (
-                              <Check className="h-4 w-4 text-white" />
+                            <h3 className={`text-base font-semibold mb-1 ${
+                              reminder.completed
+                                ? "text-gray-500 dark:text-gray-500 line-through"
+                                : "text-gray-900 dark:text-white"
+                            }`}>
+                              {reminder.title}
+                            </h3>
+
+                            {reminder.description && (
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                {reminder.description}
+                              </p>
                             )}
-                          </button>
 
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1">
-                                <h3 className={`text-base font-semibold mb-1 ${
-                                  reminder.completed 
-                                    ? 'text-gray-500 dark:text-gray-500 line-through' 
-                                    : 'text-gray-900 dark:text-white'
-                                }`}>
-                                  {reminder.title}
-                                </h3>
-                                
-                                {reminder.description && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                    {reminder.description}
-                                  </p>
-                                )}
-
-                                <div className="flex flex-wrap items-center gap-3 text-sm">
-                                  {/* Time */}
-                                  {reminder.due_time && (
-                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                                      <Clock className="h-4 w-4" />
-                                      <span>{reminder.due_time}</span>
-                                    </div>
-                                  )}
-
-                                  {/* Person */}
-                                  {reminder.person_name && (
-                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                                      <User className="h-4 w-4" />
-                                      <span>{reminder.person_name}</span>
-                                    </div>
-                                  )}
-
-                                  {/* Priority */}
-                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getPriorityColor(reminder.priority)}`}>
-                                    {reminder.priority}
-                                  </span>
+                            <div className="flex flex-wrap items-center gap-3 text-sm">
+                              {reminder.due_time && (
+                                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                  <Clock className="h-4 w-4" />
+                                  <span>{reminder.due_time}</span>
                                 </div>
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => openEditModal(reminder)}
-                                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => deleteReminder(reminder.id)}
-                                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
+                              )}
+                              {reminder.person_name && (
+                                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                  <User className="h-4 w-4" />
+                                  <span>{reminder.person_name}</span>
+                                </div>
+                              )}
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getPriorityColor(reminder.priority)}`}>
+                                {reminder.priority}
+                              </span>
                             </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(reminder)}
+                              className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors min-touch"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteReminder(reminder.id)}
+                              className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors min-touch"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+
+                          {/* Checkbox on RIGHT — isolated, only toggles complete */}
+                          <div className="relative shrink-0 flex items-center justify-center z-20 isolate">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                toggleComplete(reminder.id, reminder.completed);
+                              }}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onTouchStart={(e) => e.stopPropagation()}
+                              className={`shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors min-touch touch-manipulation
+                                        ${celebratingId === reminder.id ? "animate-reminder-circle-pop" : ""}
+                                        ${reminder.completed
+                                          ? "bg-green-500 border-green-500"
+                                          : "border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-400"
+                                        }`}
+                            >
+                              {reminder.completed && (
+                                <Check className="h-4 w-4 text-white" />
+                              )}
+                            </button>
+                            {burstParticles.length > 0 && celebratingId === reminder.id && (
+                              <>
+                                {burstParticles.map((p) => (
+                                  <div
+                                    key={p.id}
+                                    className="absolute rounded-full pointer-events-none animate-reminder-burst"
+                                    style={{
+                                      width: p.size,
+                                      height: p.size,
+                                      backgroundColor: p.color,
+                                      top: "50%",
+                                      left: "50%",
+                                      // @ts-expect-error CSS custom properties for animation
+                                      "--tx": `${p.tx}px`,
+                                      "--ty": `${p.ty}px`,
+                                    }}
+                                  />
+                                ))}
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -612,6 +680,20 @@ export default function RemindersPage() {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                              bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Color
+                </label>
+                <div className="flex items-center gap-3">
+                  <ColorPicker
+                    value={editForm.color}
+                    onChange={(color) => setEditForm({ ...editForm, color })}
+                    compact={false}
                   />
                 </div>
               </div>
