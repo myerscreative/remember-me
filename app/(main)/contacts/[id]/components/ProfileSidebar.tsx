@@ -30,6 +30,7 @@ interface ProfileSidebarProps {
     target_frequency_days?: number;
     importance?: ContactImportance;
     last_interaction_date?: string; // Additional check if passed different name
+    created_at?: string;
   };
   onFrequencyChange?: (days: number) => void;
   onImportanceChange?: (importance: ContactImportance) => void;
@@ -45,7 +46,11 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
   // Determine which date to use for health
   const healthDate = contact.last_contact_date || contact.last_interaction_date || null;
   // Calculate Health
-  const health = getRelationshipHealth(healthDate, contact.target_frequency_days || 30);
+  const health = getRelationshipHealth(
+    healthDate,
+    contact.target_frequency_days || 30,
+    contact.created_at
+  );
 
 
   const handleAvatarClick = () => {

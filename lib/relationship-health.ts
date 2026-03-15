@@ -6,20 +6,42 @@ export type HealthStatus = 'nurtured' | 'drifting' | 'neglected';
 
 interface HealthCalculatorProps {
   lastContactDate: Date | string | null;
+  createdAt?: Date | string | null;
   cadenceDays: number; // e.g., 30
+}
+
+function toValidDate(input: Date | string | null | undefined): Date | null {
+  if (!input) return null;
+  const parsed = new Date(input);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getHealthBaselineDate(
+  lastContactDate: Date | string | null | undefined,
+  createdAt?: Date | string | null
+): Date | null {
+  const last = toValidDate(lastContactDate);
+  const created = toValidDate(createdAt);
+
+  if (last && created) {
+    return last.getTime() >= created.getTime() ? last : created;
+  }
+
+  return last || created || null;
 }
 
 export const getRelationshipHealth = ({
   lastContactDate,
+  createdAt,
   cadenceDays,
 }: HealthCalculatorProps): HealthStatus => {
-  if (!lastContactDate) return 'neglected';
+  const baselineDate = getHealthBaselineDate(lastContactDate, createdAt);
+  if (!baselineDate) return 'neglected';
 
-  const last = new Date(lastContactDate);
   const now = new Date();
   
   // Calculate difference in days
-  const diffInMs = now.getTime() - last.getTime();
+  const diffInMs = now.getTime() - baselineDate.getTime();
   const daysSinceLastContact = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
   // 1. Nurtured: Within the cadence window
@@ -68,15 +90,20 @@ export const healthColorMap = {
  */
 export function getDetailedRelationshipHealth(
   lastContactDate: string | Date | null,
-  targetDays: number = 30
+  targetDays: number = 30,
+  createdAt?: string | Date | null
 ): { status: HealthStatus; daysSince: number; color: string; label: string } {
-  const lastDateObj = lastContactDate ? new Date(lastContactDate) : null;
+  const baselineDate = getHealthBaselineDate(lastContactDate, createdAt);
   const now = new Date();
-  const daysSince = lastDateObj 
-    ? Math.floor((now.getTime() - lastDateObj.getTime()) / (1000 * 60 * 60 * 24))
+  const daysSince = baselineDate
+    ? Math.floor((now.getTime() - baselineDate.getTime()) / (1000 * 60 * 60 * 24))
     : 999;
 
-  const status = getRelationshipHealth({ lastContactDate, cadenceDays: targetDays });
+  const status = getRelationshipHealth({
+    lastContactDate,
+    createdAt,
+    cadenceDays: targetDays,
+  });
   const styles = healthColorMap[status];
 
   return {

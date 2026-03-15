@@ -131,8 +131,9 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
         ) : (
           categorized.map(({ contact, category, daysAgo }, i) => {
             const initials = (contact.first_name?.[0] || '') + (contact.last_name?.[0] || '');
-            const lastDate = contact.last_interaction_date
-              ? format(parseISO(contact.last_interaction_date), 'MMM d')
+            const baselineDate = getBaselineDate(contact);
+            const lastDate = baselineDate
+              ? format(parseISO(baselineDate), 'MMM d')
               : 'Never';
             
             const isNurtured = nurturedIds.has(contact.id);
@@ -241,9 +242,28 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
 }
 
 function getDaysAgo(contact: NetworkContact): number {
-  const lastStr = contact.last_interaction_date || contact.last_contact;
-  if (!lastStr) return 999;
-  const last = new Date(lastStr);
+  const baselineStr = getBaselineDate(contact);
+  if (!baselineStr) return 999;
+  const last = new Date(baselineStr);
   const now = new Date();
   return Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function getBaselineDate(contact: NetworkContact): string | null {
+  const candidates = [
+    contact.last_interaction_date,
+    contact.last_contact,
+    contact.created_at,
+  ]
+    .filter((dateStr): dateStr is string => Boolean(dateStr))
+    .map((dateStr) => new Date(dateStr))
+    .filter((date) => !Number.isNaN(date.getTime()));
+
+  if (candidates.length === 0) return null;
+
+  const latest = candidates.reduce((max, current) =>
+    current.getTime() > max.getTime() ? current : max
+  );
+
+  return latest.toISOString();
 }

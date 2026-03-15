@@ -1,17 +1,50 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Seedling } from './Seedling';
 import { ContactStatus } from '@/hooks/useGardenPhysics';
+import { getRelationshipHealth } from '@/types/relationship';
 
 export interface Contact {
   id: string;
   name: string;
-  status: ContactStatus;
+  status?: ContactStatus;
   daysSinceLastContact?: number; // Optional for backward compatibility if not hooked up yet
   lastInteractionType?: string;
+  created_at?: string | Date | null;
+  last_interaction_date?: string | Date | null;
+  last_contact?: string | Date | null;
 }
 
 export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
   const [activeSeedId, setActiveSeedId] = useState<string | null>(null);
+  const wrappedContacts = useMemo(() => {
+    const toDate = (value?: string | Date | null): Date | null => {
+      if (!value) return null;
+      const parsed = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const mapStatus = (status: 'NURTURED' | 'DRIFTING' | 'NEGLECTED'): ContactStatus => {
+      if (status === 'NURTURED') return 'Nurtured';
+      if (status === 'DRIFTING') return 'Drifting';
+      return 'Neglected';
+    };
+
+    return contacts.map((contact) => {
+      const createdAt = toDate(contact.created_at) ?? new Date();
+      const lastContacted =
+        toDate(contact.last_interaction_date) ??
+        toDate(contact.last_contact) ??
+        null;
+
+      const health = getRelationshipHealth(createdAt, lastContacted);
+
+      return {
+        ...contact,
+        status: mapStatus(health.status),
+        daysSinceLastContact: health.daysSince,
+      };
+    });
+  }, [contacts]);
 
   return (
     <div 
@@ -24,7 +57,7 @@ export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
       <div className="absolute h-[85%] aspect-square border border-slate-900/40 rounded-full pointer-events-none" />
       
       {/* The People */}
-      {contacts.map((contact, i) => (
+      {wrappedContacts.map((contact, i) => (
         <Seedling 
           key={contact.id} 
           id={contact.id}

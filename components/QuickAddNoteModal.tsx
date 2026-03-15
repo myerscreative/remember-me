@@ -5,9 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2, BookOpen, Mic, MicOff } from "lucide-react";
+import { Search, Loader2, BookOpen, Mic, Square } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { addSharedMemory } from "@/app/actions/story-actions";
+import { addQuickEntryNote } from "@/app/actions/story-actions";
 import { toast } from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -39,10 +39,14 @@ export function QuickAddNoteModal({
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
-  // Voice state
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaChunksRef = useRef<Blob[]>([]);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleSave = useCallback(async (currentNote?: string) => {
     const noteToSave = currentNote !== undefined ? currentNote : note;
@@ -50,9 +54,13 @@ export function QuickAddNoteModal({
 
     setIsSaving(true);
     try {
-      const res = await addSharedMemory(selectedContact.id, cleanupTranscribedText(noteToSave));
+      const res = await addQuickEntryNote(selectedContact.id, cleanupTranscribedText(noteToSave));
       if (res.success) {
-        toast.success("Note Analyzed & Profile Updated! 🧠✨");
+        const parts: string[] = [];
+        if (res.captured?.location) parts.push(res.captured.location);
+        if (res.captured?.interests?.length) parts.push(res.captured.interests.join(", "));
+        const capturedText = parts.length > 0 ? ` Captured: ${parts.join(" and ")}.` : "";
+        toast.success(`Saved!${capturedText}`);
         setNote("");
         setSelectedContact(null);
         setSearch("");
@@ -68,76 +76,132 @@ export function QuickAddNoteModal({
     }
   }, [selectedContact, note, onSuccess, onClose]);
 
-  // Handle auto-save timer
-  const resetSilenceTimer = useCallback(() => {
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = setTimeout(() => {
-      if (isListening) {
-        stopListening();
-        handleSave(note); // Pass the current note to handleSave
-      }
-    }, 3000);
-  }, [isListening, handleSave, note]);
+  const stopMediaTracks = useCallback(() => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+  }, []);
 
-  const startListening = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      toast.error("Voice recognition not supported in this browser");
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const transcribeRecording = useCallback(async (audioBlob: Blob, mimeType: string) => {
+    setIsTranscribing(true);
+    const formData = new FormData();
+    const extension = mimeType.includes("mp4") ? "mp4" : "webm";
+    formData.append("audio", audioBlob, `quick-entry.${extension}`);
+
+    try {
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to transcribe audio");
+      }
+
+      const data = await response.json();
+      const transcript = cleanupTranscribedText(data.transcript || "");
+
+      if (transcript) {
+        setNote((prev) => {
+          const separator = prev.trim() ? "\n" : "";
+          return `${prev}${separator}${transcript}`;
+        });
+        toast.success("Transcript added to Shared Memory");
+      }
+    } catch (error) {
+      console.error("Audio transcription failed:", error);
+      toast.error(error instanceof Error ? error.message : "Transcription failed");
+    } finally {
+      setIsTranscribing(false);
+    }
+  }, []);
+
+  const startRecording = async () => {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      toast.error("Audio recording is not supported in this browser");
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
 
-    recognitionRef.current.onstart = () => setIsListening(true);
-    recognitionRef.current.onerror = (event: any) => {
-      console.error("Speech recognition error", event.error);
-      setIsListening(false);
-    };
-    recognitionRef.current.onend = () => setIsListening(false);
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "";
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
 
-    recognitionRef.current.onresult = (event: any) => {
+      mediaRecorderRef.current = recorder;
+      mediaChunksRef.current = [];
 
-      let finalTranscript = '';
-
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          mediaChunksRef.current.push(event.data);
         }
-      }
+      };
 
-      if (finalTranscript) {
-        setNote(prev => prev + (prev ? " " : "") + finalTranscript);
-        resetSilenceTimer();
-      }
-    };
+      recorder.onstop = async () => {
+        const resolvedMimeType = recorder.mimeType || "audio/webm";
+        const audioBlob = new Blob(mediaChunksRef.current, { type: resolvedMimeType });
+        if (audioBlob.size > 0) {
+          await transcribeRecording(audioBlob, resolvedMimeType);
+        }
+        stopMediaTracks();
+      };
 
-    recognitionRef.current.start();
+      recorder.start();
+      setRecordingSeconds(0);
+      setIsRecording(true);
+      timerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      toast.error("Microphone permission is required for recording");
+    }
   };
 
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
     }
-    setIsListening(false);
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    setIsRecording(false);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
+  const toggleRecording = () => {
+    if (isTranscribing || isSaving) return;
+    if (isRecording) {
+      stopRecording();
+      return;
     }
+    startRecording();
   };
 
   useEffect(() => {
     return () => {
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      if (recognitionRef.current) recognitionRef.current.stop();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+      stopMediaTracks();
     };
-  }, []);
+  }, [stopMediaTracks]);
 
   const searchContacts = useCallback(async () => {
     setIsSearching(true);
@@ -239,30 +303,40 @@ export function QuickAddNoteModal({
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   className={cn(
-                    "min-h-[180px] bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl resize-none p-4 pb-12 transition-all duration-300 text-slate-200",
-                    isListening && "border-blue-400 ring-2 ring-blue-400/20"
+                    "min-h-[180px] bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl resize-none p-4 pb-16 transition-all duration-300 text-slate-200",
+                    isRecording && "border-indigo-500 ring-2 ring-indigo-500/20"
                   )}
                   autoFocus
                 />
                 
-                <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                  {isListening && (
-                    <span className="flex h-3 w-3 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                    </span>
-                  )}
+                <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-950/70 px-2 py-1.5">
+                  <p className="min-h-[20px] text-[11px] text-slate-400">
+                    {isTranscribing
+                      ? "Transcribing audio..."
+                      : isRecording
+                      ? `Recording ${formatTime(recordingSeconds)}`
+                      : "Tap mic to dictate"}
+                  </p>
                   <Button
-                    onClick={toggleListening}
+                    onClick={toggleRecording}
                     size="icon"
-                    variant={isListening ? "default" : "outline"}
+                    variant={isRecording ? "default" : "outline"}
+                    disabled={isTranscribing || isSaving}
                     className={cn(
-                      "h-10 w-10 rounded-full transition-all duration-300",
-                      isListening ? "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 scale-110" : "bg-white dark:bg-slate-800 text-slate-500 hover:text-blue-500 border-slate-200 dark:border-slate-700"
+                      "h-9 w-9 shrink-0 rounded-full transition-all duration-300",
+                      isRecording
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/30"
+                        : "bg-white dark:bg-slate-800 text-slate-500 hover:text-indigo-500 border-slate-200 dark:border-slate-700"
                     )}
-                    title={isListening ? "Stop listening" : "Transcribe with voice"}
+                    title={isRecording ? "Stop recording" : "Record voice note"}
                   >
-                    {isListening ? <Mic className="h-5 w-5 text-white" /> : <MicOff className="h-5 w-5" />}
+                    {isTranscribing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isRecording ? (
+                      <Square className="h-4 w-4 fill-current" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>

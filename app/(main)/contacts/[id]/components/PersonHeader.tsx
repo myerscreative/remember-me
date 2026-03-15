@@ -55,7 +55,11 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
   );
 
   // Health Calculation
-  const health = getRelationshipHealth(contact.last_interaction_date, contact.target_frequency_days || 30);
+  const health = getRelationshipHealth(
+    contact.last_interaction_date,
+    contact.target_frequency_days || 30,
+    contact.created_at
+  );
   
   // Frequency Label (e.g. "Monthly Cadence")
   const frequencyLabel = FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Monthly";

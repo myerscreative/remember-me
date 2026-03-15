@@ -3,15 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWeeklyBloom } from "@/hooks/useWeeklyBloom";
-import { Users, Activity, Search, TreePine, Sprout } from "lucide-react";
+import { Users, Search, TreePine } from "lucide-react";
+import { NetworkIcon } from "@/components/icons/NetworkIcon";
 import { cn } from "@/lib/utils";
 
-// Bottom navigation component - Updated 2026-01-20
+// Bottom navigation component - Updated 2026-03-12
 const navItems: { href: string; label: string; icon: React.ElementType; activeColor: string; inactiveColor: string; isSearch?: boolean }[] = [
   {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: Activity,
+    href: "/",
+    label: "People",
+    icon: Users,
+    activeColor: "text-primary",
+    inactiveColor: "text-muted-foreground",
+  },
+  {
+    href: "/network",
+    label: "Network",
+    icon: NetworkIcon,
     activeColor: "text-primary",
     inactiveColor: "text-muted-foreground",
   },
@@ -21,28 +29,6 @@ const navItems: { href: string; label: string; icon: React.ElementType; activeCo
     icon: TreePine,
     activeColor: "text-primary",
     inactiveColor: "text-muted-foreground",
-  },
-  {
-    href: "/",
-    label: "Network",
-    icon: Users,
-    activeColor: "text-primary",
-    inactiveColor: "text-muted-foreground",
-  },
-  {
-    href: "/greenhouse",
-    label: "Feedback",
-    icon: Sprout,
-    activeColor: "text-primary",
-    inactiveColor: "text-muted-foreground",
-  },
-  {
-    href: "#search",
-    label: "Search",
-    icon: Search,
-    activeColor: "text-foreground",
-    inactiveColor: "text-muted-foreground",
-    isSearch: true,
   },
 ];
 

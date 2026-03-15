@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { Database } from "@/types/database.types";
 import { processMemory } from './process-memory';
+import { parseQuickEntryNarrative } from '@/lib/ai/parse-quick-entry';
 import { z } from "zod";
 
 type Person = Database['public']['Tables']['persons']['Row'];
@@ -422,6 +423,132 @@ export async function addSharedMemory(person_id: string, content: string) {
       
       return { success: false, error: message };
     }
+}
+
+export type QuickEntryCaptured = {
+  location: string | null;
+  interests: string[];
+  context: string | null;
+};
+
+/**
+ * Quick Entry with Auto-Filling via Narrative.
+ * 1. Always saves raw text to Shared Memories (no data lost).
+ * 2. Parses narrative with AI to extract: where_met, why_stay_in_contact, interests.
+ * 3. Updates contact profile with extracted fields (merge, don't overwrite empty).
+ * 4. Returns captured data for success toast.
+ */
+export async function addQuickEntryNote(
+  personId: string,
+  content: string
+): Promise<{ success: boolean; error?: string; captured?: QuickEntryCaptured }> {
+  try {
+    const validationResult = sharedMemorySchema.safeParse({ personId, content });
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error: validationResult.error.issues.map((i) => i.message).join(", "),
+      };
+    }
+
+    const { personId: validatedPersonId, content: validatedContent } =
+      validationResult.data;
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) return { success: false, error: "Unauthorized" };
+
+    // 1. Always save raw text to Shared Memories first (no data lost)
+    const { error: insertError } = await (supabase as any)
+      .from("shared_memories")
+      .insert({
+        person_id: validatedPersonId,
+        user_id: user.id,
+        content: validatedContent,
+      });
+
+    if (insertError) throw insertError;
+
+    const captured: QuickEntryCaptured = {
+      location: null,
+      interests: [],
+      context: null,
+    };
+
+    // 2. Parse narrative with AI
+    let parsed;
+    try {
+      parsed = await parseQuickEntryNarrative(validatedContent);
+    } catch (parseErr) {
+      console.error("Quick entry parse failed:", parseErr);
+      revalidatePath(`/contacts/${validatedPersonId}`);
+      revalidatePath("/dashboard");
+      return { success: true, captured }; // Still success - raw text saved
+    }
+
+    // 3. Build update payload (only non-empty, merge interests)
+    const updates: Record<string, unknown> = {};
+
+    if (parsed.where_met) {
+      updates.where_met = parsed.where_met;
+      captured.location = parsed.where_met;
+    }
+    if (parsed.why_stay_in_contact) {
+      updates.why_stay_in_contact = parsed.why_stay_in_contact;
+      captured.context = parsed.why_stay_in_contact;
+    }
+    if (parsed.interests.length > 0) {
+      const { data: contact } = await (supabase as any)
+        .from("persons")
+        .select("interests")
+        .eq("id", validatedPersonId)
+        .eq("user_id", user.id)
+        .single();
+
+      const current = Array.isArray(contact?.interests) ? contact.interests : [];
+      const merged = [...current];
+      for (const i of parsed.interests) {
+        const lower = i.toLowerCase();
+        if (!merged.some((x: string) => x.toLowerCase() === lower)) {
+          merged.push(i);
+        }
+      }
+      updates.interests = merged.slice(0, 20);
+      captured.interests = parsed.interests;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      const { error: updateError } = await (supabase as any)
+        .from("persons")
+        .update(updates)
+        .eq("id", validatedPersonId)
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        console.error("Quick entry profile update failed:", updateError);
+      } else {
+        try {
+          const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+          fetch(`${origin}/api/refresh-ai-summary`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contactId: validatedPersonId }),
+          }).catch((err) => console.error("Background AI refresh failed:", err));
+        } catch {
+          /* noop */
+        }
+      }
+    }
+
+    revalidatePath(`/contacts/${validatedPersonId}`);
+    revalidatePath("/dashboard");
+    revalidatePath("/admin/dashboard");
+    return { success: true, captured };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("addQuickEntryNote error:", error);
+    return { success: false, error: message };
+  }
 }
 
 export async function addInterest(contactId: string, interest: string) {

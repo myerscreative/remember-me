@@ -34,6 +34,8 @@ export async function addContact(name: string): Promise<{ success: boolean; id?:
       lastName = nameParts.slice(1).join(' ');
     }
 
+    const nowIso = new Date().toISOString();
+
     const { data, error } = await supabase
       .from('persons')
       .insert({
@@ -43,8 +45,12 @@ export async function addContact(name: string): Promise<{ success: boolean; id?:
         last_name: lastName,
         imported: false,
         has_context: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        // Explicitly initialize nullable contact timestamps.
+        // Health logic uses created_at as baseline until first real interaction.
+        last_contact: null,
+        last_interaction_date: null,
+        created_at: nowIso,
+        updated_at: nowIso,
       })
       .select('id')
       .single();

@@ -263,6 +263,7 @@ export default function ContactDetailPage({
   // Calculate Health State for UI
   const healthState = getRelationshipHealth({
       lastContactDate: contact.last_interaction_date,
+      createdAt: contact.created_at,
       cadenceDays: contact.target_frequency_days || 30
   });
   

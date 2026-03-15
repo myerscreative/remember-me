@@ -7,6 +7,26 @@ interface RelationshipStatus {
 
 export function getRelationshipStatus(contact: Person): RelationshipStatus {
   const now = new Date();
+
+  const toValidDate = (dateStr?: string | null): Date | null => {
+    if (!dateStr) return null;
+    const parsed = new Date(dateStr);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const getBaselineDate = (): Date | null => {
+    const candidates = [
+      toValidDate(contact.last_interaction_date),
+      toValidDate(contact.last_contact),
+      toValidDate(contact.created_at),
+    ].filter((d): d is Date => d !== null);
+
+    if (candidates.length === 0) return null;
+
+    return candidates.reduce((latest, current) =>
+      current.getTime() > latest.getTime() ? current : latest
+    );
+  };
   
   // 1. Check for upcoming Milestones (Birthdays in < 7 days)
   if (contact.birthday) {
@@ -32,16 +52,16 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
     }
   }
 
-  // 2. Check if last_contact_date is NULL (New Contact Logic)
-  const lastContactStr = contact.last_interaction_date || contact.last_contact;
-  
-  if (!lastContactStr) {
+  // 2. Use most recent of last interaction/contact/created date as baseline.
+  // This keeps brand-new contacts in their initial nurtured window.
+  const baselineDate = getBaselineDate();
+
+  if (!baselineDate) {
     return { label: "Initiate your first reach-out", colorClass: "text-indigo-500 dark:text-indigo-400 font-semibold text-[12px] font-sans" };
   }
 
   // 3. Check Overdue Status
-  const lastContactDate = new Date(lastContactStr);
-  const diffTime = Math.abs(now.getTime() - lastContactDate.getTime());
+  const diffTime = Math.abs(now.getTime() - baselineDate.getTime());
   const daysAgo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
   // Custom thresholds

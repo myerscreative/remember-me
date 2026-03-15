@@ -15,6 +15,7 @@ import { Edit2 } from 'lucide-react';
 import { EditContactModal } from './EditContactModal';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
+import { getRelationshipHealth } from '@/types/relationship';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
   return (
@@ -145,9 +146,23 @@ export default function ConnectionProfile({
 
   const targetDays = contact.target_frequency_days || 30;
   const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.name;
+  const parseValidDate = (value: string | null | undefined): Date | null => {
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const createdAtDate = parseValidDate(contact.created_at) ?? new Date();
+  const rawLastContacted = contact.last_interaction_date || contact.last_contact || contact.last_contact_date || null;
+  const lastContactedDate = parseValidDate(rawLastContacted);
+  const relationshipHealth = getRelationshipHealth(createdAtDate, lastContactedDate, {
+    driftingDays: Math.max(1, Math.floor(targetDays * 0.5)),
+    neglectedDays: targetDays,
+  });
   
-  // Health Score Logic (Consistent with OverviewTab)
-  const daysSince = contact.days_since_last_interaction ?? 30;
+  // Health Score Logic uses referenceDate = lastContacted ?? createdAt.
+  // This keeps brand-new contacts at Day 0 instead of immediately degraded.
+  const daysSince = relationshipHealth.daysSince;
   const baseHealthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
   const healthScore = Math.min(100, baseHealthScore + (contact.health_boost || 0));
 
