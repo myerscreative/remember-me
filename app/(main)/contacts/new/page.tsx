@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { X, Mic, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import type { PersonInsert } from "@/types/database.types";
+import { createContact } from "@/app/actions/create-contact";
 import { VoiceEntryModalEnhanced } from "@/components/voice-entry-modal-enhanced";
 import { formatPhoneNumber } from "@/lib/utils";
 import toast, { Toaster } from "react-hot-toast";
@@ -110,51 +110,33 @@ export default function NewContactPage() {
         return;
       }
 
-      // Combine first and last name for full name
-      const fullName = formData.lastName.trim() 
-        ? `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim()
-        : formData.firstName.trim();
-
-      // Prepare person data with separate first_name and last_name fields
-      const personData: PersonInsert = {
-        user_id: user.id,
+      // Create contact via server action (ensures created_at, last_contacted null, cadence default 30)
+      const result = await createContact({
         first_name: formData.firstName.trim(),
         last_name: formData.lastName.trim() || null,
-        name: fullName, // Keep for backward compatibility
-        family_members: formData.familyMembers.length > 0 ? formData.familyMembers : null,
-        notes: formData.misc.trim() || null, // Map misc to notes field
+        email: formData.email.trim() || null,
+        phone: formData.phone.trim() || null,
+        linkedin: formData.linkedin.trim() || null,
+        company: formData.company.trim() || null,
+        job_title: formData.jobTitle.trim() || null,
         where_met: formData.whereMet.trim() || null,
         who_introduced: formData.introducedBy.trim() || null,
         why_stay_in_contact: formData.whyStayInContact.trim() || null,
         what_found_interesting: formData.whatInteresting.trim() || null,
         most_important_to_them: formData.whatsImportant.trim() || null,
-        // Temporarily commented out until schema cache refreshes
-        // first_impression: formData.firstImpression.trim() || null,
-        // memorable_moment: formData.memorableMoment.trim() || null,
-        email: formData.email.trim() || null,
-        phone: formData.phone.trim() || null,
-        linkedin: formData.linkedin.trim() || null,
+        notes: formData.misc.trim() || null,
+        birthday: formData.birthday || null,
+        family_members: formData.familyMembers.length > 0 ? formData.familyMembers : null,
         interests: formData.interests.split(',').map(s => s.trim()).filter(Boolean),
-      };
+        target_frequency_days: 30, // Default Monthly cadence
+        has_context: true,
+      });
 
-      // Insert person
-      const { data: newPerson, error: personError } = await (supabase as any)
-        .from("persons")
-        .insert(personData)
-        .select()
-        .single();
-
-      if (personError) {
-        console.error("Supabase insert error:", personError);
-        console.error("Error details:", {
-          message: personError.message,
-          code: personError.code,
-          details: personError.details,
-          hint: personError.hint,
-        });
-        console.error("Data being inserted:", personData);
-        throw personError;
+      if (!result.success || !result.id) {
+        throw new Error(result.error ?? "Failed to create contact");
       }
+
+      const newPerson = { id: result.id };
 
       // Handle tags if provided
       if (formData.tags.trim() && newPerson) {

@@ -51,6 +51,8 @@ export async function addContact(name: string): Promise<{ success: boolean; id?:
         last_interaction_date: null,
         created_at: nowIso,
         updated_at: nowIso,
+        // Default cadence: 30 (Monthly)
+        target_frequency_days: 30,
       })
       .select('id')
       .single();

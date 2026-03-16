@@ -79,10 +79,8 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
       const firstName = nameParts[0] || "";
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
 
-      // Prepare contact data
-      const contactData = {
-        user_id: user.id,
-        name: data.name || "",
+      const { createContact } = await import("@/app/actions/create-contact");
+      const result = await createContact({
         first_name: firstName,
         last_name: lastName,
         email: data.email || null,
@@ -94,39 +92,30 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
         what_found_interesting: data.whatInteresting || null,
         most_important_to_them: data.whatsImportant || null,
         family_members: data.familyMembers || null,
-        interests: (data.interests || data.tags) ? (data.interests || data.tags).split(',').map((t: string) => t.trim()) : null,
+        interests: (data.interests || data.tags) ? (data.interests || data.tags).split(',').map((t: string) => t.trim()).filter(Boolean) : null,
         notes: data.misc || null,
-        imported: false, // This is a manually added contact via voice
-        has_context: true, // Voice capture means it has context
-      };
+        birthday: data.birthday || null,
+        target_frequency_days: 30, // Default Monthly cadence for Quick Entry
+        has_context: true,
+      });
 
-      // Insert contact
-      const { data: newContact, error } = await (supabase as any)
-        .from("persons")
-        .insert([contactData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error saving contact:", error);
-        toast.error("Failed to save contact. Please try again.");
+      if (!result.success || !result.id) {
+        toast.error(result.error ?? "Failed to save contact. Please try again.");
         return;
       }
 
-      // If there are interests, we need to ensure they are added to the dedicated interests table
+      // If there are interests, add them to the dedicated interests table
       if (data.interests) {
-        const interestsList = data.interests.split(',').map((i: string) => i.trim());
+        const interestsList = data.interests.split(',').map((i: string) => i.trim()).filter(Boolean);
         const { toggleInterest } = await import("@/app/actions/toggle-interest");
         for (const interestName of interestsList) {
-            if (interestName) {
-                await toggleInterest(newContact.id, interestName);
-            }
+          await toggleInterest(result.id!, interestName);
         }
       }
 
       // Close modal and navigate to the new contact
       setIsNewContactModalOpen(false);
-      router.push(`/contacts/${newContact.id}`);
+      router.push(`/contacts/${result.id}`);
       router.refresh();
 
     } catch (error) {

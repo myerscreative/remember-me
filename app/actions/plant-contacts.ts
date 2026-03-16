@@ -158,6 +158,9 @@ export async function plantContacts(contacts: any[]): Promise<{ success: boolean
               has_context: false,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
+              last_contact: null,
+              last_interaction_date: null,
+              target_frequency_days: 30,
             })
             .select()
             .single();

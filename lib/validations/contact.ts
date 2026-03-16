@@ -201,6 +201,7 @@ export const createContactSchema = z.object({
   where_met: safeStringSchema(500),
   importance: importanceSchema,
   target_frequency_days: targetFrequencySchema,
+  birthday: dateOnlySchema,
 });
 
 /**
