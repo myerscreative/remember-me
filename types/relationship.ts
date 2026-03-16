@@ -1,23 +1,17 @@
-export type HealthStatus = 'NURTURED' | 'DRIFTING' | 'NEGLECTED';
+export type HealthStatus = 'NURTURED' | 'WARNING' | 'NEGLECTED';
 
-interface HealthConfig {
-  driftingDays: number;
-  neglectedDays: number;
+export interface RelationshipHealth {
+  lastContactDate: Date;
+  targetContactDate: Date;
+  status: HealthStatus;
 }
 
-export const getRelationshipHealth = (
-  createdAt: Date,
-  lastContacted: Date | null,
-  config: HealthConfig = { driftingDays: 14, neglectedDays: 30 }
-): { status: HealthStatus; daysSince: number } => {
-  const referenceDate = lastContacted ?? createdAt;
+export const getHealthStatus = (targetDate: Date): HealthStatus => {
   const now = new Date();
+  const diffInMs = targetDate.getTime() - now.getTime();
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-  const diffTime = Math.abs(now.getTime() - referenceDate.getTime());
-  const daysSince = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  if (daysSince >= config.neglectedDays) return { status: 'NEGLECTED', daysSince };
-  if (daysSince >= config.driftingDays) return { status: 'DRIFTING', daysSince };
-
-  return { status: 'NURTURED', daysSince };
+  if (diffInMs < 0) return 'NEGLECTED'; // Red: Time has passed
+  if (diffInDays <= 5) return 'WARNING'; // Yellow: Within 5-day window
+  return 'NURTURED'; // Green: More than 5 days out
 };

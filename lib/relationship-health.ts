@@ -2,18 +2,76 @@
 /**
  * Logic to determine Relationship Health based on "Intention over Automation"
  */
-export type HealthStatus = 'nurtured' | 'drifting' | 'neglected';
 
-interface HealthCalculatorProps {
-  lastContactDate: Date | string | null;
-  createdAt?: Date | string | null;
-  cadenceDays: number; // e.g., 30
+/**
+ * Centralized health calculation used by Hero Circle and Health Card.
+ * ReferenceDate = lastContacted ?? createdAt
+ * DaysRemaining = CadenceDays - DaysElapsed
+ * HealthScore = (DaysRemaining / CadenceDays) * 100
+ * NextDue = ReferenceDate + CadenceDays
+ */
+export interface CalculateHealthInput {
+  lastContacted: string | Date | null;
+  createdAt: string | Date | null;
+  cadenceDays?: number | null;
+}
+
+export interface CalculateHealthResult {
+  healthScore: number;
+  daysElapsed: number;
+  daysRemaining: number;
+  nextDue: Date;
+  statusLabel: 'Nurtured' | 'Drifting' | 'Neglected';
 }
 
 function toValidDate(input: Date | string | null | undefined): Date | null {
   if (!input) return null;
   const parsed = new Date(input);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function calculateHealth(input: CalculateHealthInput): CalculateHealthResult {
+  const cadenceDays = input.cadenceDays ?? 30;
+  const createdAt = toValidDate(input.createdAt);
+  const lastContacted = toValidDate(input.lastContacted);
+
+  // Reference = most recent of lastContacted and createdAt.
+  // If lastContacted is before createdAt (e.g. backdated interaction), use createdAt.
+  const referenceDate = (() => {
+    if (!lastContacted && !createdAt) return new Date();
+    if (!lastContacted) return createdAt!;
+    if (!createdAt) return lastContacted;
+    return lastContacted.getTime() >= createdAt.getTime() ? lastContacted : createdAt;
+  })();
+  const now = new Date();
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const daysElapsed = Math.max(0, Math.floor((now.getTime() - referenceDate.getTime()) / msPerDay));
+  const daysRemaining = Math.max(0, cadenceDays - daysElapsed);
+
+  const rawScore = (daysRemaining / cadenceDays) * 100;
+  const healthScore = Math.round(Math.max(0, Math.min(100, rawScore)));
+
+  const nextDue = new Date(referenceDate.getTime() + cadenceDays * msPerDay);
+
+  const statusLabel =
+    healthScore > 70 ? 'Nurtured' : healthScore >= 30 ? 'Drifting' : 'Neglected';
+
+  return {
+    healthScore,
+    daysElapsed,
+    daysRemaining,
+    nextDue,
+    statusLabel,
+  };
+}
+
+export type HealthStatus = 'nurtured' | 'drifting' | 'neglected';
+
+interface HealthCalculatorProps {
+  lastContactDate: Date | string | null;
+  createdAt?: Date | string | null;
+  cadenceDays: number; // e.g., 30
 }
 
 function getHealthBaselineDate(

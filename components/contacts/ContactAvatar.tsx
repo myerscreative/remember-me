@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Camera, Info } from 'lucide-react';
 import { HealthScoreModal } from './HealthScoreModal';
 import { cn } from '@/lib/utils';
+import { getHealthStatus } from '@/types/relationship';
 
 interface ContactAvatarProps {
   contact: {
@@ -15,14 +16,18 @@ interface ContactAvatarProps {
     last_name?: string;
     photo_url?: string;
   };
-  healthScore: number;
+  daysRemaining: number;
+  cadenceDays: number;
+  targetContactDate: Date;
   onAvatarClick?: () => void;
   className?: string;
 }
 
 export function ContactAvatar({
   contact,
-  healthScore,
+  daysRemaining,
+  cadenceDays,
+  targetContactDate,
   onAvatarClick,
   className,
 }: ContactAvatarProps) {
@@ -34,15 +39,15 @@ export function ContactAvatar({
     .toUpperCase()
     .slice(0, 2);
 
-  const getHealthColor = (score: number) => {
-    if (score >= 70) return 'bg-green-500';
-    if (score >= 40) return 'bg-orange-500';
+  const status = getHealthStatus(targetContactDate);
+  const getHealthColor = () => {
+    if (status === 'NURTURED') return 'bg-green-500';
+    if (status === 'WARNING') return 'bg-amber-500';
     return 'bg-red-500';
   };
-
-  const getHealthBorder = (score: number) => {
-    if (score >= 70) return 'border-emerald-500';
-    if (score >= 40) return 'border-orange-500';
+  const getHealthBorder = () => {
+    if (status === 'NURTURED') return 'border-emerald-500';
+    if (status === 'WARNING') return 'border-amber-500';
     return 'border-red-500';
   };
 
@@ -54,7 +59,7 @@ export function ContactAvatar({
           onClick={onAvatarClick}
           className={cn(
             'w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-black text-white border-4 transition-all duration-500 shadow-2xl hover:scale-105 cursor-pointer',
-            getHealthBorder(healthScore)
+            getHealthBorder()
           )}
         >
           {contact.photo_url ? (
@@ -75,34 +80,35 @@ export function ContactAvatar({
           </div>
         </div>
 
-        {/* Score pip - stays within the explicit 128×128 container */}
+        {/* Days remaining pip */}
         <div
           id="tour-health-score"
           className={cn(
             'absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
-            getHealthColor(healthScore)
+            getHealthColor()
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          {Math.round(healthScore)}
+          {Math.max(0, Math.round(daysRemaining))}
         </div>
       </div>
 
-      {/* Health Score label row — normal flow, always visible, never clipped */}
+      {/* Days left label row */}
       <div
         className="flex items-center gap-2 mt-2"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-          Health Score
+          Days left
         </span>
         <HealthScoreModal 
-          score={healthScore} 
+          daysRemaining={daysRemaining}
+          cadenceDays={cadenceDays}
           trigger={
             <button
               onClick={(e) => e.stopPropagation()}
               className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 hover:bg-indigo-500 border border-slate-600 text-slate-400 hover:text-white transition-colors"
-              aria-label="Learn about Health Score"
+              aria-label="Learn about days remaining"
             >
               <Info className="w-3 h-3" strokeWidth={2.5} />
             </button>

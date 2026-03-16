@@ -13,11 +13,12 @@ import {
 import { Button } from '@/components/ui/button';
 
 interface HealthScoreModalProps {
-  score: number;
+  daysRemaining: number;
+  cadenceDays: number;
   trigger: React.ReactNode;
 }
 
-export function HealthScoreModal({ score, trigger }: HealthScoreModalProps) {
+export function HealthScoreModal({ daysRemaining, cadenceDays, trigger }: HealthScoreModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -27,16 +28,16 @@ export function HealthScoreModal({ score, trigger }: HealthScoreModalProps) {
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
             <Heart className="size-5 text-indigo-400" />
-            About Relationship Health
+            Days Until Next Contact
           </DialogTitle>
         </DialogHeader>
         <div className="p-6 space-y-6">
           <div className="space-y-4">
             <p className="text-sm text-slate-400 leading-relaxed">
-              {score === 0 ? (
-                <span className="text-indigo-300 font-medium">A score of 0 means this &apos;Seed&apos; hasn&apos;t been nurtured yet. Use the Brain Dump or log a Shared Memory to boost it.</span>
+              {daysRemaining === 0 ? (
+                <span className="text-indigo-300 font-medium">0 days left means it&apos;s time to reach out. Log an interaction or add a Shared Memory to reset the clock.</span>
               ) : (
-                "This score shows how nurtured this connection is. It drifts lower over time if you don't stay in touch. Use the Brain Dump or log interactions to boost it!"
+                `You have ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} left before your next check-in (based on a ${cadenceDays}-day cadence). Log interactions to keep this connection nurtured!`
               )}
             </p>
             
@@ -45,25 +46,25 @@ export function HealthScoreModal({ score, trigger }: HealthScoreModalProps) {
                  <div className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
                  <div className="flex flex-col">
                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Nurtured</span>
-                   <span className="text-[10px] text-slate-500">Strong & Consistent</span>
+                   <span className="text-[10px] text-slate-500">More than 5 days until next contact</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">81-100</span>
+                 <span className="text-[10px] text-slate-600 ml-auto font-mono">&gt;5 days</span>
                </div>
-               <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-500/5 border border-orange-500/10">
-                 <div className="size-2 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.5)]" />
+               <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                 <div className="size-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
                  <div className="flex flex-col">
-                   <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Drifting</span>
-                   <span className="text-[10px] text-slate-500">Needs Attention</span>
+                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Due soon</span>
+                   <span className="text-[10px] text-slate-500">1–5 days until next contact</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">41-80</span>
+                 <span className="text-[10px] text-slate-600 ml-auto font-mono">1–5 days</span>
                </div>
                <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10">
                  <div className="size-2 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
                  <div className="flex flex-col">
-                   <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Neglected</span>
-                   <span className="text-[10px] text-slate-500">Fading Seed</span>
+                   <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Overdue</span>
+                   <span className="text-[10px] text-slate-500">Time to reach out</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">0-40</span>
+                 <span className="text-[10px] text-slate-600 ml-auto font-mono">0 days</span>
                </div>
             </div>
           </div>

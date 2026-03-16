@@ -41,12 +41,16 @@ import toast from 'react-hot-toast';
 import { auditDraftMessage } from '@/app/actions/audit-message';
 import { addSharedMemory } from '@/app/actions/story-actions';
 import { useDebounce } from '@/hooks/use-debounce';
+import { calculateHealth } from '@/lib/relationship-health';
+import { getHealthStatus } from '@/types/relationship';
 
 // --- Components from Blueprint ---
 
-const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
-  const statusLabel = score > 80 ? 'Nurtured' : score > 40 ? 'Drifting' : 'Neglected';
-  const statusColor = score > 80 ? 'text-emerald-400' : score > 40 ? 'text-orange-400' : 'text-red-400';
+const VitalSigns = ({ daysRemaining, cadenceDays, nextDue, targetContactDate, statusLabel }: { daysRemaining: number, cadenceDays: number, nextDue: string, targetContactDate: Date, statusLabel?: string }) => {
+  const healthStatus = getHealthStatus(targetContactDate);
+  const status = statusLabel ?? (healthStatus === 'NURTURED' ? 'Nurtured' : healthStatus === 'WARNING' ? 'Due soon' : 'Overdue');
+  const statusColor = healthStatus === 'NURTURED' ? 'text-emerald-400' : healthStatus === 'WARNING' ? 'text-amber-400' : 'text-red-400';
+  const ratio = cadenceDays > 0 ? Math.min(1, Math.max(0, daysRemaining / cadenceDays)) : 0;
   
   return (
     <div className="w-full bg-slate-900 border border-slate-200/10 rounded-2xl p-5 flex items-center justify-between mb-4 shadow-sm">
@@ -55,25 +59,26 @@ const VitalSigns = ({ score, nextDue }: { score: number, nextDue: string }) => {
           <svg className="w-full h-full transform -rotate-90">
              <circle cx="28" cy="28" r="24" stroke="#1e293b" strokeWidth="4" fill="transparent" />
              <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" 
-               strokeDasharray="150.8" strokeDashoffset={150.8 - (150.8 * score) / 100} 
+               strokeDasharray="150.8" strokeDashoffset={150.8 - (150.8 * ratio)} 
                className={statusColor} 
              />
           </svg>
-          <span className={`absolute text-xs font-black ${statusColor}`}>{score}</span>
+          <span className={`absolute text-xs font-black ${statusColor}`}>{Math.max(0, Math.round(daysRemaining))}</span>
         </div>
         <div>
           <div className="flex items-center gap-1.5 mb-1">
-            <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Health Score</p>
+            <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Days left</p>
             <HealthScoreModal 
-              score={score} 
+              daysRemaining={daysRemaining}
+              cadenceDays={cadenceDays}
               trigger={
-                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Health Scores">
+                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about days remaining">
                   <HelpCircle size={12} />
                 </button>
               }
             />
           </div>
-          <p className="text-sm text-slate-200 font-bold">{statusLabel} State</p>
+          <p className="text-sm text-slate-200 font-bold">{status} State</p>
         </div>
       </div>
       <div className="text-right border-l border-slate-800 pl-6">
@@ -471,17 +476,16 @@ export function OverviewTab({
   const [submittingTag, setSubmittingTag] = useState(false);
   const [submittingInterest, setSubmittingInterest] = useState(false);
 
-  // Health Score Logic 
-  const daysSince = contact.days_since_last_interaction ?? 30;
-  const targetDays = contact.target_frequency_days ?? 30;
-  const baseHealthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
-  const healthScore = Math.min(100, baseHealthScore + (contact.health_boost || 0));
-      
-  const lastInteractionDate = contact.last_interaction_date ? new Date(contact.last_interaction_date) : null;
-  const nextDueDate = lastInteractionDate 
-    ? new Date(lastInteractionDate.getTime() + (targetDays * 24 * 60 * 60 * 1000))
-    : new Date();
-  const nextDueText = nextDueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  // Health Score - uses shared calculateHealth (ReferenceDate = lastContacted ?? createdAt)
+  const rawLastContacted = contact.last_interaction_date || contact.last_contact || contact.last_contact_date || null;
+  const healthResult = calculateHealth({
+    lastContacted: rawLastContacted,
+    createdAt: contact.created_at,
+    cadenceDays: contact.target_frequency_days ?? 30,
+  });
+  const cadenceDays = contact.target_frequency_days ?? 30;
+  const daysRemaining = Math.max(0, healthResult.daysRemaining + Math.round((contact.health_boost || 0) / 100 * cadenceDays));
+  const nextDueText = healthResult.nextDue.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
   const latestInteraction = interactions.length > 0 ? interactions[0] : null;
 
@@ -685,7 +689,7 @@ export function OverviewTab({
 
       <div className="px-4 space-y-8">
         {/* Vital Signs */}
-        <VitalSigns score={healthScore} nextDue={nextDueText} />
+        <VitalSigns daysRemaining={daysRemaining} cadenceDays={cadenceDays} nextDue={nextDueText} targetContactDate={healthResult.nextDue} statusLabel={healthResult.statusLabel} />
 
         {/* Interaction Suite */}
         <InteractionSuite contactId={contact.id} onLog={onLogInteraction} isLogging={isLogging} />

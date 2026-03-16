@@ -30,41 +30,45 @@ describe('ContactAvatar', () => {
     last_name: 'Doe',
   };
 
+  const targetDateGreen = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+  const targetDateAmber = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  const targetDateRed = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
+
   it('renders initials when no photo_url is provided', () => {
-    render(<ContactAvatar contact={mockContact} healthScore={85} />);
+    render(<ContactAvatar contact={mockContact} daysRemaining={26} cadenceDays={30} targetContactDate={targetDateGreen} />);
     expect(screen.getByText('JD')).toBeInTheDocument();
   });
 
   it('renders image when photo_url is provided', () => {
     const contactWithPhoto = { ...mockContact, photo_url: 'https://example.com/photo.jpg' };
-    render(<ContactAvatar contact={contactWithPhoto} healthScore={85} />);
+    render(<ContactAvatar contact={contactWithPhoto} daysRemaining={26} cadenceDays={30} targetContactDate={targetDateGreen} />);
     const img = screen.getByAltText('John Doe');
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', 'https://example.com/photo.jpg');
   });
 
-  it('renders the correct health score', () => {
-    render(<ContactAvatar contact={mockContact} healthScore={42} />);
-    expect(screen.getByText('42')).toBeInTheDocument();
+  it('renders the correct days remaining', () => {
+    render(<ContactAvatar contact={mockContact} daysRemaining={13} cadenceDays={30} targetContactDate={targetDateGreen} />);
+    expect(screen.getByText('13')).toBeInTheDocument();
   });
 
-  it('applies correct color based on health score', () => {
-    const { rerender } = render(<ContactAvatar contact={mockContact} healthScore={85} />);
-    let pip = screen.getByText('85');
+  it('applies correct color: green >5 days, amber 1-5, red overdue', () => {
+    const { rerender } = render(<ContactAvatar contact={mockContact} daysRemaining={10} cadenceDays={30} targetContactDate={targetDateGreen} />);
+    let pip = screen.getByText('10');
     expect(pip).toHaveClass('bg-green-500');
 
-    rerender(<ContactAvatar contact={mockContact} healthScore={55} />);
-    pip = screen.getByText('55');
-    expect(pip).toHaveClass('bg-orange-500');
+    rerender(<ContactAvatar contact={mockContact} daysRemaining={3} cadenceDays={30} targetContactDate={targetDateAmber} />);
+    pip = screen.getByText('3');
+    expect(pip).toHaveClass('bg-amber-500');
 
-    rerender(<ContactAvatar contact={mockContact} healthScore={20} />);
-    pip = screen.getByText('20');
+    rerender(<ContactAvatar contact={mockContact} daysRemaining={0} cadenceDays={30} targetContactDate={targetDateRed} />);
+    pip = screen.getByText('0');
     expect(pip).toHaveClass('bg-red-500');
   });
 
   it('calls onAvatarClick when clicking the main avatar area', () => {
     const handleClick = jest.fn();
-    render(<ContactAvatar contact={mockContact} healthScore={85} onAvatarClick={handleClick} />);
+    render(<ContactAvatar contact={mockContact} daysRemaining={26} cadenceDays={30} targetContactDate={targetDateGreen} onAvatarClick={handleClick} />);
 
     // Click the avatar container (the one with initials - getByText returns the containing div)
     const avatar = screen.getByText('JD').closest('div[class*="rounded-full"]');
@@ -73,26 +77,25 @@ describe('ContactAvatar', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('stops propagation when clicking the health score area', () => {
+  it('stops propagation when clicking the days remaining pip', () => {
     const handleAvatarClick = jest.fn();
     render(
       <div onClick={handleAvatarClick}>
-        <ContactAvatar contact={mockContact} healthScore={85} />
+        <ContactAvatar contact={mockContact} daysRemaining={26} cadenceDays={30} targetContactDate={targetDateGreen} />
       </div>
     );
 
-    const pip = screen.getByText('85');
+    const pip = screen.getByText('26');
     fireEvent.click(pip);
 
     // Parent onClick should NOT be called because of stopPropagation
     expect(handleAvatarClick).not.toHaveBeenCalled();
   });
 
-  it('renders info link to field guide', () => {
-    render(<ContactAvatar contact={mockContact} healthScore={85} />);
+  it('renders info button for days remaining', () => {
+    render(<ContactAvatar contact={mockContact} daysRemaining={26} cadenceDays={30} targetContactDate={targetDateGreen} />);
 
-    const infoLink = screen.getByRole('link', { name: /learn about health score/i });
-    expect(infoLink).toBeInTheDocument();
-    expect(infoLink).toHaveAttribute('href', '/field-guide#health-score');
+    const infoButton = screen.getByRole('button', { name: /learn about days remaining/i });
+    expect(infoButton).toBeInTheDocument();
   });
 });

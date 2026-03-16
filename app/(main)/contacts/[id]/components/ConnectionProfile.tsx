@@ -15,7 +15,7 @@ import { Edit2 } from 'lucide-react';
 import { EditContactModal } from './EditContactModal';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
 import { OnboardingOverlay } from '@/components/onboarding/OnboardingOverlay';
-import { getRelationshipHealth } from '@/types/relationship';
+import { calculateHealth } from '@/lib/relationship-health';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
   return (
@@ -144,27 +144,17 @@ export default function ConnectionProfile({
     }
   };
 
-  const targetDays = contact.target_frequency_days || 30;
   const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.name;
-  const parseValidDate = (value: string | null | undefined): Date | null => {
-    if (!value) return null;
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  };
 
-  const createdAtDate = parseValidDate(contact.created_at) ?? new Date();
   const rawLastContacted = contact.last_interaction_date || contact.last_contact || contact.last_contact_date || null;
-  const lastContactedDate = parseValidDate(rawLastContacted);
-  const relationshipHealth = getRelationshipHealth(createdAtDate, lastContactedDate, {
-    driftingDays: Math.max(1, Math.floor(targetDays * 0.5)),
-    neglectedDays: targetDays,
+  const healthResult = calculateHealth({
+    lastContacted: rawLastContacted,
+    createdAt: contact.created_at,
+    cadenceDays: contact.target_frequency_days ?? 30,
   });
-  
-  // Health Score Logic uses referenceDate = lastContacted ?? createdAt.
-  // This keeps brand-new contacts at Day 0 instead of immediately degraded.
-  const daysSince = relationshipHealth.daysSince;
-  const baseHealthScore = Math.max(0, Math.min(100, Math.round(100 - (daysSince / (targetDays * 1.5)) * 100)));
-  const healthScore = Math.min(100, baseHealthScore + (contact.health_boost || 0));
+  const cadenceDays = contact.target_frequency_days ?? 30;
+  const daysRemaining = Math.max(0, healthResult.daysRemaining + Math.round((contact.health_boost || 0) / 100 * cadenceDays));
+  const healthScore = Math.min(100, healthResult.healthScore + (contact.health_boost || 0));
 
   const birthdayText = contact.birthday 
     ? new Date(contact.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric', timeZone: 'UTC' })
@@ -213,7 +203,9 @@ export default function ConnectionProfile({
         <section className="flex flex-col items-center pt-10 pb-8 text-center border-b border-slate-900 mb-6">
           <ContactAvatar 
             contact={contact}
-            healthScore={healthScore}
+            daysRemaining={daysRemaining}
+            cadenceDays={cadenceDays}
+            targetContactDate={healthResult.nextDue}
             onAvatarClick={handleAvatarClick}
           />
 
