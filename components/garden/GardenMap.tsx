@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Seedling } from './Seedling';
 import { ContactStatus } from '@/hooks/useGardenPhysics';
-import { getRelationshipHealth } from '@/types/relationship';
+import { getDetailedRelationshipHealth } from '@/lib/relationship-health';
 
 export interface Contact {
   id: string;
@@ -12,6 +12,7 @@ export interface Contact {
   created_at?: string | Date | null;
   last_interaction_date?: string | Date | null;
   last_contact?: string | Date | null;
+  target_frequency_days?: number | null;
 }
 
 export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
@@ -23,9 +24,9 @@ export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
       return Number.isNaN(parsed.getTime()) ? null : parsed;
     };
 
-    const mapStatus = (status: 'NURTURED' | 'DRIFTING' | 'NEGLECTED'): ContactStatus => {
-      if (status === 'NURTURED') return 'Nurtured';
-      if (status === 'DRIFTING') return 'Drifting';
+    const mapStatus = (status: 'nurtured' | 'drifting' | 'neglected'): ContactStatus => {
+      if (status === 'nurtured') return 'Nurtured';
+      if (status === 'drifting') return 'Drifting';
       return 'Neglected';
     };
 
@@ -35,8 +36,13 @@ export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
         toDate(contact.last_interaction_date) ??
         toDate(contact.last_contact) ??
         null;
+      const targetDays = contact.target_frequency_days ?? 30;
 
-      const health = getRelationshipHealth(createdAt, lastContacted);
+      const health = getDetailedRelationshipHealth(
+        lastContacted,
+        targetDays,
+        createdAt
+      );
 
       return {
         ...contact,
