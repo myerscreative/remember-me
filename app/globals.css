@@ -418,7 +418,7 @@
   --rm-health-new:     #8b9ff0;
 }
 
-[data-theme="light"], .light {
+:root:not(.dark), [data-theme="light"], .light {
   --rm-bg-canvas:    #f5f6fa;
   --rm-bg-surface:   #ffffff;
   --rm-bg-elevated:  #ffffff;
