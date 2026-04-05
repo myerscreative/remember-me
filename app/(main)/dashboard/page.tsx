@@ -430,6 +430,10 @@ export default function DashboardPage() {
         tribeName={selectedTribe?.name || ""}
         contacts={selectedTribe?.contacts || []}
       />
+
+      <p className="text-xs text-gray-400 fixed bottom-2 right-2 z-50">
+        Build: {process.env.NEXT_PUBLIC_BUILD_TIME ?? 'dev'}
+      </p>
     </div>
   );
 }
