@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Camera, Info } from 'lucide-react';
 import { HealthScoreModal } from './HealthScoreModal';
 import { cn } from '@/lib/utils';
-import { getHealthStatus } from '@/types/relationship';
+import { type HealthStatus } from '@/lib/relationship-health';
 
 interface ContactAvatarProps {
   contact: {
@@ -39,15 +39,15 @@ export function ContactAvatar({
     .toUpperCase()
     .slice(0, 2);
 
-  const status = getHealthStatus(targetContactDate);
+  const status: HealthStatus = daysRemaining <= 0 ? 'neglected' : daysRemaining <= 5 ? 'drifting' : 'nurtured';
   const getHealthColor = () => {
-    if (status === 'NURTURED') return 'bg-green-500';
-    if (status === 'WARNING') return 'bg-amber-500';
+    if (status === 'nurtured') return 'bg-green-500';
+    if (status === 'drifting') return 'bg-amber-500';
     return 'bg-red-500';
   };
   const getHealthBorder = () => {
-    if (status === 'NURTURED') return 'border-emerald-500';
-    if (status === 'WARNING') return 'border-amber-500';
+    if (status === 'nurtured') return 'border-emerald-500';
+    if (status === 'drifting') return 'border-amber-500';
     return 'border-red-500';
   };
 

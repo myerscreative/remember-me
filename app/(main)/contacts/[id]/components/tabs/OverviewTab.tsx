@@ -41,15 +41,14 @@ import toast from 'react-hot-toast';
 import { auditDraftMessage } from '@/app/actions/audit-message';
 import { addSharedMemory } from '@/app/actions/story-actions';
 import { useDebounce } from '@/hooks/use-debounce';
-import { calculateHealth } from '@/lib/relationship-health';
-import { getHealthStatus } from '@/types/relationship';
+import { calculateHealth, type HealthStatus } from '@/lib/relationship-health';
 
 // --- Components from Blueprint ---
 
-const VitalSigns = ({ daysRemaining, cadenceDays, nextDue, targetContactDate, statusLabel }: { daysRemaining: number, cadenceDays: number, nextDue: string, targetContactDate: Date, statusLabel?: string }) => {
-  const healthStatus = getHealthStatus(targetContactDate);
-  const status = statusLabel ?? (healthStatus === 'NURTURED' ? 'Nurtured' : healthStatus === 'WARNING' ? 'Due soon' : 'Overdue');
-  const statusColor = healthStatus === 'NURTURED' ? 'text-emerald-400' : healthStatus === 'WARNING' ? 'text-amber-400' : 'text-red-400';
+const VitalSigns = ({ daysRemaining, cadenceDays, nextDue, statusLabel }: { daysRemaining: number, cadenceDays: number, nextDue: string, statusLabel?: string }) => {
+  const healthStatus: HealthStatus = daysRemaining <= 0 ? 'neglected' : daysRemaining <= 5 ? 'drifting' : 'nurtured';
+  const status = statusLabel ?? (healthStatus === 'nurtured' ? 'Nurtured' : healthStatus === 'drifting' ? 'Due soon' : 'Overdue');
+  const statusColor = healthStatus === 'nurtured' ? 'text-emerald-400' : healthStatus === 'drifting' ? 'text-amber-400' : 'text-red-400';
   const ratio = cadenceDays > 0 ? Math.min(1, Math.max(0, daysRemaining / cadenceDays)) : 0;
   
   return (
@@ -415,12 +414,88 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
   );
 };
 
+const ContactSynopsis = ({
+  synopsis,
+  lastContactNotes,
+  lastContactDate,
+  lastContactType,
+  nextGoalNote,
+  nextContactDate,
+  onRefreshAISummary,
+}: {
+  synopsis?: string | null;
+  lastContactNotes?: string | null;
+  lastContactDate?: string | null;
+  lastContactType?: string;
+  nextGoalNote?: string | null;
+  nextContactDate?: string | null;
+  onRefreshAISummary?: () => Promise<void>;
+}) => {
+  const hasContent = synopsis || lastContactNotes || lastContactDate || nextGoalNote || nextContactDate;
+  if (!hasContent) return null;
+
+  return (
+    <div className="bg-indigo-600/5 border border-indigo-500/10 rounded-xl p-4 relative overflow-hidden group shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Sparkles size={14} className="text-indigo-400" />
+          <span className="text-[10px] font-black text-indigo-400/80 uppercase tracking-[0.2em]">Synopsis</span>
+        </div>
+        {onRefreshAISummary && (
+          <button
+            onClick={onRefreshAISummary}
+            className="text-slate-600 hover:text-indigo-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"
+            title="Refresh AI Insight"
+          >
+            <Loader2 size={14} />
+          </button>
+        )}
+      </div>
+      <div className="space-y-3 text-sm">
+        {synopsis && (
+          <p className="text-slate-400 leading-relaxed italic line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+            &ldquo;{synopsis}&rdquo;
+          </p>
+        )}
+        {(lastContactNotes || lastContactDate) && (
+          <div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Last contact</p>
+            <p className="text-slate-300 leading-relaxed">
+              {lastContactDate && (
+                <span className="text-slate-500">{lastContactDate}</span>
+              )}
+              {lastContactDate && lastContactType && (
+                <span className="ml-2 text-[10px] font-bold uppercase text-indigo-400/80">{lastContactType}</span>
+              )}
+              {lastContactNotes && (
+                <span>{lastContactDate ? ' — ' : ''}{lastContactNotes}</span>
+              )}
+            </p>
+          </div>
+        )}
+        {(nextGoalNote || nextContactDate) && (
+          <div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Next steps</p>
+            <p className="text-slate-300 leading-relaxed">
+              {nextGoalNote && <span>{nextGoalNote}</span>}
+              {nextGoalNote && nextContactDate && ' · '}
+              {nextContactDate && (
+                <span className="text-indigo-400 font-medium">Due {nextContactDate}</span>
+              )}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdit?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-t border-slate-900 pt-2">
+    <div className="border-t border-slate-900 pt-1">
       <div className="flex items-center gap-2">
-        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-6 text-slate-500 hover:text-slate-300 transition-colors group">
+        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-3 text-slate-500 hover:text-slate-300 transition-colors group">
           <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Contact Info & Metadata</span>
           <div className={cn("transition-transform duration-300", isOpen ? "rotate-180" : "")}>
             <ChevronDown size={18} />
@@ -432,14 +507,14 @@ const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdi
               e.stopPropagation();
               onEdit();
             }}
-            className="p-3 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+            className="p-2 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
             title="Edit Contact Info"
           >
             <Edit2 size={16} />
           </button>
         )}
       </div>
-      {isOpen && <div className="pb-12 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">{children}</div>}
+      {isOpen && <div className="pb-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">{children}</div>}
     </div>
   );
 };
@@ -486,8 +561,6 @@ export function OverviewTab({
   const cadenceDays = contact.target_frequency_days ?? 30;
   const daysRemaining = Math.max(0, healthResult.daysRemaining + Math.round((contact.health_boost || 0) / 100 * cadenceDays));
   const nextDueText = healthResult.nextDue.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-
-  const latestInteraction = interactions.length > 0 ? interactions[0] : null;
 
   const handleAddTag = async () => {
     if (!tagInput.trim()) return;
@@ -537,8 +610,45 @@ export function OverviewTab({
     } catch { toast.error('Failed to remove interest'); }
   };
 
+  const latestInteraction = interactions.length > 0 ? interactions[0] : null;
+  const lastContactNotes = latestInteraction?.notes?.replace?.('[Attempt] ', '') || null;
+  const nextGoalNote = latestInteraction?.next_goal_note || null;
+  const nextContactDate = contact.next_contact_date ? new Date(contact.next_contact_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
+
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-8 bg-slate-950 pb-36">
+    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-6 bg-slate-950 pb-36">
+      {/* Synopsis - right below birthday */}
+      <section className="px-4 -mt-2">
+        <ContactSynopsis
+          synopsis={synopsis}
+          lastContactNotes={lastContactNotes}
+          lastContactDate={latestInteraction ? new Date(latestInteraction.date || latestInteraction.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : null}
+          lastContactType={latestInteraction?.type}
+          nextGoalNote={nextGoalNote}
+          nextContactDate={nextContactDate}
+          onRefreshAISummary={onRefreshAISummary}
+        />
+      </section>
+
+      {/* Quick Actions - Call/Email/Text right below synopsis */}
+      <section className="grid grid-cols-3 gap-2 px-4 pt-0">
+        <QuickActionButton 
+          icon={<Phone size={18} />} 
+          label="Call" 
+          href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
+        />
+        <QuickActionButton 
+          icon={<Mail size={18} />} 
+          label="Email" 
+          href={contact.email ? `mailto:${contact.email}` : undefined} 
+        />
+        <QuickActionButton 
+          icon={<MessageSquare size={18} />} 
+          label="Text" 
+          href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
+        />
+      </section>
+
       {/* Metadata Folder */}
       <section className="px-4">
         <MetadataFolder onEdit={onEdit}>
@@ -641,55 +751,10 @@ export function OverviewTab({
           </div>
         </MetadataFolder>
       </section>
-      
-      {/* Quick Actions */}
-      <section className="grid grid-cols-3 gap-4 px-4 pt-4">
-        <QuickActionButton 
-          icon={<Phone size={22} />} 
-          label="Call" 
-          href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
-        />
-        <QuickActionButton 
-          icon={<Mail size={22} />} 
-          label="Email" 
-          href={contact.email ? `mailto:${contact.email}` : undefined} 
-        />
-        <QuickActionButton 
-          icon={<MessageSquare size={22} />} 
-          label="Text" 
-          href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
-        />
-      </section>
-
-      {/* AI Synopsis */}
-      {synopsis && (
-        <section className="px-4 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
-          <div className="bg-indigo-600/5 border border-indigo-500/10 rounded-2xl p-6 relative overflow-hidden group shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Sparkles size={16} className="text-indigo-400" />
-                <span className="text-[10px] font-black text-indigo-400/80 uppercase tracking-[0.2em]">Relationship Overview</span>
-              </div>
-              {onRefreshAISummary && (
-                <button 
-                  onClick={onRefreshAISummary}
-                  className="text-slate-600 hover:text-indigo-400 p-2 hover:bg-white/5 rounded-xl transition-all"
-                  title="Refresh AI Insight"
-                >
-                  <Loader2 size={14} className={cn("transition-all", false ? "animate-spin" : "")} />
-                </button>
-              )}
-            </div>
-            <p className="text-sm text-slate-400 leading-relaxed italic line-clamp-4 group-hover:line-clamp-none transition-all duration-500">
-              &ldquo;{synopsis}&rdquo;
-            </p>
-          </div>
-        </section>
-      )}
 
       <div className="px-4 space-y-8">
         {/* Vital Signs */}
-        <VitalSigns daysRemaining={daysRemaining} cadenceDays={cadenceDays} nextDue={nextDueText} targetContactDate={healthResult.nextDue} statusLabel={healthResult.statusLabel} />
+        <VitalSigns daysRemaining={daysRemaining} cadenceDays={cadenceDays} nextDue={nextDueText} statusLabel={healthResult.statusLabel} />
 
         {/* Interaction Suite */}
         <InteractionSuite contactId={contact.id} onLog={onLogInteraction} isLogging={isLogging} />
@@ -730,8 +795,8 @@ export function OverviewTab({
 
 const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) => {
   const content = (
-    <div className="flex flex-col items-center justify-center p-6 bg-slate-900 border border-slate-200/10 rounded-2xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
-      <div className="text-indigo-400 group-hover:text-white mb-2 transition-all">{icon}</div>
+    <div className="flex flex-col items-center justify-center p-3 py-4 bg-slate-900 border border-slate-200/10 rounded-xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
+      <div className="text-indigo-400 group-hover:text-white mb-1 transition-all">{icon}</div>
       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-300">{label}</span>
     </div>
   );
