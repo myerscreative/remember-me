@@ -168,16 +168,16 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden pb-16 md:pb-0">
+    <div className="flex flex-col h-screen bg-canvas overflow-hidden pb-16 md:pb-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
               <Zap className="h-8 w-8 text-purple-600" />
               Fast Search
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-text-secondary">
               Lightning-fast full-text search across all your contacts
             </p>
             {searchTime !== null && (
@@ -190,10 +190,10 @@ export default function SearchPage() {
 
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-text-tertiary" />
             <Input
               placeholder='Search by name, email, context, or keywords...'
-              className="pl-10 pr-10 h-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700"
+              className="pl-10 pr-10 h-12 rounded-xl bg-surface border border-border-strong"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -221,7 +221,7 @@ export default function SearchPage() {
           {/* Quick Filters */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <h3 className="text-sm font-medium text-text-secondary">
                 Quick Filters
               </h3>
               {activeFilter && (
@@ -327,7 +327,7 @@ export default function SearchPage() {
               {discoveryResults.length > 0 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-indigo-500" />
                       Through Your Network
                     </h2>
@@ -351,8 +351,8 @@ export default function SearchPage() {
               )}
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-8 mt-2">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <div className="flex items-center justify-between border-t border-border-default pt-8 mt-2">
+                  <h2 className="text-lg font-semibold text-text-primary">
                     {searchResults.length > 0
                       ? `${searchResults.length} Contact${searchResults.length !== 1 ? "s" : ""} in your Garden`
                       : "Direct Contacts"}
@@ -363,7 +363,7 @@ export default function SearchPage() {
                   <div className="space-y-3">
                     {searchResults.map((contact) => (
                       <Link key={contact.id} href={`/contacts/${contact.id}`}>
-                        <Card className="hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer border border-gray-200 dark:border-gray-700">
+                        <Card className="hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer border border-border-default">
                           <CardContent className="p-4">
                             <div className="flex items-start gap-4">
                               <Avatar className="h-12 w-12 shrink-0">
@@ -378,13 +378,13 @@ export default function SearchPage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                                <h3 className="font-semibold text-text-primary mb-1">
                                   {contact.first_name} {contact.last_name || ""}
                                 </h3>
 
                                 <div className="flex flex-wrap gap-2 items-center">
                                   {contact.email && (
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="text-xs text-text-tertiary">
                                       {contact.email}
                                     </span>
                                   )}
@@ -411,7 +411,7 @@ export default function SearchPage() {
                                 </div>
 
                                 {(contact.relationship_summary || contact.where_met) && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                                  <p className="text-sm text-text-secondary mt-2 line-clamp-2">
                                     {contact.relationship_summary || contact.where_met}
                                   </p>
                                 )}
@@ -423,13 +423,13 @@ export default function SearchPage() {
                     ))}
                   </div>
                 ) : !isSearching ? (
-                  <Card className="border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  <Card className="border-2 border-dashed border-border-default">
                     <CardContent className="py-12 text-center">
-                      <Search className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      <Search className="h-12 w-12 mx-auto mb-4 text-text-tertiary" />
+                      <h3 className="font-semibold text-text-primary mb-2">
                         No results found
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-text-secondary">
                         Try different keywords or use quick filters above
                       </p>
                     </CardContent>

@@ -17,7 +17,7 @@ export const DailyBriefing = ({ driftedContacts }: { driftedContacts: Contact[] 
         <h4 className="text-orange-400 font-bold text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
           <span role="img" aria-label="alert">⚠️</span> Garden Alert: New Drifters
         </h4>
-        <p className="text-slate-400 text-sm mb-3">
+        <p className="text-text-tertiary text-sm mb-3">
           The following seeds are starting to drift toward the outer rings:
         </p>
         <div className="flex -space-x-2 relative z-10">
@@ -27,7 +27,7 @@ export const DailyBriefing = ({ driftedContacts }: { driftedContacts: Contact[] 
               href={`/contacts/${c.id}`}
               onClick={(e) => e.stopPropagation()}
               title={c.name}
-              className="h-8 w-8 rounded-full border-2 border-slate-950 bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-200 hover:z-20 hover:scale-110 hover:border-orange-500/50 transition-all cursor-pointer shadow-lg"
+              className="h-8 w-8 rounded-full border-2 border-canvas bg-elevated flex items-center justify-center text-[10px] font-bold text-text-primary hover:z-20 hover:scale-110 hover:border-orange-500/50 transition-all cursor-pointer shadow-lg"
             >
               {c.name.split(' ').map(n => n[0]).join('')}
             </Link>

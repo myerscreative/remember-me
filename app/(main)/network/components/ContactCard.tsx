@@ -186,7 +186,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
             {contact.interests.map((interest, idx) => {
               const isMatch = sharedInterests.includes(interest);
               
-              let tagClass = 'bg-[#f3f4f6] text-[#4b5563]';
+              let tagClass = 'bg-subtle text-text-secondary';
               let content = interest;
               
               if (isMatch) {

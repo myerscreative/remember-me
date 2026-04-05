@@ -153,7 +153,7 @@ export function AudioInputButton({
         className={cn(
           "rounded-full transition-all duration-300",
           buttonSizeClass,
-          !isRecording && "hover:bg-indigo-500/10 hover:text-indigo-400 text-slate-400",
+          !isRecording && "hover:bg-indigo-500/10 hover:text-indigo-400 text-text-tertiary",
           isRecording && "animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         )}
       >

@@ -159,15 +159,15 @@ export default function NetworkGraphView({ contacts, relationships, onNodeClick 
       />
       
       {/* Info Banner - Full Width at Top */}
-      <div className="absolute top-0 left-0 right-0 z-50 px-4 py-3 bg-slate-800 border-b border-slate-700 pointer-events-none shadow-md">
-         <div className="flex items-center justify-between text-xs text-white">
-            <div className="font-bold uppercase tracking-wider text-slate-400">Relationship Graph</div>
-            <div className="flex items-center gap-4 text-slate-200">
-               <span className="font-medium"><span className="text-white font-bold">{graphData.nodes.length}</span> People</span>
-               <span className="text-slate-600">•</span>
-               <span className="font-medium"><span className="text-white font-bold">{graphData.links.length}</span> Connections</span>
-               <span className="text-slate-600">•</span>
-               <span className="text-[10px] text-slate-400">Drag to move • Scroll to zoom</span>
+      <div className="absolute top-0 left-0 right-0 z-50 px-4 py-3 bg-elevated border-b border-border-default pointer-events-none shadow-md">
+         <div className="flex items-center justify-between text-xs text-text-primary">
+            <div className="font-bold uppercase tracking-wider text-text-tertiary">Relationship Graph</div>
+            <div className="flex items-center gap-4 text-text-secondary">
+               <span className="font-medium"><span className="text-text-primary font-bold">{graphData.nodes.length}</span> People</span>
+               <span className="text-text-tertiary">•</span>
+               <span className="font-medium"><span className="text-text-primary font-bold">{graphData.links.length}</span> Connections</span>
+               <span className="text-text-tertiary">•</span>
+               <span className="text-[10px] text-text-tertiary">Drag to move • Scroll to zoom</span>
             </div>
          </div>
       </div>

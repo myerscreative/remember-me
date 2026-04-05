@@ -89,7 +89,7 @@ export default function RelationshipTree({
       style={{ backgroundColor: seasonBg }}
     >
       {/* Season indicator */}
-      <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/70 backdrop-blur-sm rounded-full text-sm font-medium text-gray-600 shadow-sm z-10">
+      <div className="absolute top-4 right-4 px-3 py-1.5 bg-surface/70 backdrop-blur-sm rounded-full text-sm font-medium text-text-secondary shadow-sm z-10">
         {season === 'spring' && '🌸 Spring'}
         {season === 'summer' && '☀️ Summer'}
         {season === 'fall' && '🍂 Fall'}

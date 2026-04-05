@@ -21,7 +21,7 @@ const categories = [
   { value: 'family', label: 'Family', icon: Users, color: 'text-pink-500' },
   { value: 'goal', label: 'Goals', icon: Target, color: 'text-purple-500' },
   { value: 'interest', label: 'Interests', icon: Star, color: 'text-amber-500' },
-  { value: 'general', label: 'General', icon: MoreHorizontal, color: 'text-gray-500' },
+  { value: 'general', label: 'General', icon: MoreHorizontal, color: 'text-text-tertiary' },
 ] as const;
 
 type CategoryValue = typeof categories[number]['value'];
@@ -65,7 +65,7 @@ export function QuickFactDialog({ open, onOpenChange, contactId, onSuccess }: Qu
         <div className="space-y-4 pt-2">
           {/* Category picker */}
           <div>
-            <label className="text-sm font-medium text-gray-500 mb-2 block">Category</label>
+            <label className="text-sm font-medium text-text-tertiary mb-2 block">Category</label>
             <div className="flex gap-2 flex-wrap">
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -79,7 +79,7 @@ export function QuickFactDialog({ open, onOpenChange, contactId, onSuccess }: Qu
                       'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
                       isSelected
                         ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 ring-2 ring-indigo-500'
-                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200'
+                        : 'bg-subtle text-text-secondary hover:bg-subtle'
                     )}
                   >
                     <Icon className={cn('w-3.5 h-3.5', isSelected ? 'text-indigo-600' : cat.color)} />
@@ -92,12 +92,12 @@ export function QuickFactDialog({ open, onOpenChange, contactId, onSuccess }: Qu
 
           {/* Content input */}
           <div>
-            <label className="text-sm font-medium text-gray-500 mb-2 block">What should you remember?</label>
+            <label className="text-sm font-medium text-text-tertiary mb-2 block">What should you remember?</label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="e.g., Just started a new job at NASA..."
-              className="min-h-[100px] resize-none font-serif text-gray-700 dark:text-gray-300"
+              className="min-h-[100px] resize-none font-serif text-text-secondary"
               autoFocus
             />
           </div>

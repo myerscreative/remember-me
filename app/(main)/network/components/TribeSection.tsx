@@ -14,8 +14,8 @@ interface TribeSectionProps {
 
 export function TribeSection({ tribe, onNurtureTribe, searchTerm }: TribeSectionProps) {
   // Use generic styling since SubTribe doesn't have a type property
-  const gradient = 'from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-900';
-  const titleColor = 'text-violet-700 dark:text-violet-300';
+  const gradient = 'from-violet-500/10 to-purple-500/10 border-violet-200';
+  const titleColor = 'text-violet-700';
 
   return (
     <motion.div
@@ -25,14 +25,14 @@ export function TribeSection({ tribe, onNurtureTribe, searchTerm }: TribeSection
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-xl bg-white/50 dark:bg-black/20 ${titleColor}`}>
+          <div className={`p-2 rounded-xl bg-surface/50 ${titleColor}`}>
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
             <h3 className={`text-xl font-bold ${titleColor}`}>
               {tribe.name}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-text-tertiary">
               {tribe.memberCount} members
             </p>
           </div>
@@ -41,7 +41,7 @@ export function TribeSection({ tribe, onNurtureTribe, searchTerm }: TribeSection
         <Button 
           onClick={() => onNurtureTribe(tribe)}
           variant="outline"
-          className="bg-white/50 dark:bg-black/20 hover:bg-white/80 dark:hover:bg-black/40 border-0 shadow-sm"
+          className="bg-surface/50 hover:bg-surface/80 border-0 shadow-sm"
         >
           <Sparkles className="w-4 h-4 mr-2 text-amber-500" />
           Nurture Entire Tribe

@@ -521,7 +521,7 @@ export default function ImportContactsPage() {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleContact(originalIndex)}
-                              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                              className="h-4 w-4 rounded border-border-strong text-purple-600 focus:ring-purple-500"
                             />
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-text-primary truncate">

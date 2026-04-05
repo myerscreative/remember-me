@@ -54,13 +54,13 @@ export const GardenMap = ({ contacts }: { contacts: Contact[] }) => {
 
   return (
     <div 
-      className="relative w-full aspect-square md:aspect-video max-h-[70vh] bg-slate-950 overflow-hidden flex items-center justify-center rounded-3xl border border-slate-900 shadow-2xl"
+      className="relative w-full aspect-square md:aspect-video max-h-[70vh] bg-canvas overflow-hidden flex items-center justify-center rounded-3xl border border-border-default shadow-2xl"
       onClick={() => setActiveSeedId(null)}
     >
       {/* Dynamic Background Rings */}
-      <div className="absolute h-[25%] aspect-square border border-slate-900/40 rounded-full pointer-events-none" />
-      <div className="absolute h-[55%] aspect-square border border-slate-900/40 rounded-full pointer-events-none" />
-      <div className="absolute h-[85%] aspect-square border border-slate-900/40 rounded-full pointer-events-none" />
+      <div className="absolute h-[25%] aspect-square border border-border-default/40 rounded-full pointer-events-none" />
+      <div className="absolute h-[55%] aspect-square border border-border-default/40 rounded-full pointer-events-none" />
+      <div className="absolute h-[85%] aspect-square border border-border-default/40 rounded-full pointer-events-none" />
       
       {/* The People */}
       {wrappedContacts.map((contact, i) => (

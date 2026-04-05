@@ -13,14 +13,14 @@ export const showNurtureToast = (name: string) => {
       
       <div className="flex-1">
         <h4 className="text-sm font-bold text-white">Connection Nurtured</h4>
-        <p className="text-[11px] text-slate-400">
+        <p className="text-[11px] text-text-tertiary">
           Your garden seed for <span className="text-emerald-400 font-semibold">{name}</span> is healthy.
         </p>
       </div>
 
       <button 
         onClick={() => toast.dismiss(t)}
-        className="text-slate-600 hover:text-white transition-colors"
+        className="text-text-secondary hover:text-white transition-colors"
       >
         <CheckCircle2 size={18} />
       </button>

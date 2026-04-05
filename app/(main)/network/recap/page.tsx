@@ -25,7 +25,7 @@ export default function WeeklyRecapPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0a0e1a]">
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
           <p className="text-emerald-500/50 font-medium animate-pulse">Growing your bloom...</p>
@@ -37,14 +37,14 @@ export default function WeeklyRecapPage() {
   const isStagnant = bloom?.status === 'stagnant' || !bloom;
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white p-6 md:p-12 overflow-y-auto scrollbar-hide">
+    <div className="min-h-screen bg-canvas text-text-primary p-6 md:p-12 overflow-y-auto scrollbar-hide">
       <div className="max-w-2xl mx-auto space-y-12 pb-24 md:pb-12">
         {/* Back Button */}
         <motion.button 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.push('/network')}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors group px-4 py-2 rounded-xl hover:bg-white/5"
+          className="flex items-center gap-2 text-text-tertiary hover:text-text-primary transition-colors group px-4 py-2 rounded-xl hover:bg-subtle"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Back to Garden</span>
@@ -59,9 +59,9 @@ export default function WeeklyRecapPage() {
           <div className="flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 blur-3xl bg-emerald-500/30 rounded-full animate-pulse" />
-              <div className="relative bg-zinc-900/80 p-8 rounded-[2.5rem] border border-white/5 shadow-2xl backdrop-blur-sm ring-1 ring-white/10">
+              <div className="relative bg-elevated/80 p-8 rounded-[2.5rem] border border-border-default shadow-2xl backdrop-blur-sm ring-1 ring-border-default">
                 {isStagnant ? (
-                    <Leaf size={64} className="text-zinc-500" />
+                    <Leaf size={64} className="text-text-tertiary" />
                 ) : (
                     <TreePine size={64} className="text-emerald-500" />
                 )}
@@ -72,7 +72,7 @@ export default function WeeklyRecapPage() {
           <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight px-4">
               {isStagnant ? (
-                <span className="text-zinc-300">Your Garden Missed You</span>
+                <span className="text-text-secondary">Your Garden Missed You</span>
               ) : (
                 <span className="bg-linear-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
                   Your Weekly Bloom is Ready!
@@ -80,7 +80,7 @@ export default function WeeklyRecapPage() {
               )}
             </h1>
 
-            <p className="text-xl text-zinc-400 max-w-lg mx-auto leading-relaxed px-4">
+            <p className="text-xl text-text-secondary max-w-lg mx-auto leading-relaxed px-4">
               {isStagnant 
                 ? "Take a moment to see who's drifting. A small interaction can keep a connection alive."
                 : "See the connections you've nurtured this week and the memories you've grown."}
@@ -94,7 +94,7 @@ export default function WeeklyRecapPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-zinc-900/40 p-8 rounded-4xl border border-white/5 relative overflow-hidden group backdrop-blur-md shadow-xl"
+            className="bg-elevated/40 p-8 rounded-4xl border border-border-default relative overflow-hidden group backdrop-blur-md shadow-xl"
           >
             <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
@@ -103,9 +103,9 @@ export default function WeeklyRecapPage() {
                 <Heart size={32} className="text-emerald-400 fill-emerald-400/20 animate-pulse" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-semibold text-xl text-white">New Memory Created</h3>
+                <h3 className="font-semibold text-xl text-text-primary">New Memory Created</h3>
                 <p className="text-emerald-400/90 text-lg">
-                  You and <span className="font-bold text-white uppercase tracking-wider">{bloom.highlight_contact.name}</span> connected this week.
+                  You and <span className="font-bold text-text-primary uppercase tracking-wider">{bloom.highlight_contact.name}</span> connected this week.
                 </p>
               </div>
               <div className="sm:ml-auto">
@@ -130,7 +130,7 @@ export default function WeeklyRecapPage() {
               {isStagnant ? "Explore Garden" : "See Your Progress"}
             </Button>
             
-            <p className="text-xs text-zinc-500 uppercase tracking-widest font-medium">
+            <p className="text-xs text-text-tertiary uppercase tracking-widest font-medium">
                 Recaps refresh every Sunday at 9:00 AM
             </p>
         </motion.div>

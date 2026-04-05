@@ -113,21 +113,21 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+      <div className="bg-surface rounded-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Crop Avatar</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border-default">
+          <h2 className="text-xl font-semibold text-text-primary">Crop Avatar</h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-subtle rounded-lg transition-colors"
             disabled={processing}
           >
-            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <X className="h-5 w-5 text-text-tertiary" />
           </button>
         </div>
 
         {/* Cropper Area */}
-        <div className="relative h-96 bg-gray-900">
+        <div className="relative h-96 bg-canvas">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -142,8 +142,8 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
         </div>
 
         {/* Zoom Control */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="p-4 border-b border-border-default">
+          <label className="block text-sm font-medium text-text-secondary mb-2">
             Zoom
           </label>
           <input
@@ -153,7 +153,7 @@ export function ImageCropModal({ imageSrc, onCropComplete, onCancel }: ImageCrop
             step={0.1}
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="w-full h-2 bg-subtle rounded-lg appearance-none cursor-pointer accent-blue-600"
             disabled={processing}
           />
         </div>

@@ -19,12 +19,12 @@ export default function TreeStatsPanel({ stats, className = '' }: TreeStatsProps
     stats.total > 0 ? Math.round((value / stats.total) * 100) : 0;
 
   return (
-    <div className={`bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-5 ${className}`}>
+    <div className={`bg-surface/80 backdrop-blur-sm rounded-2xl border border-border-default shadow-lg p-5 ${className}`}>
       {/* Header with health score */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌳</span>
-          <h3 className="text-lg font-semibold text-gray-800">Tree Health</h3>
+          <h3 className="text-lg font-semibold text-text-primary">Tree Health</h3>
           <Link href="/field-guide#garden-map" className="text-blue-500 hover:text-blue-600 transition-colors" title="Learn about Tree Health">
             <HelpCircle size={14} />
           </Link>
@@ -56,18 +56,18 @@ export default function TreeStatsPanel({ stats, className = '' }: TreeStatsProps
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-sm font-bold text-gray-700">{stats.healthScore}</span>
+            <span className="text-sm font-bold text-text-secondary">{stats.healthScore}</span>
           </div>
         </div>
       </div>
       
       {/* Health message */}
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-text-secondary mb-4">
         {emoji} {message}
       </p>
 
       {/* Stacked bar visualization */}
-      <div className="h-3 rounded-full overflow-hidden flex mb-4 bg-gray-100">
+      <div className="h-3 rounded-full overflow-hidden flex mb-4 bg-subtle">
         {stats.healthy > 0 && (
           <div 
             className="transition-all duration-300"
@@ -131,9 +131,9 @@ export default function TreeStatsPanel({ stats, className = '' }: TreeStatsProps
       </div>
 
       {/* Total contacts */}
-      <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-        <p className="text-sm text-gray-500">
-          Total: <span className="font-semibold text-gray-700">{stats.total} contacts</span>
+      <div className="mt-4 pt-4 border-t border-border-default text-center">
+        <p className="text-sm text-text-tertiary">
+          Total: <span className="font-semibold text-text-secondary">{stats.total} contacts</span>
         </p>
       </div>
     </div>
@@ -150,17 +150,17 @@ function StatItem({ status, count, percentage }: StatItemProps) {
   const { label, emoji } = HEALTH_LABELS[status];
   
   return (
-    <div className="text-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+    <div className="text-center p-2 rounded-lg hover:bg-surface transition-colors">
       <div 
         className="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-xs"
         style={{ backgroundColor: HEALTH_COLORS[status] }}
       >
         <span className="text-white font-semibold">{count}</span>
       </div>
-      <p className="text-xs text-gray-500 truncate" title={label}>
+      <p className="text-xs text-text-tertiary truncate" title={label}>
         {emoji}
       </p>
-      <p className="text-[10px] text-gray-400">{percentage}%</p>
+      <p className="text-[10px] text-text-tertiary">{percentage}%</p>
     </div>
   );
 }

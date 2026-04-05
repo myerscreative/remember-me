@@ -29,18 +29,18 @@ export function ImportProgress({
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-gray-700 dark:text-gray-300">
+          <span className="font-medium text-text-secondary">
             {stage === 'parsing' && 'Parsing contacts...'}
             {stage === 'importing' && 'Importing contacts...'}
             {stage === 'complete' && 'Import complete!'}
             {stage === 'error' && 'Import failed'}
           </span>
-          <span className="text-gray-500 dark:text-gray-400">
+          <span className="text-text-tertiary">
             {imported} / {total}
           </span>
         </div>
 
-        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-2 bg-subtle rounded-full overflow-hidden">
           <div
             className={cn(
               "h-full transition-all duration-300",
@@ -50,7 +50,7 @@ export function ImportProgress({
           />
         </div>
 
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-text-tertiary">
           <span>{percentage}%</span>
           {failed > 0 && (
             <span className="text-red-600 dark:text-red-400">
@@ -127,10 +127,10 @@ export function ImportProgress({
       {/* Stats Summary (shown during import or after completion) */}
       {(stage === 'importing' || stage === 'complete') && (
         <div className="grid grid-cols-3 gap-3 pt-2">
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Users className="h-5 w-5 text-gray-400 mx-auto mb-1" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{total}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
+          <div className="text-center p-3 bg-surface rounded-lg border border-border-default">
+            <Users className="h-5 w-5 text-text-tertiary mx-auto mb-1" />
+            <p className="text-lg font-bold text-text-primary">{total}</p>
+            <p className="text-xs text-text-tertiary">Total</p>
           </div>
 
           <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">

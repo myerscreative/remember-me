@@ -108,13 +108,13 @@ export function QuickVoiceMemoModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg">
+      <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-border-default">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Quick Voice Memo</h2>
+            <h2 className="text-xl font-bold text-text-primary">Quick Voice Memo</h2>
             {personName && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-text-tertiary mt-1">
                 Recording about {personName}
               </p>
             )}
@@ -153,10 +153,10 @@ export function QuickVoiceMemoModal({
           {/* Instructions */}
           {!isSaved && !isProcessing && (
             <div className="text-center space-y-2">
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-text-secondary">
                 Record a quick voice memo to capture thoughts, context, or reminders
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-text-tertiary">
                 Your recording will be saved{personName ? ` with ${personName}'s profile` : ' to your attachments'}
               </p>
             </div>

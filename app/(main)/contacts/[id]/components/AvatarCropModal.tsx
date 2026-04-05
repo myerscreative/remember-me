@@ -48,7 +48,7 @@ export function AvatarCropModal({ open, imageSrc, onClose, onCropComplete }: Ava
           <DialogTitle>Crop Photo</DialogTitle>
         </DialogHeader>
         
-        <div className="relative h-[400px] bg-gray-100 dark:bg-gray-900">
+        <div className="relative h-[400px] bg-subtle">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -72,7 +72,7 @@ export function AvatarCropModal({ open, imageSrc, onClose, onCropComplete }: Ava
               min={1}
               max={3}
               step={0.1}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full h-2 bg-subtle rounded-lg appearance-none cursor-pointer"
             />
           </div>
 

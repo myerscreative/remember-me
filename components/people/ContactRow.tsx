@@ -100,7 +100,7 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
         {/* Name & Birthday */}
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[16px] font-semibold text-slate-200 truncate">{contact.name}</span>
+            <span className="text-[16px] font-semibold text-text-primary truncate">{contact.name}</span>
             {/* Birthday Badge (Today/Upcoming) */}
             {birthdayInfo.state === 'today' && (
                <span className="text-[13px] font-semibold text-[#ef4444] whitespace-nowrap">🎂 {birthdayInfo.text}</span>
@@ -111,17 +111,17 @@ export function ContactRow({ contact, onToggleFavorite }: ContactRowProps) {
           </div>
           {/* Distant Birthday */}
           {birthdayInfo.state === 'distant' && (
-            <span className="text-[12px] text-slate-500 whitespace-nowrap">🎂 {birthdayInfo.text}</span>
+            <span className="text-[12px] text-text-tertiary whitespace-nowrap">🎂 {birthdayInfo.text}</span>
           )}
         </div>
 
         {/* Last Contact */}
-        <div className={cn("text-[14px] font-medium", !contact.last_contact ? "text-slate-500" : "text-slate-300")}>
+        <div className={cn("text-[14px] font-medium", !contact.last_contact ? "text-text-tertiary" : "text-text-secondary")}>
           {lastContactText}
         </div>
 
         {/* Frequency */}
-        <div className="text-[14px] text-slate-400">
+        <div className="text-[14px] text-text-tertiary">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div 

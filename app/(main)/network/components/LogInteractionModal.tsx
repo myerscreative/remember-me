@@ -103,7 +103,7 @@ export function LogInteractionModal({ isOpen, onClose, tribe, onNurtured }: LogI
                value={nextGoal}
                onChange={(e) => setNextGoal(e.target.value)}
                placeholder="e.g. Follow up about the new role..."
-               className="min-h-[60px] border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/20 focus:ring-indigo-500/20"
+               className="min-h-[60px] border-indigo-200 bg-indigo-50/50 focus:ring-indigo-500/20"
              />
           </div>
         </div>

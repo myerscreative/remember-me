@@ -104,23 +104,23 @@ export function CalendarStatus() {
 
   if (checkingStatus) {
      return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6 p-8 flex justify-center">
-            <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
+        <div className="bg-surface rounded-xl border border-border-default shadow-sm overflow-hidden mb-6 p-8 flex justify-center">
+            <RefreshCw className="w-6 h-6 animate-spin text-text-tertiary" />
         </div>
      );
   }
 
   if (!isConnected) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
+      <div className="bg-surface rounded-xl border border-border-default shadow-sm overflow-hidden mb-6">
         <div className="p-6 text-center">
-          <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Calendar className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-6 h-6 text-indigo-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-text-primary mb-2">
             Connect Your Calendar
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+          <p className="text-text-secondary mb-6 max-w-sm mx-auto">
             Enable automatic meeting prep by connecting your Google Calendar.
           </p>
           <Button onClick={handleConnect} className="bg-indigo-600 hover:bg-indigo-700 text-white">
@@ -132,18 +132,18 @@ export function CalendarStatus() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
+    <div className="bg-surface rounded-xl border border-border-default shadow-sm overflow-hidden mb-6">
       {/* Header */}
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+      <div className="p-4 border-b border-border-default flex items-center justify-between bg-surface/50">
         <div className="flex items-center gap-2">
-          <div className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-2 rounded-lg">
+          <div className="bg-green-100 text-green-600 p-2 rounded-lg">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Calendar Connected</h3>
+            <h3 className="font-semibold text-text-primary">Calendar Connected</h3>
             <div className="flex items-center gap-1.5">
               <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
-              <p className="text-xs text-green-600 dark:text-green-400 font-medium">Sync Active</p>
+              <p className="text-xs text-green-600 font-medium">Sync Active</p>
             </div>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function CalendarStatus() {
           size="sm" 
           onClick={fetchEvents} 
           disabled={loading}
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="text-text-tertiary hover:text-text-secondary"
         >
           <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
           Refresh
@@ -163,7 +163,7 @@ export function CalendarStatus() {
       {/* Content */}
       <div className="p-4">
         {error ? (
-          <div className="text-center py-4 text-red-500 text-sm bg-red-50 dark:bg-red-900/10 rounded-lg">
+          <div className="text-center py-4 text-red-500 text-sm bg-red-50 rounded-lg">
             {error}
             <button onClick={fetchEvents} className="ml-2 underline hover:no-underline font-medium">Try again</button>
           </div>
@@ -172,13 +172,13 @@ export function CalendarStatus() {
             <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-text-tertiary">
             <p>No upcoming meetings found.</p>
             <p className="text-xs mt-1">Enjoy your free time! 🎉</p>
           </div>
         ) : (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-1">
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2 px-1">
               Next {Math.min(events.length, 5)} Events
             </p>
             
@@ -189,19 +189,19 @@ export function CalendarStatus() {
               return (
               <div 
                 key={event.id} 
-                className="group flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
+                className="group flex items-start gap-3 p-2 rounded-lg hover:bg-surface transition-colors border border-transparent hover:border-border-default"
               >
                 <div className="shrink-0 w-14 text-center">
-                  <span className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
+                  <span className="block text-xs font-bold text-text-tertiary uppercase">
                     {getEventDate(startDate)}
                   </span>
-                  <span className="block text-sm font-semibold text-gray-900 dark:text-gray-200">
+                  <span className="block text-sm font-semibold text-text-primary">
                     {formatEventTime(startDate)}
                   </span>
                 </div>
                 
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h4 className="text-sm font-medium text-text-primary truncate group-hover:text-blue-600 transition-colors">
                     {event.summary}
                   </h4>
                   
@@ -211,7 +211,7 @@ export function CalendarStatus() {
                         href={event.hangoutLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
                         title="Join Video Call"
                       >
                         <Video className="w-3 h-3" />
@@ -220,13 +220,13 @@ export function CalendarStatus() {
                     )}
                     
                     {event.attendees && event.attendees.length > 0 && (
-                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400" title={`${event.attendees.length} attendees`}>
+                      <div className="flex items-center gap-1 text-xs text-text-tertiary" title={`${event.attendees.length} attendees`}>
                         <Users className="w-3 h-3" />
                         {event.attendees.length}
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1 text-xs text-text-tertiary">
                       <Clock className="w-3 h-3" />
                       {Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 60000)}m
                     </div>

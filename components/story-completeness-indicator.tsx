@@ -105,7 +105,7 @@ export function StoryCompletenessIndicator({
   if (minimized) {
     return (
       <Card 
-        className="border border-gray-200 dark:border-[#3a3f4b] bg-gray-50 dark:bg-[#252931] cursor-pointer transition-all hover:shadow-md dark:shadow-md dark:shadow-black/20"
+        className="border border-border-default bg-surface cursor-pointer transition-all hover:shadow-md"
         onClick={() => setMinimized(false)}
       >
         <CardContent className="p-3">
@@ -114,11 +114,11 @@ export function StoryCompletenessIndicator({
               <div className={cn("h-8 w-8 rounded-full flex items-center justify-center", colors.icon)}>
                 <Sparkles className="h-4 w-4" />
               </div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <p className="text-sm font-medium text-text-secondary">
                 Add important info to your memory
               </p>
             </div>
-            <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="h-4 w-4 text-text-tertiary" />
           </div>
         </CardContent>
       </Card>
@@ -127,7 +127,7 @@ export function StoryCompletenessIndicator({
 
   // Expanded view
   return (
-    <Card className="border border-gray-200 dark:border-[#3a3f4b] bg-gray-50 dark:bg-[#252931] shadow-sm dark:shadow-md dark:shadow-black/20">
+    <Card className="border border-border-default bg-surface shadow-sm">
       <CardContent className="p-4">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -137,14 +137,14 @@ export function StoryCompletenessIndicator({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-300">
+                  <p className="text-sm font-semibold text-text-primary">
                     Story {completeness}% Complete
                   </p>
                   <Badge className={colors.badge}>
                     {missingFields.length} missing
                   </Badge>
                 </div>
-                <p className="text-xs text-gray-700 dark:text-gray-400">
+                <p className="text-xs text-text-secondary">
                   {getMessage()}
                 </p>
               </div>
@@ -154,7 +154,7 @@ export function StoryCompletenessIndicator({
                 variant="ghost"
                 size="sm"
                 onClick={() => setExpanded(!expanded)}
-                className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+                className="h-8 w-8 p-0 text-text-secondary hover:text-text-primary"
                 title={expanded ? "Show less" : "Show details"}
               >
                 {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -163,7 +163,7 @@ export function StoryCompletenessIndicator({
                 variant="ghost"
                 size="sm"
                 onClick={() => setMinimized(true)}
-                className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+                className="h-8 w-8 p-0 text-text-secondary hover:text-text-primary"
                 title="Minimize"
               >
                 <X className="h-4 w-4" />
@@ -172,7 +172,7 @@ export function StoryCompletenessIndicator({
           </div>
 
           {/* Progress Bar with Gradient */}
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden relative">
+          <div className="w-full h-2 bg-subtle rounded-full overflow-hidden relative">
             <div
               className="h-full rounded-full transition-all duration-500 absolute left-0"
               style={{ 
@@ -192,15 +192,15 @@ export function StoryCompletenessIndicator({
 
           {/* Missing Fields List */}
           {expanded && missingFields.length > 0 && (
-            <div className="pt-2 border-t border-gray-200 dark:border-[#3a3f4b]">
-              <p className="text-xs font-medium mb-2 text-gray-700 dark:text-gray-400">
+            <div className="pt-2 border-t border-border-default">
+              <p className="text-xs font-medium mb-2 text-text-secondary">
                 Add these details:
               </p>
               <div className="space-y-1">
                 {missingFields.map((field, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div className={cn("h-1.5 w-1.5 rounded-full", colors.progress)} />
-                    <p className="text-xs text-gray-700 dark:text-gray-300">
+                    <p className="text-xs text-text-secondary">
                       {getFieldLabel(field)}
                     </p>
                   </div>

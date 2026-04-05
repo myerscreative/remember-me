@@ -58,7 +58,7 @@ export function ContactAvatar({
         <div
           onClick={onAvatarClick}
           className={cn(
-            'w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-black text-white border-4 transition-all duration-500 shadow-2xl hover:scale-105 cursor-pointer',
+            'w-32 h-32 rounded-full bg-canvas flex items-center justify-center text-4xl font-black text-white border-4 transition-all duration-500 shadow-2xl hover:scale-105 cursor-pointer',
             getHealthBorder()
           )}
         >
@@ -84,7 +84,7 @@ export function ContactAvatar({
         <div
           id="tour-health-score"
           className={cn(
-            'absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-slate-950 shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
+            'absolute bottom-0 right-0 w-10 h-10 rounded-full border-4 border-canvas shadow-md flex items-center justify-center text-white font-sans font-bold text-sm',
             getHealthColor()
           )}
           onClick={(e) => e.stopPropagation()}
@@ -98,7 +98,7 @@ export function ContactAvatar({
         className="flex items-center gap-2 mt-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <span className="text-[10px] font-black uppercase tracking-widest text-text-tertiary">
           Days left
         </span>
         <HealthScoreModal 
@@ -107,7 +107,7 @@ export function ContactAvatar({
           trigger={
             <button
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 hover:bg-indigo-500 border border-slate-600 text-slate-400 hover:text-white transition-colors"
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-elevated hover:bg-indigo-500 border border-border-default text-text-tertiary hover:text-white transition-colors"
               aria-label="Learn about days remaining"
             >
               <Info className="w-3 h-3" strokeWidth={2.5} />

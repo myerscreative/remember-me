@@ -186,7 +186,7 @@ export function VoiceRecorder({ onRecordingComplete, onError }: VoiceRecorderPro
           <div className="text-3xl font-bold text-red-600">
             {formatTime(recordingTime)}
           </div>
-          <div className="text-sm text-gray-500 mt-1">
+          <div className="text-sm text-text-tertiary mt-1">
             {isPaused ? "Paused" : "Recording..."}
           </div>
         </div>

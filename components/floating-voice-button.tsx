@@ -200,11 +200,11 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
         className={cn(
           "fixed bottom-20 right-6 md:bottom-6 md:right-6 z-40",
           "h-14 w-14 rounded-full shadow-lg",
-          showMenu ? "bg-gray-600 hover:bg-gray-700" : "bg-purple-600 hover:bg-purple-700",
+          showMenu ? "bg-elevated hover:bg-elevated" : "bg-purple-600 hover:bg-purple-700",
           "text-white",
           "transition-all duration-200 ease-in-out",
           showMenu ? "rotate-45" : "hover:scale-110 active:scale-95",
-          "focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800",
+          "focus:outline-none focus:ring-4 focus:ring-purple-300",
           className
         )}
         size="icon"
@@ -228,7 +228,7 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
           className={cn(
             "fixed bottom-20 right-6 md:bottom-6 md:right-6 z-30",
             "h-14 w-14 rounded-full",
-            "bg-purple-400 dark:bg-purple-500",
+            "bg-purple-400",
             "animate-ping opacity-20",
             "pointer-events-none"
           )}

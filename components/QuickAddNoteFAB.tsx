@@ -29,18 +29,18 @@ export function QuickAddNoteFAB() {
         <Popover open={showInfo} onOpenChange={setShowInfo}>
           <PopoverTrigger asChild>
             <button
-              className="h-6 w-6 bg-[#1E293B] text-slate-400 hover:text-white rounded-full flex items-center justify-center shadow-lg border border-[#334155] transition-colors"
+              className="h-6 w-6 bg-[#1E293B] text-text-tertiary hover:text-white rounded-full flex items-center justify-center shadow-lg border border-[#334155] transition-colors"
               aria-label="Quick Note info"
             >
               <Info className="h-3 w-3" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" side="top" align="start">
-            <h3 className="text-slate-200 font-bold text-xs uppercase tracking-wider border-b border-slate-700/50 pb-2 mb-2">Global Quick Capture</h3>
-            <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
+            <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider border-b border-border-default/50 pb-2 mb-2">Global Quick Capture</h3>
+            <p className="text-text-tertiary text-[11px] leading-relaxed mb-3">
               <span className="text-white font-bold">Use this to record a memory or note immediately.</span>
             </p>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
+            <p className="text-text-tertiary text-[11px] leading-relaxed">
               Our AI will identify the contact you&apos;re talking about and route the information to their <span className="text-white font-bold">Story</span> automatically.
             </p>
           </PopoverContent>
@@ -51,12 +51,12 @@ export function QuickAddNoteFAB() {
           onClick={() => setIsOpen(true)}
           className={cn(
             "h-14 w-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all active:scale-95 hover:scale-105 group",
-            "border-4 border-white dark:border-slate-900"
+            "border-4 border-white"
           )}
           aria-label="Quick add story note"
         >
           <BookOpen className="h-6 w-6 group-hover:scale-110 transition-transform" />
-          <div className="absolute -top-1 -right-1 h-5 w-5 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-md">
+          <div className="absolute -top-1 -right-1 h-5 w-5 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-white shadow-md">
             <Plus className="h-3 w-3 text-white stroke-[3px]" />
           </div>
         </button>

@@ -238,7 +238,7 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
                   <Sprout className="h-8 w-8 text-emerald-600" />
                </div>
-               <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+               <p className="text-sm font-medium text-text-secondary">
                    Start adding contact context to see your<br/>garden grow
                </p>
             </div>
@@ -247,11 +247,11 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
          {/* Tooltip */}
          {tooltip.visible && tooltip.contact && (
             <div 
-              className="fixed z-50 px-3 py-2 bg-slate-900/95 text-white text-xs rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-[140%] backdrop-blur-sm border border-slate-700 min-w-[200px] text-center"
+              className="fixed z-50 px-3 py-2 bg-canvas/95 text-text-primary text-xs rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-[140%] backdrop-blur-sm border border-border-default min-w-[200px] text-center"
               style={{ left: tooltip.x, top: tooltip.y }}
             >
               <div className="font-bold text-sm mb-0.5">{tooltip.contact.name}</div>
-              <div className="text-slate-300 text-[11px] leading-tight mb-1">
+              <div className="text-text-tertiary text-[11px] leading-tight mb-1">
                 Last contact: {tooltip.contact.days === 999 ? 'Never' : `${tooltip.contact.days} days ago`}
               </div>
               <div className={`text-[10px] font-bold uppercase tracking-wider inline-block px-1.5 py-0.5 rounded bg-white/10 text-${tooltip.contact.color === '#10b981' ? 'emerald' : tooltip.contact.color === '#84cc16' ? 'lime' : tooltip.contact.color === '#fbbf24' ? 'amber' : 'orange'}-400`}>

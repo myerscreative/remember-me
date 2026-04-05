@@ -30,19 +30,19 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
   const approvalPoints = getPoints(data.approvals);
 
   return (
-    <div className="flex flex-col p-6 bg-slate-800 rounded-2xl border border-slate-700/50 shadow-xl w-full">
+    <div className="flex flex-col p-6 bg-elevated rounded-2xl border border-border-default/50 shadow-xl w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center">
+          <h3 className="text-lg font-bold text-text-primary flex items-center">
             Community Velocity
             <BridgeVelocityInfo />
           </h3>
-          <p className="text-xs text-slate-400">New connections added vs. daily interactions</p>
+          <p className="text-xs text-text-tertiary">New connections added vs. daily interactions</p>
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-0.5 bg-slate-500 rounded-full"></span>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">New Contacts</span>
+            <span className="w-2.5 h-0.5 bg-text-tertiary rounded-full"></span>
+            <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">New Contacts</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-0.5 bg-emerald-400 rounded-full"></span>
@@ -62,7 +62,7 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
               x2={width - padding}
               y2={padding + p * (height - padding * 2)}
               stroke="currentColor"
-              className="text-slate-700/50"
+              className="text-border-default/50"
               strokeDasharray="2,4"
             />
           ))}
@@ -73,7 +73,7 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
-            className="text-slate-600"
+            className="text-text-secondary"
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 0.5 }}
             transition={{ duration: 2, delay: 0.5 }}
@@ -112,7 +112,7 @@ export default function BridgeVelocityChart({ data }: BridgeVelocityChartProps) 
         </svg>
       </div>
       
-      <div className="flex justify-between mt-2 text-[10px] text-slate-500 font-bold px-5 uppercase tracking-tighter">
+      <div className="flex justify-between mt-2 text-[10px] text-text-tertiary font-bold px-5 uppercase tracking-tighter">
         <span>30 Days Ago</span>
         <span>Today</span>
       </div>

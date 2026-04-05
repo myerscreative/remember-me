@@ -247,7 +247,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         </div>
 
         {/* Meeting Info Banner */}
-        <div className="px-8 py-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-surface dark:to-surface border-b-2 border-indigo-500 flex gap-6 items-center">
+        <div className="px-8 py-8 bg-linear-to-br from-blue-50 to-blue-100 border-b-2 border-indigo-500 flex gap-6 items-center">
           {contact?.photo_url || primaryContact?.photo ? (
             <img
               src={contact?.photo_url || primaryContact?.photo || ''}
@@ -375,7 +375,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
                     <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">Interests</h4>
                     <div className="flex flex-wrap gap-2">
                       {contact.interests.map((interest, i) => (
-                        <span key={i} className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">
+                        <span key={i} className="px-3 py-1 bg-indigo-100  text-indigo-700  rounded-full text-sm font-medium">
                           {interest}
                         </span>
                       ))}
@@ -393,18 +393,18 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
             <h3 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
               Last Contact
             </h3>
-            <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl">
+            <div className="p-5 bg-emerald-50  border-2 border-emerald-400  rounded-2xl">
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-emerald-200 dark:border-emerald-600 rounded-lg text-emerald-800 dark:text-emerald-400 text-sm font-bold">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-emerald-200  rounded-lg text-emerald-800  text-sm font-bold">
                   {contact.last_contact_method === 'phone' ? <Phone className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
                   <span className="capitalize">{contact.last_contact_method || 'Contact'}</span>
                 </span>
-                <span className="text-emerald-700 dark:text-emerald-400 font-medium text-sm">
+                <span className="text-emerald-700  font-medium text-sm">
                   {getDaysAgo(contact.last_interaction_date)} days ago
                 </span>
               </div>
               {contact.notes && (
-                <div className="p-4 bg-surface rounded-xl text-emerald-900 dark:text-emerald-300 italic border border-emerald-100 dark:border-emerald-700">
+                <div className="p-4 bg-surface rounded-xl text-emerald-900  italic border border-emerald-100 ">
                   &quot;{contact.notes}&quot;
                 </div>
               )}
@@ -413,7 +413,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         )}
 
         {/* Conversation Starters */}
-        <div className="px-8 py-8 mx-8 my-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-2 border-amber-300 dark:border-amber-600 rounded-2xl">
+        <div className="px-8 py-8 mx-8 my-4 bg-linear-to-br from-amber-50 to-amber-100 border-2 border-amber-300 dark:border-amber-600 rounded-2xl">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-text-primary flex items-center gap-2">
               Conversation Starters
@@ -437,7 +437,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
           ) : (
             <div className="space-y-4">
               {conversationStarters.map((starter, i) => (
-                <div key={i} className="flex gap-4 items-start p-4 bg-surface rounded-xl shadow-sm border border-amber-100 dark:border-amber-700">
+                <div key={i} className="flex gap-4 items-start p-4 bg-surface rounded-xl shadow-sm border border-amber-200">
                   <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-amber-400 text-white font-bold rounded-full">
                     {i + 1}
                   </span>
@@ -456,7 +456,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
                 onClose();
                 router.push(`/contacts/${contact.id}`);
               }}
-              className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50"
+              className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 "
             >
               View Full Profile
             </Button>
@@ -464,7 +464,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface dark:text-text-primary dark:border-border-strong dark:hover:bg-subtle"
+            className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface text-text-primary border-border-strong hover:bg-subtle"
           >
             Close
           </Button>

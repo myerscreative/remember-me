@@ -208,7 +208,7 @@ export default function StoryRecallGame() {
       <div className="min-h-screen bg-linear-to-br from-amber-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">📖</div>
-          <p className="text-lg text-slate-600">Loading memories...</p>
+          <p className="text-lg text-text-secondary">Loading memories...</p>
         </div>
       </div>
     );
@@ -254,7 +254,7 @@ export default function StoryRecallGame() {
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto mt-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-surface rounded-3xl shadow-xl p-8">
             {/* Context Card - show who checking memory for */}
            <div className="flex items-center justify-center gap-4 mb-8 bg-amber-50 p-4 rounded-xl border border-amber-100">
                <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold">
@@ -266,7 +266,7 @@ export default function StoryRecallGame() {
            </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">{currentQuestion.prompt}</h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">{currentQuestion.prompt}</h2>
           </div>
 
           <div className="space-y-3">
@@ -286,7 +286,7 @@ export default function StoryRecallGame() {
                       ? 'bg-green-100 border-2 border-green-500 scale-105'
                       : showIncorrect
                       ? 'bg-red-100 border-2 border-red-500 animate-shake'
-                      : 'bg-slate-50 border-2 border-slate-200 hover:border-amber-400 hover:bg-amber-50 hover:scale-105'
+                      : 'bg-surface border-2 border-border-default hover:border-amber-400 hover:bg-amber-50 hover:scale-105'
                   } ${gameState.showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {choice}

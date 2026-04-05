@@ -380,13 +380,13 @@ export function OverviewPanel({
                                                 {conn.person.photo_url ? (
                                                     <img src={conn.person.photo_url} alt={conn.person.name} className="h-full w-full object-cover" />
                                                 ) : (
-                                                    <span className="text-xs text-slate-400">
+                                                    <span className="text-xs text-text-tertiary">
                                                         {conn.person.first_name?.[0]}{conn.person.last_name?.[0]}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="text-[13px] font-medium text-slate-200 truncate group-hover:text-text-primary transition-colors">{conn.person.name}</div>
+                                                <div className="text-[13px] font-medium text-text-primary truncate group-hover:text-text-primary transition-colors">{conn.person.name}</div>
                                                 <div className="text-[11px] text-[#94a3b8]">{conn.relationship_type}</div>
                                             </div>
                                             <button 
@@ -394,7 +394,7 @@ export function OverviewPanel({
                                                     e.stopPropagation();
                                                     onUnlinkConnection?.(conn.id);
                                                 }}
-                                                className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-red-400 transition-all hover:bg-slate-800 rounded-full"
+                                                className="opacity-0 group-hover:opacity-100 p-2 text-text-tertiary hover:text-red-400 transition-all hover:bg-elevated rounded-full"
                                                 title="Unlink connection"
                                             >
                                                 <X className="w-4 h-4" />
@@ -425,7 +425,7 @@ export function OverviewPanel({
                           {contact.notes && (
                             <div className="mb-4 last:mb-0">
                                 {contact.deep_lore && <div className="text-[10px] uppercase text-[#64748b] mb-1">Notes</div>}
-                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                <p className="text-[13px] md:text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
                                     {contact.notes}
                                 </p>
                             </div>
@@ -434,7 +434,7 @@ export function OverviewPanel({
                           {contact.deep_lore && (
                             <div className="last:mb-0">
                                 <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
-                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-border-default pl-3 italic">
+                                <p className="text-[13px] md:text-sm text-text-secondary whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-border-default pl-3 italic">
                                     &quot;{contact.deep_lore}&quot;
                                 </p>
                             </div>

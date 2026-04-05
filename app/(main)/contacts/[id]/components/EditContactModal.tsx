@@ -217,8 +217,8 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
           </div>
 
           {/* Last Contact Section */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Last Contact (for backfilling)</h4>
+          <div className="pt-4 border-t border-border-default">
+            <h4 className="text-sm font-medium text-text-secondary mb-3">Last Contact (for backfilling)</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="lastContactDate">Date</Label>
@@ -236,7 +236,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                     id="lastContactMethod"
                     value={formData.lastContactMethod}
                     onChange={(e) => setFormData({ ...formData, lastContactMethod: e.target.value })}
-                    className="w-full h-11 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
+                    className="w-full h-11 px-3 py-2 rounded-md border border-border-default bg-surface text-text-primary text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
                   >
                   <option value="">Select method...</option>
                   <option value="call">Call</option>
@@ -254,7 +254,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
               id="targetFrequencyDays"
               value={formData.targetFrequencyDays}
               onChange={(e) => setFormData({ ...formData, targetFrequencyDays: parseInt(e.target.value) })}
-              className="w-full h-11 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
+              className="w-full h-11 px-3 py-2 rounded-md border border-border-default bg-surface text-text-primary text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-0"
             >
               {FREQUENCY_PRESETS.map((preset) => (
                 <option key={preset.days} value={preset.days}>
@@ -266,7 +266,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
 
 
 
-      <div className="flex flex-col gap-4 w-full pt-4 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex flex-col gap-4 w-full pt-4 border-t border-border-default">
         <div className="flex flex-col-reverse sm:flex-row justify-between items-center w-full gap-4">
             {!showDeleteConfirm ? (
               <Button 
@@ -288,7 +288,7 @@ export function EditContactModal({ isOpen, onClose, contact, onSuccess }: EditCo
                     type="button" 
                     variant="ghost" 
                     size="sm"
-                    className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white h-9 px-4"
+                    className="text-text-tertiary hover:text-text-primary h-9 px-4"
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={isSaving}
                   >

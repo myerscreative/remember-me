@@ -42,16 +42,16 @@ export function NetworkDomainBar({ domains, selectedDomainId, onSelectDomain }: 
             onClick={() => onSelectDomain(isSelected ? null : domain.id)}
             className={cn(
               "flex items-center gap-2 h-10 px-6 rounded-full border transition-all duration-300",
-              isSelected 
-                ? "bg-white dark:bg-white/10 shadow-md border-indigo-200 dark:border-indigo-500/30 scale-105" 
-                : "bg-transparent border-transparent hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400"
+              isSelected
+                ? "bg-surface shadow-md border-indigo-200 scale-105"
+                : "bg-transparent border-transparent hover:bg-subtle text-text-tertiary"
             )}
             style={{ 
                color: (isSelected && domain.color) ? domain.color : undefined 
             }}
           >
             <Icon className="w-4 h-4" />
-            <span className={cn("font-medium", isSelected ? "text-gray-900 dark:text-white" : "")}>{domain.name}</span>
+            <span className={cn("font-medium", isSelected ? "text-text-primary" : "")}>{domain.name}</span>
           </Button>
         );
       })}

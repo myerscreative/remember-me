@@ -207,7 +207,7 @@ export function SearchResultCard({
                                 </Badge>
                                 ))}
                                 {tags.length > 3 && (
-                                <Badge variant="secondary" className="bg-gray-500/10 text-text-secondary border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
+                                <Badge variant="secondary" className="bg-subtle text-text-secondary border border-border-default text-[11px] h-6 px-2 rounded-md font-medium">
                                     +{tags.length - 3}
                                 </Badge>
                                 )}

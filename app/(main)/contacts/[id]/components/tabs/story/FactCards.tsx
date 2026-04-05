@@ -48,8 +48,8 @@ const categoryConfig: Record<string, {
   general: {
     icon: MoreHorizontal,
     label: 'General',
-    bgClass: 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700',
-    iconClass: 'text-gray-500',
+    bgClass: 'bg-subtle border-border-default',
+    iconClass: 'text-text-tertiary',
   },
 };
 
@@ -72,7 +72,7 @@ export function FactCards({ facts, contactId, onFactAdded }: FactCardsProps) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-text-tertiary">
           📌 Key Facts
         </h3>
         <Button 
@@ -88,12 +88,12 @@ export function FactCards({ facts, contactId, onFactAdded }: FactCardsProps) {
       {facts.length === 0 ? (
         <div 
           onClick={() => setDialogOpen(true)}
-          className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors"
+          className="border-2 border-dashed border-border-default rounded-xl p-6 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors"
         >
-          <p className="text-gray-400 text-sm">
+          <p className="text-text-tertiary text-sm">
             Add important details about this person
           </p>
-          <p className="text-gray-300 text-xs mt-1">
+          <p className="text-text-tertiary text-xs mt-1">
             Spouse name, favorite coffee, career goals...
           </p>
         </div>
@@ -121,11 +121,11 @@ export function FactCards({ facts, contactId, onFactAdded }: FactCardsProps) {
                 
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className={cn('w-4 h-4', config.iconClass)} />
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
                     {config.label}
                   </span>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 font-serif">
+                <p className="text-sm text-text-secondary line-clamp-3 font-serif">
                   {fact.content}
                 </p>
               </div>
@@ -135,9 +135,9 @@ export function FactCards({ facts, contactId, onFactAdded }: FactCardsProps) {
           {/* Add more card */}
           <div 
             onClick={() => setDialogOpen(true)}
-            className="shrink-0 w-32 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors min-h-[100px]"
+            className="shrink-0 w-32 rounded-xl border-2 border-dashed border-border-default flex items-center justify-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors min-h-[100px]"
           >
-            <Plus className="w-5 h-5 text-gray-400" />
+            <Plus className="w-5 h-5 text-text-tertiary" />
           </div>
         </div>
       )}

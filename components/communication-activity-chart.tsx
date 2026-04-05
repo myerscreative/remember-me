@@ -54,8 +54,8 @@ export function CommunicationActivityChart({
 
   if (data.length === 0 || totalInteractions === 0) {
     return (
-      <div className={cn("h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg", className)}>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+      <div className={cn("h-[300px] flex items-center justify-center bg-surface rounded-lg", className)}>
+        <p className="text-sm text-text-tertiary">
           No interaction data available for this period
         </p>
       </div>
@@ -72,13 +72,13 @@ export function CommunicationActivityChart({
       <div className="flex items-center gap-6 mb-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-semibold text-gray-900 dark:text-white">{totalInteractions}</span> total interactions
+          <span className="text-sm text-text-secondary">
+            <span className="font-semibold text-text-primary">{totalInteractions}</span> total interactions
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="text-sm text-text-secondary">
+            <span className="font-semibold text-text-primary">
               {(totalInteractions / data.length).toFixed(1)}
             </span> avg/day
           </span>
@@ -86,7 +86,7 @@ export function CommunicationActivityChart({
       </div>
 
       {/* Chart */}
-      <div className="relative h-[300px] bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden">
+      <div className="relative h-[300px] bg-surface rounded-lg overflow-hidden">
         <svg
           width="100%"
           height="100%"
@@ -106,13 +106,13 @@ export function CommunicationActivityChart({
                   y2={y}
                   stroke="currentColor"
                   strokeOpacity={0.1}
-                  className="text-gray-400 dark:text-gray-600"
+                  className="text-text-tertiary"
                 />
                 <text
                   x={chartPadding.left - 8}
                   y={y + 4}
                   textAnchor="end"
-                  className="fill-gray-400 dark:fill-gray-500 text-[10px]"
+                  className="fill-text-tertiary text-[10px]"
                 >
                   {Math.round(maxValue * ratio)}
                 </text>
@@ -145,7 +145,7 @@ export function CommunicationActivityChart({
                   width={barWidth}
                   height={Math.max(barHeight, 2)}
                   rx={Math.min(4, barWidth / 4)}
-                  className="fill-blue-500 dark:fill-blue-400 transition-all duration-200 group-hover:fill-blue-600 dark:group-hover:fill-blue-300"
+                  className="fill-blue-500 transition-all duration-200 group-hover:fill-blue-600"
                 />
 
                 {/* Hover tooltip */}
@@ -156,13 +156,13 @@ export function CommunicationActivityChart({
                     width={60}
                     height={28}
                     rx={4}
-                    className="fill-gray-900 dark:fill-gray-100"
+                    className="fill-elevated"
                   />
                   <text
                     x={x + barWidth / 2}
                     y={y - 17}
                     textAnchor="middle"
-                    className="fill-white dark:fill-gray-900 text-[11px] font-medium"
+                    className="fill-white text-[11px] font-medium"
                   >
                     {item.value} interaction{item.value !== 1 ? 's' : ''}
                   </text>
@@ -173,7 +173,7 @@ export function CommunicationActivityChart({
                   x={x + barWidth / 2}
                   y={chartPadding.top + chartHeight + 20}
                   textAnchor="middle"
-                  className="fill-gray-500 dark:fill-gray-400 text-[10px]"
+                  className="fill-text-tertiary text-[10px]"
                 >
                   {item.label}
                 </text>

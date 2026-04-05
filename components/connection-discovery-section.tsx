@@ -78,9 +78,9 @@ export function ConnectionDiscoverySection() {
 
   if (loading) {
     return (
-      <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+      <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
         <div className="flex items-center justify-center py-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading discoveries...</p>
+          <p className="text-sm text-text-tertiary">Loading discoveries...</p>
         </div>
       </Card>
     );
@@ -111,13 +111,13 @@ export function ConnectionDiscoverySection() {
           return (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-md transition-all"
+              className="bg-surface rounded-lg p-4 border-2 border-purple-200 hover:border-purple-300 hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2 flex-1">
                   <Icon className={cn("h-5 w-5 shrink-0", typeInfo.iconColor)} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-text-primary">
                       {typeInfo.label} <span className="font-bold">{discovery.commonValue}</span>
                     </p>
                   </div>
@@ -134,7 +134,7 @@ export function ConnectionDiscoverySection() {
                     const fullName = `${person.first_name} ${person.last_name || ""}`.trim();
                     return (
                       <Link key={person.id} href={`/contacts/${person.id}`}>
-                        <Avatar className="h-8 w-8 border-2 border-white dark:border-gray-800 hover:z-10 hover:scale-110 transition-transform cursor-pointer">
+                        <Avatar className="h-8 w-8 border-2 border-surface hover:z-10 hover:scale-110 transition-transform cursor-pointer">
                           <AvatarImage src={person.photo_url || undefined} />
                           <AvatarFallback
                             className={cn(
@@ -150,7 +150,7 @@ export function ConnectionDiscoverySection() {
                   })}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                  <p className="text-xs text-text-secondary truncate">
                     {discovery.persons
                       .slice(0, 3)
                       .map((p) => `${p.first_name} ${p.last_name || ""}`.trim())

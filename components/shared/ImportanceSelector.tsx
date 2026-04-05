@@ -14,7 +14,7 @@ export function ImportanceSelector({ importance, onChange, className }: Importan
   const options: { value: ContactImportance; label: string; icon: React.FC<any>; color: string }[] = [
     { value: 'high', label: 'Inner Circle', icon: Crown, color: 'text-amber-500 bg-amber-50 border-amber-200' },
     { value: 'medium', label: 'Steady Friends', icon: User, color: 'text-blue-500 bg-blue-50 border-blue-200' },
-    { value: 'low', label: 'Distant Peers', icon: UserMinus, color: 'text-slate-500 bg-slate-50 border-slate-200' },
+    { value: 'low', label: 'Distant Peers', icon: UserMinus, color: 'text-text-tertiary bg-subtle border-border-default' },
   ];
 
   return (
@@ -29,9 +29,9 @@ export function ImportanceSelector({ importance, onChange, className }: Importan
             onClick={() => onChange(opt.value)}
             className={`
               flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border transition-all duration-200
-              ${isSelected 
-                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500/20' 
-                : 'bg-white dark:bg-[#2c3039] border-gray-200 dark:border-[#3a3f4b] text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-[#343942]'
+              ${isSelected
+                ? 'bg-blue-50 border-blue-200 text-blue-600 ring-2 ring-blue-500/20'
+                : 'bg-surface border-border-default text-text-tertiary hover:border-border-strong hover:bg-surface'
               }
             `}
             title={opt.label}

@@ -22,7 +22,7 @@ function highlightText(text: string, highlight?: string) {
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === highlight.toLowerCase() ? (
-          <span key={i} className="bg-yellow-200 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 px-0.5 rounded">
+          <span key={i} className="bg-yellow-200 text-yellow-800 px-0.5 rounded">
             {part}
           </span>
         ) : (
@@ -51,7 +51,7 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
 
   return (
     <Link href={`/contacts/${contact.id}`}>
-      <Card className="group relative overflow-hidden p-3 hover:shadow-md transition-all duration-300 border-white/20 bg-white/40 dark:bg-black/20 hover:bg-white/60 dark:hover:bg-black/40 backdrop-blur-md">
+      <Card className="group relative overflow-hidden p-3 hover:shadow-md transition-all duration-300 border-white/20 bg-surface/40 hover:bg-surface/60 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 border-2 border-white/20">
             <AvatarImage src={contact.photo_url || undefined} alt={contact.name ?? "Contact"} />
@@ -62,25 +62,25 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
           
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
-               <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+               <h4 className="font-semibold text-sm text-text-primary truncate">
                 {highlightText(contact.name, highlight)}
               </h4>
             </div>
             
             {/* Context - Only show if very relevant or searching, otherwise keep it clean */}
             {(contact.where_met || contact.relationship_summary) && highlight && (
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1">
+              <p className="text-[10px] text-text-tertiary line-clamp-1">
                 {highlightText(contact.where_met || contact.relationship_summary || '', highlight)}
               </p>
             )}
             
-            <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-3 mt-1 text-[10px] text-text-tertiary">
                {/* Last Contact */}
                <div className="flex items-center gap-1">
                  <CalendarDays className="h-3 w-3 opacity-70" />
                  <span>{lastContact || 'No contact'}</span>
                  {contact.target_frequency_days && (
-                   <span className="flex items-center gap-1 bg-black/5 dark:bg-white/10 px-1 rounded text-[9px] font-bold uppercase tracking-wider">
+                   <span className="flex items-center gap-1 bg-black/5 px-1 rounded text-[9px] font-bold uppercase tracking-wider">
                       <RefreshCw className="h-2.5 w-2.5 opacity-60" />
                       {FREQUENCY_PRESETS.find(p => p.days === contact.target_frequency_days)?.label || "Custom"}
                    </span>
@@ -101,7 +101,7 @@ export function NetworkCard({ contact, highlight }: NetworkCardProps) {
            {/* Connection Indicator (Mini Dot) */}
            <div className={cn(
               "h-2 w-2 rounded-full",
-              getRelationshipStatus(contact).colorClass.split(' ')[1]?.replace('text-', 'bg-') || 'bg-gray-300'
+              getRelationshipStatus(contact).colorClass.split(' ')[1]?.replace('text-', 'bg-') || 'bg-border-default'
             )} title={getRelationshipStatus(contact).label} />
         </div>
       </Card>

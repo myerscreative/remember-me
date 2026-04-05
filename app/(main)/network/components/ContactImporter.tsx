@@ -265,29 +265,29 @@ export function ContactImporter({ onCloseAction }: { onCloseAction: () => void }
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <div className="bg-blue-50/50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-2xl p-5 mb-6">
+              <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 mb-6">
                  <ol className="space-y-4 text-text-tertiary">
                     <li className="flex items-start">
-                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
                         <p>Open the Contacts app on your iPhone.</p>
                     </li>
                     <li className="flex items-start">
-                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
                         <p>Tap <strong>Lists</strong> <span className="text-text-secondary text-sm">(top left)</span>, long-press <strong>All Contacts</strong>, and tap <strong>Export</strong>.</p>
                     </li>
                     <li className="flex items-start">
-                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
                         <p>Email the file to yourself or save to Files, then continue.</p>
                     </li>
                  </ol>
               </div>
 
                {/* Lead Architect Shortcut Notice */}
-               <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl p-4 flex items-start">
-                   <div className="shrink-0 mt-0.5 mr-3 p-1.5 bg-amber-100 dark:bg-amber-500/20 rounded-full text-amber-600 dark:text-amber-400">
+               <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start">
+                   <div className="shrink-0 mt-0.5 mr-3 p-1.5 bg-amber-100 rounded-full text-amber-600">
                         <Smartphone className="w-4 h-4" />
                    </div>
-                   <div className="text-sm text-amber-900 dark:text-amber-200">
+                   <div className="text-sm text-amber-900">
                        <span className="font-semibold block mb-1">Shortcut for meeting new people:</span>
                        Create a personal &quot;ReMember Me&quot; contact card to share instantly when networking. Setup coming soon!
                    </div>
@@ -315,8 +315,8 @@ export function ContactImporter({ onCloseAction }: { onCloseAction: () => void }
                 onClick={() => fileInputRef.current?.click()}
               >
                   <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                  <div className="relative border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-2xl p-10 flex flex-col items-center justify-center text-center bg-surface hover:bg-indigo-50/50 dark:hover:bg-surface transition-colors">
-                      <div className="p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-full mb-4 group-hover:scale-110 transition-transform">
+                  <div className="relative border-2 border-dashed border-indigo-200 rounded-2xl p-10 flex flex-col items-center justify-center text-center bg-surface hover:bg-indigo-50/50 transition-colors">
+                      <div className="p-4 bg-indigo-50 rounded-full mb-4 group-hover:scale-110 transition-transform">
                         {isParsing ? (
                              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                         ) : (
@@ -367,7 +367,7 @@ export function ContactImporter({ onCloseAction }: { onCloseAction: () => void }
                             onClick={() => handleToggleSelect(contact.id)}
                             className={`flex items-center p-3 rounded-xl border cursor-pointer transition-colors ${
                                 contact.selected 
-                                    ? 'bg-indigo-50/50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-700/50' 
+                                    ? 'bg-indigo-50/50 border-indigo-200'
                                     : 'bg-surface border-border-default hover:border-border-strong'
                             }`}
                         >

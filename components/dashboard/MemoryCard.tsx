@@ -23,21 +23,21 @@ const MemoryCard: React.FC<{ memory: SharedMemoryCard; onClick?: () => void }> =
       }[memory.status];
 
   return (
-    <div className="w-full mb-4 p-5 rounded-3xl border border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-indigo-500/30">
+    <div className="w-full mb-4 p-5 rounded-3xl border border-white/5 bg-canvas/40 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-indigo-500/30">
       {/* Header Section */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           {/* Avatar with Ring */}
           <div className="relative">
              <div className={`absolute -inset-1 rounded-full blur-[2px] opacity-20 ${dotColor.replace('bg-', 'bg-')}`} />
-             <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 border-2 border-white/10 text-slate-100 font-bold shadow-xl overflow-hidden">
+             <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-elevated border-2 border-white/10 text-text-primary font-bold shadow-xl overflow-hidden">
                {memory.initials}
              </div>
           </div>
           
           {/* Contact Info */}
           <div>
-            <h3 className="text-slate-100 font-black text-lg tracking-tight leading-tight">
+            <h3 className="text-text-primary font-black text-lg tracking-tight leading-tight">
               {memory.contactName}
             </h3>
             <div className="flex items-center gap-2 mt-1">
@@ -50,7 +50,7 @@ const MemoryCard: React.FC<{ memory: SharedMemoryCard; onClick?: () => void }> =
         </div>
 
         <button 
-          className="h-10 w-10 flex items-center justify-center rounded-full bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-300 active:scale-90"
+          className="h-10 w-10 flex items-center justify-center rounded-full bg-white/5 border border-white/5 text-text-tertiary hover:text-white hover:bg-white/10 transition-all duration-300 active:scale-90"
           onClick={onClick}
         >
           <ChevronRight size={20} />
@@ -66,7 +66,7 @@ const MemoryCard: React.FC<{ memory: SharedMemoryCard; onClick?: () => void }> =
           {memory.isQuickLog && (
             <Zap size={16} className="text-indigo-400 mt-1 shrink-0 animate-pulse" />
           )}
-          <p className="text-slate-200 italic font-semibold leading-relaxed text-sm">
+          <p className="text-text-primary italic font-semibold leading-relaxed text-sm">
             &quot;{memory.content}&quot;
           </p>
         </div>

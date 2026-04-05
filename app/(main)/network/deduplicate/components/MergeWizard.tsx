@@ -74,7 +74,7 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: 
         </DialogHeader>
 
         <div className="py-6">
-          <div className="bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 p-4 rounded-lg mb-6 flex items-start gap-3 text-sm">
+          <div className="bg-amber-50 text-amber-800 p-4 rounded-lg mb-6 flex items-start gap-3 text-sm">
              <AlertTriangle className="w-5 h-5 shrink-0" />
              <p>
                Select the <strong>Primary Record</strong> you want to keep. 
@@ -89,8 +89,8 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: 
                 key={contact.id}
                 onClick={() => setSelectedKeeperId(contact.id)}
                 className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                  selectedKeeperId === contact.id 
-                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30' 
+                  selectedKeeperId === contact.id
+                    ? 'border-indigo-600 bg-indigo-50'
                     : 'border-border-default hover:border-border-strong'
                 }`}
               >

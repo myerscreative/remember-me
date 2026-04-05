@@ -52,7 +52,7 @@ const VitalSigns = ({ daysRemaining, cadenceDays, nextDue, statusLabel }: { days
   const ratio = cadenceDays > 0 ? Math.min(1, Math.max(0, daysRemaining / cadenceDays)) : 0;
   
   return (
-    <div className="w-full bg-slate-900 border border-slate-200/10 rounded-2xl p-5 flex items-center justify-between mb-4 shadow-sm">
+    <div className="w-full bg-surface border border-border-default rounded-2xl p-5 flex items-center justify-between mb-4 shadow-sm">
       <div className="flex items-center gap-5">
         <div className="relative w-14 h-14 flex items-center justify-center">
           <svg className="w-full h-full transform -rotate-90">
@@ -66,22 +66,22 @@ const VitalSigns = ({ daysRemaining, cadenceDays, nextDue, statusLabel }: { days
         </div>
         <div>
           <div className="flex items-center gap-1.5 mb-1">
-            <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">Days left</p>
+            <p className="text-[10px] uppercase font-black text-text-tertiary tracking-widest">Days left</p>
             <HealthScoreModal 
               daysRemaining={daysRemaining}
               cadenceDays={cadenceDays}
               trigger={
-                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about days remaining">
+                <button className="text-text-tertiary hover:text-indigo-400 transition-colors" title="Learn about days remaining">
                   <HelpCircle size={12} />
                 </button>
               }
             />
           </div>
-          <p className="text-sm text-slate-200 font-bold">{status} State</p>
+          <p className="text-sm text-text-primary font-bold">{status} State</p>
         </div>
       </div>
-      <div className="text-right border-l border-slate-800 pl-6">
-        <p className="text-[10px] uppercase text-slate-500 font-black tracking-widest mb-1">Next Due</p>
+      <div className="text-right border-l border-border-default pl-6">
+        <p className="text-[10px] uppercase text-text-tertiary font-black tracking-widest mb-1">Next Due</p>
         <p className="text-sm text-indigo-400 font-black uppercase tracking-tight">{nextDue}</p>
       </div>
     </div>
@@ -133,9 +133,9 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
     runAudit();
   }, [debouncedNote, contactId]);
 
-  const resonanceColor = !resonance ? 'border-slate-800' : 
-    resonance.score < 60 ? 'border-slate-700 shadow-slate-900/10' : 
-    resonance.score < 85 ? 'border-slate-700 shadow-slate-900/10' : 
+  const resonanceColor = !resonance ? 'border-border-default' :
+    resonance.score < 60 ? 'border-border-default shadow-sm' :
+    resonance.score < 85 ? 'border-border-default shadow-sm' :
     'border-indigo-400 shadow-indigo-900/40 ring-2 ring-indigo-500/20';
 
   const handleLogInteraction = async () => {
@@ -183,21 +183,21 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
 
   return (
     <div className={cn(
-      "w-full bg-slate-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
-      isExpanded ? resonanceColor : "border-slate-800"
+      "w-full bg-surface rounded-2xl border transition-all duration-500 overflow-hidden shadow-lg",
+      isExpanded ? resonanceColor : "border-border-default"
     )}>
       {/* No banners or rules suggested here */}
-      <div className={cn("p-5", isExpanded && "border-b border-slate-200/10")}>
+      <div className={cn("p-5", isExpanded && "border-b border-border-default")}>
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-2">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">What did you discuss?</label>
+            <label className="block text-[10px] font-black text-text-tertiary uppercase tracking-widest">What did you discuss?</label>
             <Dialog>
               <DialogTrigger asChild>
-                <button className="text-slate-500 hover:text-indigo-400 transition-colors" title="Learn about Deep Lore">
+                <button className="text-text-tertiary hover:text-indigo-400 transition-colors" title="Learn about Deep Lore">
                   <HelpCircle size={12} />
                 </button>
               </DialogTrigger>
-              <DialogContent className="bg-slate-950 border-slate-800 text-slate-200 sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
+              <DialogContent className="bg-canvas border-border-default text-text-primary sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
                 <DialogHeader className="p-6 pb-0">
                   <DialogTitle className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <Brain className="size-5 text-purple-400" />
@@ -205,10 +205,10 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
                   </DialogTitle>
                 </DialogHeader>
                 <div className="p-6 space-y-4">
-                  <p className="text-sm text-slate-400 leading-relaxed">
+                  <p className="text-sm text-text-tertiary leading-relaxed">
                     Record voice notes after hangouts to capture <span className="text-purple-300 font-medium">&quot;Deep Lore&quot;</span> and update their story.
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-text-tertiary">
                     The Brain Dump is your space to offload thoughts, memories, and details without worrying about formatting. Our AI will synthesize these into the relationship history.
                   </p>
                   <DialogClose asChild>
@@ -225,24 +225,24 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
               <Popover>
                 <PopoverTrigger asChild>
                   <button 
-                    className="p-1.5 text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
+                    className="p-1.5 text-indigo-400 hover:bg-elevated rounded-lg transition-all"
                     title="AI Sparkle"
                   >
                     <Sparkles size={14} />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-48 p-2 bg-slate-900 border-slate-700 shadow-2xl z-50" align="end">
+                <PopoverContent className="w-48 p-2 bg-surface border-border-default shadow-2xl z-50" align="end">
                   <div className="flex flex-col gap-1">
-                    <button 
+                    <button
                       onClick={() => toast.success('Polite-ifying your note...', { icon: '✨' })}
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 rounded-md transition-all text-left"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-text-secondary hover:bg-elevated rounded-md transition-all text-left"
                     >
                       <MessageSquare size={12} className="text-indigo-400" />
                       Polite-ify Note
                     </button>
-                    <button 
+                    <button
                       onClick={() => toast.success('Summarizing into Bio...', { icon: '✨' })}
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 rounded-md transition-all text-left"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-text-secondary hover:bg-elevated rounded-md transition-all text-left"
                     >
                       <Sparkles size={12} className="text-indigo-400" />
                       Summarize to Bio
@@ -259,15 +259,15 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
             placeholder="Capture thoughts here..."
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full bg-transparent text-slate-100 placeholder-slate-600 resize-none focus:outline-none min-h-[100px] text-base leading-relaxed"
+            className="w-full bg-transparent text-text-primary placeholder-text-tertiary resize-none focus:outline-none min-h-[100px] text-base leading-relaxed"
           />
           <div className="absolute right-0 bottom-0 p-1 flex items-center gap-2">
-            {isAuditing && <Loader2 size={12} className="animate-spin text-slate-600" />}
+            {isAuditing && <Loader2 size={12} className="animate-spin text-text-tertiary" />}
             {resonance && (
               <div className={cn(
                 "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter",
-                resonance.score < 60 ? "bg-slate-800 text-slate-500" :
-                resonance.score < 85 ? "bg-slate-800 text-slate-400" :
+                resonance.score < 60 ? "bg-elevated text-text-tertiary" :
+                resonance.score < 85 ? "bg-elevated text-text-tertiary" :
                 "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
               )}>
                 R:{resonance.score}
@@ -291,9 +291,9 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
               onClick={() => setStatus('attempted')} 
               className={cn(
                 "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
-                status === 'attempted' 
-                  ? "bg-slate-800 border-slate-200 text-white" 
-                  : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
+                status === 'attempted'
+                  ? "bg-elevated border-border-strong text-text-primary"
+                  : "border-border-default text-text-tertiary hover:bg-elevated/50 hover:border-border-default hover:text-text-secondary"
               )}
             >
               Attempted
@@ -304,7 +304,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
                 "flex-1 h-10 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all",
                 status === 'connected' 
                   ? "bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40" 
-                  : "border-slate-800 text-slate-500 hover:bg-slate-800/50 hover:border-slate-700 hover:text-slate-400"
+                  : "border-border-default text-text-tertiary hover:bg-elevated/50 hover:border-border-default hover:text-text-secondary"
               )}
             >
               ✓ Connected
@@ -312,34 +312,34 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
           </div>
           
           <div className="flex gap-3">
-            <div className="flex-1 bg-slate-950/50 rounded-xl p-3 border border-slate-200/10 flex items-center gap-3">
-              <Calendar size={14} className="text-slate-500" />
+            <div className="flex-1 bg-canvas/50 rounded-xl p-3 border border-border-default flex items-center gap-3">
+              <Calendar size={14} className="text-text-tertiary" />
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] uppercase font-black text-slate-600 tracking-widest mb-0.5">Interaction Date</p>
-                <input 
-                  type="date" 
+                <p className="text-[9px] uppercase font-black text-text-tertiary tracking-widest mb-0.5">Interaction Date</p>
+                <input
+                  type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="bg-transparent text-slate-200 text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                  className="bg-transparent text-text-primary text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer"
                 />
               </div>
             </div>
 
-            <div className="flex-1 bg-slate-950/50 rounded-xl p-3 border border-slate-200/10 flex items-center gap-3">
-              <Calendar size={14} className="text-slate-500" />
+            <div className="flex-1 bg-canvas/50 rounded-xl p-3 border border-border-default flex items-center gap-3">
+              <Calendar size={14} className="text-text-tertiary" />
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] uppercase font-black text-slate-500 tracking-widest mb-0.5">Schedule Next</p>
-                <input 
-                  type="date" 
+                <p className="text-[9px] uppercase font-black text-text-tertiary tracking-widest mb-0.5">Schedule Next</p>
+                <input
+                  type="date"
                   value={nextDate}
                   onChange={(e) => setNextDate(e.target.value)}
-                  className="bg-transparent text-slate-200 text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer" 
+                  className="bg-transparent text-text-primary text-xs font-bold focus:outline-none w-full scheme-dark cursor-pointer"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3 sticky bottom-4 z-10 bg-slate-900 pt-2 pb-1">
+          <div className="flex gap-3 sticky bottom-4 z-10 bg-surface pt-2 pb-1">
             <button 
               onClick={handleLogInteraction}
               disabled={isLogging || !status}
@@ -348,8 +348,8 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
                 status === 'connected' 
                   ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/40 ring-2 ring-white/10" 
                   : status === 'attempted'
-                  ? "bg-slate-700 hover:bg-slate-600 text-white"
-                  : "bg-slate-800 hover:bg-slate-700 text-slate-300"
+                  ? "bg-elevated hover:bg-subtle text-text-primary"
+                  : "bg-elevated hover:bg-subtle text-text-secondary"
               )}
             >
               {isLogging ? 'Logging...' : status === 'connected' ? '✓ Log Connection' : status === 'attempted' ? 'Log Attempt' : 'Log Interaction'}
@@ -360,7 +360,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
                 setNote('');
                 setStatus(null);
               }}
-              className="px-5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-xl transition-all border border-slate-700"
+              className="px-5 py-4 bg-elevated hover:bg-subtle text-text-tertiary rounded-xl transition-all border border-border-default"
             >
               <X size={18} />
             </button>
@@ -376,20 +376,20 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
               <Sparkles size={14} />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-200">Interaction Saved!</p>
-              <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Optional Invitation</p>
+              <p className="text-sm font-bold text-text-primary">Interaction Saved!</p>
+              <p className="text-[10px] text-text-tertiary uppercase font-black tracking-widest">Optional Invitation</p>
             </div>
           </div>
           
           <div className="space-y-3">
-            <p className="text-xs text-slate-400 leading-relaxed italic">
+            <p className="text-xs text-text-tertiary leading-relaxed italic">
               &quot;Add a quick detail you want to remember from this chat?&quot;
             </p>
             <textarea
               value={enrichmentNote}
               onChange={(e) => setEnrichmentNote(e.target.value)}
               placeholder="e.g. They just adopted a golden retriever named Rex..."
-              className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all resize-none"
+              className="w-full bg-canvas/50 border border-border-default rounded-xl p-4 text-sm text-text-primary placeholder-text-tertiary focus:outline-none focus:border-indigo-500 transition-all resize-none"
               rows={2}
             />
             <div className="flex gap-3">
@@ -402,7 +402,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
               </button>
               <button
                 onClick={() => setShowSuccessEnrichment(false)}
-                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+                className="px-6 py-3 bg-elevated hover:bg-subtle text-text-tertiary text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Skip
               </button>
@@ -444,7 +444,7 @@ const ContactSynopsis = ({
         {onRefreshAISummary && (
           <button
             onClick={onRefreshAISummary}
-            className="text-slate-600 hover:text-indigo-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"
+            className="text-text-tertiary hover:text-indigo-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"
             title="Refresh AI Insight"
           >
             <Loader2 size={14} />
@@ -453,16 +453,16 @@ const ContactSynopsis = ({
       </div>
       <div className="space-y-3 text-sm">
         {synopsis && (
-          <p className="text-slate-400 leading-relaxed italic line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+          <p className="text-text-tertiary leading-relaxed italic line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
             &ldquo;{synopsis}&rdquo;
           </p>
         )}
         {(lastContactNotes || lastContactDate) && (
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Last contact</p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-[10px] font-black text-text-tertiary uppercase tracking-widest mb-1">Last contact</p>
+            <p className="text-text-secondary leading-relaxed">
               {lastContactDate && (
-                <span className="text-slate-500">{lastContactDate}</span>
+                <span className="text-text-tertiary">{lastContactDate}</span>
               )}
               {lastContactDate && lastContactType && (
                 <span className="ml-2 text-[10px] font-bold uppercase text-indigo-400/80">{lastContactType}</span>
@@ -475,8 +475,8 @@ const ContactSynopsis = ({
         )}
         {(nextGoalNote || nextContactDate) && (
           <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Next steps</p>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-[10px] font-black text-text-tertiary uppercase tracking-widest mb-1">Next steps</p>
+            <p className="text-text-secondary leading-relaxed">
               {nextGoalNote && <span>{nextGoalNote}</span>}
               {nextGoalNote && nextContactDate && ' · '}
               {nextContactDate && (
@@ -493,9 +493,9 @@ const ContactSynopsis = ({
 const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdit?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-t border-slate-900 pt-1">
+    <div className="border-t border-border-default pt-1">
       <div className="flex items-center gap-2">
-        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-3 text-slate-500 hover:text-slate-300 transition-colors group">
+        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between flex-1 py-3 text-text-tertiary hover:text-text-secondary transition-colors group">
           <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Contact Info & Metadata</span>
           <div className={cn("transition-transform duration-300", isOpen ? "rotate-180" : "")}>
             <ChevronDown size={18} />
@@ -507,7 +507,7 @@ const MetadataFolder = ({ children, onEdit }: { children: React.ReactNode, onEdi
               e.stopPropagation();
               onEdit();
             }}
-            className="p-2 -mr-2 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+            className="p-2 -mr-2 text-text-tertiary hover:text-indigo-400 transition-all active:scale-95"
             title="Edit Contact Info"
           >
             <Edit2 size={16} />
@@ -616,7 +616,7 @@ export function OverviewTab({
   const nextContactDate = contact.next_contact_date ? new Date(contact.next_contact_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-6 bg-slate-950 pb-36">
+    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-6 bg-canvas pb-36">
       {/* Synopsis - right below birthday */}
       <section className="px-4 -mt-2">
         <ContactSynopsis
@@ -662,7 +662,7 @@ export function OverviewTab({
             {/* Tags Section */}
             <div className="space-y-5">
               <div className="flex items-center justify-between px-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
+                <label className="text-[11px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-3">
                   <Tag size={13} className="text-indigo-500" /> Tags
                 </label>
                 <button
@@ -677,10 +677,10 @@ export function OverviewTab({
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                    className="bg-surface text-text-secondary border-border-default hover:border-border-strong h-10 px-5 rounded-xl group transition-all"
                   >
                     {tag}
-                    <button onClick={() => handleRemoveTag(tag)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                    <button onClick={() => handleRemoveTag(tag)} className="ml-3 text-text-tertiary hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                       <X size={14} />
                     </button>
                   </Badge>
@@ -694,7 +694,7 @@ export function OverviewTab({
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                     placeholder="Identify with tag..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-surface border border-border-default rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddTag} disabled={submittingTag} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -707,7 +707,7 @@ export function OverviewTab({
             {/* Interests Section */}
             <div className="space-y-5">
               <div className="flex items-center justify-between px-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest flex items-center gap-3">
+                <label className="text-[11px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-3">
                   <Sparkles size={13} className="text-indigo-500" /> Interests
                 </label>
                 <button
@@ -722,10 +722,10 @@ export function OverviewTab({
                   <Badge
                     key={interest}
                     variant="secondary"
-                    className="bg-slate-900 text-slate-300 border-slate-200/10 hover:border-slate-700 h-10 px-5 rounded-xl group transition-all"
+                    className="bg-surface text-text-secondary border-border-default hover:border-border-strong h-10 px-5 rounded-xl group transition-all"
                   >
                     {interest}
-                    <button onClick={() => handleRemoveInterest(interest)} className="ml-3 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                    <button onClick={() => handleRemoveInterest(interest)} className="ml-3 text-text-tertiary hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                       <X size={14} />
                     </button>
                   </Badge>
@@ -739,7 +739,7 @@ export function OverviewTab({
                     onChange={(e) => setInterestInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
                     placeholder="Favorite interest..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-surface border border-border-default rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddInterest} disabled={submittingInterest} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -761,11 +761,11 @@ export function OverviewTab({
 
         {/* Recent Activity */}
         <section className="space-y-5">
-          <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] px-1">Timeline</h3>
+          <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.3em] px-1">Timeline</h3>
           {latestInteraction ? (
-            <div className="bg-slate-900 border border-slate-200/10 rounded-2xl p-6 shadow-sm flex flex-col gap-4 group hover:border-slate-700 transition-all duration-300">
+            <div className="bg-surface border border-border-default rounded-2xl p-6 shadow-sm flex flex-col gap-4 group hover:border-border-strong transition-all duration-300">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <span className="text-[10px] font-black text-text-tertiary uppercase tracking-widest">
                   {new Date(latestInteraction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
                 <span className={cn(
@@ -777,13 +777,13 @@ export function OverviewTab({
                   {latestInteraction.notes?.includes('[Attempt]') ? 'Follow Up Attempt' : 'Value Exchange'}
                 </span>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed font-medium">
+              <p className="text-sm text-text-secondary leading-relaxed font-medium">
                 {latestInteraction.notes?.replace('[Attempt] ', '') || 'Memory shared.'}
               </p>
             </div>
           ) : (
-            <div className="bg-slate-900/40 rounded-2xl p-10 border border-dashed border-slate-800/50 text-center">
-              <p className="text-[11px] font-bold text-slate-600 uppercase tracking-widest opacity-60">Empty History</p>
+            <div className="bg-surface/40 rounded-2xl p-10 border border-dashed border-border-default/50 text-center">
+              <p className="text-[11px] font-bold text-text-secondary uppercase tracking-widest opacity-60">Empty History</p>
             </div>
           )}
         </section>
@@ -795,9 +795,9 @@ export function OverviewTab({
 
 const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) => {
   const content = (
-    <div className="flex flex-col items-center justify-center p-3 py-4 bg-slate-900 border border-slate-200/10 rounded-xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
+    <div className="flex flex-col items-center justify-center p-3 py-4 bg-surface border border-border-default rounded-xl hover:bg-elevated/50 transition-all active:scale-[0.98] group shadow-sm">
       <div className="text-indigo-400 group-hover:text-text-primary mb-1 transition-all">{icon}</div>
-      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-300">{label}</span>
+      <span className="text-[10px] font-black uppercase tracking-widest text-text-tertiary group-hover:text-text-secondary">{label}</span>
     </div>
   );
 
@@ -810,11 +810,11 @@ const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label
 };
 
 const MetadataItem = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
-  <div className="flex items-center gap-5 bg-slate-900/40 p-5 rounded-2xl border border-slate-200/10 hover:border-slate-700 transition-all group">
+  <div className="flex items-center gap-5 bg-surface/40 p-5 rounded-2xl border border-border-default hover:border-border-strong transition-all group">
     <div className="text-indigo-400/50 group-hover:text-indigo-400 transition-colors shrink-0">{icon}</div>
     <div className="min-w-0">
-      <p className="text-[9px] uppercase font-black text-slate-600 tracking-widest mb-1">{label}</p>
-      <p className="text-sm text-slate-300 font-bold truncate tracking-tight">{value}</p>
+      <p className="text-[9px] uppercase font-black text-text-secondary tracking-widest mb-1">{label}</p>
+      <p className="text-sm text-text-secondary font-bold truncate tracking-tight">{value}</p>
     </div>
   </div>
 );

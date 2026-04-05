@@ -132,10 +132,10 @@ export default function AIBatchPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-text-secondary">
             Loading contacts...
           </span>
         </div>
@@ -149,14 +149,14 @@ export default function AIBatchPage() {
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
               <div className="relative">
                 <Sprout className="h-8 w-8 text-green-600" />
                 <Brain className="h-4 w-4 text-purple-600 absolute -top-1 -right-1" />
               </div>
               AI Relationship Insight
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-text-secondary">
               Automatically cultivate context and summaries for your imported seeds.
             </p>
           </div>
@@ -184,7 +184,7 @@ export default function AIBatchPage() {
           {summary && !isProcessing && results.length === 0 && (
             <>
               {summary.withEnoughContext > 0 ? (
-                <Card className="border-slate-200 dark:border-slate-800">
+                <Card className="border-border-default">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Download className="h-5 w-5 text-purple-600" />
@@ -194,16 +194,16 @@ export default function AIBatchPage() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-text-tertiary">
                           Total Imported
                         </p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        <p className="text-2xl font-bold text-text-primary">
                           {summary.total}
                         </p>
                       </div>
 
                       <div className="space-y-1">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-text-tertiary">
                           Ready to Process
                         </p>
                         <p className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -215,7 +215,7 @@ export default function AIBatchPage() {
                         className="space-y-1 cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => router.push("/triage?mode=enrichment")}
                       >
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-text-tertiary">
                           Need More Context
                         </p>
                         <div className="flex items-center gap-2">
@@ -230,22 +230,22 @@ export default function AIBatchPage() {
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-200 dark:border-gray-800/10 pt-4 flex items-center justify-between">
+                    <div className="border-t border-border-default pt-4 flex items-center justify-between">
                       <div className="flex flex-wrap items-center gap-6">
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm font-medium text-text-primary">
                             {formatCurrency(summary.estimatedCost)}
                           </span>
-                          <span className="text-xs text-gray-500">Est. Cost</span>
+                          <span className="text-xs text-text-tertiary">Est. Cost</span>
                         </div>
 
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm font-medium text-text-primary">
                             {formatDuration(summary.estimatedTime)}
                           </span>
-                          <span className="text-xs text-gray-500">Est. Time</span>
+                          <span className="text-xs text-text-tertiary">Est. Time</span>
                         </div>
                       </div>
                       
@@ -274,14 +274,14 @@ export default function AIBatchPage() {
                 </Card>
               ) : summary.total > 0 ? (
                 /* Success State (Enriched) */
-                <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+                <Card className="border-border-default bg-subtle/50">
                   <CardContent className="pt-10 pb-10 flex flex-col items-center text-center space-y-4">
                     <div className="h-16 w-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
                       <Flower2 className="h-10 w-10 text-green-600" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Your Garden is Enriched!</h2>
-                      <p className="text-slate-600 dark:text-slate-400 max-w-md">
+                      <h2 className="text-2xl font-bold text-text-primary">Your Garden is Enriched!</h2>
+                      <p className="text-text-secondary max-w-md">
                         All your seeds have been analyzed and have the context they need to flourish. Your Relationship Garden is looking healthy.
                       </p>
                     </div>
@@ -324,10 +324,10 @@ export default function AIBatchPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="text-text-secondary">
                       Progress
                     </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold text-text-primary">
                       {progress.processed} / {progress.total}
                     </span>
                   </div>
@@ -350,10 +350,10 @@ export default function AIBatchPage() {
 
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-2xl font-bold text-text-primary">
                       {progress.processed}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Processed
                     </p>
                   </div>
@@ -361,7 +361,7 @@ export default function AIBatchPage() {
                     <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {progress.successful}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Successful
                     </p>
                   </div>
@@ -369,7 +369,7 @@ export default function AIBatchPage() {
                     <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {progress.failed}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Failed
                     </p>
                   </div>
@@ -388,12 +388,12 @@ export default function AIBatchPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-3 text-center bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <div className="grid grid-cols-3 gap-3 text-center bg-subtle rounded-lg p-4">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-2xl font-bold text-text-primary">
                       {results.length}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Total
                     </p>
                   </div>
@@ -401,7 +401,7 @@ export default function AIBatchPage() {
                     <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {results.filter((r) => r.success).length}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Successful
                     </p>
                   </div>
@@ -409,7 +409,7 @@ export default function AIBatchPage() {
                     <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {results.filter((r) => !r.success).length}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-text-tertiary">
                       Failed
                     </p>
                   </div>
@@ -433,8 +433,8 @@ export default function AIBatchPage() {
 
                 {/* Failed Results */}
                 {results.some((r) => !r.success) && (
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+                  <div className="border-t border-border-default pt-4">
+                    <h4 className="font-semibold text-text-primary mb-3">
                       Failed Contacts
                     </h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -444,6 +444,7 @@ export default function AIBatchPage() {
                           <div
                             key={result.personId}
                             className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-800"
+
                           >
                             <p className="text-sm font-semibold text-red-900 dark:text-red-200">
                               {result.personName}
@@ -461,15 +462,15 @@ export default function AIBatchPage() {
           )}
 
           {/* Info Card */}
-          <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+          <Card className="border-border-default bg-subtle/50">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-400 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-text-tertiary shrink-0 mt-0.5" />
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                  <h3 className="font-semibold text-text-primary">
                     How AI Batch Processing Works
                   </h3>
-                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
+                  <ul className="text-sm text-text-secondary space-y-1 list-disc list-inside">
                     <li>
                       Generates one-line summaries for imported contacts
                     </li>

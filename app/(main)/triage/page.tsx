@@ -100,11 +100,11 @@ export default async function TriagePage({ searchParams }: TriagePageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors pb-24">
+    <div className="min-h-screen bg-canvas font-sans transition-colors pb-24">
       <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
         <TriageHeader isEnrichment={isEnrichmentMode} />
 
-        <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border-default overflow-hidden">
           {isEnrichmentMode ? (
             <TriageEnrichmentList initialContacts={contacts} />
           ) : (
@@ -113,8 +113,8 @@ export default async function TriagePage({ searchParams }: TriagePageProps) {
         </div>
 
         {contacts.length === 0 && !isEnrichmentMode && (
-          <div className="mt-8 p-10 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
-             <p className="text-slate-600 dark:text-slate-300 font-medium">
+          <div className="mt-8 p-10 bg-subtle/50 rounded-2xl border border-dashed border-border-strong text-center">
+             <p className="text-text-secondary font-medium">
                All your seeds are planted! To give the AI more context, try adding a few notes to your contacts in their individual profiles.
              </p>
           </div>

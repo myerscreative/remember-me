@@ -204,10 +204,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 1 }}
                   onClick={onClose}
-                  className="w-full mt-10 px-8 py-5 bg-surface text-slate-950 font-black rounded-3xl shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] transform transition-all active:scale-95 text-lg flex items-center justify-center gap-2"
+                  className="w-full mt-10 px-8 py-5 bg-surface text-text-primary font-black rounded-3xl shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] transform transition-all active:scale-95 text-lg flex items-center justify-center gap-2"
                 >
                   Keep Nurturing
-                  <Zap size={20} className="fill-slate-950" />
+                  <Zap size={20} className="fill-current" />
                 </motion.button>
               </div>
             </div>

@@ -80,9 +80,9 @@ export function ActionButtons({ contactId, phoneNumber, email }: ActionButtonsPr
              setLogModalOpen(true);
           }}
           title="Log generic interaction"
-          className="hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="hover:bg-subtle"
         >
-          <Plus className="w-5 h-5 text-gray-500" />
+          <Plus className="w-5 h-5 text-text-tertiary" />
         </Button>
       </div>
 

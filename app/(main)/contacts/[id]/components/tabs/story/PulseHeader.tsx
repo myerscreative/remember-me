@@ -73,7 +73,7 @@ export function PulseHeader({ lastContactDate, targetDays = 30 }: PulseHeaderPro
       <div className="flex items-center gap-4">
         <div className={cn(
           'w-14 h-14 rounded-full flex items-center justify-center',
-          'bg-white dark:bg-gray-900 shadow-sm'
+          'bg-surface shadow-sm'
         )}>
           <Icon className={cn('w-7 h-7', config.textClass)} />
         </div>
@@ -83,14 +83,14 @@ export function PulseHeader({ lastContactDate, targetDays = 30 }: PulseHeaderPro
             <span className={cn('text-lg font-semibold', config.textClass)}>
               {config.label}
             </span>
-            <span className="text-gray-400 dark:text-gray-500">•</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-text-tertiary">•</span>
+            <span className="text-sm text-text-tertiary">
               {health.daysSince === 999 
                 ? 'Never contacted' 
                 : `Last spoke ${formatDaysSince(health.daysSince)}`}
             </span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-text-secondary">
             {config.description}
           </p>
         </div>

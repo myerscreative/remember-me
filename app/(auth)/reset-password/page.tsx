@@ -129,10 +129,10 @@ export default function ResetPasswordPage() {
   // Show loading while checking session
   if (!sessionChecked && !error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-text-secondary">
             Verifying reset link...
           </span>
         </div>
@@ -142,9 +142,9 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+          <div className="bg-surface rounded-lg shadow-lg p-8 text-center">
             <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30">
               <svg
                 className="w-8 h-8 text-green-600 dark:text-green-400"
@@ -160,10 +160,10 @@ export default function ResetPasswordPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-text-primary mb-2">
               Password Reset Successful!
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-text-secondary mb-4">
               Your password has been updated. Redirecting you to the app...
             </p>
           </div>
@@ -173,15 +173,15 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-surface rounded-lg shadow-lg p-8">
           {/* Logo/Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-text-primary mb-2">
               Reset Password
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-text-secondary">
               Enter your new password below
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function ResetPasswordPage() {
             <div>
               <Label
                 htmlFor="new-password"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-text-secondary"
               >
                 New Password
               </Label>
@@ -218,7 +218,7 @@ export default function ResetPasswordPage() {
             <div>
               <Label
                 htmlFor="confirm-password"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-text-secondary"
               >
                 Confirm New Password
               </Label>
@@ -233,7 +233,7 @@ export default function ResetPasswordPage() {
                 disabled={isLoading}
                 minLength={6}
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-text-tertiary">
                 Password must be at least 6 characters
               </p>
             </div>
@@ -259,7 +259,7 @@ export default function ResetPasswordPage() {
         <div className="mt-4 text-center">
           <Link
             href="/login"
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            className="text-sm text-text-secondary hover:text-text-primary"
           >
             ← Back to login
           </Link>

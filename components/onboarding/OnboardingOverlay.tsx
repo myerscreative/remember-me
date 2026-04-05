@@ -129,10 +129,10 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
       {/* Skip button */}
       <button 
         onClick={handleClose}
-        className="absolute top-8 right-8 text-slate-400 hover:text-white transition-colors flex items-center gap-2 font-bold text-sm pointer-events-auto group"
+        className="absolute top-8 right-8 text-text-tertiary hover:text-white transition-colors flex items-center gap-2 font-bold text-sm pointer-events-auto group"
       >
-        Skip Tour 
-        <div className="p-1.5 rounded-full bg-slate-800/50 group-hover:bg-slate-700 transition-colors">
+        Skip Tour
+        <div className="p-1.5 rounded-full bg-elevated/50 group-hover:bg-elevated transition-colors">
           <X size={16} />
         </div>
       </button>
@@ -148,7 +148,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
             transition={{ type: 'spring', damping: 20, stiffness: 100 }}
             className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none"
           >
-            <div className="w-full max-w-[min(90vw,320px)] p-6 bg-slate-900 border border-slate-700/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] pointer-events-auto">
+            <div className="w-full max-w-[min(90vw,320px)] p-6 bg-canvas border border-border-default/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] pointer-events-auto">
             <div className="flex items-center gap-2 mb-3">
               <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
                 {step.icon}
@@ -167,7 +167,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
               {step.buttonText}
             </button>
             
-            <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="mt-6 pt-4 border-t border-border-default flex items-center justify-between">
               <div className="flex gap-1.5">
                 {steps.map((_, i) => (
                   <motion.div 
@@ -180,7 +180,7 @@ export function OnboardingOverlay({ contactName, onStepChange, onClose }: Onboar
                   />
                 ))}
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-tertiary">
                 Step {currentStep + 1} of {steps.length}
               </span>
             </div>

@@ -141,7 +141,7 @@ export function InterestsTab({ contactId }: InterestsTabProps) {
     return (
         <div className="flex flex-wrap gap-2 animate-pulse">
             {[1, 2, 3, 4].map(i => (
-                <div key={i} className="h-8 w-24 bg-gray-100 dark:bg-gray-800 rounded-full" />
+                <div key={i} className="h-8 w-24 bg-subtle rounded-full" />
             ))}
         </div>
     );
@@ -178,7 +178,7 @@ export function InterestsTab({ contactId }: InterestsTabProps) {
                                 e.stopPropagation();
                                 handleRemoveInterest(interest);
                             }}
-                            className="p-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full"
+                            className="p-0.5 hover:bg-black/10 rounded-full"
                          >
                              <X className="w-3 h-3" />
                          </button>

@@ -126,7 +126,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           <Button 
             onClick={() => setIsImporterOpen(true)}
             variant="outline" 
-            className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 bg-surface border-indigo-200 dark:border-indigo-500/30 text-text-accent hover:bg-indigo-50 dark:hover:bg-surface"
+            className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 bg-surface border-indigo-200 text-text-accent hover:bg-indigo-50"
           >
               <Upload className="w-4 h-4" />
               Import iPhone Contacts
@@ -149,9 +149,9 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
               key={i}
               variants={cardVariants}
               onClick={() => onNavigate(tool.route)}
-              className={`relative flex w-full text-left gap-4 px-5 py-4 rounded-xl border transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-canvas group ${
+              className={`relative flex w-full text-left gap-4 px-5 py-4 rounded-xl border transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 group ${
                 isNurture
-                  ? "border-red-500/30 bg-red-500/5 dark:bg-red-500/10 shadow-sm"
+                  ? "border-red-500/30 bg-red-500/5 shadow-sm"
                   : "border-border-default bg-surface/50 hover:bg-surface"
               }`}
             >
@@ -169,7 +169,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
                       e.stopPropagation();
                       setExpandedInfo(i);
                     }}
-                    className="p-1.5 text-text-secondary hover:text-text-accent rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/20 transition-colors"
+                    className="p-1.5 text-text-secondary hover:text-text-accent rounded-full hover:bg-indigo-50 transition-colors"
                     title={`More info about ${tool.title}`}
                   >
                     <Info className="w-4 h-4" />
@@ -214,7 +214,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
             <div className="mt-6">
               <Button
                 onClick={() => setExpandedInfo(null)}
-                className="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 shadow-none font-semibold"
+                className="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 shadow-none font-semibold"
               >
                 Got it
               </Button>

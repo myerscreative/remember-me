@@ -177,7 +177,7 @@ function InterestMatchGameContent() {
       <div className="min-h-screen bg-linear-to-br from-green-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🎣</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     );
@@ -222,10 +222,10 @@ function InterestMatchGameContent() {
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto mt-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-surface rounded-3xl shadow-xl p-8">
             {/* Question Prompt */}
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            <h2 className="text-2xl font-bold text-text-primary mb-2">
               Who loves <span className="text-green-600">{question.interest}</span>?
             </h2>
             <div className="inline-block px-4 py-2 bg-amber-50 border-2 border-amber-200 rounded-lg">
@@ -255,7 +255,7 @@ function InterestMatchGameContent() {
                       ? 'bg-red-100 border-red-500 animate-shake'
                       : isSelected
                       ? 'bg-green-600 text-white border-green-600 scale-105'
-                      : 'bg-slate-50 border-slate-200 hover:border-green-400 hover:scale-105'
+                      : 'bg-surface border-border-default hover:border-green-400 hover:scale-105'
                   } ${showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl font-bold ${
@@ -263,7 +263,7 @@ function InterestMatchGameContent() {
                   }`}>
                     {contact.initials}
                   </div>
-                  <p className={cn("text-center font-semibold", isSelected && !showFeedback ? "text-white" : "text-slate-900")}>
+                  <p className={cn("text-center font-semibold", isSelected && !showFeedback ? "text-white" : "text-text-primary")}>
                     {contact.name}
                   </p>
                   {showCorrect && (
@@ -323,7 +323,7 @@ export default function InterestMatchGame() {
       <div className="min-h-screen bg-linear-to-br from-green-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🎣</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     }>

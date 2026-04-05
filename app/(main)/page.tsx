@@ -399,7 +399,7 @@ export default function HomePage() {
                        <Zap className="h-4 w-4" />
                      </Link>
                   </Button>
-                  <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1 hidden lg:block" />
+                  <div className="w-px h-6 bg-border-default mx-1 hidden lg:block" />
                   <Button 
                      variant="ghost" 
                      size="icon" 

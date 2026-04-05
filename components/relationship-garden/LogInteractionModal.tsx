@@ -102,17 +102,17 @@ export default function LogInteractionModal({
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       {/* Backdrop with Blur XL */}
       <div 
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl transition-all duration-300"
+        className="absolute inset-0 bg-canvas/60 backdrop-blur-xl transition-all duration-300"
         onClick={onClose}
       />
       
       {/* Modal Container - Matches Lore Card */}
-      <div className="relative bg-[#0F172A]/95 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-[90vh] sm:h-auto overflow-y-auto">
+      <div className="relative bg-canvas/95 border border-border-default/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-[90vh] sm:h-auto overflow-y-auto">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-border-default">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold ring-2 ring-slate-700 shadow-inner">
+            <div className="w-12 h-12 rounded-full bg-elevated flex items-center justify-center text-text-primary font-bold ring-2 ring-border-default shadow-inner">
               {contact.initials}
             </div>
             <div>
@@ -123,45 +123,45 @@ export default function LogInteractionModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="p-2 rounded-full text-text-tertiary hover:bg-elevated hover:text-text-primary transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Stats Row (Tier & Frequency) */}
-        <div className="px-6 py-3 bg-slate-900/50 border-b border-slate-800 flex items-center gap-6">
+        <div className="px-6 py-3 bg-surface/50 border-b border-border-default flex items-center gap-6">
             {/* Importance / Tier */}
             <div className="flex flex-col gap-1 w-1/2">
-                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Tier</span>
+                <span className="text-[10px] uppercase text-text-tertiary font-bold tracking-wider">Tier</span>
                 {onUpdateImportance ? (
                   <select
                     value={contact.importance || 'medium'}
                     onChange={(e) => onUpdateImportance(e.target.value as 'high' | 'medium' | 'low')}
-                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
+                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-border-default bg-transparent hover:bg-elevated text-text-secondary focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
                   >
                     <option value="high">⭐ High (Favorites)</option>
                     <option value="medium">🔹 Medium (Friends)</option>
                     <option value="low">▫️ Low (Contacts)</option>
                   </select>
                 ) : (
-                    <span className="text-xs text-slate-300 font-medium capitalize flex items-center gap-1">
+                    <span className="text-xs text-text-secondary font-medium capitalize flex items-center gap-1">
                         {contact.importance === 'high' ? '⭐ High' : contact.importance === 'low' ? '▫️ Low' : '🔹 Medium'}
                     </span>
                 )}
             </div>
 
             {/* Separator */}
-            <div className="h-8 w-px bg-slate-800 shrink-0" />
+            <div className="h-8 w-px bg-border-default shrink-0" />
 
             {/* Frequency */}
             <div className="flex flex-col gap-1 w-1/2">
-                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Frequency</span>
+                <span className="text-[10px] uppercase text-text-tertiary font-bold tracking-wider">Frequency</span>
                 {onUpdateFrequency ? (
                   <select
                     value={contact.targetFrequencyDays || 30}
                     onChange={(e) => onUpdateFrequency(Number(e.target.value))}
-                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-slate-700 bg-transparent hover:bg-slate-800 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
+                    className="text-xs py-1 px-2 -ml-2 rounded-lg border border-transparent hover:border-border-default bg-transparent hover:bg-elevated text-text-secondary focus:outline-none focus:border-indigo-500 cursor-pointer font-medium transition-colors w-full"
                   >
                     <option value="7">Every 7 days (Weekly)</option>
                     <option value="14">Every 14 days (Bi-weekly)</option>
@@ -171,7 +171,7 @@ export default function LogInteractionModal({
                     <option value="365">Every 365 days (Yearly)</option>
                   </select>
                 ) : (
-                  <span className="text-xs text-slate-300 font-medium">
+                  <span className="text-xs text-text-secondary font-medium">
                       {contact.targetFrequencyDays ? `Every ${contact.targetFrequencyDays} days` : 'No target set'}
                   </span>
                 )}
@@ -182,7 +182,7 @@ export default function LogInteractionModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Interaction Type Grid */}
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+            <label className="block text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">
               How did you connect?
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -199,13 +199,13 @@ export default function LogInteractionModal({
                       "p-3 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-2 h-20 relative group",
                       isActive 
                         ? "border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.25)]" 
-                        : "border-slate-800 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-700"
+                        : "border-border-default bg-surface/50 hover:bg-elevated hover:border-border-strong"
                     )}
                   >
                     <span className="text-2xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>
                     <span className={cn(
                       "text-[10px] font-bold uppercase tracking-tight",
-                      isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"
+                      isActive ? "text-indigo-400" : "text-text-tertiary group-hover:text-text-secondary"
                     )}>
                       {typeInfo.label}
                     </span>
@@ -217,21 +217,21 @@ export default function LogInteractionModal({
 
           {/* Date Picker */}
           <div>
-             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+             <label className="block text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">
                When did this happen?
              </label>
              <input 
                  type="date"
                  value={date}
                  onChange={(e) => setDate(e.target.value)}
-                 className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all scheme-dark"
+                 className="w-full px-4 py-3 rounded-xl border border-border-default bg-surface/50 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all scheme-dark"
              />
           </div>
 
           {/* Note */}
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-              Story / Notes <span className="text-slate-600 font-normal normal-case italic ml-1">(optional)</span>
+            <label className="block text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">
+              Story / Notes <span className="text-text-tertiary font-normal normal-case italic ml-1">(optional)</span>
             </label>
             <textarea
               ref={noteInputRef}
@@ -239,14 +239,14 @@ export default function LogInteractionModal({
               onChange={(e) => setNote(e.target.value)}
               placeholder="What did you talk about? Any memorable moments?"
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-border-default bg-surface/50 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none transition-all"
             />
           </div>
 
           {/* Recent Interactions */}
           {recentInteractions.length > 0 && (
-            <div className="border-t border-slate-800 pt-4">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+            <div className="border-t border-border-default pt-4">
+              <label className="block text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">
                 Recent Interactions
               </label>
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -256,14 +256,14 @@ export default function LogInteractionModal({
                   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                   return (
-                    <div key={interaction.id || index} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800">
+                    <div key={interaction.id || index} className="p-3 rounded-lg bg-surface/50 border border-border-default">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">{typeInfo.emoji}</span>
-                        <span className="text-xs font-bold text-slate-400 uppercase">{typeInfo.label}</span>
-                        <span className="text-xs text-slate-500 ml-auto">{formattedDate}</span>
+                        <span className="text-xs font-bold text-text-tertiary uppercase">{typeInfo.label}</span>
+                        <span className="text-xs text-text-tertiary ml-auto">{formattedDate}</span>
                       </div>
                       {interaction.notes && (
-                        <p className="text-sm text-slate-300 mt-2">{interaction.notes}</p>
+                        <p className="text-sm text-text-secondary mt-2">{interaction.notes}</p>
                       )}
                     </div>
                   );
@@ -274,8 +274,8 @@ export default function LogInteractionModal({
 
           {loadingInteractions && recentInteractions.length === 0 && (
             <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-              <span className="ml-2 text-sm text-slate-400">Loading recent interactions...</span>
+              <Loader2 className="w-5 h-5 animate-spin text-text-tertiary" />
+              <span className="ml-2 text-sm text-text-tertiary">Loading recent interactions...</span>
             </div>
           )}
 

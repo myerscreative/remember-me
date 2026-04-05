@@ -12,7 +12,7 @@ const WebRecallGame = dynamic(
   {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center min-h-[320px] text-slate-500">
+    <div className="flex items-center justify-center min-h-[320px] text-text-tertiary">
       <Loader2 className="h-8 w-8 animate-spin" />
     </div>
   ),
@@ -55,7 +55,7 @@ function WebRecallGamePageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
       </div>
     );
@@ -63,11 +63,11 @@ function WebRecallGamePageContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="bg-slate-800 p-8 rounded-3xl shadow-xl text-center max-w-md border border-slate-700">
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+        <div className="bg-elevated p-8 rounded-3xl shadow-xl text-center max-w-md border border-border-default">
           <div className="text-5xl mb-6">🕸️</div>
-          <h2 className="text-2xl font-bold mb-4 text-white">Not enough connections</h2>
-          <p className="text-slate-400 mb-8 leading-relaxed">{error}</p>
+          <h2 className="text-2xl font-bold mb-4 text-text-primary">Not enough connections</h2>
+          <p className="text-text-tertiary mb-8 leading-relaxed">{error}</p>
           <button 
             onClick={() => router.push('/practice')} 
             className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-900/20"
@@ -85,7 +85,7 @@ function WebRecallGamePageContent() {
 export default function WebRecallPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
       </div>
     }>

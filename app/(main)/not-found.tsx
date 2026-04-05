@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         {/* 404 Icon */}
         <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-6">
@@ -12,15 +12,15 @@ export default function NotFound() {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-4xl font-bold text-text-primary mb-2">
           404
         </h1>
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">
           Page not found
         </h2>
 
         {/* Message */}
-        <p className="text-gray-600 dark:text-gray-400 mb-8">
+        <p className="text-text-secondary mb-8">
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 

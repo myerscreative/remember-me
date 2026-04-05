@@ -152,10 +152,10 @@ export default function FactMatchGame() {
   if (allContacts.length < 4 || questions.length === 0) {
        return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+            <div className="bg-surface p-8 rounded-2xl shadow-xl text-center max-w-md">
                 <div className="text-4xl mb-4">🧩</div>
                 <h2 className="text-xl font-bold mb-2">Not enough data</h2>
-                <p className="text-gray-600 mb-6">We need more contacts with Company info to play Fact Match!</p>
+                <p className="text-text-secondary mb-6">We need more contacts with Company info to play Fact Match!</p>
                 <button onClick={() => router.push('/')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Go to Dashboard</button>
             </div>
         </div>
@@ -215,7 +215,7 @@ export default function FactMatchGame() {
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🧩</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     );
@@ -259,9 +259,9 @@ export default function FactMatchGame() {
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto mt-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-surface rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">{currentQuestion.prompt}</h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">{currentQuestion.prompt}</h2>
           </div>
 
           <div className="space-y-3">
@@ -281,10 +281,10 @@ export default function FactMatchGame() {
                       ? 'bg-green-100 border-2 border-green-500 scale-105'
                       : showIncorrect
                       ? 'bg-red-100 border-2 border-red-500 animate-shake'
-                      : 'bg-slate-50 border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 hover:scale-105'
+                      : 'bg-surface border-2 border-border-default hover:border-blue-400 hover:bg-blue-50 hover:scale-105'
                   } ${gameState.showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  <span className="text-slate-500 mr-3">{String.fromCharCode(65 + index)})</span>
+                  <span className="text-text-tertiary mr-3">{String.fromCharCode(65 + index)})</span>
                   {choice.name}
                   {showCorrect && <span className="float-right text-green-600 text-2xl">✓</span>}
                   {showIncorrect && <span className="float-right text-red-600 text-2xl">✗</span>}

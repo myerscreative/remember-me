@@ -25,9 +25,9 @@ export function WeeklyBriefing() {
 
   if (loading) {
     return (
-      <Card className="border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-2xl animate-pulse rounded-2xl">
+      <Card className="border-white/5 bg-canvas/40 backdrop-blur-xl shadow-2xl animate-pulse rounded-2xl">
         <CardContent className="p-6 h-32 flex items-center justify-center">
-            <div className="flex items-center gap-3 text-slate-400">
+            <div className="flex items-center gap-3 text-text-tertiary">
                 <Sparkles className="w-5 h-5 animate-spin text-indigo-500/50"/>
                 <span className="text-sm font-black uppercase tracking-widest opacity-50">Analyzing weekly context...</span>
             </div>
@@ -41,7 +41,7 @@ export function WeeklyBriefing() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-xs font-black text-text-tertiary uppercase tracking-widest flex items-center gap-2">
             <Sparkles className="w-3 h-3 text-indigo-500" />
             Recent Shared Memories & Garden Shifts
         </h3>

@@ -28,7 +28,7 @@ export function LoreTooltip({ children, lastContactDate, lastContactMethod, isFa
         <TooltipTrigger asChild>
           {children}
         </TooltipTrigger>
-        <TooltipContent className="bg-[#0F172A] border border-slate-700 text-slate-200 text-xs p-3 max-w-[200px] shadow-xl">
+        <TooltipContent className="bg-canvas border border-border-default text-text-primary text-xs p-3 max-w-[200px] shadow-xl">
            <div className="flex flex-col gap-1.5">
                <div className="flex items-center gap-2">
                    <Clock className="h-3 w-3 text-[#38BDF8]" />
@@ -36,7 +36,7 @@ export function LoreTooltip({ children, lastContactDate, lastContactMethod, isFa
                </div>
                
                {lastContactMethod && (
-                   <p className="text-slate-400 pl-5">via {lastContactMethod}</p>
+                   <p className="text-text-tertiary pl-5">via {lastContactMethod}</p>
                )}
                
                {isFading && (

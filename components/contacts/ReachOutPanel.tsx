@@ -75,52 +75,52 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
       <SheetContent 
         side={side} 
         className={cn(
-            "w-full border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] p-0 flex flex-col",
+            "w-full border-border-default bg-surface p-0 flex flex-col",
             side === 'right' ? "sm:max-w-md h-full" : "h-[70vh] rounded-t-[2rem]"
         )}
       >
         <div className="flex flex-col h-full">
-           <SheetHeader className="p-6 border-b border-slate-200 dark:border-slate-800">
-             <SheetTitle className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 text-left">
+           <SheetHeader className="p-6 border-b border-border-default">
+             <SheetTitle className="flex items-center gap-2 text-text-primary text-left">
                <Sparkles className="w-5 h-5 text-indigo-500" />
                Shared Memory Reach-Out
              </SheetTitle>
-             <SheetDescription className="text-slate-500 dark:text-slate-400 text-left">
+             <SheetDescription className="text-text-tertiary text-left">
                 Using your deepest lore with {contact.name.split(' ')[0]}.
              </SheetDescription>
            </SheetHeader>
 
            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 relative group transition-all hover:border-indigo-500/30">
-                 <div className="absolute -top-3 left-6 px-3 py-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 shadow-sm">
+              <div className="bg-subtle rounded-2xl p-6 border border-border-default relative group transition-all hover:border-indigo-500/30">
+                 <div className="absolute -top-3 left-6 px-3 py-1 bg-surface border border-border-default rounded-full text-[10px] font-bold uppercase tracking-widest text-text-tertiary shadow-sm">
                     Reconnection Draft
                  </div>
                  
-                 <p className="text-lg text-slate-800 dark:text-slate-200 leading-relaxed font-medium mt-2">
+                 <p className="text-lg text-text-primary leading-relaxed font-medium mt-2">
                     {script || "Generating your script..."}
                  </p>
               </div>
 
               <div className="space-y-4">
-                 <h4 className="text-xs font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Why this script?</h4>
+                 <h4 className="text-xs font-bold text-text-tertiary uppercase tracking-widest">Why this script?</h4>
                  <div className="grid gap-3">
                     <div className="flex gap-3 text-sm">
-                       <div className="w-5 h-5 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center shrink-0 border border-teal-100 dark:border-teal-900/50">
-                          <Check className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                       <div className="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100">
+                          <Check className="w-3 h-3 text-teal-600" />
                        </div>
-                       <p className="text-slate-600 dark:text-slate-400">Mentions your latest shared memory to spark warmth.</p>
+                       <p className="text-text-secondary">Mentions your latest shared memory to spark warmth.</p>
                     </div>
                     <div className="flex gap-3 text-sm">
-                       <div className="w-5 h-5 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center shrink-0 border border-teal-100 dark:border-teal-900/50">
-                          <Check className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                       <div className="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100">
+                          <Check className="w-3 h-3 text-teal-600" />
                        </div>
-                       <p className="text-slate-600 dark:text-slate-400">Focuses on your personal reason for staying in contact.</p>
+                       <p className="text-text-secondary">Focuses on your personal reason for staying in contact.</p>
                     </div>
                  </div>
               </div>
            </div>
 
-           <div className="p-6 border-t border-slate-200 dark:border-slate-800 mt-auto bg-slate-50/50 dark:bg-slate-900/30">
+           <div className="p-6 border-t border-border-default mt-auto bg-subtle/50">
               <Button
                 onClick={handleCopy}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 h-12 rounded-xl text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -137,7 +137,7 @@ export function ReachOutPanel({ isOpen, onClose, contact }: ReachOutPanelProps) 
                   </>
                 )}
               </Button>
-              <p className="text-center text-[11px] text-slate-400 mt-4">
+              <p className="text-center text-[11px] text-text-tertiary mt-4">
                  Open your favorite messaging app and paste this draft.
               </p>
            </div>

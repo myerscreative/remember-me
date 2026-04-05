@@ -23,11 +23,11 @@ export default function NetworkSearchBar({ onSearch }: NetworkSearchBarProps) {
           id="network-search-input"
           type="text"
           placeholder="Search by interest, skill, location..."
-          className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+          className="w-full pl-10 pr-4 py-2 border border-border-default rounded-md bg-surface text-text-primary placeholder-text-tertiary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
           value={term}
           onChange={e => setTerm(e.target.value)}
         />
-        <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-2.5 w-5 h-5 text-text-tertiary" />
       </div>
     </div>
   );

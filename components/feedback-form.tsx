@@ -84,7 +84,7 @@ export function FeedbackForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-400">Category</label>
+        <label className="text-sm font-medium text-text-tertiary">Category</label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {categories.map((cat) => {
             const Icon = cat.icon;
@@ -104,7 +104,7 @@ export function FeedbackForm() {
                 <div className={cn("size-8 rounded-lg flex items-center justify-center", isSelected ? "bg-indigo-500 text-white" : "bg-white/5", !isSelected && cat.color)}>
                   <Icon size={18} />
                 </div>
-                <span className={cn("text-sm font-medium", isSelected ? "text-white" : "text-gray-300")}>
+                <span className={cn("text-sm font-medium", isSelected ? "text-white" : "text-text-tertiary")}>
                   {cat.label}
                 </span>
               </button>
@@ -114,21 +114,21 @@ export function FeedbackForm() {
       </div>
 
       <div className="space-y-3">
-        <label htmlFor="description" className="text-sm font-medium text-gray-400">Tell us more...</label>
+        <label htmlFor="description" className="text-sm font-medium text-text-tertiary">Tell us more...</label>
         <textarea
           id="description"
           rows={5}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What&apos;s on your mind? The more detail the better..."
-          className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all resize-none"
+          className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all resize-none"
         />
       </div>
 
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-400">Screenshot (Optional)</label>
+        <label className="text-sm font-medium text-text-tertiary">Screenshot (Optional)</label>
         <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl cursor-pointer transition-colors text-sm text-gray-300">
+          <label className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl cursor-pointer transition-colors text-sm text-text-tertiary">
             <Camera size={18} />
             <span>{screenshot ? 'Change Screenshot' : 'Upload Screenshot'}</span>
             <input
@@ -139,7 +139,7 @@ export function FeedbackForm() {
             />
           </label>
           {screenshot && (
-            <span className="text-xs text-gray-500 truncate max-w-[200px]">
+            <span className="text-xs text-text-tertiary truncate max-w-[200px]">
               {screenshot.name}
             </span>
           )}

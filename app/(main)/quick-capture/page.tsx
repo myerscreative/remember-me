@@ -167,7 +167,7 @@ export default function QuickCapturePage() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex flex-col h-screen bg-linear-to-br from-cyan-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 overflow-hidden">
+      <div className="flex flex-col h-screen bg-linear-to-br from-cyan-50 via-surface to-blue-50 overflow-hidden">
         <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
@@ -177,10 +177,10 @@ export default function QuickCapturePage() {
                 <Zap className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
                   Quick Capture
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-text-secondary">
                   Capture meeting notes while they&apos;re fresh
                 </p>
               </div>
@@ -203,7 +203,7 @@ export default function QuickCapturePage() {
 
           {/* Contact Name (Optional) */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               Who did you meet? (Optional)
             </label>
             <input
@@ -211,21 +211,21 @@ export default function QuickCapturePage() {
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
               placeholder="e.g., John Smith"
-              className="w-full h-12 px-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-cyan-400 dark:focus:border-cyan-600 focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-900 transition-all"
+              className="w-full h-12 px-4 rounded-xl bg-surface border border-border-default text-text-primary placeholder:text-text-tertiary focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200 transition-all"
               disabled={isSaving}
             />
           </div>
 
           {/* Notes */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               What do you want to remember?
             </label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Quick notes about the meeting...&#10;&#10;What stood out? What&apos;s important to them? What did you discuss?"
-              className="min-h-[250px] rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 text-base resize-none focus:border-cyan-400 dark:focus:border-cyan-600 focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-900"
+              className="min-h-[250px] rounded-xl bg-surface border border-border-default text-text-primary placeholder:text-text-tertiary text-base resize-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
               disabled={isSaving}
               autoFocus
             />
@@ -266,7 +266,7 @@ export default function QuickCapturePage() {
               variant="ghost"
               onClick={() => router.push("/")}
               disabled={isSaving}
-              className="w-full h-12 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="w-full h-12 rounded-xl text-text-secondary hover:bg-subtle"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel

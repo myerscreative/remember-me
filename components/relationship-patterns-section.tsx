@@ -62,10 +62,10 @@ const getPatternColor = (type: string) => {
       };
     case "archive_pattern":
       return {
-        bg: "bg-gray-100 dark:bg-gray-800",
-        text: "text-gray-700 dark:text-gray-300",
+        bg: "bg-subtle",
+        text: "text-text-secondary",
         iconBg: "bg-gray-500",
-        badge: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+        badge: "bg-subtle text-text-secondary",
       };
     default:
       return {
@@ -101,9 +101,9 @@ export function RelationshipPatternsSection() {
 
   if (loading) {
     return (
-      <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+      <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
         <div className="flex items-center justify-center py-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing patterns...</p>
+          <p className="text-sm text-text-tertiary">Analyzing patterns...</p>
         </div>
       </Card>
     );
@@ -111,13 +111,13 @@ export function RelationshipPatternsSection() {
 
   if (patterns.length === 0) {
     return (
-      <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+      <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
-            <BarChart3 className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Relationship Patterns</h2>
+            <BarChart3 className="h-5 w-5 text-text-secondary" />
+            <h2 className="text-xl font-semibold text-text-primary">Relationship Patterns</h2>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-text-secondary mt-1">
             Not enough data yet - keep building your network!
           </p>
         </div>
@@ -126,13 +126,13 @@ export function RelationshipPatternsSection() {
   }
 
   return (
-    <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+    <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Relationship Patterns</h2>
+          <BarChart3 className="h-5 w-5 text-indigo-600" />
+          <h2 className="text-xl font-semibold text-text-primary">Your Relationship Patterns</h2>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-sm text-text-secondary mt-1">
           Insights about how you build and maintain relationships
         </p>
       </div>
@@ -159,7 +159,7 @@ export function RelationshipPatternsSection() {
                     <p className={cn("text-sm font-semibold", colors.text)}>{pattern.insight}</p>
                     <Badge className={cn("text-xs font-medium", colors.badge)}>{pattern.metric}</Badge>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-xs text-text-secondary leading-relaxed">
                     💡 {pattern.recommendation}
                   </p>
                 </div>

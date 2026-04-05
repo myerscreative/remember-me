@@ -125,9 +125,9 @@ export default function TreeLeaf({
       {showTooltip && isHovered && (
         <g className="pointer-events-none z-50">
           <foreignObject x="-80" y="-80" width="160" height="60">
-             <div className="bg-white rounded-lg shadow-xl border border-gray-100 p-2 text-center transform -translate-y-2">
-               <p className="text-xs font-bold text-gray-800 leading-tight">{contact.name}</p>
-                <p className="text-[10px] text-gray-500">{formatRelativeTime(contact.daysAgo)}</p>
+             <div className="bg-white rounded-lg shadow-xl border border-border-default p-2 text-center transform -translate-y-2">
+               <p className="text-xs font-bold text-text-primary leading-tight">{contact.name}</p>
+                <p className="text-[10px] text-text-tertiary">{formatRelativeTime(contact.daysAgo)}</p>
                
                {/* Quick Briefing: AI Synopsis or Status */}
                {contact.sharedMemory ? (
@@ -142,7 +142,7 @@ export default function TreeLeaf({
                  </div>
                )}
                {/* Arrow */}
-               <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-100"></div>
+               <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-border-default"></div>
              </div>
           </foreignObject>
         </g>

@@ -35,7 +35,7 @@ export function PersonPanel({ contact }: PersonPanelProps) {
   const healthStatus = isOverdue ? 'neglected' : (isHealthy ? 'nurtured' : 'drifting');
 
   return (
-    <div className="w-full md:w-[420px] bg-[#0f1419] border-b md:border-b-0 md:border-r border-[#1a1f2e] flex flex-col overflow-y-auto shrink-0 h-auto md:h-full">
+    <div className="w-full md:w-[420px] bg-canvas border-b md:border-b-0 md:border-r border-border-default flex flex-col overflow-y-auto shrink-0 h-auto md:h-full">
 
       <div className="flex-1 p-6 md:p-8 flex flex-col">
           <InteractionLogger 

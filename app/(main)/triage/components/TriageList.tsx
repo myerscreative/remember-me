@@ -73,24 +73,24 @@ export default function TriageList({ initialContacts }: TriageListProps) {
   return (
     <div>
       {/* Toolbar */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-4">
+      <div className="p-4 border-b border-border-default bg-subtle/50 flex items-center gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
           <input
             type="text"
             placeholder="Search contacts..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400 dark:text-white"
+            className="w-full pl-9 pr-4 py-2 rounded-lg border border-border-default bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all placeholder:text-text-tertiary text-text-primary"
           />
         </div>
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+        <div className="text-sm font-medium text-text-tertiary whitespace-nowrap">
           {unplantedCount} Unplanted Seeds
         </div>
       </div>
 
       {/* List */}
-      <div className="divide-y divide-slate-100 dark:divide-slate-800 pb-24">
+      <div className="divide-y divide-border-default pb-24">
         {filteredContacts.map(contact => {
           const isPlanted = plantedIds.has(contact.id);
           
@@ -99,18 +99,18 @@ export default function TriageList({ initialContacts }: TriageListProps) {
               key={contact.id}
               className={`
                 py-2 px-4 flex items-center justify-between transition-all duration-300
-                ${isPlanted 
-                  ? 'opacity-40 grayscale-[0.5] bg-slate-50/50 dark:bg-slate-800/30' 
-                  : contact.importance === 'high' 
-                    ? 'bg-amber-50/80 dark:bg-amber-900/10 border-l-4 border-l-amber-400' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-4 border-l-transparent'}
+                ${isPlanted
+                  ? 'opacity-40 grayscale-[0.5] bg-subtle/50'
+                  : contact.importance === 'high'
+                    ? 'bg-amber-50/80 dark:bg-amber-900/10 border-l-4 border-l-amber-400'
+                    : 'hover:bg-subtle border-l-4 border-l-transparent'}
               `}
             >
               <div className="flex items-center gap-4">
                 {/* Status Dot or Checkmark */}
                 <div className="relative">
                   <div 
-                    className={`w-3 h-3 rounded-full ${statusColor[contact.status] || 'bg-slate-300'} transition-all ${isPlanted ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+                    className={`w-3 h-3 rounded-full ${statusColor[contact.status] || 'bg-border-strong'} transition-all ${isPlanted ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
                     title={`${contact.daysAgo} days ago`}
                   />
                   {isPlanted && (
@@ -121,26 +121,26 @@ export default function TriageList({ initialContacts }: TriageListProps) {
                 </div>
                 
                 <div>
-                  <div className={cn("font-medium transition-colors", isPlanted ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white")}>
+                  <div className={cn("font-medium transition-colors", isPlanted ? "text-text-tertiary" : "text-text-primary")}>
                     {contact.name}
                     {isPlanted && <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-500/50">Planted</span>}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                  <div className="text-xs text-text-tertiary">
                     {contact.daysAgo === 999 ? 'Never contacted' : `${contact.daysAgo} days ago`}
                   </div>
                 </div>
               </div>
 
               {/* Toggle Group */}
-              <div className={cn("flex rounded-lg border border-slate-200 bg-slate-100 p-1 transition-opacity dark:border-slate-700 dark:bg-slate-800", isPlanted && "pointer-events-none")}>
+              <div className={cn("flex rounded-lg border border-border-default bg-subtle p-1 transition-opacity", isPlanted && "pointer-events-none")}>
                 <button
                   onClick={() => handleImportanceChange(contact.id, 'low')}
                   disabled={isPlanted}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                     contact.importance === "low"
-                      ? "bg-white text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200"
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                      ? "bg-surface text-text-secondary shadow-sm"
+                      : "text-text-tertiary hover:text-text-secondary"
                   )}
                 >
                   Casual
@@ -151,8 +151,8 @@ export default function TriageList({ initialContacts }: TriageListProps) {
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                     contact.importance === "medium"
-                      ? "bg-white text-blue-600 shadow-sm dark:bg-slate-700 dark:text-blue-400"
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                      ? "bg-surface text-blue-600 shadow-sm dark:text-blue-400"
+                      : "text-text-tertiary hover:text-text-secondary"
                   )}
                 >
                   Medium
@@ -164,7 +164,7 @@ export default function TriageList({ initialContacts }: TriageListProps) {
                     "rounded-md px-3 py-1.5 text-xs font-medium transition-all ring-1",
                     contact.importance === "high"
                       ? "bg-amber-100 text-amber-700 shadow-sm ring-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:ring-amber-800"
-                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                      : "text-text-tertiary hover:text-text-secondary"
                   )}
                 >
                   High
@@ -175,7 +175,7 @@ export default function TriageList({ initialContacts }: TriageListProps) {
         })}
 
         {filteredContacts.length === 0 && (
-          <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+          <div className="p-12 text-center text-text-tertiary">
             No contacts found matching &quot;{query}&quot;
           </div>
         )}

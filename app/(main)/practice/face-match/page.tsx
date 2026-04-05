@@ -158,10 +158,10 @@ function FaceMatchGameContent() {
   if (allContacts.length < 4) {
       return (
         <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+            <div className="bg-surface p-8 rounded-2xl shadow-xl text-center max-w-md">
                 <div className="text-4xl mb-4">👥</div>
                 <h2 className="text-xl font-bold mb-2">Not enough contacts</h2>
-                <p className="text-gray-600 mb-6">You need at least 4 contacts to play Face Match. Go add some friends!</p>
+                <p className="text-text-secondary mb-6">You need at least 4 contacts to play Face Match. Go add some friends!</p>
                 <button onClick={() => router.push('/')} className="px-4 py-2 bg-indigo-600 text-white rounded-lg">Go to Dashboard</button>
             </div>
         </div>
@@ -222,7 +222,7 @@ function FaceMatchGameContent() {
       <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🎮</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     );
@@ -266,10 +266,10 @@ function FaceMatchGameContent() {
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto mt-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-surface rounded-3xl shadow-xl p-8">
           {/* Question Prompt */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Who is this?</h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">Who is this?</h2>
             {searchParams.get('filter') === 'group' && (
                 <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">
                     Group: {searchParams.get('value')}
@@ -302,10 +302,10 @@ function FaceMatchGameContent() {
                       ? 'bg-green-100 border-2 border-green-500 scale-105'
                       : showIncorrect
                       ? 'bg-red-100 border-2 border-red-500 animate-shake'
-                      : 'bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 hover:scale-105'
+                      : 'bg-surface border-2 border-border-default hover:border-indigo-400 hover:bg-indigo-50 hover:scale-105'
                   } ${gameState.showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  <span className="text-slate-500 mr-3">{String.fromCharCode(65 + index)})</span>
+                  <span className="text-text-tertiary mr-3">{String.fromCharCode(65 + index)})</span>
                   {choice.name}
                   {showCorrect && <span className="float-right text-green-600 text-2xl">✓</span>}
                   {showIncorrect && <span className="float-right text-red-600 text-2xl">✗</span>}
@@ -336,7 +336,7 @@ export default function FaceMatchGame() {
       <div className="min-h-screen bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🎮</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     }>

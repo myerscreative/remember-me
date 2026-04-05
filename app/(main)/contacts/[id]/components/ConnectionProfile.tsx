@@ -19,16 +19,16 @@ import { calculateHealth } from '@/lib/relationship-health';
 
 const GlobalTabs = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: any) => void }) => {
   return (
-    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 w-full">
+    <nav className="sticky top-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-border-default w-full">
       <div className="flex justify-around items-center p-2 max-w-2xl mx-auto">
         {['Overview', 'Story', 'Family', 'Brain Dump'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-              activeTab === tab 
-              ? 'bg-slate-800 text-white border border-slate-700' 
-              : 'text-slate-500 hover:text-slate-300'
+              activeTab === tab
+              ? 'bg-elevated text-text-primary border border-border-default'
+              : 'text-text-tertiary hover:text-text-secondary'
             }`}
           >
             {tab}
@@ -187,7 +187,7 @@ export default function ConnectionProfile({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200">
+    <div className="min-h-screen bg-canvas text-text-primary">
       <GlobalTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="max-w-2xl mx-auto px-4 pb-32">
@@ -200,7 +200,7 @@ export default function ConnectionProfile({
         />
 
         {/* Profile Identity - Shared across tabs */}
-        <section className="flex flex-col items-center pt-8 pb-4 text-center border-b border-slate-900 mb-4">
+        <section className="flex flex-col items-center pt-8 pb-4 text-center border-b border-border-default mb-4">
           <ContactAvatar 
             contact={contact}
             daysRemaining={daysRemaining}
@@ -210,16 +210,16 @@ export default function ConnectionProfile({
           />
 
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-extrabold text-white tracking-tight leading-none">{name}</h1>
-            <button 
+            <h1 className="text-4xl font-extrabold text-text-primary tracking-tight leading-none">{name}</h1>
+            <button
               onClick={() => setIsEditModalOpen(true)}
-              className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-full transition-all"
+              className="p-2 text-text-tertiary hover:text-text-primary hover:bg-elevated rounded-full transition-all"
               title="Edit Profile"
             >
               <Edit2 size={18} />
             </button>
           </div>
-          <p className="text-slate-500 text-[11px] font-bold uppercase tracking-[0.2em]">
+          <p className="text-text-tertiary text-[11px] font-bold uppercase tracking-[0.2em]">
             Birthday: {birthdayText}
           </p>
         </section>

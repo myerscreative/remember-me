@@ -101,8 +101,8 @@ export function NetworkTutorial({ isOpen, onClose, onNavigate }: NetworkTutorial
                     onNavigate(step.route);
                   }}
                   className={`flex w-full text-left gap-4 px-4 py-2.5 rounded-xl border transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 overflow-hidden group ${
-                    isNurture 
-                      ? "border-red-500/30 bg-red-500/5 dark:bg-red-500/10 scale-[1.02] shadow-sm" 
+                    isNurture
+                      ? "border-red-500/30 bg-red-500/5 scale-[1.02] shadow-sm"
                       : "border-border-default bg-canvas/50 hover:bg-surface"
                   }`}
                 >
@@ -118,7 +118,7 @@ export function NetworkTutorial({ isOpen, onClose, onNavigate }: NetworkTutorial
                           e.stopPropagation();
                           setExpandedInfo(i);
                         }}
-                        className="p-1.5 text-text-secondary hover:text-text-accent rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/20 transition-colors"
+                        className="p-1.5 text-text-secondary hover:text-text-accent rounded-full hover:bg-indigo-50 transition-colors"
                         title={`More info about ${step.title}`}
                       >
                         <Info className="w-4 h-4" />
@@ -185,8 +185,8 @@ export function NetworkTutorial({ isOpen, onClose, onNavigate }: NetworkTutorial
               
               <div className="mt-6">
                 <Button 
-                  onClick={() => setExpandedInfo(null)} 
-                  className="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 shadow-none font-semibold"
+                  onClick={() => setExpandedInfo(null)}
+                  className="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 shadow-none font-semibold"
                 >
                   Got it
                 </Button>
@@ -203,7 +203,7 @@ export function TutorialButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-text-secondary hover:text-text-accent hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-500/20"
+      className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-text-secondary hover:text-text-accent hover:bg-indigo-50 rounded-lg transition-all border border-transparent hover:border-indigo-100"
       title="How to use Tribe Search"
     >
       <HelpCircle className="w-4 h-4" />

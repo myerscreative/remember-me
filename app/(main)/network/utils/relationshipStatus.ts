@@ -48,7 +48,7 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
     if (diffDays >= 0 && diffDays <= 7) {
       const label = diffDays === 0 ? "Reach out for their birthday today!" : "Reach out for their upcoming milestone!";
       // Milestone Hook: "Reach out for their upcoming milestone!"
-      return { label, colorClass: "text-indigo-500 dark:text-indigo-400 font-semibold text-[12px] font-sans" };
+      return { label, colorClass: "text-indigo-500 font-semibold text-[12px] font-sans" };
     }
   }
 
@@ -57,7 +57,7 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
   const baselineDate = getBaselineDate();
 
   if (!baselineDate) {
-    return { label: "Initiate your first reach-out", colorClass: "text-indigo-500 dark:text-indigo-400 font-semibold text-[12px] font-sans" };
+    return { label: "Initiate your first reach-out", colorClass: "text-indigo-500 font-semibold text-[12px] font-sans" };
   }
 
   // 3. Check Overdue Status
@@ -81,5 +81,5 @@ export function getRelationshipStatus(contact: Person): RelationshipStatus {
   }
 
   // 4. Up to Date (Slate - No suggested action)
-  return { label: "Up to Date", colorClass: "text-slate-500 dark:text-slate-400 font-sans text-xs" };
+  return { label: "Up to Date", colorClass: "text-text-tertiary font-sans text-xs" };
 }

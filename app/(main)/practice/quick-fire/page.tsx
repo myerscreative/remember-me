@@ -235,7 +235,7 @@ function QuickFireGameContent() {
       <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">⚡</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     );
@@ -278,7 +278,7 @@ function QuickFireGameContent() {
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto mt-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-surface rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
             <div className="inline-block px-4 py-2 bg-red-100 rounded-lg mb-4">
               <span className="text-sm font-semibold text-red-600">⚡ QUICK FIRE</span>
@@ -290,7 +290,7 @@ function QuickFireGameContent() {
                     </span>
                 </div>
             )}
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">
+            <h2 className="text-2xl font-bold text-text-primary mb-6">
               {question.question}
             </h2>
           </div>
@@ -309,7 +309,7 @@ function QuickFireGameContent() {
                     ? 'bg-green-100 border-green-500 focus:ring-green-200'
                     : feedback === 'incorrect'
                     ? 'bg-red-100 border-red-500 focus:ring-red-200'
-                    : 'border-slate-200 focus:border-red-400 focus:ring-red-100'
+                    : 'border-border-default focus:border-red-400 focus:ring-red-100'
                 }`}
                 autoComplete="off"
               />
@@ -332,7 +332,7 @@ function QuickFireGameContent() {
                 type="button"
                 onClick={handleSkip}
                 disabled={!!feedback}
-                className="px-6 py-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-4 bg-subtle text-text-secondary font-semibold rounded-xl hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Skip
               </button>
@@ -347,8 +347,8 @@ function QuickFireGameContent() {
             </div>
           )}
 
-          <div className="mt-6 text-center text-sm text-slate-500">
-            Press <kbd className="px-2 py-1 bg-slate-100 rounded border border-slate-300">Enter</kbd> to submit
+          <div className="mt-6 text-center text-sm text-text-tertiary">
+            Press <kbd className="px-2 py-1 bg-subtle rounded border border-border-strong">Enter</kbd> to submit
           </div>
         </div>
       </div>
@@ -362,7 +362,7 @@ export default function QuickFireGame() {
       <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">⚡</div>
-          <p className="text-lg text-slate-600">Loading game...</p>
+          <p className="text-lg text-text-secondary">Loading game...</p>
         </div>
       </div>
     }>

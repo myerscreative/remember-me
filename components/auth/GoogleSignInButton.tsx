@@ -26,7 +26,7 @@ export function GoogleSignInButton() {
     return (
       <button 
         disabled 
-        className="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg"
+        className="px-6 py-3 bg-subtle text-text-tertiary rounded-lg"
       >
         Loading...
       </button>
@@ -35,7 +35,7 @@ export function GoogleSignInButton() {
 
   if (session) {
     return (
-      <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-3 bg-surface px-3 py-1.5 rounded-full border border-border-default">
         <div className="flex items-center gap-2">
           {session.user.image && (
             <img
@@ -44,14 +44,14 @@ export function GoogleSignInButton() {
               className="w-6 h-6 rounded-full"
             />
           )}
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          <span className="text-sm font-medium text-text-secondary">
             {session.user.name?.split(' ')[0]}
           </span>
         </div>
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
+        <div className="w-px h-4 bg-border-strong" />
         <button
           onClick={handleSignOut}
-          className="text-xs font-medium text-gray-500 hover:text-red-500 transition-colors whitespace-nowrap"
+          className="text-xs font-medium text-text-tertiary hover:text-red-500 transition-colors whitespace-nowrap"
         >
           Sign Out
         </button>
@@ -63,7 +63,7 @@ export function GoogleSignInButton() {
     <button
       onClick={handleSignIn}
       disabled={isLoading}
-      className="flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50 text-sm font-medium text-gray-700 dark:text-gray-300"
+      className="flex items-center gap-2 px-4 py-2 bg-transparent border border-border-strong rounded-lg hover:bg-surface transition disabled:opacity-50 text-sm font-medium text-text-secondary"
     >
       <svg className="w-4 h-4" viewBox="0 0 24 24">
         <path

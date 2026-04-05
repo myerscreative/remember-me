@@ -33,7 +33,7 @@ export function DailyPracticeWidget() {
 
   if (isComplete) {
       return (
-        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm relative overflow-hidden group hover:border-green-200 transition-colors">
+        <div className="bg-surface rounded-xl p-6 border border-border-default shadow-sm relative overflow-hidden group hover:border-green-200 transition-colors">
             <div className="absolute top-0 right-0 p-4 opacity-5">
                 <Trophy size={100} className="transform rotate-12" />
             </div>
@@ -45,8 +45,8 @@ export function DailyPracticeWidget() {
                     </div>
                 </div>
                 
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Great job today!</h3>
-                <p className="text-gray-500 text-sm mb-4">
+                <h3 className="text-lg font-bold text-text-primary mb-1">Great job today!</h3>
+                <p className="text-text-tertiary text-sm mb-4">
                     You kept your {stats.currentStreak} day streak alive.
                 </p>
                 

@@ -31,7 +31,7 @@ export default function QuickFilters({ activeFilters, setActiveFilters }: QuickF
           className={`px-3 py-1 rounded-full text-sm transition-colors ${
             activeFilters.includes(filter.id)
               ? 'bg-[#6366f1] text-white'
-              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              : 'bg-subtle text-text-primary hover:bg-border-default'
           }`}
         >
           {filter.label}

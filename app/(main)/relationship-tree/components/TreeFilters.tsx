@@ -37,13 +37,13 @@ export default function TreeFilters({
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-4">
+    <div className="bg-surface/80 backdrop-blur-sm rounded-2xl border border-border-default shadow-lg p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">Filters</h3>
+        <h3 className="text-sm font-semibold text-text-secondary">Filters</h3>
         {hasActiveFilters && (
           <button
             onClick={onClearAll}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
           >
             Clear all
           </button>
@@ -52,7 +52,7 @@ export default function TreeFilters({
 
       {/* Health Status Filters */}
       <div className="mb-4">
-        <p className="text-xs text-gray-500 mb-2">By Health</p>
+        <p className="text-xs text-text-tertiary mb-2">By Health</p>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(HEALTH_LABELS) as TreeHealthStatus[]).map(status => (
             <FilterChip
@@ -68,7 +68,7 @@ export default function TreeFilters({
 
       {/* Category Filters */}
       <div>
-        <p className="text-xs text-gray-500 mb-2">By Category</p>
+        <p className="text-xs text-text-tertiary mb-2">By Category</p>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(CATEGORY_CONFIG) as ContactCategory[]).map(category => (
             <FilterChip
@@ -101,7 +101,7 @@ function FilterChip({ label, isActive, onClick, title }: FilterChipProps) {
         px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
         ${isActive 
           ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-500 ring-offset-1' 
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          : 'bg-subtle text-text-secondary hover:bg-subtle'
         }
       `}
     >

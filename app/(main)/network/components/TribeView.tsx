@@ -14,7 +14,7 @@ export function TribeView({ tribes, searchTerm, onNurtureTribe }: TribeViewProps
   if (tribes.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500">No tribes found matching &quot;{searchTerm}&quot;</p>
+        <p className="text-text-tertiary">No tribes found matching &quot;{searchTerm}&quot;</p>
       </div>
     );
   }

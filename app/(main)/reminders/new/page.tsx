@@ -77,17 +77,17 @@ export default function NewReminderPage() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-canvas">
         {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4">
+      <div className="bg-surface border-b border-border-default px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/reminders">
-              <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <button className="p-2 hover:bg-subtle rounded-lg transition-colors">
+                <ArrowLeft className="h-5 w-5 text-text-secondary" />
               </button>
             </Link>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-xl font-bold text-text-primary">
               New Reminder
             </h1>
           </div>
@@ -96,11 +96,11 @@ export default function NewReminderPage() {
 
       {/* Form */}
       <div className="max-w-2xl mx-auto p-4">
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <form onSubmit={handleSubmit} className="bg-surface rounded-lg border border-border-default p-6">
           <div className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Title *
               </label>
               <input
@@ -109,16 +109,16 @@ export default function NewReminderPage() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="What do you need to remember?"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         placeholder-gray-500 dark:placeholder-gray-400
+                className="w-full px-4 py-2 border border-border-strong rounded-lg
+                         bg-surface text-text-primary
+                         placeholder-text-tertiary
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Description
               </label>
               <textarea
@@ -126,9 +126,9 @@ export default function NewReminderPage() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Add more details..."
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         placeholder-gray-500 dark:placeholder-gray-400
+                className="w-full px-4 py-2 border border-border-strong rounded-lg
+                         bg-surface text-text-primary
+                         placeholder-text-tertiary
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -136,7 +136,7 @@ export default function NewReminderPage() {
             {/* Date and Time */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   Date *
                 </label>
                 <DatePicker
@@ -157,15 +157,15 @@ export default function NewReminderPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   Time
                 </label>
                 <input
                   type="time"
                   value={formData.due_time}
                   onChange={(e) => setFormData({ ...formData, due_time: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full px-4 py-2 border border-border-strong rounded-lg
+                           bg-surface text-text-primary
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -173,14 +173,14 @@ export default function NewReminderPage() {
 
             {/* Person */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Related to Contact
               </label>
               <select
                 value={formData.person_id}
                 onChange={(e) => setFormData({ ...formData, person_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                className="w-full px-4 py-2 border border-border-strong rounded-lg
+                         bg-surface text-text-primary
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">None</option>
@@ -196,14 +196,14 @@ export default function NewReminderPage() {
 
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Priority
               </label>
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                className="w-full px-4 py-2 border border-border-strong rounded-lg
+                         bg-surface text-text-primary
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="low">Low</option>
@@ -218,8 +218,8 @@ export default function NewReminderPage() {
             <Link href="/reminders" className="flex-1">
               <button
                 type="button"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="w-full px-4 py-2 border border-border-strong rounded-lg
+                         text-text-secondary hover:bg-subtle transition-colors"
               >
                 Cancel
               </button>
@@ -228,8 +228,8 @@ export default function NewReminderPage() {
               type="submit"
               disabled={saving}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2 
-                       bg-blue-600 dark:bg-blue-500 text-white rounded-lg 
-                       hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
+                       bg-blue-600 text-white rounded-lg
+                       hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               <Save className="h-5 w-5" />
               {saving ? 'Saving...' : 'Create Reminder'}

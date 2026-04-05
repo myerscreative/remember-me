@@ -73,9 +73,9 @@ export function PivotCard({
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[100] transition-opacity duration-300 backdrop-blur-[2px]" />
-        <Drawer.Content className="bg-slate-50 flex flex-col rounded-t-[32px] max-h-[92vh] fixed bottom-0 left-0 right-0 z-[101] outline-none border-t border-slate-200 shadow-2xl">
+        <Drawer.Content className="bg-surface flex flex-col rounded-t-[32px] max-h-[92vh] fixed bottom-0 left-0 right-0 z-[101] outline-none border-t border-border-default shadow-2xl">
           <div className="p-6 overflow-y-auto">
-            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-slate-300 mb-8" />
+            <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-border-strong mb-8" />
             
             <div className="max-w-xl mx-auto">
               {/* Header */}
@@ -85,36 +85,36 @@ export function PivotCard({
                     <Sparkles className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Human-First Pivot</h2>
+                    <h2 className="text-2xl font-black text-text-primary tracking-tight">Human-First Pivot</h2>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] font-black rounded uppercase tracking-widest border border-rose-200">
                         {frictionScore}
                       </span>
-                      <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                      <span className="text-text-tertiary text-[10px] font-bold uppercase tracking-widest">
                         Intervention Required
                       </span>
                     </div>
                   </div>
                 </div>
-                <button onClick={() => onOpenChange(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                  <X className="h-6 w-6 text-slate-400" />
+                <button onClick={() => onOpenChange(false)} className="p-2 hover:bg-subtle rounded-full transition-colors">
+                  <X className="h-6 w-6 text-text-tertiary" />
                 </button>
               </div>
 
               {isLoading ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-4">
                   <RefreshCcw className="h-8 w-8 text-indigo-600 animate-spin" />
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Auditing Social Friction...</p>
+                  <p className="text-sm font-bold text-text-tertiary uppercase tracking-widest">Auditing Social Friction...</p>
                 </div>
               ) : result ? (
                 <div className="space-y-6">
                   {/* Diagnosis */}
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                  <div className="p-4 bg-surface rounded-2xl border border-border-default shadow-sm">
                     <div className="flex items-start gap-3">
                       <AlertCircle className="h-5 w-5 text-indigo-600 shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Diagnosis</p>
-                        <p className="text-slate-700 leading-relaxed font-medium">{result.diagnosis}</p>
+                        <p className="text-xs font-black text-text-tertiary uppercase tracking-widest mb-1">Diagnosis</p>
+                        <p className="text-text-secondary leading-relaxed font-medium">{result.diagnosis}</p>
                       </div>
                     </div>
                   </div>
@@ -127,15 +127,15 @@ export function PivotCard({
                         "p-5 rounded-2xl border-2 text-left transition-all duration-200 group relative",
                         selectedContent === result.optionA.content 
                           ? "bg-white border-indigo-600 shadow-xl shadow-indigo-100 ring-4 ring-indigo-50" 
-                          : "bg-slate-100 border-transparent hover:border-slate-300"
+                          : "bg-subtle border-transparent hover:border-border-strong"
                       )}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Option A: The Pivot</span>
                         {selectedContent === result.optionA.content && <div className="h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-sm" />}
                       </div>
-                      <h3 className="font-bold text-slate-900 mb-2">{result.optionA.title}</h3>
-                      <p className="text-sm text-slate-600 leading-relaxed italic">&quot;{result.optionA.content}&quot;</p>
+                      <h3 className="font-bold text-text-primary mb-2">{result.optionA.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed italic">&quot;{result.optionA.content}&quot;</p>
                     </button>
 
                     <button 
@@ -144,15 +144,15 @@ export function PivotCard({
                         "p-5 rounded-2xl border-2 text-left transition-all duration-200 group relative",
                         selectedContent === result.optionB.content 
                           ? "bg-white border-indigo-600 shadow-xl shadow-indigo-100 ring-4 ring-indigo-50" 
-                          : "bg-slate-100 border-transparent hover:border-slate-300"
+                          : "bg-subtle border-transparent hover:border-border-strong"
                       )}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Option B: The Long-Game</span>
                         {selectedContent === result.optionB.content && <div className="h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-sm" />}
                       </div>
-                      <h3 className="font-bold text-slate-900 mb-2">{result.optionB.title}</h3>
-                      <p className="text-sm text-slate-600 leading-relaxed italic">&quot;{result.optionB.content}&quot;</p>
+                      <h3 className="font-bold text-text-primary mb-2">{result.optionB.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed italic">&quot;{result.optionB.content}&quot;</p>
                     </button>
                   </div>
 
@@ -166,7 +166,7 @@ export function PivotCard({
                       {isSending ? <RefreshCcw className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
                       Replace & Send
                     </Button>
-                    <p className="text-center text-[10px] text-slate-400 mt-4 font-bold uppercase tracking-widest">
+                    <p className="text-center text-[10px] text-text-tertiary mt-4 font-bold uppercase tracking-widest">
                       Updates timeline in Supabase to prevent relationship amnesia
                     </p>
                   </div>

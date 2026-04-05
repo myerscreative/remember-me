@@ -80,7 +80,7 @@ export function NurtureJubilee({ isActive, contactName, onComplete }: NurtureJub
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
         >
           {/* Backdrop Blur */}
-          <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md" />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
           {/* Celebration Card */}
           <motion.div
@@ -93,7 +93,7 @@ export function NurtureJubilee({ isActive, contactName, onComplete }: NurtureJub
               stiffness: 100,
               delay: 0.1 
             }}
-            className="relative bg-[#0F172A]/95 border-2 border-slate-200/20 rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.15)] p-8 max-w-sm w-full text-center overflow-hidden"
+            className="relative bg-[#0F172A]/95 border-2 border-border-default/20 rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.15)] p-8 max-w-sm w-full text-center overflow-hidden"
           >
             {/* Pulsing Heart Icon */}
             <motion.div
@@ -122,7 +122,7 @@ export function NurtureJubilee({ isActive, contactName, onComplete }: NurtureJub
 
             {/* Contact Name with Graffiti Underline */}
             <div className="relative inline-block mb-6">
-              <span className="text-xl font-bold text-slate-300 relative z-10 px-2 italic">
+              <span className="text-xl font-bold text-text-tertiary relative z-10 px-2 italic">
                 {contactName}
               </span>
               <svg 
@@ -144,7 +144,7 @@ export function NurtureJubilee({ isActive, contactName, onComplete }: NurtureJub
             </div>
 
             {/* Sub-text (Affirmation) */}
-            <p className="text-slate-400 text-lg leading-relaxed font-medium">
+            <p className="text-text-tertiary text-lg leading-relaxed font-medium">
               &ldquo;{affirmation}&rdquo;
             </p>
 

@@ -248,7 +248,7 @@ export default function ContactDetailPage({
   }, [id]);
 
   if (loading) {
-     return <div className="min-h-screen flex items-center justify-center bg-[#0a0e1a]"><div className="animate-pulse text-gray-500">Loading profile...</div></div>;
+     return <div className="min-h-screen flex items-center justify-center bg-canvas"><div className="animate-pulse text-text-tertiary">Loading profile...</div></div>;
   }
 
   if (error || !contact) {
@@ -274,7 +274,7 @@ export default function ContactDetailPage({
     : 'Never';
 
   return (
-    <div className="flex flex-col items-center md:items-start min-h-screen bg-[#0a0e1a]">
+    <div className="flex flex-col items-center md:items-start min-h-screen bg-canvas">
       <Toaster position="top-center" />
       
     <div className="w-full max-w-[1200px] mx-auto">

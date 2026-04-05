@@ -80,21 +80,21 @@ export default function ChangePasswordPage() {
 
   if (checkingSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <Toaster position="top-center" />
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-surface rounded-lg shadow-lg p-8">
             
           <Link 
             href="/settings" 
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-6 transition-colors"
+            className="inline-flex items-center text-sm text-text-tertiary hover:text-text-secondary mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Settings
@@ -102,10 +102,10 @@ export default function ChangePasswordPage() {
 
           {/* Title */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold text-text-primary mb-2">
               Change Password
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-text-secondary">
               Create a new secure password for your account
             </p>
           </div>
@@ -115,7 +115,7 @@ export default function ChangePasswordPage() {
             <div>
               <Label
                 htmlFor="new-password"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-text-secondary"
               >
                 New Password
               </Label>
@@ -126,7 +126,7 @@ export default function ChangePasswordPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="mt-1 h-11 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                className="mt-1 h-11 bg-surface border-border-strong text-text-primary"
                 disabled={isLoading}
                 minLength={6}
               />
@@ -135,7 +135,7 @@ export default function ChangePasswordPage() {
             <div>
               <Label
                 htmlFor="confirm-password"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-text-secondary"
               >
                 Confirm New Password
               </Label>
@@ -146,7 +146,7 @@ export default function ChangePasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="mt-1 h-11 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                className="mt-1 h-11 bg-surface border-border-strong text-text-primary"
                 disabled={isLoading}
                 minLength={6}
               />

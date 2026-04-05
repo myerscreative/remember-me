@@ -91,9 +91,9 @@ export function ArchiveContactDialog({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+      <div className="bg-surface rounded-xl max-w-md w-full p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold text-text-primary">
             {isArchived ? "Unarchive Contact" : "Archive Contact"}
           </h2>
           <Button
@@ -110,7 +110,7 @@ export function ArchiveContactDialog({
         </div>
 
         <div className="mb-6">
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-secondary mb-4">
             {isArchived ? (
               <>
                 Are you sure you want to unarchive <strong>{contactName}</strong>?
@@ -126,7 +126,7 @@ export function ArchiveContactDialog({
 
           {!isArchived && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Why are you archiving this contact?
               </label>
               <Textarea
@@ -136,7 +136,7 @@ export function ArchiveContactDialog({
                 className="min-h-[100px]"
                 autoFocus
               />
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-text-tertiary mt-2">
                 This helps you remember the context when you look back later.
               </p>
             </div>

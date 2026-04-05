@@ -129,7 +129,7 @@ export function ExploreFilter({
                   type="checkbox" 
                   checked={showMutuals} 
                   onChange={(e) => onToggleMutuals(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                  className="rounded border-border-strong text-blue-600 focus:ring-blue-500 w-4 h-4"
                 />
                 Show only mutual connections
              </label>

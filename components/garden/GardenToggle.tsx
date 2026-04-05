@@ -17,7 +17,7 @@ export function GardenToggle({ mode, onChange }: GardenToggleProps) {
           "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all",
           mode === 'frequency' 
             ? "bg-indigo-600 text-white shadow-sm" 
-            : "text-slate-600 hover:bg-white/50"
+            : "text-text-secondary hover:bg-white/50"
         )}
       >
         <Clock size={14} />
@@ -29,7 +29,7 @@ export function GardenToggle({ mode, onChange }: GardenToggleProps) {
           "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all",
           mode === 'tier' 
             ? "bg-indigo-600 text-white shadow-sm" 
-            : "text-slate-600 hover:bg-white/50"
+            : "text-text-secondary hover:bg-white/50"
         )}
       >
         <Star size={14} />

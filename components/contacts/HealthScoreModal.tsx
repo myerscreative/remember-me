@@ -24,16 +24,16 @@ export function HealthScoreModal({ daysRemaining, cadenceDays, trigger }: Health
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="bg-slate-950 border-slate-800 text-slate-200 sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
+      <DialogContent className="bg-canvas border-border-default text-text-secondary sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
         <DialogHeader className="p-6 pb-0">
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-text-primary flex items-center gap-2">
             <Heart className="size-5 text-indigo-400" />
             Days Until Next Contact
           </DialogTitle>
         </DialogHeader>
         <div className="p-6 space-y-6">
           <div className="space-y-4">
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-text-tertiary leading-relaxed">
               {daysRemaining === 0 ? (
                 <span className="text-indigo-300 font-medium">0 days left means it&apos;s time to reach out. Log an interaction or add a Shared Memory to reset the clock.</span>
               ) : (
@@ -46,25 +46,25 @@ export function HealthScoreModal({ daysRemaining, cadenceDays, trigger }: Health
                  <div className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
                  <div className="flex flex-col">
                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Nurtured</span>
-                   <span className="text-[10px] text-slate-500">More than 5 days until next contact</span>
+                   <span className="text-[10px] text-text-tertiary">More than 5 days until next contact</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">&gt;5 days</span>
+                 <span className="text-[10px] text-text-secondary ml-auto font-mono">&gt;5 days</span>
                </div>
                <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
                  <div className="size-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
                  <div className="flex flex-col">
                    <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Due soon</span>
-                   <span className="text-[10px] text-slate-500">1–5 days until next contact</span>
+                   <span className="text-[10px] text-text-tertiary">1–5 days until next contact</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">1–5 days</span>
+                 <span className="text-[10px] text-text-secondary ml-auto font-mono">1–5 days</span>
                </div>
                <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10">
                  <div className="size-2 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
                  <div className="flex flex-col">
                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Overdue</span>
-                   <span className="text-[10px] text-slate-500">Time to reach out</span>
+                   <span className="text-[10px] text-text-tertiary">Time to reach out</span>
                  </div>
-                 <span className="text-[10px] text-slate-600 ml-auto font-mono">0 days</span>
+                 <span className="text-[10px] text-text-secondary ml-auto font-mono">0 days</span>
                </div>
             </div>
           </div>

@@ -23,7 +23,7 @@ export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileH
           fallbackHref="/"
           variant="ghost"
           size="sm"
-          className="hidden md:flex text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pl-0 hover:bg-transparent"
+          className="hidden md:flex text-text-tertiary hover:text-text-primary pl-0 hover:bg-transparent"
           aria-label="Back to contacts"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -33,7 +33,7 @@ export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileH
 
       {/* Center: Title */}
       <div className="flex-1 flex justify-center">
-        <span className="text-sm font-semibold text-gray-900 dark:text-white tracking-wide uppercase">Profile</span>
+        <span className="text-sm font-semibold text-text-primary tracking-wide uppercase">Profile</span>
       </div>
 
       {/* Right: Actions */}
@@ -46,7 +46,7 @@ export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileH
             "h-9 w-9 rounded-full transition-all duration-200",
             isFavorite 
               ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-              : "text-gray-400 hover:text-amber-500 hover:bg-gray-50 dark:hover:bg-[#2c3039]"
+              : "text-text-tertiary hover:text-amber-500 hover:bg-subtle"
           )}
         >
           <Star className={cn("h-4 w-4", isFavorite && "fill-amber-500")} />
@@ -55,11 +55,11 @@ export function ProfileHeader({ onEdit, importance, onToggleFavorite }: ProfileH
           variant="ghost" 
           size="icon" 
           onClick={onEdit}
-          className="h-9 w-9 text-gray-400 hover:text-indigo-600 hover:bg-gray-50 dark:hover:bg-[#2c3039] rounded-full transition-colors"
+          className="h-9 w-9 text-text-tertiary hover:text-indigo-600 hover:bg-subtle rounded-full transition-colors"
         >
           <Edit className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2c3039] rounded-full transition-colors">
+        <Button variant="ghost" size="icon" className="h-9 w-9 text-text-tertiary hover:text-text-primary hover:bg-subtle rounded-full transition-colors">
           <Settings className="h-4 w-4" />
         </Button>
       </div>

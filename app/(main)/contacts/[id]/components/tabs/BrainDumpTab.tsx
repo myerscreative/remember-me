@@ -186,7 +186,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       </div>
 
       {/* Text Input for Quick Memory */}
-      <div className="bg-surface rounded-2xl p-5 border border-slate-800/50">
+      <div className="bg-surface rounded-2xl p-5 border border-border-default/50">
         <label className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3 block">
           ✏️ Quick Text Memory
         </label>
@@ -224,7 +224,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       </div>
 
       {/* Recent Memories */}
-      <div className="bg-surface rounded-2xl p-5 border border-slate-800/50">
+      <div className="bg-surface rounded-2xl p-5 border border-border-default/50">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
             💭 Memory Vault ({allMemories.length})

@@ -45,12 +45,12 @@ export default function ActionPanel({
   }
 
   return (
-    <div className={`bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-5 ${className}`}>
+    <div className={`bg-surface/80 backdrop-blur-sm rounded-2xl border border-border-default shadow-lg p-5 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">💧</span>
-          <h3 className="text-lg font-semibold text-gray-800">Water Your Tree</h3>
+          <h3 className="text-lg font-semibold text-text-primary">Water Your Tree</h3>
         </div>
         <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
           {contactsNeedingAttention.length} need attention
@@ -58,7 +58,7 @@ export default function ActionPanel({
       </div>
       
       {/* Description */}
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-text-tertiary mb-4">
         These relationships need your attention. Reach out to turn their leaves green!
       </p>
 
@@ -75,7 +75,7 @@ export default function ActionPanel({
 
       {/* Show remaining count */}
       {remainingCount > 0 && (
-        <p className="text-xs text-gray-400 text-center mt-3">
+        <p className="text-xs text-text-tertiary text-center mt-3">
           +{remainingCount} more contacts need attention
         </p>
       )}
@@ -103,7 +103,7 @@ function ActionContactItem({ contact, onWater }: ActionContactItemProps) {
   const color = HEALTH_COLORS[contact.healthStatus];
   
   return (
-    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+    <div className="flex items-center justify-between p-3 bg-surface rounded-xl hover:bg-subtle transition-colors">
       <div className="flex items-center gap-3">
         {/* Avatar */}
         <div 
@@ -115,11 +115,11 @@ function ActionContactItem({ contact, onWater }: ActionContactItemProps) {
         
         {/* Info */}
         <div>
-          <p className="font-medium text-gray-800 flex items-center gap-1.5">
+          <p className="font-medium text-text-primary flex items-center gap-1.5">
             {contact.name}
             <span>{emoji}</span>
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-text-tertiary">
             {formatRelativeTime(contact.daysAgo)}
           </p>
         </div>

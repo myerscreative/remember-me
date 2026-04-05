@@ -117,10 +117,10 @@ export default function SmartRemindersPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="flex items-center gap-3">
           <Bell className="h-6 w-6 animate-pulse text-yellow-600" />
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-text-secondary">
             Loading smart reminders...
           </span>
         </div>
@@ -129,7 +129,7 @@ export default function SmartRemindersPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen bg-canvas pb-16 md:pb-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-6">
           {/* Header */}
@@ -140,12 +140,12 @@ export default function SmartRemindersPage() {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
                 <Bell className="h-8 w-8 text-yellow-600" />
                 Smart Reminders
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 pl-14">
+            <p className="text-text-secondary pl-14">
               AI-powered suggestions for who to reach out to
             </p>
           </div>
@@ -156,10 +156,10 @@ export default function SmartRemindersPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-3xl font-bold text-text-primary">
                       {stats.totalReminders}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-text-tertiary mt-1">
                       Total
                     </p>
                   </div>
@@ -172,7 +172,7 @@ export default function SmartRemindersPage() {
                     <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                       {stats.highUrgency}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-text-tertiary mt-1">
                       High
                     </p>
                   </div>
@@ -185,7 +185,7 @@ export default function SmartRemindersPage() {
                     <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                       {stats.mediumUrgency}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-text-tertiary mt-1">
                       Medium
                     </p>
                   </div>
@@ -198,7 +198,7 @@ export default function SmartRemindersPage() {
                     <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                       {stats.lowUrgency}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-text-tertiary mt-1">
                       Low
                     </p>
                   </div>
@@ -209,8 +209,8 @@ export default function SmartRemindersPage() {
 
           {/* Filters */}
           <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="h-5 w-5 text-gray-400" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <Filter className="h-5 w-5 text-text-tertiary" />
+            <span className="text-sm text-text-secondary">
               Filter:
             </span>
             <Button
@@ -294,13 +294,13 @@ export default function SmartRemindersPage() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <h3
-                                className="text-lg font-semibold text-gray-900 dark:text-white cursor-pointer hover:text-purple-600 dark:hover:text-purple-400"
+                                className="text-lg font-semibold text-text-primary cursor-pointer hover:text-purple-600 dark:hover:text-purple-400"
                                 onClick={() => router.push(`/contacts/${reminder.id}`)}
                               >
                                 {reminder.first_name} {reminder.last_name || ""}
                               </h3>
                               {reminder.relationship_summary && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                <p className="text-sm text-text-secondary mt-1">
                                   {reminder.relationship_summary}
                                 </p>
                               )}
@@ -335,7 +335,7 @@ export default function SmartRemindersPage() {
                           </div>
 
                           {/* Suggested Action */}
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-2 text-sm text-text-secondary">
                             <MessageCircle className="h-4 w-4" />
                             <span>Suggested: {reminder.suggestedAction}</span>
                           </div>
@@ -379,10 +379,10 @@ export default function SmartRemindersPage() {
             <Card>
               <CardContent className="py-12 text-center">
                 <CheckCircle2 className="h-16 w-16 mx-auto mb-4 text-green-500" />
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-semibold text-text-primary mb-2">
                   All caught up!
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-text-secondary">
                   {activeFilter === 'all'
                     ? "No pending follow-ups. Great job staying connected!"
                     : `No ${activeFilter} urgency reminders.`}

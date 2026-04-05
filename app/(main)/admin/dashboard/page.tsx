@@ -26,7 +26,7 @@ import { Brain } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
 
-const chartPlaceholder = () => <div className="h-64 animate-pulse rounded-2xl bg-slate-800/50" />;
+const chartPlaceholder = () => <div className="h-64 animate-pulse rounded-2xl bg-elevated/50" />;
 
 const PulseChart = dynamic(() => import('./components/PulseChart').then((m) => m.default), {
   ssr: false,
@@ -84,10 +84,10 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     if (alert?.active && !isPivotOpen) {
       toast(() => (
-        <div className="flex items-center gap-4 bg-slate-50 p-1">
+        <div className="flex items-center gap-4 bg-surface p-1">
           <div className="flex flex-col">
             <p className="text-xs font-black text-rose-600 uppercase tracking-widest leading-none mb-1">Friction Alert</p>
-            <p className="text-[10px] text-slate-500 font-bold">{alert.data.score}</p>
+            <p className="text-[10px] text-text-tertiary font-bold">{alert.data.score}</p>
           </div>
           <button 
             onClick={() => {
@@ -145,10 +145,10 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Aggregating Vital Signs...</p>
+          <p className="text-text-tertiary font-bold uppercase tracking-widest text-xs">Aggregating Vital Signs...</p>
         </div>
       </div>
     );
@@ -156,30 +156,30 @@ export default function AdminDashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-center p-8 bg-slate-800 rounded-2xl border border-slate-700">
-          <p className="text-white font-bold mb-2">Aggregation Failed</p>
-          <p className="text-slate-400 text-sm">Unable to fetch community metrics. Please refresh or contact admin.</p>
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="text-center p-8 bg-elevated rounded-2xl border border-border-default">
+          <p className="text-text-primary font-bold mb-2">Aggregation Failed</p>
+          <p className="text-text-tertiary text-sm">Unable to fetch community metrics. Please refresh or contact admin.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-32">
+    <div className="min-h-screen bg-canvas pb-32">
       {/* Header Section */}
-      <header className="px-6 pt-8 pb-12 bg-linear-to-b from-slate-800 to-slate-900 border-b border-slate-700/50">
+      <header className="px-6 pt-8 pb-12 bg-linear-to-b from-elevated to-canvas border-b border-border-default/50">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded uppercase tracking-widest border border-emerald-500/20">
               Admin Alpha
             </span>
-            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+            <span className="text-text-tertiary text-[10px] font-bold uppercase tracking-widest">
               • Private Command Center
             </span>
           </div>
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-black text-white">Community Command</h1>
+            <h1 className="text-3xl font-black text-text-primary">Community Command</h1>
             
             <div className="flex items-center gap-3">
               <DriftRescue />
@@ -190,15 +190,15 @@ export default function AdminDashboardPage() {
                     <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hidden sm:inline">Ledger Insights</span>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-full sm:max-w-xl bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto">
+                <SheetContent side="right" className="w-full sm:max-w-xl bg-surface border-l border-border-default overflow-y-auto">
                   <SheetHeader className="mb-8">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="p-2 bg-indigo-500/10 rounded-lg">
                         <Brain className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                       </div>
-                      <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Learning Ledger</SheetTitle>
+                      <SheetTitle className="text-2xl font-black text-text-primary uppercase tracking-tighter">Learning Ledger</SheetTitle>
                     </div>
-                    <SheetDescription className="text-slate-500 font-medium">
+                    <SheetDescription className="text-text-tertiary font-medium">
                       AI-driven insights from your outreach performance and response resonance.
                     </SheetDescription>
                   </SheetHeader>
@@ -258,10 +258,10 @@ export default function AdminDashboardPage() {
           <div className="lg:col-span-1 space-y-6">
             <PulseChart score={data.pulseScore} />
             
-            <div className="p-6 bg-slate-800 rounded-2xl border border-slate-700/50 shadow-xl">
+            <div className="p-6 bg-elevated rounded-2xl border border-border-default/50 shadow-xl">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Garden Health</h3>
-                <Info className="h-4 w-4 text-slate-600" />
+                <h3 className="text-sm font-black text-text-tertiary uppercase tracking-widest">Garden Health</h3>
+                <Info className="h-4 w-4 text-text-secondary" />
               </div>
               <div className="space-y-6">
                 <HealthBar label="Nurtured" value={data.gardenHealth.nurtured} color="bg-emerald-500" />
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                 <ShieldAlert className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-bold text-orange-400 mb-1">Attention Required</p>
-                  <p className="text-[10px] text-slate-400 leading-relaxed">
+                  <p className="text-[10px] text-text-tertiary leading-relaxed">
                     {Math.round(data.gardenHealth.neglected)}% of your garden is neglected. Focus on re-engaging your core network.
                   </p>
                 </div>
@@ -292,11 +292,11 @@ export default function AdminDashboardPage() {
             {/* Bottom Actions */}
             <div className="p-6 bg-emerald-500 rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-between group cursor-pointer hover:bg-emerald-400 transition-colors">
               <div>
-                <h3 className="text-xl font-black text-slate-900">Host a Connection Blitz</h3>
-                <p className="text-sm font-medium text-slate-900/70">Boost network density by 15% with a prompted referral event.</p>
+                <h3 className="text-xl font-black text-text-primary">Host a Connection Blitz</h3>
+                <p className="text-sm font-medium text-text-primary/70">Boost network density by 15% with a prompted referral event.</p>
               </div>
-              <div className="w-12 h-12 bg-slate-900/10 rounded-full flex items-center justify-center group-hover:bg-slate-900/20 transition-colors">
-                <ChevronRight className="h-6 w-6 text-slate-900" />
+              <div className="w-12 h-12 bg-canvas/10 rounded-full flex items-center justify-center group-hover:bg-canvas/20 transition-colors">
+                <ChevronRight className="h-6 w-6 text-text-primary" />
               </div>
             </div>
           </div>
@@ -326,14 +326,14 @@ interface StatCardProps {
 
 function StatCard({ label, value, change, positive, icon, info }: StatCardProps) {
   return (
-    <div className="p-4 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
-      <div className="flex items-center gap-2 mb-2 text-slate-500">
+    <div className="p-4 bg-elevated/50 backdrop-blur-sm rounded-xl border border-border-default/50 hover:bg-elevated transition-colors">
+      <div className="flex items-center gap-2 mb-2 text-text-tertiary">
         {icon}
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
         {info}
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-black text-white">{value}</span>
+        <span className="text-2xl font-black text-text-primary">{value}</span>
         <span className={`text-[10px] font-bold ${positive ? 'text-emerald-400' : 'text-orange-400'}`}>
           {change}
         </span>
@@ -352,10 +352,10 @@ function HealthBar({ label, value, color }: HealthBarProps) {
   return (
     <div>
       <div className="flex justify-between items-center mb-1.5 px-1">
-        <span className="text-xs font-bold text-slate-300">{label}</span>
-        <span className="text-[10px] font-bold text-slate-500">{Math.round(value)}%</span>
+        <span className="text-xs font-bold text-text-tertiary">{label}</span>
+        <span className="text-[10px] font-bold text-text-tertiary">{Math.round(value)}%</span>
       </div>
-      <div className="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-subtle/50 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}

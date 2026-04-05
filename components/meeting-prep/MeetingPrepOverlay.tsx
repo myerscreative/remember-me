@@ -184,7 +184,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
         {/* --- Content (Desktop View) --- */}
         <div className="hidden md:block">
           {/* Meeting Info Banner */}
-          <div className="px-8 py-8 bg-linear-to-br from-blue-50 to-blue-100 dark:from-surface dark:to-surface border-b-2 border-indigo-500 flex gap-6 items-center">
+          <div className="px-8 py-8 bg-linear-to-br from-blue-50 to-blue-100  border-b-2 border-indigo-500 flex gap-6 items-center">
             <div className="w-20 h-20 rounded-full bg-indigo-500 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-500/30">
               {contact.initials}
             </div>
@@ -292,24 +292,24 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
             <h3 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
               📞 Last Contact
             </h3>
-            <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl">
+            <div className="p-5 bg-emerald-50  border-2 border-emerald-400  rounded-2xl">
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-emerald-200 dark:border-emerald-600 rounded-lg text-emerald-800 dark:text-emerald-400 text-sm font-bold">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-emerald-200  rounded-lg text-emerald-800  text-sm font-bold">
                   {contact.lastContact.method === 'phone' ? <Phone className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
                   <span className="capitalize">{contact.lastContact.method || 'Unknown'}</span>
                 </span>
-                <span className="text-emerald-700 dark:text-emerald-400 font-medium text-sm">
+                <span className="text-emerald-700  font-medium text-sm">
                   {contact.lastContact.daysAgo ? `${contact.lastContact.daysAgo} days ago` : ''} ({contact.lastContact.date})
                 </span>
               </div>
-              <div className="p-4 bg-surface rounded-xl text-emerald-900 dark:text-emerald-300 italic border border-emerald-100 dark:border-emerald-700">
+              <div className="p-4 bg-surface rounded-xl text-emerald-900  italic border border-emerald-100 ">
                 "{contact.lastContact.notes}"
               </div>
             </div>
           </div>
 
           {/* Conversation Starters */}
-          <div className="px-8 py-8 mx-8 my-4 bg-linear-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-2 border-amber-300 dark:border-amber-600 rounded-2xl">
+          <div className="px-8 py-8 mx-8 my-4 bg-linear-to-br from-amber-50 to-amber-100  border-2 border-amber-300  rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-text-primary flex items-center gap-2">
                 🎯 Conversation Starters
@@ -317,7 +317,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
               <button
                 onClick={loadConversationStarters}
                 disabled={isGeneratingStarters}
-                className="px-3 py-1 text-sm bg-surface text-text-accent border border-indigo-300 dark:border-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-subtle disabled:opacity-50 transition-colors"
+                className="px-3 py-1 text-sm bg-surface text-text-accent border border-indigo-300  rounded-lg hover:bg-indigo-50  disabled:opacity-50 transition-colors"
               >
                 {isGeneratingStarters ? '✨ Generating...' : '🔄 Regenerate'}
               </button>
@@ -333,7 +333,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
             ) : (
               <div className="space-y-4">
                 {conversationStarters.map((starter, i) => (
-                  <div key={i} className="flex gap-4 items-start p-4 bg-surface rounded-xl shadow-sm border border-amber-100 dark:border-amber-700">
+                  <div key={i} className="flex gap-4 items-start p-4 bg-surface rounded-xl shadow-sm border border-amber-100 ">
                     <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-amber-400 text-white font-bold rounded-full">
                       {i + 1}
                     </span>
@@ -350,10 +350,10 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                  <h3 className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <Brain className="text-indigo-500" /> Practice Mode
                  </h3>
-                 <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Beta</span>
+                 <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Beta</span>
              </div>
 
-             <div className="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-800">
+             <div className="bg-linear-to-br from-indigo-50 to-purple-50  rounded-2xl p-6 border border-indigo-100 ">
                  <div className="flex flex-col md:flex-row items-center gap-6">
                      <div className="flex-1">
                          <h4 className="font-bold text-text-primary mb-2">Want to drill before the meeting?</h4>
@@ -361,10 +361,10 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                             Take a quick 2-minute quiz to sharpen your memory.
                          </p>
                          <div className="flex flex-wrap gap-2">
-                             <Button size="sm" variant="outline" className="bg-surface hover:bg-indigo-50 dark:hover:bg-subtle text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-700">
+                             <Button size="sm" variant="outline" className="bg-surface hover:bg-indigo-50  text-indigo-700  border-indigo-200 ">
                                 📖 Story Recall
                              </Button>
-                             <Button size="sm" variant="outline" className="bg-surface hover:bg-pink-50 dark:hover:bg-subtle text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-700">
+                             <Button size="sm" variant="outline" className="bg-surface hover:bg-pink-50  text-pink-700  border-pink-200 ">
                                 🎯 Interest Check
                              </Button>
                          </div>
@@ -375,7 +375,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                                 onClose();
                                 router.push('/practice');
                             }}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-200 "
                         >
                             Start Practice <ArrowRight className="ml-2 w-4 h-4" />
                          </Button>
@@ -411,7 +411,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                     </div>
                     <p className="text-text-tertiary leading-relaxed">{conn.matchReason}</p>
                   </div>
-                  <Button className="w-full bg-surface text-text-accent border-2 border-indigo-600 dark:border-indigo-500 hover:bg-indigo-600 hover:text-white transition-colors">
+                  <Button className="w-full bg-surface text-text-accent border-2 border-indigo-600  hover:bg-indigo-600 hover:text-white transition-colors">
                     Suggest Introduction
                   </Button>
                 </div>
@@ -425,7 +425,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
               📝 Pre-Meeting Notes
             </h3>
             <textarea
-              className="w-full p-4 border-2 border-border-default rounded-2xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/50 outline-none transition-all resize-none text-text-tertiary bg-surface placeholder:text-text-secondary"
+              className="w-full p-4 border-2 border-border-default rounded-2xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100  outline-none transition-all resize-none text-text-tertiary bg-surface placeholder:text-text-secondary"
               rows={4}
               placeholder="Add any reminders or topics you want to cover..."
               defaultValue="Remember to mention the React conference coming up. She might be interested in attending together."
@@ -434,13 +434,13 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
 
           {/* Footer Actions */}
           <div className="px-8 py-8 flex gap-4 flex-wrap bg-canvas">
-             <Button className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50">
+             <Button className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 ">
                View Full Profile
              </Button>
-             <Button variant="outline" className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface dark:text-text-primary dark:border-border-strong dark:hover:bg-subtle">
+             <Button variant="outline" className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface   ">
                Edit Contact
              </Button>
-             <Button variant="outline" className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface dark:text-text-primary dark:border-border-strong dark:hover:bg-subtle">
+             <Button variant="outline" className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface   ">
                Add to Favorites ⭐
              </Button>
           </div>
@@ -453,7 +453,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
           <div className="min-w-[calc(100vw-2rem)] snap-start bg-canvas rounded-3xl p-6 shadow-xl flex flex-col items-center text-center overflow-y-auto max-h-[calc(100vh-180px)]">
             <div className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-6 border-b border-border-default pb-2 w-full">Meeting Details</div>
 
-            <div className="w-24 h-24 rounded-full bg-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-xl shadow-indigo-200 dark:shadow-indigo-900/50 mb-4">
+            <div className="w-24 h-24 rounded-full bg-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-xl shadow-indigo-200  mb-4">
               {contact.initials}
             </div>
 
@@ -463,14 +463,14 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
             <div className="w-full bg-canvas rounded-2xl p-4 mb-6 border border-border-default">
               <div className="flex flex-col gap-2">
                 <span className="font-semibold text-text-primary">Today at {new Date(meeting.startTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</span>
-                <span className="inline-block px-3 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-sm font-bold border border-red-100 dark:border-red-800 self-center">
+                <span className="inline-block px-3 py-1 bg-red-50  text-red-600  rounded-full text-sm font-bold border border-red-100  self-center">
                   {timeUntil}
                 </span>
               </div>
             </div>
 
             {meeting.locationUrl ? (
-               <a href={meeting.locationUrl} target="_blank" rel="noreferrer" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 mb-4 block">
+               <a href={meeting.locationUrl} target="_blank" rel="noreferrer" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200  mb-4 block">
                  Join Meeting
                </a>
             ) : (
@@ -543,7 +543,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                   </div>
                ) : (
                  conversationStarters.slice(0, 3).map((starter, i) => (
-                   <div key={i} className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl text-left flex gap-3">
+                   <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-left flex gap-3">
                      <span className="w-6 h-6 bg-amber-400 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
                      <p className="text-text-primary leading-relaxed font-medium text-sm">"{starter}"</p>
                    </div>
@@ -551,7 +551,7 @@ export function MeetingPrepOverlay({ meeting, isOpen, onClose }: MeetingPrepOver
                )}
             </div>
 
-            <Button className="w-full mt-auto py-6 bg-surface border-2 border-indigo-600 dark:border-indigo-500 text-text-accent hover:bg-indigo-50 dark:hover:bg-subtle font-bold rounded-2xl shadow-none">
+            <Button className="w-full mt-auto py-6 bg-surface border-2 border-indigo-600  text-text-accent hover:bg-indigo-50  font-bold rounded-2xl shadow-none">
               View Full Details →
             </Button>
           </div>

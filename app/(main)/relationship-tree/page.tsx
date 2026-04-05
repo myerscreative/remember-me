@@ -19,7 +19,7 @@ import {
 import { useGameData, GameContact } from '@/hooks/useGameData';
 
 const treeLoading = () => (
-  <div className="flex items-center justify-center min-h-[400px] text-slate-500">
+  <div className="flex items-center justify-center min-h-[400px] text-text-tertiary">
     <Loader2 className="h-8 w-8 animate-spin" />
   </div>
 );
@@ -31,17 +31,17 @@ const RelationshipTree = dynamic(() => import('./components/RelationshipTree').t
 
 const TreeStatsPanel = dynamic(() => import('./components/TreeStats').then((m) => m.default), {
   ssr: false,
-  loading: () => <div className="h-32 animate-pulse rounded-xl bg-slate-100" />,
+  loading: () => <div className="h-32 animate-pulse rounded-xl bg-subtle" />,
 });
 
 const TreeFilters = dynamic(() => import('./components/TreeFilters').then((m) => m.default), {
   ssr: false,
-  loading: () => <div className="h-24 animate-pulse rounded-xl bg-slate-100" />,
+  loading: () => <div className="h-24 animate-pulse rounded-xl bg-subtle" />,
 });
 
 const ActionPanel = dynamic(() => import('./components/ActionPanel').then((m) => m.default), {
   ssr: false,
-  loading: () => <div className="h-40 animate-pulse rounded-xl bg-slate-100" />,
+  loading: () => <div className="h-40 animate-pulse rounded-xl bg-subtle" />,
 });
 
 // Mock data transformer - adapted for Real Data
@@ -144,20 +144,20 @@ export default function RelationshipTreePage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-amber-50 via-white to-green-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+      <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-lg border-b border-border-default">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link 
               href="/" 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-subtle rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-text-secondary" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-text-primary flex items-center gap-2">
                 🌳 Relationship Tree
               </h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-text-tertiary">
                 Visualize your network health
               </p>
             </div>
@@ -166,14 +166,14 @@ export default function RelationshipTreePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLabels(!showLabels)}
-              className={cn("rounded-lg p-2 transition-colors", showLabels ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100")}
+              className={cn("rounded-lg p-2 transition-colors", showLabels ? "bg-indigo-100 text-indigo-600" : "text-text-secondary hover:bg-subtle")}
               title={showLabels ? 'Hide labels' : 'Show labels'}
             >
               {showLabels ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={cn("rounded-lg p-2 transition-colors", showFilters ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100")}
+              className={cn("rounded-lg p-2 transition-colors", showFilters ? "bg-indigo-100 text-indigo-600" : "text-text-secondary hover:bg-subtle")}
               title="Toggle filters"
             >
               <Filter className="w-5 h-5" />
@@ -187,7 +187,7 @@ export default function RelationshipTreePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tree visualization */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-lg overflow-hidden">
               <RelationshipTree
                 contacts={treeContacts}
                 onContactClick={handleContactClick}

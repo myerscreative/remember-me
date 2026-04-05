@@ -61,16 +61,16 @@ export function Calendar({
   })
 
   return (
-    <div className={cn("p-3 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-800", className)}>
+    <div className={cn("p-3 bg-surface rounded-lg shadow-lg border border-border-default", className)}>
       <div className="flex items-center justify-between mb-4 px-1">
-        <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+        <span className="font-semibold text-sm text-text-primary">
           {format(currentMonth, "MMMM yyyy")}
         </span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="h-7 w-7 text-text-tertiary hover:text-text-primary"
             onClick={prevMonth}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -78,7 +78,7 @@ export function Calendar({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="h-7 w-7 text-text-tertiary hover:text-text-primary"
             onClick={nextMonth}
           >
             <ChevronRight className="h-4 w-4" />
@@ -88,7 +88,7 @@ export function Calendar({
 
       <div className="grid grid-cols-7 gap-1 mb-2 text-center">
         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-          <div key={day} className="text-[0.8rem] font-medium text-slate-500 dark:text-slate-400">
+          <div key={day} className="text-[0.8rem] font-medium text-text-tertiary">
             {day}
           </div>
         ))}
@@ -107,16 +107,16 @@ export function Calendar({
               onClick={() => onSelect?.(day)}
               className={cn(
                 "h-9 w-9 p-0 text-sm rounded-md flex items-center justify-center transition-all relative",
-                !isCurrentMonth && "text-slate-300 dark:text-slate-600 opacity-50",
+                !isCurrentMonth && "text-text-tertiary opacity-50",
                 isSelected && "bg-blue-600 text-white hover:bg-blue-600 hover:text-white shadow-md z-10",
-                !isSelected && isCurrentMonth && "text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800",
-                !isSelected && !isCurrentMonth && "hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                isCurrentDay && !isSelected && "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-500 dark:ring-blue-400"
+                !isSelected && isCurrentMonth && "text-text-primary hover:bg-subtle",
+                !isSelected && !isCurrentMonth && "hover:bg-surface",
+                isCurrentDay && !isSelected && "text-blue-600 font-bold bg-blue-50 ring-1 ring-blue-500"
               )}
             >
               {format(day, "d")}
               {isCurrentDay && !isSelected && (
-                <span className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                <span className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
               )}
             </button>
           )

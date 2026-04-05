@@ -13,7 +13,7 @@ export default function PulseChart({ score }: PulseChartProps) {
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-slate-800 rounded-2xl border border-slate-700/50 shadow-xl">
+    <div className="flex flex-col items-center justify-center p-6 bg-elevated rounded-2xl border border-border-default/50 shadow-xl">
       <div className="relative w-48 h-48">
         <svg className="w-full h-full transform -rotate-90">
           <circle
@@ -23,7 +23,7 @@ export default function PulseChart({ score }: PulseChartProps) {
             fill="transparent"
             stroke="currentColor"
             strokeWidth="12"
-            className="text-slate-700"
+            className="text-border-default"
           />
           <motion.circle
             cx="96"
@@ -49,16 +49,16 @@ export default function PulseChart({ score }: PulseChartProps) {
           <motion.span 
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-4xl font-black text-white"
+            className="text-4xl font-black text-text-primary"
           >
             {Math.round(score)}%
           </motion.span>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+          <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest mt-1">
             Community Pulse
           </span>
         </div>
       </div>
-      <p className="mt-4 text-xs text-slate-400 text-center leading-relaxed max-w-[200px]">
+      <p className="mt-4 text-xs text-text-tertiary text-center leading-relaxed max-w-[200px]">
         Overall percentage of <span className="text-emerald-400 font-bold">Nurtured</span> contacts across the group.
       </p>
     </div>

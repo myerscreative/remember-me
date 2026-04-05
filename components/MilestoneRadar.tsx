@@ -30,7 +30,7 @@ export function MilestoneRadar() {
       case 'birthday': return <Cake className="h-4 w-4 text-pink-500" />;
       case 'professional': return <Rocket className="h-4 w-4 text-blue-500" />;
       case 'anniversary': return <Calendar className="h-4 w-4 text-orange-500" />;
-      default: return <Calendar className="h-4 w-4 text-gray-500" />;
+      default: return <Calendar className="h-4 w-4 text-text-tertiary" />;
     }
   };
 
@@ -53,7 +53,7 @@ export function MilestoneRadar() {
               <Radar className="h-4 w-4" />
               Milestone Radar
             </CardTitle>
-            <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500 font-black rounded-none">NEXT 30D</Badge>
+            <Badge variant="outline" className="border-border-default text-text-tertiary font-black rounded-none">NEXT 30D</Badge>
           </div>
         </CardHeader>
         <CardContent className="pt-4 px-0">
@@ -98,7 +98,7 @@ export function MilestoneRadar() {
                 );
               })
             ) : (
-              <div className="p-8 text-center text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">
+              <div className="p-8 text-center text-text-secondary text-xs font-bold uppercase tracking-widest leading-relaxed">
                 {isLoading ? 'Scanning Radar...' : 'Any Important Date or Birthday that is attached to a contact shows here.'}
               </div>
             )}

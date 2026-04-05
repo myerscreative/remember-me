@@ -124,13 +124,13 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-surface rounded-lg shadow-lg p-8">
           {/* Logo/Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">ReMember Me</h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold text-text-primary mb-2">ReMember Me</h1>
+            <p className="text-text-secondary">
               {isResetPassword ? "Reset your password" : isSignUp ? "Create your account" : "Welcome back"}
             </p>
           </div>
@@ -152,7 +152,7 @@ function LoginForm() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label htmlFor="email" className="text-sm font-medium text-text-secondary">
                 Email
               </Label>
               <Input
@@ -169,7 +169,7 @@ function LoginForm() {
 
             {!isResetPassword && (
               <div>
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Label htmlFor="password" className="text-sm font-medium text-text-secondary">
                   Password
                 </Label>
                 <Input
@@ -184,7 +184,7 @@ function LoginForm() {
                   minLength={6}
                 />
                 {isSignUp && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-text-tertiary">
                     Password must be at least 6 characters
                   </p>
                 )}
@@ -225,10 +225,10 @@ function LoginForm() {
               <>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300 dark:border-gray-600" />
+                    <span className="w-full border-t border-border-strong" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">
+                    <span className="bg-surface px-2 text-muted-foreground">
                       Or continue with
                     </span>
                   </div>
@@ -238,7 +238,7 @@ function LoginForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-11 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="h-11 border-border-strong hover:bg-subtle"
                     onClick={async () => {
                       try {
                         setIsLoading(true);
@@ -266,7 +266,7 @@ function LoginForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-11 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="h-11 border-border-strong hover:bg-subtle"
                     onClick={async () => {
                       try {
                         setIsLoading(true);
@@ -330,15 +330,15 @@ function LoginForm() {
 
         {/* Back to app link */}
         <div className="mt-4 text-center">
-          <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+          <Link href="/" className="text-sm text-text-secondary hover:text-text-primary">
             ← Back to app
           </Link>
         </div>
 
         {/* Dev Login Button - ONLY VISIBLE IN DEVELOPMENT */}
         {process.env.NODE_ENV === "development" && (
-          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
-            <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide font-semibold">Development Only</p>
+          <div className="mt-8 pt-4 border-t border-border-default text-center">
+            <p className="text-xs text-text-tertiary mb-2 uppercase tracking-wide font-semibold">Development Only</p>
             <Button
               type="button"
               variant="secondary"
@@ -396,10 +396,10 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="mt-2 text-sm text-text-secondary">Loading...</p>
         </div>
       </div>
     }>

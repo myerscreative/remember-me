@@ -71,14 +71,14 @@ export function LearningLedgerSection() {
   }, []);
 
   if (loading) return (
-    <div className="h-48 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-xl" />
+    <div className="h-48 animate-pulse bg-subtle rounded-xl" />
   );
 
   if (!stats) return (
-    <Card className="p-12 text-center bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800">
-      <Brain className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Learning Ledger Empty</h3>
-      <p className="text-sm text-slate-500 max-w-sm mx-auto">
+    <Card className="p-12 text-center bg-surface border-dashed border-border-default">
+      <Brain className="h-12 w-12 text-text-tertiary mx-auto mb-4" />
+      <h3 className="text-lg font-bold text-text-primary mb-2">Learning Ledger Empty</h3>
+      <p className="text-sm text-text-tertiary max-w-sm mx-auto">
         Start sending outreach with the Pre-Send Auditor to see learning insights here.
       </p>
     </Card>
@@ -92,7 +92,7 @@ export function LearningLedgerSection() {
             <Zap className="h-4 w-4" />
             <span className="text-[10px] font-black uppercase tracking-widest">Resonance Rate</span>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.successRate}%</div>
+          <div className="text-2xl font-black text-text-primary">{stats.successRate}%</div>
         </div>
         
         <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
@@ -100,7 +100,7 @@ export function LearningLedgerSection() {
             <Clock className="h-4 w-4" />
             <span className="text-[10px] font-black uppercase tracking-widest">Avg Response</span>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.avgResponseTimeMin}m</div>
+          <div className="text-2xl font-black text-text-primary">{stats.avgResponseTimeMin}m</div>
         </div>
 
         <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800">
@@ -108,11 +108,11 @@ export function LearningLedgerSection() {
             <MessageSquare className="h-4 w-4" />
             <span className="text-[10px] font-black uppercase tracking-widest">Training Data</span>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.totalOutreach} pts</div>
+          <div className="text-2xl font-black text-text-primary">{stats.totalOutreach} pts</div>
         </div>
       </div>
 
-      <Card className="overflow-hidden border-slate-200 dark:border-slate-800">
+      <Card className="overflow-hidden border-border-default">
         <div className="p-6 bg-linear-to-br from-indigo-600 to-purple-700">
           <div className="flex items-center gap-2 text-white/80 mb-2">
             <Brain className="h-5 w-5" />
@@ -126,11 +126,11 @@ export function LearningLedgerSection() {
           </Button>
         </div>
         
-        <div className="p-6 bg-white dark:bg-slate-900">
-          <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Successful &quot;Gold&quot; Hooks</h4>
+        <div className="p-6 bg-surface">
+          <h4 className="text-xs font-black text-text-tertiary uppercase tracking-widest mb-4">Successful &quot;Gold&quot; Hooks</h4>
           <div className="space-y-3">
             {stats.successfulHooks.map((hook, i) => (
-              <div key={i} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 italic">
+              <div key={i} className="p-3 bg-surface rounded-lg border border-border-default text-sm text-text-secondary italic">
                 &quot;{hook}&quot;
               </div>
             ))}
@@ -139,7 +139,7 @@ export function LearningLedgerSection() {
       </Card>
       
       {/* AI Suggestion with Action Purple CTA */}
-      <div className="p-6 bg-slate-900 rounded-2xl border border-indigo-500/30 shadow-2xl shadow-indigo-500/10 relative overflow-hidden group">
+      <div className="p-6 bg-canvas rounded-2xl border border-indigo-500/30 shadow-2xl shadow-indigo-500/10 relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
           <Zap className="h-24 w-24 text-indigo-500" />
         </div>
@@ -150,7 +150,7 @@ export function LearningLedgerSection() {
              </span>
           </div>
           <h3 className="text-2xl font-black text-white mb-2">Shift to &quot;Low-Stakes&quot; Follow-ups</h3>
-          <p className="text-slate-400 mb-6 max-w-xl">
+          <p className="text-text-tertiary mb-6 max-w-xl">
             Based on your response velocity, contacts are 3x more likely to reply to messages sent without an immediate &quot;Ask&quot;. We recommend two weeks of &quot;Nurture-Only&quot; outreach.
           </p>
           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-widest px-8 shadow-xl shadow-indigo-600/20">

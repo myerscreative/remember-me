@@ -36,7 +36,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
 
   return (
     <>
-      <Card className="border border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-2xl relative overflow-hidden group rounded-3xl">
+      <Card className="border border-white/5 bg-canvas/40 backdrop-blur-xl shadow-2xl relative overflow-hidden group rounded-3xl">
         {/* Glass Header */}
         <div className="absolute top-0 left-0 right-0 h-16 bg-linear-to-b from-primary/10 to-transparent pointer-events-none" />
         
@@ -102,7 +102,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                   <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-background bg-muted shadow-md">
                                        <Avatar className="h-full w-full">
                                             <AvatarImage src={p.photo_url || undefined} />
-                                            <AvatarFallback className="text-lg font-bold text-white bg-slate-400 dark:bg-slate-600">
+                                            <AvatarFallback className="text-lg font-bold text-white bg-text-tertiary">
                                                 {getInitials(p.first_name, p.last_name)}
                                             </AvatarFallback>
                                        </Avatar>
@@ -123,7 +123,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                             }}
                           >
                               <h3 className="text-foreground font-bold text-sm truncate px-1">{p.name}</h3>
-                              <p className="text-slate-600 dark:text-slate-400 text-[10px] font-medium truncate px-1 leading-tight">
+                              <p className="text-text-secondary text-[10px] font-medium truncate px-1 leading-tight">
                                   {p.deep_lore || p.relationship_summary || "Needs some love"}
                               </p>
                           </div>
@@ -133,7 +133,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
+                                    className="h-8 w-8 rounded-full bg-subtle text-text-secondary hover:bg-subtle/80 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Call with ${p.first_name}`)}
                                 >
                                    <Phone className="h-3.5 w-3.5" />
@@ -141,7 +141,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
+                                    className="h-8 w-8 rounded-full bg-subtle text-text-secondary hover:bg-subtle/80 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Email to ${p.first_name}`)}
                                >
                                    <Mail className="h-3.5 w-3.5" />
@@ -149,7 +149,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
                                <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-8 w-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition-all shadow-sm"
+                                    className="h-8 w-8 rounded-full bg-subtle text-text-secondary hover:bg-subtle/80 transition-all shadow-sm"
                                     onClick={() => handleNurture(p.id, p.name, `Message to ${p.first_name}`)}
                                >
                                    <MessageSquare className="h-3.5 w-3.5" />
@@ -166,7 +166,7 @@ export function DailyBriefingCard({ briefing, onActionComplete }: DailyBriefingC
           ) : (
              <div className="flex flex-col items-center justify-center py-6 opacity-50">
                  <Flower2 className="h-12 w-12 text-emerald-500 mb-2" />
-                 <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Garden is Blooming</p>
+                 <p className="text-text-tertiary text-sm font-bold uppercase tracking-widest">Garden is Blooming</p>
              </div>
           )}
           
