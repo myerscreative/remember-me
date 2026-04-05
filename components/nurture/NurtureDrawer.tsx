@@ -1,9 +1,10 @@
 "use client";
 
 import { Drawer } from "vaul";
-import { MessageCircle, Phone, Sparkles } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 import { NurtureContext } from "@/types/nurture";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface NurtureDrawerProps {
   isOpen: boolean;
@@ -14,6 +15,22 @@ interface NurtureDrawerProps {
 
 export function NurtureDrawer({ isOpen, onOpenChange, data, onAction }: NurtureDrawerProps) {
   const handleAction = (channel: string) => {
+    const phone = data.phoneNumber;
+
+    if (channel === 'Message') {
+      if (phone) {
+        window.location.href = `sms:${phone.replace(/\D/g, '')}`;
+      } else {
+        toast.error('No phone number saved');
+      }
+    } else if (channel === 'Call') {
+      if (phone) {
+        window.location.href = `tel:${phone.replace(/\D/g, '')}`;
+      } else {
+        toast.error('No phone number saved');
+      }
+    }
+
     onAction?.(channel);
     onOpenChange(false);
   };
@@ -21,37 +38,95 @@ export function NurtureDrawer({ isOpen, onOpenChange, data, onAction }: NurtureD
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50 transition-opacity duration-300 backdrop-blur-sm" />
-        <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-3xl h-fit mt-24 fixed bottom-0 left-0 right-0 z-50 outline-none border-t border-slate-700 shadow-2xl">
-          <div className="p-6 pb-8 space-y-6 flex-1">
-            {/* Handle/Grabber */}
-            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-2" />
-            
+        <Drawer.Overlay className="fixed inset-0 z-50 transition-opacity duration-300 backdrop-blur-sm" style={{ backgroundColor: "rgba(0,0,0,0.3)" }} />
+        <Drawer.Content
+          className="flex flex-col rounded-t-2xl h-fit mt-24 fixed bottom-0 left-0 right-0 z-50 outline-none"
+          style={{
+            backgroundColor: "var(--rm-bg-card)",
+            borderTop: "0.5px solid var(--rm-border)",
+          }}
+        >
+          <div className="p-6 pb-8 space-y-5 flex-1">
+            {/* Handle */}
+            <div
+              className="w-10 h-1 rounded-full mx-auto mb-2"
+              style={{ backgroundColor: "var(--rm-border)" }}
+            />
+
             {/* Header */}
-            <header className="text-center relative">
-              <h2 className="text-xl font-bold text-white tracking-tight flex items-center justify-center gap-2">
-                Nurture {data.name} <Sparkles size={18} className="text-indigo-400" />
+            <header className="text-center">
+              <h2
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontSize: 19,
+                  fontWeight: 400,
+                  color: "var(--rm-text-primary)",
+                }}
+              >
+                Say hello to {data.name}
               </h2>
             </header>
 
             <div className="space-y-4">
-              {/* The Lore Spark */}
-              <section className="bg-indigo-950/30 border border-indigo-500/30 p-4 rounded-xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-                <h3 className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-2 flex items-center gap-1.5 z-10 relative">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-                  Remember Why
+              {/* Remember Why */}
+              <section
+                style={{
+                  backgroundColor: "var(--rm-avatar-bg)",
+                  border: "0.5px solid var(--rm-border)",
+                  borderRadius: 13,
+                  padding: "12px 14px",
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    color: "var(--rm-text-muted)",
+                    marginBottom: 6,
+                  }}
+                >
+                  Remember why
                 </h3>
-                <p className="text-slate-200 italic font-serif leading-relaxed z-10 relative px-1">&quot;{data.whyStayInContact}&quot;</p>
+                <p
+                  style={{
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    color: "var(--rm-text-primary)",
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    fontStyle: "italic",
+                  }}
+                >
+                  &quot;{data.whyStayInContact}&quot;
+                </p>
               </section>
 
-              {/* Suggested Starter */}
+              {/* Conversation Starter */}
               {data.lastSharedMemory && (
-                <section className="bg-slate-800 border border-slate-700 p-4 rounded-xl">
-                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                    Conversation Starter
+                <section
+                  style={{
+                    backgroundColor: "var(--rm-bg-base)",
+                    border: "0.5px solid var(--rm-border)",
+                    borderRadius: 13,
+                    padding: "12px 14px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: "var(--rm-text-muted)",
+                      marginBottom: 6,
+                    }}
+                  >
+                    Conversation starter
                   </h3>
-                  <div className="bg-slate-900/50 rounded-lg p-3 text-sm text-slate-300 font-medium">
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "var(--rm-text-secondary)",
+                      fontWeight: 500,
+                    }}
+                  >
                     &quot;Hey! Was just thinking about {data.lastSharedMemory.content}...&quot;
                   </div>
                 </section>
@@ -60,19 +135,33 @@ export function NurtureDrawer({ isOpen, onOpenChange, data, onAction }: NurtureD
 
             {/* Actions */}
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <Button 
+              <Button
                 onClick={() => handleAction('Message')}
-                className="h-14 flex items-center justify-center gap-2 bg-linear-to-br from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-900/30 w-full text-base"
+                disabled={!data.phoneNumber}
+                className="h-12 flex items-center justify-center gap-2 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "var(--rm-accent)",
+                  color: "#FFFFFF",
+                  fontWeight: 500,
+                  border: "none",
+                }}
               >
-                <MessageCircle size={20} />
+                <MessageCircle size={18} />
                 Message
               </Button>
-              <Button 
+              <Button
                 onClick={() => handleAction('Call')}
+                disabled={!data.phoneNumber}
                 variant="outline"
-                className="h-14 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white border-slate-700 rounded-xl font-bold transition-all w-full text-base"
+                className="h-12 flex items-center justify-center gap-2 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "var(--rm-bg-base)",
+                  color: "var(--rm-text-primary)",
+                  fontWeight: 500,
+                  border: "0.5px solid var(--rm-border)",
+                }}
               >
-                <Phone size={20} className="text-slate-300" />
+                <Phone size={18} style={{ color: "var(--rm-text-secondary)" }} />
                 Call
               </Button>
             </div>

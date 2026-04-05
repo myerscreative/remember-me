@@ -1,33 +1,13 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ErrorFallback } from "@/components/error-fallback";
-import {
-  Users,
-  TrendingUp,
-  Zap,
-  Activity,
-  RefreshCw,
-  Sparkles,
-} from "lucide-react";
-import { toast } from "react-hot-toast";
+import { Activity } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DailyPracticeWidget } from '@/components/dashboard/DailyPracticeWidget';
-import { GardenPreview } from '@/components/dashboard/GardenPreview';
 import { NeedsNurtureList } from "@/components/dashboard/NeedsNurtureList";
-import { DailyBriefing } from "@/components/dashboard/DailyBriefing";
 import { getDailyBriefing } from '@/app/actions/get-daily-briefing';
 import LogGroupInteractionModal from "@/components/LogGroupInteractionModal";
-import { cn } from "@/lib/utils";
-import { autoMapTribes } from "@/app/actions/auto-map-tribes";
-import { MilestoneRadar } from "@/components/MilestoneRadar";
-import { CriticalNudges } from "@/components/dashboard/CriticalNudges";
-import { SocialForecast } from "@/components/dashboard/SocialForecast";
-import { WeeklyBriefing } from "@/components/dashboard/WeeklyBriefing";
-import { TriageMode } from "@/components/dashboard/TriageMode";
+import { getMilestones, type Milestone } from "@/lib/dashboard/dashboardUtils";
 import {
   getDashboardStats,
   getContactsNeedingAttention,
@@ -39,6 +19,65 @@ import {
 } from "@/lib/dashboard/dashboardUtils";
 import { createClient } from "@/lib/supabase/client";
 import { getAllMapContacts } from "@/app/actions/dashboard-map";
+import { getInitialsFromFullName } from "@/lib/utils/contact-helpers";
+import { getLastSeenText } from "@/lib/utils/interaction-utils";
+import Link from "next/link";
+
+/* ─── helpers ─── */
+function getGreetingPrefix(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function formatTodayDate(): string {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/** Map a contact to a health tier */
+function getHealthTier(contact: any): {
+  dot: string;
+  label: string;
+  textColor: string;
+} {
+  const now = Date.now();
+  const lastDate = contact.last_interaction_date || contact.last_contact || contact.created_at;
+  if (!lastDate) {
+    return { dot: "var(--rm-health-brown)", label: "Drifting", textColor: "var(--rm-health-text-brown)" };
+  }
+  const daysAgo = Math.floor((now - new Date(lastDate).getTime()) / 86_400_000);
+  let threshold = 30;
+  if (contact.importance === "high") threshold = 14;
+  else if (contact.importance === "low") threshold = 90;
+
+  if (daysAgo < threshold) {
+    return { dot: "var(--rm-health-green)", label: "Thriving", textColor: "var(--rm-health-green)" };
+  }
+  if (daysAgo < threshold + 30) {
+    return { dot: "var(--rm-health-amber)", label: "Needs some love", textColor: "var(--rm-health-text-amber)" };
+  }
+  return { dot: "var(--rm-health-brown)", label: "Drifting", textColor: "var(--rm-health-text-brown)" };
+}
+
+function getContextLine(contact: any): string {
+  const where = contact.where_met;
+  const lastSeen = getLastSeenText(contact.last_interaction_date);
+
+  if (where && !where.includes("@") && !where.toLowerCase().includes("hotmail") && !where.toLowerCase().includes("gmail") && !where.toLowerCase().includes("yahoo")) {
+    return `${where} · ${lastSeen === "Never" ? "No contact yet" : lastSeen}`;
+  }
+  return `Added from contacts · ${lastSeen === "Never" ? "No contact yet" : lastSeen}`;
+}
+
+function getCTALabel(contact: any): string {
+  const hasInteraction = contact.last_interaction_date || contact.last_contact;
+  return hasInteraction ? "Check in →" : "Say hello →";
+}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -49,12 +88,11 @@ export default function DashboardPage() {
   const [tribeHealth, setTribeHealth] = useState<TribeHealth[]>([]);
   const [relationshipHealth, setRelationshipHealth] = useState<RelationshipHealth | null>(null);
   const [allContacts, setAllContacts] = useState<any[]>([]);
-  
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+
   const [user, setUser] = useState<any>(null);
   const [selectedTribe, setSelectedTribe] = useState<TribeHealth | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTriageActive, setIsTriageActive] = useState(false);
-  const [driftedContacts, setDriftedContacts] = useState<any[]>([]);
 
   const loadDashboardData = useCallback(async () => {
     setIsLoading(true);
@@ -68,6 +106,7 @@ export default function DashboardPage() {
         healthResult,
         briefingResult,
         mapResult,
+        milestonesResult,
       ] = await Promise.all([
         getDashboardStats(),
         getContactsNeedingAttention(),
@@ -75,43 +114,24 @@ export default function DashboardPage() {
         getRelationshipHealth(),
         getDailyBriefing(),
         getAllMapContacts(),
+        getMilestones(),
       ]);
 
-      const supabaseClient = createClient();
-
       if (mapResult.data) {
-         setAllContacts(mapResult.data);
-      }
-      
-      if (mapResult.error) {
-          console.error("Map Sync Error:", mapResult.error);
-          toast.error(`Map Sync Failed: ${mapResult.error}`);
+        setAllContacts(mapResult.data);
       }
 
       if (statsResult.error) throw statsResult.error;
-      if (attentionResult.error) console.error("Error fetching attention list:", attentionResult.error);
 
       setStats(statsResult.data);
       setNeedingAttention((attentionResult.data || []).slice(0, 10));
       setTribeHealth(tribesResult.data || []);
       setRelationshipHealth(healthResult.data);
+      setMilestones(milestonesResult.data || []);
 
-      if (user?.id) {
-        const { data: drifted } = await supabaseClient
-          .from('persons')
-          .select('id, name')
-          .eq('user_id', user.id)
-          .in('status', ['Drifting', 'Neglected'])
-          .or('archive_status.is.null,archive_status.eq.false')
-          .limit(10);
-        setDriftedContacts(drifted || []);
-      }
-
-      // Suppress unused warning if briefingResult is not needed here
       if (briefingResult) {
-        // ... handled in briefing page
+        // handled in briefing page
       }
-
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       setError(error instanceof Error ? error : new Error("Failed to load dashboard data"));
@@ -131,26 +151,24 @@ export default function DashboardPage() {
     loadDashboardData();
   }, [loadDashboardData]);
 
-
-
+  /* ─── loading ─── */
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--rm-bg-base)" }}>
         <div className="flex items-center gap-3">
-          <Activity className="h-6 w-6 animate-pulse text-purple-600" />
-          <span className="text-gray-600 dark:text-gray-400">
-            Loading dashboard...
-          </span>
+          <Activity className="h-5 w-5 animate-pulse" style={{ color: "var(--rm-accent)" }} />
+          <span style={{ color: "var(--rm-text-secondary)", fontSize: 13 }}>Loading...</span>
         </div>
       </div>
     );
   }
 
+  /* ─── error ─── */
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-        <ErrorFallback 
-          error={error} 
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "var(--rm-bg-base)" }}>
+        <ErrorFallback
+          error={error}
           reset={loadDashboardData}
           title="Dashboard unavailable"
           message="We couldn't load your dashboard data. Please check your connection and try again."
@@ -159,236 +177,253 @@ export default function DashboardPage() {
     );
   }
 
+  const firstName =
+    user?.user_metadata?.full_name?.split(" ")[0] ||
+    user?.user_metadata?.name?.split(" ")[0] ||
+    "Friend";
+
+  const topThree = needingAttention.slice(0, 3);
+  const hasMore = needingAttention.length > 3;
+
+  /* Filter milestones to show non-empty slots */
+  const upcomingBirthday = milestones.find((m) => m.type === "birthday");
+  const upcomingAnniversary = milestones.find((m) => m.type === "anniversary");
+  const upcomingFollowUp = milestones.find((m) => m.type !== "birthday" && m.type !== "anniversary");
+  const comingUpItems = [upcomingBirthday, upcomingAnniversary, upcomingFollowUp].filter(Boolean) as Milestone[];
+
   return (
-    <div className="flex flex-col min-h-screen bg-transparent pb-32 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen pb-32 overflow-x-hidden" style={{ backgroundColor: "var(--rm-bg-base)" }}>
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1600px] mx-auto w-full px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
-          
-            {/* Mobile Header (Simplified) */}
-            <div className="flex md:hidden items-center justify-between mb-3">
-                <h1 className="text-xl font-bold flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-purple-600" />
-                    Dashboard
-                </h1>
-                <Button
-                    onClick={() => setIsTriageActive(!isTriageActive)}
-                    variant={isTriageActive ? "default" : "outline"}
-                    size="sm"
-                    className={cn(
-                        "rounded-full font-bold uppercase tracking-tighter text-[10px] h-7 px-2.5 gap-1.5",
-                        isTriageActive ? "bg-orange-600" : "border-orange-200 text-orange-600"
-                    )}
-                >
-                    {isTriageActive ? "Exit" : "Nurture"}
-                </Button>
-            </div>
+        <div className="max-w-lg mx-auto w-full px-4 py-6 space-y-5">
 
-          {/* Nurture View Override */}
-          {isTriageActive ? (
-            <TriageMode 
-              contacts={needingAttention.map(c => ({
-                id: c.id,
-                name: c.name,
-                first_name: c.first_name,
-                last_name: c.last_name,
-                photo_url: c.photo_url,
-                days_since_contact: Math.floor((Date.now() - new Date(c.last_interaction_date).getTime()) / (1000 * 60 * 60 * 24)),
-                importance: c.importance
-              }))} 
-              onActionComplete={() => {
-                setIsTriageActive(false);
-                loadDashboardData();
+          {/* ─── Greeting ─── */}
+          <div style={{ padding: "0 2px" }}>
+            <h1
+              style={{
+                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontSize: 21,
+                lineHeight: 1.25,
+                fontWeight: 400,
+                color: "var(--rm-text-primary)",
               }}
-            />
-          ) : (
-            <>
-              {/* Welcome Greeting */}
-              <div className="space-y-1 mb-2 px-1">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    Welcome back to your Garden, {user?.user_metadata?.full_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || 'Friend'}.
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                    You have <span className="font-bold text-purple-600 dark:text-purple-400">{stats?.imported || 0} Seeds</span> ready to be planted 
-                    and <span className="font-bold text-orange-600 dark:text-orange-400">{(relationshipHealth?.warning || 0) + (relationshipHealth?.needsAttention || 0)} connections</span> that could use some water.
-                </p>
-              </div>
+            >
+              {getGreetingPrefix()}, {firstName}.
+            </h1>
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--rm-text-muted)",
+                marginTop: 4,
+              }}
+            >
+              {formatTodayDate()}
+            </p>
+          </div>
 
-              {/* Social Forecast (North Star) */}
-              <div className="mb-4">
-                  <SocialForecast />
-              </div>
-              
-              {/* MAIN 3-COLUMN GRID */}
-              <div className="flex flex-col lg:grid lg:grid-cols-[250px_1fr_350px] gap-6 items-start">
+          {/* ─── "A few people to say hello to" ─── */}
+          {topThree.length > 0 && (
+            <section>
+              <h2
+                style={{
+                  fontSize: 10,
+                  fontWeight: 500,
+                  color: "var(--rm-text-muted)",
+                  marginBottom: 9,
+                }}
+              >
+                A few people to say hello to
+              </h2>
 
-              {/* COLUMN 1: SIDEBAR RAIL (250px) - Hidden on Mobile */}
-              <div className="hidden lg:block space-y-6 lg:sticky lg:top-6">
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {topThree.map((contact) => {
+                  const health = getHealthTier(contact);
+                  const initials = getInitialsFromFullName(contact.name || "?");
+                  return (
+                    <div
+                      key={contact.id}
+                      onClick={() => router.push(`/contacts/${contact.id}`)}
+                      style={{
+                        backgroundColor: "var(--rm-bg-card)",
+                        border: "0.5px solid var(--rm-border)",
+                        borderRadius: 13,
+                        padding: "11px 13px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {/* Avatar */}
+                      <div
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: "50%",
+                          backgroundColor: "var(--rm-avatar-bg)",
+                          color: "var(--rm-avatar-text)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 11,
+                          fontWeight: 500,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {initials}
+                      </div>
 
-                 {/* Quick Actions */}
-                 <div className="space-y-2">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Actions</h3>
-                    <div className="space-y-2">
-                        <Button onClick={() => router.push("/contacts/new")} className="w-full justify-start bg-purple-600 hover:bg-purple-700 font-bold shadow-sm">
-                          <Users className="h-4 w-4 mr-3" /> Add Contact
-                        </Button>
-                        <Button onClick={() => router.push("/briefing")} variant="outline" className="w-full justify-start font-bold text-purple-700 border-purple-200 hover:bg-purple-50">
-                          <Sparkles className="h-4 w-4 mr-3" /> Daily Briefing
-                        </Button>
-                        <Button onClick={() => router.push("/import")} variant="ghost" className="w-full justify-start text-slate-600 dark:text-slate-400 font-medium">
-                          <TrendingUp className="h-4 w-4 mr-3" /> Import Data
-                        </Button>
-                        <Button onClick={() => router.push("/ai-batch")} variant="ghost" className="w-full justify-start text-slate-600 dark:text-slate-400 font-medium">
-                          <Zap className="h-4 w-4 mr-3" /> AI Batch
-                        </Button>
+                      {/* Name + context + health */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: "var(--rm-text-primary)",
+                            lineHeight: 1.3,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {contact.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "var(--rm-text-secondary)",
+                            marginTop: 1,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {getContextLine(contact)}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3 }}>
+                          <span
+                            style={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: "50%",
+                              backgroundColor: health.dot,
+                              display: "inline-block",
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span style={{ fontSize: 10, color: health.textColor }}>
+                            {health.label}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* CTA */}
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 500,
+                          color: "var(--rm-accent)",
+                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {getCTALabel(contact)}
+                      </span>
                     </div>
-                 </div>
+                  );
+                })}
+              </div>
 
-                 {/* Stats Summary */}
-                 <div className="space-y-2">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Overview</h3>
-                    <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-none overflow-hidden">
-                        <CardContent className="p-0">
-                            <Link href="/network" className="flex justify-between items-center p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                <span className="text-sm font-medium text-slate-500">Total</span>
-                                <span className="text-lg font-bold text-slate-900 dark:text-white">{stats?.totalContacts || 0}</span>
-                            </Link>
-                            <div className="h-px bg-slate-200 dark:bg-slate-800" />
-                            <Link href="/network?has_lore=true" className="flex justify-between items-center p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                <span className="text-sm font-medium text-slate-500">Context</span>
-                                <span className="text-lg font-bold text-slate-700 dark:text-slate-300">{stats?.withContext || 0}</span>
-                            </Link>
-                        </CardContent>
-                    </Card>
-                 </div>
-
-                 {/* Ignition (Bottom of rail) */}
-                 <Button
-                    onClick={async () => {
-                        const loadingToast = toast.loading("Igniting data...");
-                        const res = await autoMapTribes();
-                        toast.dismiss(loadingToast);
-                        if (res.success) {
-                            toast.success(`Mapped ${res.count} contacts.`);
-                            loadDashboardData();
-                        } else {
-                            toast.error("Ignition failed");
-                        }
-                    }}
-                    variant="outline"
-                    className="w-full border-dashed border-slate-300 text-slate-400 text-xs uppercase tracking-widest hover:text-orange-500 hover:border-orange-500 transition-colors"
+              {hasMore && (
+                <Link
+                  href="/?filter=nurture"
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: "var(--rm-accent)",
+                    marginTop: 10,
+                  }}
                 >
-                    <RefreshCw className="h-3 w-3 mr-2" /> Ignite
-                </Button>
-
-              </div>
-
-              {/* COLUMN 2: MAIN CENTER (Auto) */}
-              <div className="space-y-6 min-w-0 w-full">
-
-                  {/* Mobile Quick Stats - Only visible on mobile */}
-                  <div className="lg:hidden grid grid-cols-2 gap-3">
-                      <Link href="/network">
-                        <Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800 active:scale-95 transition-transform h-full">
-                            <CardContent className="p-3 text-center">
-                                <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Total</div>
-                                <div className="text-2xl font-black text-purple-900 dark:text-purple-100">{stats?.totalContacts || 0}</div>
-                            </CardContent>
-                        </Card>
-                      </Link>
-                      <Link href="/network?has_lore=true">
-                        <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800 active:scale-95 transition-transform h-full">
-                            <CardContent className="p-3 text-center">
-                                <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Context</div>
-                                <div className="text-2xl font-black text-blue-900 dark:text-blue-100">{stats?.withContext || 0}</div>
-                            </CardContent>
-                        </Card>
-                      </Link>
-                  </div>
-
-                  {/* Daily Briefing - Relationship Drift Alerts */}
-                  <DailyBriefing driftedContacts={driftedContacts} />
-
-                  {/* Critical Drifters (Urgent) */}
-                  <CriticalNudges />
-
-                  {/* Daily Practice */}
-                  <DailyPracticeWidget />
-
-                  {/* Weekly Briefing (Automated Context Summary) */}
-                  <WeeklyBriefing />
-
-
-
-                  {/* Needs Nurture List (Redesigned & Compact with Filter) */}
-                  <NeedsNurtureList contacts={needingAttention} />
-
-
-
-              </div>
-
-              {/* COLUMN 3: DATA RIGHT (350px) - Hidden on Mobile, Shows below main content */}
-              <div className="space-y-4 lg:sticky lg:top-6 w-full lg:w-auto">
-                 
-                 {/* Relationship Health Card (Map + Stats) */}
-                 <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-                     {/* Garden Preview - Click to view full garden */}
-
-                     <GardenPreview contacts={allContacts} />
-                     
-                     {/* Stats Footer */}
-                     {relationshipHealth && (
-                          <div className="flex border-t border-border divide-x divide-border bg-muted/50 backdrop-blur-sm">
-                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                  <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">Nurtured</div>
-                                  <div className="text-lg font-black text-foreground">{relationshipHealth.healthy}</div>
-                              </div>
-                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                  <div className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-0.5">Drifting</div>
-                                  <div className="text-lg font-black text-foreground">{relationshipHealth.warning}</div>
-                              </div>
-                              <div className="flex-1 py-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                                  <div className="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-0.5">Neglected</div>
-                                  <div className="text-lg font-black text-foreground">{relationshipHealth.needsAttention}</div>
-                              </div>
-                          </div>
-                     )}
-                 </div>
-
-                 {/* Milestone Radar (Conditional) */}
-                 <div className="bg-white dark:bg-card rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <MilestoneRadar />
-                 </div>
-
-                 {/* Tribe Health (Conditional) */}
-                 {tribeHealth.length > 0 && (
-                     <div className="bg-white dark:bg-card rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tribes</h3>
-                        </div>
-                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                             {tribeHealth.slice(0, 5).map(t => (
-                                 <div key={t.name} className="px-3 py-2 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer" onClick={() => { setSelectedTribe(t); setIsModalOpen(true); }}>
-                                     <div className="flex items-center gap-2">
-                                         {t.isThirsty && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
-                                         <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{t.name}</span>
-                                     </div>
-                                     <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-sm", t.isThirsty ? "bg-red-100 text-red-600" : "bg-slate-100 text-slate-500")}>
-                                         {t.maxDaysSince}d
-                                     </span>
-                                 </div>
-                             ))}
-                        </div>
-                     </div>
-                 )}
-
-              </div>
-            </div>
-            </>
+                  See all
+                </Link>
+              )}
+            </section>
           )}
+
+          {/* ─── Coming up ─── */}
+          {comingUpItems.length > 0 && (
+            <section>
+              <h2
+                style={{
+                  fontSize: 10,
+                  fontWeight: 500,
+                  color: "var(--rm-text-muted)",
+                  marginBottom: 9,
+                }}
+              >
+                Coming up
+              </h2>
+
+              <div style={{ display: "flex", gap: 7, overflowX: "auto" }} className="scrollbar-hide">
+                {comingUpItems.map((m, i) => {
+                  const isOverdue = m.daysRemaining === 0;
+                  const timingColor = isOverdue ? "var(--rm-health-text-amber)" : "var(--rm-accent)";
+                  const timingText = isOverdue
+                    ? "Today"
+                    : m.daysRemaining === 1
+                      ? "Tomorrow"
+                      : `In ${m.daysRemaining} days`;
+                  const typeLabel =
+                    m.type === "birthday"
+                      ? "Birthday"
+                      : m.type === "anniversary"
+                        ? "Anniversary"
+                        : "Follow-up";
+
+                  return (
+                    <div
+                      key={`${m.contactId}-${i}`}
+                      style={{
+                        backgroundColor: "var(--rm-bg-card-mini)",
+                        border: "0.5px solid var(--rm-border)",
+                        borderRadius: 10,
+                        padding: "8px 9px",
+                        minWidth: 130,
+                        flex: "1 1 0",
+                      }}
+                    >
+                      <div style={{ fontSize: 9, color: "var(--rm-text-muted)", marginBottom: 3 }}>
+                        {typeLabel}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: "var(--rm-text-primary)",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {m.contactName}
+                      </div>
+                      <div style={{ fontSize: 10, color: timingColor, marginTop: 2 }}>
+                        {timingText}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ─── Full nurture list (below fold) ─── */}
+          <NeedsNurtureList contacts={needingAttention} />
         </div>
       </div>
 
-      <LogGroupInteractionModal 
+      <LogGroupInteractionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={loadDashboardData}

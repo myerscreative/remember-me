@@ -4,6 +4,47 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ========================================
+   REMEMBER ME — DESIGN TOKENS
+   ======================================== */
+:root {
+  --rm-bg-base:        #FAF8F2;
+  --rm-bg-card:        #FFFFFF;
+  --rm-bg-card-mini:   #FFFFFF;
+  --rm-border:         #EBE7DF;
+  --rm-text-primary:   #2B2826;
+  --rm-text-secondary: #A09A93;
+  --rm-text-muted:     #B0AA9F;
+  --rm-accent:         #6670C4;
+  --rm-avatar-bg:      #ECEAF8;
+  --rm-avatar-text:    #6670C4;
+  --rm-health-green:   #5E9B6E;
+  --rm-health-amber:   #C8843A;
+  --rm-health-brown:   #A0845A;
+  --rm-health-text-amber: #C8843A;
+  --rm-health-text-brown: #A0845A;
+  --rm-nav-bg:         #FAF8F2;
+}
+
+.dark {
+  --rm-bg-base:        #1B1713;
+  --rm-bg-card:        #26221C;
+  --rm-bg-card-mini:   #26221C;
+  --rm-border:         #3A342C;
+  --rm-text-primary:   #EDE8E0;
+  --rm-text-secondary: #6A6560;
+  --rm-text-muted:     #5A5550;
+  --rm-accent:         #A8AFEE;
+  --rm-avatar-bg:      #33304A;
+  --rm-avatar-text:    #A8AFEE;
+  --rm-health-green:   #5E9B6E;
+  --rm-health-amber:   #D4904A;
+  --rm-health-brown:   #8C7250;
+  --rm-health-text-amber: #D4904A;
+  --rm-health-text-brown: #8C7250;
+  --rm-nav-bg:         #1B1713;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -48,38 +89,32 @@
 
 :root {
   --radius: 0.625rem;
-  /* Warmer, friendlier background (Warm Stone/Paper) */
-  --background: oklch(0.985 0.005 85);
-  --foreground: oklch(0.25 0.02 85); /* Softer charcoal */
+  --background: #FAF8F2;
+  --foreground: #2B2826;
 
-  /* Cards remain white to pop against the warm background */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.02 85);
+  --card: #FFFFFF;
+  --card-foreground: #2B2826;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.02 85);
+  --popover: #FFFFFF;
+  --popover-foreground: #2B2826;
 
-  /* ReMember Me Brand Colors - Warmer Primary */
-  --primary: oklch(0.6 0.2 260); /* Purple - remains core identity */
-  --primary-foreground: oklch(1 0 0);
+  --primary: #6670C4;
+  --primary-foreground: #FFFFFF;
 
-  /* Warmer Secondary */
-  --secondary: oklch(0.7 0.15 200);
-  --secondary-foreground: oklch(0.1 0 0);
+  --secondary: #F3F1EC;
+  --secondary-foreground: #2B2826;
 
-  /* Warmer Muted tones */
-  --muted: oklch(0.96 0.005 85);
-  --muted-foreground: oklch(0.55 0.01 85);
+  --muted: #F3F1EC;
+  --muted-foreground: #A09A93;
 
-  --accent: oklch(0.75 0.18 150);
-  --accent-foreground: oklch(0.1 0 0);
+  --accent: #ECEAF8;
+  --accent-foreground: #2B2826;
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  /* Warmer borders */
-  --border: oklch(0.93 0.005 85);
-  --input: oklch(0.93 0.005 85);
-  --ring: oklch(0.6 0.2 260);
+  --border: #EBE7DF;
+  --input: #EBE7DF;
+  --ring: #6670C4;
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -87,15 +122,14 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
 
-  /* Warmer Sidebar */
-  --sidebar: oklch(0.975 0.005 85);
-  --sidebar-foreground: oklch(0.25 0.02 85);
-  --sidebar-primary: oklch(0.6 0.2 260);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.95 0.005 85);
-  --sidebar-accent-foreground: oklch(0.25 0.02 85);
-  --sidebar-border: oklch(0.93 0.005 85);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #FAF8F2;
+  --sidebar-foreground: #A09A93;
+  --sidebar-primary: #6670C4;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #ECEAF8;
+  --sidebar-accent-foreground: #2B2826;
+  --sidebar-border: #EBE7DF;
+  --sidebar-ring: #6670C4;
 
   /* Safe area insets for Expo/Capacitor/iOS (notch, home indicator). env() in WebView; 0 on desktop. */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -105,64 +139,55 @@
 }
 
 .dark {
-  /* Master Prompt Update: Visual Hierarchy Restoration & Anti-Dreariness */
+  --background: #1B1713;
+  --foreground: #EDE8E0;
 
-  /* 1. Primary Background (Main Content): Midnight Navy */
-  --background: #0f172a;
-  --foreground: #f8fafc; /* Slate 50 */
+  --card: #26221C;
+  --card-foreground: #EDE8E0;
 
-  /* 3. Component Background (Cards/Widgets): Slate Navy */
-  --card: #1e293b;
-  --card-foreground: #f8fafc;
+  --popover: #26221C;
+  --popover-foreground: #EDE8E0;
 
-  --popover: #1e293b;
-  --popover-foreground: #f8fafc;
+  --primary: #A8AFEE;
+  --primary-foreground: #1B1713;
 
-  /* Accents: Electric Blue (#3B82F6) */
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
+  --secondary: #332F28;
+  --secondary-foreground: #EDE8E0;
 
-  --secondary: #334155; /* Slate 700 */
-  --secondary-foreground: #f8fafc;
+  --muted: #26221C;
+  --muted-foreground: #6A6560;
 
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8; /* Slate 400 - Secondary Text */
-
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
+  --accent: #33304A;
+  --accent-foreground: #EDE8E0;
 
   --destructive: 0.6 0.2 25;
 
-  /* Borders: #334155 for cards */
-  --border: #334155;
-  --input: #334155;
-  --ring: #3b82f6;
+  --border: #3A342C;
+  --input: #3A342C;
+  --ring: #A8AFEE;
 
-  /* Charts */
   --chart-1: 0.75 0.2 250;
   --chart-2: 0.6 0.1 245;
   --chart-3: 0.5 0.1 245;
   --chart-4: 0.7 0.1 245;
   --chart-5: 0.8 0.1 245;
 
-  /* 2. Sidebar & Header Unification: Deep Navy */
-  --sidebar: #0b1120;
-  --sidebar-foreground: #94a3b8; /* Slate Gray for inactive */
-  --sidebar-primary: #3b82f6; /* Active state blue */
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1e293b; /* Hover state */
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1e293b; /* Subtle border */
-  --sidebar-ring: #3b82f6;
+  --sidebar: #1B1713;
+  --sidebar-foreground: #6A6560;
+  --sidebar-primary: #A8AFEE;
+  --sidebar-primary-foreground: #1B1713;
+  --sidebar-accent: #26221C;
+  --sidebar-accent-foreground: #EDE8E0;
+  --sidebar-border: #3A342C;
+  --sidebar-ring: #A8AFEE;
 
-  /* Component-Specific Dark Mode Vars */
-  --conversation-starter-bg: rgba(139, 92, 246, 0.1);
-  --conversation-starter-border: rgba(139, 92, 246, 0.3);
-  --conversation-starter-text: #c4b5fd;
+  --conversation-starter-bg: rgba(168, 175, 238, 0.1);
+  --conversation-starter-border: rgba(168, 175, 238, 0.3);
+  --conversation-starter-text: #A8AFEE;
 
-  --nurture-banner-bg: rgba(59, 130, 246, 0.1);
-  --nurture-banner-border: rgba(59, 130, 246, 0.3);
-  --nurture-banner-text: #93c5fd;
+  --nurture-banner-bg: rgba(168, 175, 238, 0.1);
+  --nurture-banner-border: rgba(168, 175, 238, 0.3);
+  --nurture-banner-text: #A8AFEE;
 }
 
 /* ========================================
@@ -170,58 +195,13 @@
    ======================================== */
 :root[data-theme="light"],
 :root:not(.dark) {
-  /* Core Light Theme Colors - Requested */
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --border-subtle: #e2e8f0;
-  --accent-purple: #8b5cf6;
+  --conversation-starter-bg: #ECEAF8;
+  --conversation-starter-border: #D8D5F0;
+  --conversation-starter-text: #4A4080;
 
-  /* Override CSS Variables for Light Mode */
-  --background: var(--bg-main);
-  --foreground: var(--text-primary);
-
-  --card: var(--bg-card);
-  --card-foreground: var(--text-primary);
-
-  --popover: var(--bg-card);
-  --popover-foreground: var(--text-primary);
-
-  --primary: var(--accent-purple);
-  --primary-foreground: #ffffff;
-
-  --secondary: #f1f5f9;
-  --secondary-foreground: var(--text-primary);
-
-  --muted: #f1f5f9;
-  --muted-foreground: var(--text-secondary);
-
-  --accent: #f3e8ff; /* Light Purple for active items */
-  --accent-foreground: var(--text-primary);
-
-  --border: var(--border-subtle);
-  --input: var(--border-subtle);
-  --ring: var(--accent-purple);
-
-  /* Sidebar Light Mode */
-  --sidebar: #ffffff;
-  --sidebar-foreground: var(--text-secondary);
-  --sidebar-primary: var(--accent-purple);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f3e8ff;
-  --sidebar-accent-foreground: var(--text-primary);
-  --sidebar-border: var(--border-subtle);
-  --sidebar-ring: var(--accent-purple);
-
-  /* Component-Specific Light Mode Vars */
-  --conversation-starter-bg: #f5f3ff;
-  --conversation-starter-border: #ddd6fe;
-  --conversation-starter-text: #4c1d95;
-
-  --nurture-banner-bg: #eff6ff;
-  --nurture-banner-border: #bfdbfe;
-  --nurture-banner-text: #1e3a8a;
+  --nurture-banner-bg: #ECEAF8;
+  --nurture-banner-border: #D8D5F0;
+  --nurture-banner-text: #4A4080;
 }
 
 @layer base {
@@ -321,15 +301,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  background: var(--rm-bg-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  background: var(--rm-border);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  background: var(--rm-text-muted);
 }
 
 /* ========================================

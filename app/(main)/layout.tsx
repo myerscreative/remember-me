@@ -23,7 +23,7 @@ export default function MainLayout({
           <DeepLinkHandler />
           <SplashScreenHandler />
           <ThemeProvider>
-            <div className="flex min-h-screen flex-col md:flex-row">
+            <div className="flex min-h-screen flex-col md:flex-row" style={{ backgroundColor: 'var(--rm-bg-base)' }}>
               <SidebarNav />
               <div className="flex min-h-screen flex-1 flex-col md:ml-64">
                 <MobileHeader />
