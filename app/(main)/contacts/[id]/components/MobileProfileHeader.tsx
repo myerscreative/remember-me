@@ -6,6 +6,7 @@ import { FREQUENCY_PRESETS } from "@/lib/relationship-health";
 import { ArrowLeft, Star, Edit, Check, Camera, Phone, Mail, RefreshCw, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useRef } from "react";
+import { toast } from "sonner";
 
 interface MobileProfileHeaderProps {
   contact: any;
@@ -136,23 +137,38 @@ export function MobileProfileHeader({
 
         {/* Action Buttons Row - Horizontal & Compact */}
         <div className="flex gap-2 mt-4 ml-[72px]">
-            {contact.phone && (
-                <a href={`tel:${contact.phone}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm"> 
+            {contact.phone ? (
+                <a href={`tel:${contact.phone}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm">
                     <Phone className="h-3.5 w-3.5" />
                     <span>Call</span>
                 </a>
+            ) : (
+                <button onClick={() => toast.error('No phone number saved')} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/10 text-white/40 rounded-lg transition-all border border-white/5 text-xs font-semibold backdrop-blur-sm">
+                    <Phone className="h-3.5 w-3.5" />
+                    <span>Call</span>
+                </button>
             )}
-             {contact.phone && (
-                <a href={`sms:${contact.phone}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm"> 
+            {contact.phone ? (
+                <a href={`sms:${contact.phone}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm">
                     <MessageCircle className="h-3.5 w-3.5" />
                     <span>Text</span>
                 </a>
+            ) : (
+                <button onClick={() => toast.error('No phone number saved')} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/10 text-white/40 rounded-lg transition-all border border-white/5 text-xs font-semibold backdrop-blur-sm">
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    <span>Text</span>
+                </button>
             )}
-            {contact.email && (
-                <a href={`mailto:${contact.email}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm"> 
+            {contact.email ? (
+                <a href={`mailto:${contact.email}`} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-lg transition-all border border-white/10 text-xs font-semibold backdrop-blur-sm">
                     <Mail className="h-3.5 w-3.5" />
                     <span>Email</span>
                 </a>
+            ) : (
+                <button onClick={() => toast.error('No email saved')} className="flex-1 flex items-center justify-center gap-2 py-1.5 bg-white/10 text-white/40 rounded-lg transition-all border border-white/5 text-xs font-semibold backdrop-blur-sm">
+                    <Mail className="h-3.5 w-3.5" />
+                    <span>Email</span>
+                </button>
             )}
         </div>
 

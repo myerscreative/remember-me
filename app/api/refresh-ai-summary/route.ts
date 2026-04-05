@@ -68,26 +68,44 @@ export async function POST(request: NextRequest) {
     // Type assertion for person - Supabase returns any, but we know the shape
     const typedPerson = person as any;
 
-    // Fetch shared memories
+    // Fetch shared memories (latest 3–5 for context; prioritize over deep_lore)
     const { data: sharedMemories } = await (supabase as any)
       .from("shared_memories")
       .select("content, created_at")
       .eq("person_id", contactId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    const latestMemories = (sharedMemories || []).slice(0, 5);
 
     // Build comprehensive context for AI
+    // Explicitly structure: Origin, Purpose, Values + Shared Memories (prioritized) + Historical Context (deep_lore)
     const personName = typedPerson.name || `${typedPerson.first_name || ''} ${typedPerson.last_name || ''}`.trim() || 'this person';
 
     const contextParts: string[] = [];
     contextParts.push(`Name: ${personName}`);
 
+    // Foundational narrative fields (explicit labels for prompt clarity)
+    if (typedPerson.where_met) contextParts.push(`[ORIGIN] Where we met: ${typedPerson.where_met}`);
+    if (typedPerson.why_stay_in_contact) contextParts.push(`[PURPOSE] Why we stay in contact: ${typedPerson.why_stay_in_contact}`);
+    if (typedPerson.most_important_to_them) contextParts.push(`[VALUES] What matters to them: ${typedPerson.most_important_to_them}`);
+
+    // Shared Memories: primary source for narrative (most recent first)
+    if (latestMemories.length > 0) {
+      const memoriesText = latestMemories.map((m: any) => m.content).join('\n- ');
+      contextParts.push(`[SHARED MEMORIES] (most recent first, use as primary narrative source):\n- ${memoriesText}`);
+    }
+
+    // Legacy deep_lore: Historical Context only; do NOT prioritize over shared_memories
+    if (typedPerson.deep_lore) {
+      contextParts.push(`[HISTORICAL CONTEXT] (legacy notes; use to supplement, not replace Shared Memories):\n${typedPerson.deep_lore}`);
+    }
+
+    // Supporting fields
     if (typedPerson.email) contextParts.push(`Email: ${typedPerson.email}`);
     if (typedPerson.phone) contextParts.push(`Phone: ${typedPerson.phone}`);
     if (typedPerson.company) contextParts.push(`Company: ${typedPerson.company}`);
     if (typedPerson.job_title) contextParts.push(`Job Title: ${typedPerson.job_title}`);
-    if (typedPerson.where_met) contextParts.push(`Where We Met: ${typedPerson.where_met}`);
-    if (typedPerson.why_stay_in_contact) contextParts.push(`Why We Stay in Contact: ${typedPerson.why_stay_in_contact}`);
-    if (typedPerson.most_important_to_them) contextParts.push(`What's Important to Them: ${typedPerson.most_important_to_them}`);
     if (typedPerson.birthday) contextParts.push(`Birthday: ${typedPerson.birthday}`);
 
     if (typedPerson.interests && typedPerson.interests.length > 0) {
@@ -101,27 +119,17 @@ export async function POST(request: NextRequest) {
       contextParts.push(`Family: ${familyInfo}`);
     }
 
-    if (typedPerson.deep_lore) {
-      contextParts.push(`Previous Notes: ${typedPerson.deep_lore}`);
-    }
-
-    // DO NOT include raw brain dump memories - they cause verbatim copying
-    // The AI should only use the structured, extracted fields above
-    // if (sharedMemories && sharedMemories.length > 0) {
-    //   const memoriesText = sharedMemories.slice(0, 5).map((m: any) => m.content).join('\n- ');
-    //   contextParts.push(`Recent Memories:\n- ${memoriesText}`);
-    // }
-
     const context = contextParts.join('\n');
 
-    // Generate three aligned zoom levels from the same facts
-    const systemPrompt = `You are a professional relationship manager creating concise summaries.
+    // Generate three aligned zoom levels using "Previously On..." narrative format
+    const systemPrompt = `You are a professional relationship manager creating concise summaries in a "Previously On..." narrative style.
 
 CRITICAL INSTRUCTIONS:
 1. **NEVER copy or quote the user's notes directly**
 2. **SYNTHESIZE** information into a polished, third-person narrative
-3. Transform casual brain dumps into professional summaries
-4. Extract only the key facts and present them cohesively
+3. Do NOT just list facts. Create a narrative bridge that connects who they are, how you know them, and why the relationship matters.
+4. If [PURPOSE] (why_stay_in_contact) is known, use it to frame the advice and emotional context.
+5. Prioritize [SHARED MEMORIES] over [HISTORICAL CONTEXT]. When Shared Memories exist, the most recent one MUST serve as the "Hook" for the next reach-out—lead with it to create a "Previously On..." feel.
 
 You MUST create three aligned "zoom levels":
 - MICRO: 1 sentence, 15–25 words (quick recognition)
@@ -132,6 +140,13 @@ Purpose: help the user instantly remember:
 1) who this person is
 2) how they know them  
 3) why the relationship matters
+4) what to reference when reaching out next (the Hook from the most recent Shared Memory)
+
+NARRATIVE STRUCTURE:
+- When Shared Memories exist: LEAD with the most recent shared memory as the "Previously On..." hook.
+- Use [PURPOSE] to frame why this relationship matters—weave it into the narrative, don't list it.
+- Use [ORIGIN] and [VALUES] as concrete anchors within the narrative flow.
+- Create emotional context, not a dry database entry.
 
 Example transformation:
 ❌ BAD (copying): "[Vibe Check: 4/5] I spoke with Bryan last night for probably 45 minutes. He is no longer working at Eat the Frog Fitness..."
@@ -159,7 +174,7 @@ Output must be VALID JSON ONLY:
         },
         {
           role: "user",
-          content: `PERSON DATA:\n${context}\n\nRemember: SYNTHESIZE this information into a professional summary. Do NOT copy the brain dump text.`,
+          content: `PERSON DATA:\n${context}\n\nRemember: SYNTHESIZE into a "Previously On..." narrative. Prioritize Shared Memories as the Hook. Use Purpose to frame the relationship. Do NOT copy raw notes.`,
         },
       ],
       temperature: 0.3, // Lower temperature for more consistent, less creative output

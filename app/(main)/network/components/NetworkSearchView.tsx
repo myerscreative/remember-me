@@ -2,16 +2,20 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Clock, Star, ArrowLeft, X } from 'lucide-react';
+import { Search, Clock, Star, ArrowLeft, X, Loader2 } from 'lucide-react';
 import { NetworkContact, SubTribe, NetworkData } from './NetworkDataService';
 import { TribeView } from './TribeView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { addContact } from '@/app/actions/add-contact';
+import { toast } from 'sonner';
 
 interface NetworkSearchViewProps {
   data: NetworkData;
   onBack: () => void;
   onNurtureTribe: (tribe: SubTribe) => void;
+  onContactAdded?: () => void;
   initialSearchTerm?: string;
 }
 
@@ -26,9 +30,10 @@ function getRecentlyViewed(): string[] {
   }
 }
 
-export function NetworkSearchView({ data, onBack, onNurtureTribe, initialSearchTerm = '' }: NetworkSearchViewProps) {
+export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded, initialSearchTerm = '' }: NetworkSearchViewProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [debouncedTerm, setDebouncedTerm] = useState(initialSearchTerm);
+  const [isPlanting, setIsPlanting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus on mount
@@ -85,6 +90,32 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, initialSearchT
   }, [debouncedTerm, data.contacts]);
 
   const [activeChip, setActiveChip] = useState<'recent' | 'frequent' | null>(null);
+
+  const showQuickAddCTA = debouncedTerm.length >= 3 && searchResults.length === 0;
+
+  const handlePlantSeed = async () => {
+    if (!debouncedTerm.trim() || isPlanting) return;
+    setIsPlanting(true);
+    try {
+      const result = await addContact(debouncedTerm.trim());
+      if (result.success) {
+        toast.success('Seed planted!', {
+          description: `Added ${debouncedTerm.trim()} to your garden.`
+        });
+        setSearchTerm('');
+        setDebouncedTerm('');
+        onContactAdded?.();
+      } else {
+        toast.error('Failed to add contact', {
+          description: result.error
+        });
+      }
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setIsPlanting(false);
+    }
+  };
 
   return (
     <motion.div
@@ -198,11 +229,36 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, initialSearchT
 
       {/* Search Results */}
       {debouncedTerm && (
-        <TribeView
-          tribes={searchResults}
-          searchTerm={debouncedTerm}
-          onNurtureTribe={onNurtureTribe}
-        />
+        <>
+          {showQuickAddCTA ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
+            >
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                No one named &quot;{debouncedTerm}&quot; in your garden yet.
+              </p>
+              <Button
+                onClick={handlePlantSeed}
+                disabled={isPlanting}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl min-h-11"
+              >
+                {isPlanting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  `Plant Seed for ${debouncedTerm}`
+                )}
+              </Button>
+            </motion.div>
+          ) : (
+            <TribeView
+              tribes={searchResults}
+              searchTerm={debouncedTerm}
+              onNurtureTribe={onNurtureTribe}
+            />
+          )}
+        </>
       )}
     </motion.div>
   );

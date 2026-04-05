@@ -200,7 +200,7 @@ export default function ConnectionProfile({
         />
 
         {/* Profile Identity - Shared across tabs */}
-        <section className="flex flex-col items-center pt-10 pb-8 text-center border-b border-slate-900 mb-6">
+        <section className="flex flex-col items-center pt-8 pb-4 text-center border-b border-slate-900 mb-4">
           <ContactAvatar 
             contact={contact}
             daysRemaining={daysRemaining}
@@ -237,7 +237,7 @@ export default function ConnectionProfile({
               onEdit={() => setIsEditModalOpen(true)}
             />
           )}
-          {activeTab === 'Story' && <StoryTab contact={contact} />}
+          {activeTab === 'Story' && <StoryTab contact={contact} synopsis={synopsis} />}
           {activeTab === 'Family' && <FamilyTab contact={contact} />}
           {activeTab === 'Brain Dump' && <BrainDumpTab contact={contact} />}
         </div>

@@ -155,43 +155,55 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
         {/* Action Buttons Grid */}
         <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
             {/* Call */}
-            <a href={contact.phone ? `tel:${contact.phone.replace(/\D/g, '')}` : undefined} 
-               className={cn(
-                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.phone 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
-                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
-               )}
-            >
-                <Phone size={24} />
-                <span className="text-sm font-medium text-gray-300">Call</span>
-            </a>
+            {contact.phone ? (
+              <a href={`tel:${contact.phone.replace(/\D/g, '')}`}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <Phone size={24} />
+                  <span className="text-sm font-medium text-gray-300">Call</span>
+              </a>
+            ) : (
+              <button onClick={() => toast.error('No phone number saved')}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+              >
+                  <Phone size={24} />
+                  <span className="text-sm font-medium text-gray-300">Call</span>
+              </button>
+            )}
 
             {/* Email */}
-            <a href={contact.email ? `mailto:${contact.email}` : undefined} 
-               className={cn(
-                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.email 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
-                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
-               )}
-            >
-                <Mail size={24} className="text-indigo-300" /> 
-                <span className="text-sm font-medium text-gray-300">Email</span>
-            </a>
+            {contact.email ? (
+              <a href={`mailto:${contact.email}`}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <Mail size={24} className="text-indigo-300" />
+                  <span className="text-sm font-medium text-gray-300">Email</span>
+              </a>
+            ) : (
+              <button onClick={() => toast.error('No email saved')}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+              >
+                  <Mail size={24} />
+                  <span className="text-sm font-medium text-gray-300">Email</span>
+              </button>
+            )}
 
             {/* Text */}
-            <a href={contact.phone ? `sms:${contact.phone.replace(/\D/g, '')}` : undefined} 
-               className={cn(
-                 "flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200",
-                 contact.phone 
-                   ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
-                   : "bg-[#242642]/50 cursor-not-allowed opacity-50 text-gray-500"
-               )}
-            >
-                <MessageSquare size={24} />
-                <span className="text-sm font-medium text-gray-300">Text</span>
-            </a>
+            {contact.phone ? (
+              <a href={`sms:${contact.phone.replace(/\D/g, '')}`}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <MessageSquare size={24} />
+                  <span className="text-sm font-medium text-gray-300">Text</span>
+              </a>
+            ) : (
+              <button onClick={() => toast.error('No phone number saved')}
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+              >
+                  <MessageSquare size={24} />
+                  <span className="text-sm font-medium text-gray-300">Text</span>
+              </button>
+            )}
         </div>
 
         {/* Separator */}

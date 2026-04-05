@@ -191,41 +191,53 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
         {/* 2. Action Buttons */}
         <div className="grid grid-cols-3 gap-2">
-            <a href={contact.phone ? `tel:${contact.phone}` : undefined} 
-                className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5",
-                    contact.phone 
-                    ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
-                    : "bg-[#242642]/30 cursor-not-allowed opacity-50 text-gray-500"
-                )}
-            >
-                <Phone size={20} />
-                <span className="text-xs font-medium text-gray-300">Call</span>
-            </a>
+            {contact.phone ? (
+              <a href={`tel:${contact.phone}`}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <Phone size={20} />
+                  <span className="text-xs font-medium text-gray-300">Call</span>
+              </a>
+            ) : (
+              <button onClick={() => toast('No phone number saved')}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+              >
+                  <Phone size={20} />
+                  <span className="text-xs font-medium text-gray-300">Call</span>
+              </button>
+            )}
 
-            <a href={contact.email ? `mailto:${contact.email}` : undefined} 
-                className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5",
-                    contact.email 
-                    ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
-                    : "bg-[#242642]/30 cursor-not-allowed opacity-50 text-gray-500"
-                )}
-            >
-                <Mail size={20} /> 
-                <span className="text-xs font-medium text-gray-300">Email</span>
-            </a>
+            {contact.email ? (
+              <a href={`mailto:${contact.email}`}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <Mail size={20} />
+                  <span className="text-xs font-medium text-gray-300">Email</span>
+              </a>
+            ) : (
+              <button onClick={() => toast('No email saved')}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+              >
+                  <Mail size={20} />
+                  <span className="text-xs font-medium text-gray-300">Email</span>
+              </button>
+            )}
 
-            <a href={contact.phone ? `sms:${contact.phone}` : undefined} 
-                className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5",
-                    contact.phone 
-                    ? "bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300" 
-                    : "bg-[#242642]/30 cursor-not-allowed opacity-50 text-gray-500"
-                )}
-            >
-                <MessageSquare size={20} />
-                <span className="text-xs font-medium text-gray-300">Text</span>
-            </a>
+            {contact.phone ? (
+              <a href={`sms:${contact.phone}`}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+              >
+                  <MessageSquare size={20} />
+                  <span className="text-xs font-medium text-gray-300">Text</span>
+              </a>
+            ) : (
+              <button onClick={() => toast('No phone number saved')}
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+              >
+                  <MessageSquare size={20} />
+                  <span className="text-xs font-medium text-gray-300">Text</span>
+              </button>
+            )}
         </div>
 
         <div className="w-full h-px bg-white/5" />

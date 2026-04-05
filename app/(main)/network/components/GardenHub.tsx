@@ -12,7 +12,6 @@ import {
   Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { QuickAddBar } from './QuickAddBar';
 import { ContactImporter } from './ContactImporter';
 
 interface ToolCard {
@@ -116,16 +115,6 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           Four ways to tend to your connections and help your relationships grow.
         </motion.p>
       </div>
-
-      {/* Quick Add Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="w-full"
-      >
-        <QuickAddBar />
-      </motion.div>
 
       {/* Primary Actions */}
       <motion.div

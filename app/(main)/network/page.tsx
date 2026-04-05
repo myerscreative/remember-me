@@ -27,6 +27,15 @@ function NetworkContent() {
   const [nurtureTribe, setNurtureTribe] = useState<SubTribe | null>(null);
   const [isNurtureModalOpen, setIsNurtureModalOpen] = useState(false);
 
+  const refreshData = useCallback(async () => {
+    try {
+      const networkData = await networkService.fetchNetworkData();
+      setData(networkData);
+    } catch (error) {
+      console.error('Failed to load network data:', error);
+    }
+  }, []);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -69,8 +78,8 @@ function NetworkContent() {
   // Sub-view active: render the appropriate tool view
   if (activeView && data) {
     return (
-      <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8 flex flex-col">
+        <div className="max-w-7xl mx-auto flex-1 w-full">
           <AnimatePresence mode="wait">
             {activeView === 'search' && (
               <NetworkSearchView
@@ -78,6 +87,7 @@ function NetworkContent() {
                 data={data}
                 onBack={handleBackToGarden}
                 onNurtureTribe={handleNurtureTribe}
+                onContactAdded={refreshData}
                 initialSearchTerm={initialSearchTerm}
               />
             )}
@@ -110,8 +120,10 @@ function NetworkContent() {
 
   // Default: Garden Hub landing page
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8">
-      <GardenHub onNavigate={handleNavigateToView} />
+    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8 flex flex-col">
+      <div className="flex-1 w-full">
+        <GardenHub onNavigate={handleNavigateToView} />
+      </div>
     </div>
   );
 }

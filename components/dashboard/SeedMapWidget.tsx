@@ -302,10 +302,9 @@ export default function SeedMapWidget({ contacts = [], className = '', totalCoun
               content: selectedNurtureContact.notes || "how you first met last year",
               date: selectedNurtureContact.last_interaction_date || new Date().toISOString()
             },
-            preferredChannel: 'SMS'
-          }}
-          onAction={(channel) => {
-            // In a real flow, this could open the email client, sms, or navigate to a deep link.
+            preferredChannel: 'SMS',
+            phoneNumber: selectedNurtureContact.phone,
+            email: selectedNurtureContact.email
           }}
         />
       )}

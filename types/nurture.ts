@@ -8,4 +8,5 @@ export interface NurtureContext {
   };
   preferredChannel: 'SMS' | 'WhatsApp' | 'Email' | 'Call';
   phoneNumber?: string;
+  email?: string;
 }
