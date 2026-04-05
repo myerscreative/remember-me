@@ -58,10 +58,10 @@
   --color-text-secondary: var(--rm-text-secondary);
   --color-text-tertiary:  var(--rm-text-tertiary);
   --color-text-accent:    var(--rm-text-accent);
-  --color-accent:         var(--rm-accent-primary);
-  --color-accent-hover:   var(--rm-accent-hover);
-  --color-accent-muted:   var(--rm-accent-muted);
-  --color-accent-avatar:  var(--rm-accent-avatar);
+  --color-rm-accent:         var(--rm-accent-primary);
+  --color-rm-accent-hover:   var(--rm-accent-hover);
+  --color-rm-accent-muted:   var(--rm-accent-muted);
+  --color-rm-accent-avatar:  var(--rm-accent-avatar);
   --color-health-vibrant: var(--rm-health-vibrant);
   --color-health-fading:  var(--rm-health-fading);
   --color-health-amber:   var(--rm-health-amber);

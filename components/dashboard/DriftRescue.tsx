@@ -163,7 +163,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                                 Last interacted: {contact.lastInteractionDate ? new Date(contact.lastInteractionDate).toLocaleDateString() : 'Unknown'}
                                             </div>
                                         </div>
-                                        <div className="px-2 py-0.5 bg-accent-muted rounded text-text-accent text-[10px] font-black uppercase tracking-tighter border border-indigo-100 dark:border-indigo-800">
+                                        <div className="px-2 py-0.5 bg-rm-accent-muted rounded text-text-accent text-[10px] font-black uppercase tracking-tighter border border-indigo-100 dark:border-indigo-800">
                                             {contact.memoryDensity} Shared Memories
                                         </div>
                                     </div>

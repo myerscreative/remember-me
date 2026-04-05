@@ -152,7 +152,7 @@ export function AddRelationshipModal({
 
           {/* Selected contact */}
           {selectedContact && (
-            <div className="flex items-center gap-3 p-3 bg-accent-muted rounded-xl">
+            <div className="flex items-center gap-3 p-3 bg-rm-accent-muted rounded-xl">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={selectedContact.photo_url || undefined} />
                 <AvatarFallback className="bg-indigo-100 text-indigo-600">

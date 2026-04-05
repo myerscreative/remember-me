@@ -197,7 +197,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
       <div
         className={cn(
           'rounded-xl p-5 mb-6 border border-border-default',
-          'bg-accent-muted',
+          'bg-rm-accent-muted',
           heroBorderGlow
         )}
       >

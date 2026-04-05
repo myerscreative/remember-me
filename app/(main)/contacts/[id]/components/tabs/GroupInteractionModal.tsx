@@ -128,7 +128,7 @@ export function GroupInteractionModal({
                     onClick={() => toggleContact(contact.id)}
                     className={`flex items-center gap-2 p-2 rounded-lg text-left transition-colors ${
                       isSelected
-                        ? 'bg-accent-muted border-2 border-indigo-400'
+                        ? 'bg-rm-accent-muted border-2 border-indigo-400'
                         : 'bg-canvas border-2 border-transparent hover:bg-subtle'
                     }`}
                   >

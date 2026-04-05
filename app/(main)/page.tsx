@@ -404,7 +404,7 @@ export default function HomePage() {
                      variant="ghost" 
                      size="icon" 
                      onClick={() => router.push('/practice')}
-                     className="h-9 w-9 text-text-accent hover:bg-accent-muted"
+                     className="h-9 w-9 text-text-accent hover:bg-rm-accent-muted"
                      title="Daily Practice"
                   >
                      <Brain size={18} />
@@ -447,7 +447,7 @@ export default function HomePage() {
                     variant="ghost" 
                     size="icon" 
                     onClick={toggleViewMode}
-                    className={cn("h-9 w-9 transition-colors", isCompactView ? "text-text-accent bg-accent-muted" : "text-text-secondary hover:text-text-primary")}
+                    className={cn("h-9 w-9 transition-colors", isCompactView ? "text-text-accent bg-rm-accent-muted" : "text-text-secondary hover:text-text-primary")}
                     title="Toggle View"
                   >
                     {isCompactView ? <List size={18} /> : <Rows size={18} />}
