@@ -440,13 +440,13 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                 placeholder="Search for a person..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full bg-white/95 dark:bg-[#1e293b]/95 border-2 border-indigo-500/20 dark:border-indigo-500/30 rounded-xl py-2 pl-10 pr-10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                className="w-full bg-surface/95 border-2 border-indigo-500/20 dark:border-indigo-500/30 rounded-xl py-2 pl-10 pr-10 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
               />
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
               {searchQuery && (
                 <button 
                   onClick={clearSearch} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary hover:text-text-tertiary"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -456,7 +456,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
             {/* Info Icon Button */}
             <button
               onClick={() => setShowGuide(true)}
-              className="p-2 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shrink-0"
+              className="p-2 rounded-xl bg-surface border border-border-default shadow-sm hover:shadow-md transition-all text-text-tertiary hover:text-text-primary shrink-0"
               title="Garden Guide"
             >
               <Info className="w-5 h-5 md:w-5.5 md:h-5.5" />
@@ -467,7 +467,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
       {/* Garden Canvas */}
       <div 
-        className="relative w-full h-[85vh] md:h-[90vh] bg-linear-to-b from-white to-slate-50 dark:from-[#111827] dark:to-[#0f172a] rounded-xl overflow-hidden shadow-inner border border-slate-100 dark:border-gray-800" 
+        className="relative w-full h-[85vh] md:h-[90vh] bg-linear-to-b from-canvas to-canvas rounded-xl overflow-hidden shadow-inner border border-border-default" 
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -477,17 +477,17 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
       >
         {/* Floating Miniature Zoom UI */}
         {!hideControls && (
-          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2 py-1.5 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg h-10 transition-all">
-            <div className="text-[11px] font-bold text-slate-600 dark:text-slate-300 min-w-[32px] text-center">
+          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2 py-1.5 bg-elevated backdrop-blur-sm rounded-xl border border-border-default shadow-lg h-10 transition-all">
+            <div className="text-[11px] font-bold text-text-tertiary min-w-[32px] text-center">
               {Math.round(zoom)}%
             </div>
             
-            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" />
+            <div className="h-4 w-px bg-border-default mx-0.5" />
 
             <div className="flex items-center gap-1">
               <button
                 onClick={handleZoomOut}
-                className="w-7 h-7 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
+                className="w-7 h-7 border border-border-default bg-subtle rounded-lg flex items-center justify-center text-sm font-bold text-text-tertiary hover:bg-subtle transition-all active:scale-95"
               >
                 −
               </button>
@@ -499,21 +499,21 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
                 step="5"
                 value={zoom}
                 onChange={(e) => setZoom(parseInt(e.target.value))}
-                className="w-20 md:w-28 h-1 bg-slate-200 dark:bg-slate-700 rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-900 dark:[&::-webkit-slider-thumb]:bg-indigo-500"
+                className="w-20 md:w-28 h-1 bg-border-default rounded-full outline-none appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-text-primary"
               />
 
               <button
                 onClick={handleZoomIn}
-                className="w-7 h-7 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
+                className="w-7 h-7 border border-border-default bg-subtle rounded-lg flex items-center justify-center text-sm font-bold text-text-tertiary hover:bg-subtle transition-all active:scale-95"
               >
                 +
               </button>
               
-              <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" />
+              <div className="h-4 w-px bg-border-default mx-0.5" />
 
               <button
                 onClick={handleResetZoom}
-                className="w-7 h-7 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
+                className="w-7 h-7 border border-border-default bg-subtle rounded-lg flex items-center justify-center text-xs text-text-tertiary hover:bg-subtle transition-all active:scale-95"
                 title="Reset Zoom"
               >
                 ⊙
@@ -521,7 +521,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
               <button
                 onClick={handleSetDefaultZoom}
-                className={cn("flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 transition-all hover:bg-slate-100 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700", saved && "border-green-200 bg-green-50 text-green-500 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400")}
+                className={cn("flex h-7 w-7 items-center justify-center rounded-lg border border-border-default bg-subtle text-text-tertiary transition-all hover:bg-subtle active:scale-95", saved && "border-green-200 bg-green-50 text-green-500 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400")}
                 title="Save as Default"
               >
                 {saved ? <Sparkles className="w-3 h-3" /> : <Save className="w-3 h-3" />}
@@ -533,12 +533,12 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
 
         {/* Info Badge - Desktop Only */}
         {!hideInfoBadge && (
-          <div className="hidden md:block absolute top-5 right-5 bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 p-5 rounded-4xl shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
-            <div className="text-2xl font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm">
+          <div className="hidden md:block absolute top-5 right-5 bg-surface/10 backdrop-blur-md border border-border-default/50 p-5 rounded-4xl shadow-2xl shadow-black/20 text-right z-10 transition-all hover:scale-105 duration-300">
+            <div className="text-[11px] text-text-secondary font-bold uppercase tracking-widest mb-2 opacity-80">Showing</div>
+            <div className="text-2xl font-black text-text-primary tracking-tight drop-shadow-sm">
               {filter === 'all' ? 'All Contacts' : filter.charAt(0).toUpperCase() + filter.slice(1)}
             </div>
-            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 opacity-90">
+            <div className="text-sm font-medium text-text-secondary mt-1 opacity-90">
               {filteredContacts.length} contacts
             </div>
           </div>
@@ -652,7 +652,7 @@ export default function RelationshipGarden({ contacts, filter, onContactClick, o
         {/* Tooltip */}
         {tooltip.visible && tooltip.contact && (
           <div
-            className="fixed z-60 bg-slate-900/95 backdrop-blur-xl text-white p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
+            className="fixed z-60 bg-canvas/95 backdrop-blur-xl text-text-primary p-4 rounded-xl shadow-2xl min-w-[200px] pointer-events-auto cursor-pointer"
             style={{
               left: tooltip.x,
               top: tooltip.y,

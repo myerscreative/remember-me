@@ -73,7 +73,7 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
             <Star className="h-8 w-8 text-green-600" />
         </div>
         <h3 className="text-xl font-bold">Your Garden is Fresh!</h3>
-        <p className="text-gray-500">No contacts need immediate attention at the moment.</p>
+        <p className="text-text-secondary">No contacts need immediate attention at the moment.</p>
         <Button onClick={onActionComplete} variant="outline" className="mt-4">
             Back to Dashboard
         </Button>
@@ -87,7 +87,7 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
         <h2 className="text-2xl font-black uppercase tracking-tighter text-orange-600 dark:text-orange-400">
           Quick Nurture
         </h2>
-        <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+        <p className="text-xs text-text-secondary font-bold uppercase tracking-widest">
             {cards.length - currentIndex} Thirsty Contacts Remaining
         </p>
       </div>
@@ -115,9 +115,9 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
           variant="outline" 
           size="lg" 
           onClick={handleSnooze}
-          className="h-16 w-16 rounded-full border-2 border-gray-200 dark:border-gray-800"
+          className="h-16 w-16 rounded-full border-2 border-border-default"
         >
-          <Clock className="h-6 w-6 text-gray-400" />
+          <Clock className="h-6 w-6 text-text-secondary" />
         </Button>
         <Button 
           size="lg" 
@@ -131,9 +131,9 @@ export function TriageMode({ contacts, onActionComplete }: TriageModeProps) {
           variant="outline" 
           size="lg" 
            onClick={() => window.location.href = `/contacts/${activeCard.id}`}
-          className="h-16 w-16 rounded-full border-2 border-gray-200 dark:border-gray-800"
+          className="h-16 w-16 rounded-full border-2 border-border-default"
         >
-          <ChevronRight className="h-6 w-6 text-gray-400" />
+          <ChevronRight className="h-6 w-6 text-text-secondary" />
         </Button>
       </div>
     </div>
@@ -154,16 +154,16 @@ function TriageCard({ contact, isTop, onSwipeLeft, onSwipeRight, onTap }: {
   if (!isTop) {
       return (
           <motion.div 
-            className="absolute inset-0 bg-white dark:bg-gray-800 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-700 shadow-xl p-8 flex flex-col items-center justify-center text-center scale-95 opacity-50 z-0"
+            className="absolute inset-0 bg-surface rounded-[2.5rem] border-2 border-border-default shadow-xl p-8 flex flex-col items-center justify-center text-center scale-95 opacity-50 z-0"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 0.95, opacity: 0.5 }}
           >
-             <Avatar className="h-32 w-32 mb-6 border-4 border-white dark:border-gray-900 shadow-sm">
+             <Avatar className="h-32 w-32 mb-6 border-4 border-surface shadow-sm">
                 <AvatarFallback className={cn("bg-linear-to-br text-white text-4xl font-black", getGradient(contact.name))}>
                    {getInitials(contact.first_name, contact.last_name)}
                 </AvatarFallback>
              </Avatar>
-             <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight truncate w-full px-4">
+             <h3 className="text-2xl font-black text-text-primary uppercase tracking-tight truncate w-full px-4">
                 {contact.name}
              </h3>
           </motion.div>
@@ -186,7 +186,7 @@ function TriageCard({ contact, isTop, onSwipeLeft, onSwipeRight, onTap }: {
       initial={{ scale: 0.9, opacity: 0, y: 20 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       exit={{ x: x.get() < 0 ? -300 : 300, opacity: 0, scale: 0.5, transition: { duration: 0.3 } }}
-      className="absolute inset-0 bg-white dark:bg-gray-800 rounded-[2.5rem] border-2 border-orange-200 dark:border-orange-900/50 shadow-2xl p-8 flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing z-10"
+      className="absolute inset-0 bg-surface rounded-[2.5rem] border-2 border-orange-200 dark:border-orange-900/50 shadow-2xl p-8 flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing z-10"
     >
       <div className="absolute top-6 right-6">
           <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
@@ -200,7 +200,7 @@ function TriageCard({ contact, isTop, onSwipeLeft, onSwipeRight, onTap }: {
           </div>
       )}
 
-      <Avatar className="h-40 w-40 mb-8 border-4 border-white dark:border-gray-900 shadow-md ring-4 ring-orange-50 dark:ring-orange-900/20">
+      <Avatar className="h-40 w-40 mb-8 border-4 border-surface shadow-md ring-4 ring-orange-50 dark:ring-orange-900/20">
         <AvatarImage src={contact.photo_url} />
         <AvatarFallback className={cn("bg-linear-to-br text-white text-5xl font-black", getGradient(contact.name))}>
            {getInitials(contact.first_name, contact.last_name)}
@@ -208,10 +208,10 @@ function TriageCard({ contact, isTop, onSwipeLeft, onSwipeRight, onTap }: {
       </Avatar>
 
       <div className="space-y-2 w-full px-4">
-        <h3 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none truncate">
+        <h3 className="text-3xl font-black text-text-primary uppercase tracking-tighter leading-none truncate">
             {contact.name}
         </h3>
-        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">
+        <p className="text-sm font-bold text-text-secondary uppercase tracking-widest">
             Needs attention
         </p>
       </div>
@@ -221,7 +221,7 @@ function TriageCard({ contact, isTop, onSwipeLeft, onSwipeRight, onTap }: {
               <Droplets className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Tap to Water</span>
           </div>
-          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Swipe either way to snooze</p>
+          <p className="text-[9px] text-text-secondary font-bold uppercase tracking-widest">Swipe either way to snooze</p>
       </div>
     </motion.div>
   );

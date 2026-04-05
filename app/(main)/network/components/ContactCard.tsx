@@ -28,7 +28,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
 
   // Base Styles (Default State)
   let borderColor = 'border-[#e5e7eb] border-2';
-  let bgColor = 'bg-white';
+  let bgColor = 'bg-surface';
   let avatarBg = '#8b5cf6'; // Default Purple
   const opacityClass = isDimmed ? 'opacity-30' : 'opacity-100';
 
@@ -64,7 +64,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
   const shortTime = getShortRelativeTime(daysAgo);
 
   // Status Styling
-  let statusColorClass = 'text-gray-500 bg-gray-50 border-gray-200';
+  let statusColorClass = 'text-text-secondary bg-canvas border-border-default';
   if (status === 'good') statusColorClass = 'text-green-800 bg-green-50 border-green-200';
   else if (status === 'warning') statusColorClass = 'text-yellow-800 bg-yellow-50 border-yellow-200';
   else if (status === 'overdue') statusColorClass = 'text-red-800 bg-red-50 border-red-200';
@@ -121,7 +121,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
       
       {/* Compact/Standard Last Contact Info */}
       {viewMode === 'compact' && (
-        <div className={cn("mt-1 text-center text-[10px] font-medium", showStatusWarning ? "text-red-600" : "text-gray-500")}>
+        <div className={cn("mt-1 text-center text-[10px] font-medium", showStatusWarning ? "text-red-600" : "text-text-secondary")}>
           {methodIcon} {shortTime}
         </div>
       )}
@@ -133,7 +133,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
           </div>
           {/* Shared Interest Label */}
           {showBadge && (
-            <div className="mt-2 text-center text-xs truncate font-medium text-gray-700">
+            <div className="mt-2 text-center text-xs truncate font-medium text-text-tertiary">
               {isStrong ? '🎯' : '🤝'} {sharedText}
             </div>
           )}
@@ -146,7 +146,7 @@ export default function ContactCard({ contact, matchLevel, sharedInterests = [],
           e.stopPropagation();
           onPreview(contact);
         }}
-        className="absolute top-3 left-3 w-6 h-6 rounded-full bg-white/90 border border-gray-200 text-indigo-500 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition-all z-10 shadow-sm"
+        className="absolute top-3 left-3 w-6 h-6 rounded-full bg-surface/90 border border-border-default text-indigo-500 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition-all z-10 shadow-sm"
         aria-label="View details"
       >
         <Info size={14} strokeWidth={2.5} />

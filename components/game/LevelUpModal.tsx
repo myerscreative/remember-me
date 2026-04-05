@@ -125,7 +125,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
           className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-6"
         >
           {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-canvas/90 backdrop-blur-xl" />
           
           {/* Confetti */}
           <PetalConfetti />
@@ -140,7 +140,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
           >
             {/* The Gradient Border Card */}
             <div className="p-[2px] rounded-[3rem] bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-[0_0_50px_rgba(99,102,241,0.3)]">
-              <div className="bg-slate-900 rounded-[2.9rem] overflow-hidden p-8 md:p-10 text-center">
+              <div className="bg-canvas rounded-[2.9rem] overflow-hidden p-8 md:p-10 text-center">
                 
                 {/* Level Badge */}
                 <motion.div 
@@ -150,7 +150,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                   className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-linear-to-br from-indigo-500 to-purple-600 mb-6 shadow-2xl relative"
                 >
                   <Trophy size={48} className="text-white" />
-                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center border-4 border-slate-900 font-black text-white text-sm">
+                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center border-4 border-canvas font-black text-white text-sm">
                     {level}
                   </div>
                 </motion.div>
@@ -159,7 +159,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: showContent ? 1 : 0 }}
                   transition={{ delay: 0.4 }}
-                  className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight"
+                  className="text-4xl md:text-5xl font-black text-text-primary mb-2 tracking-tight"
                 >
                   Level Up!
                 </motion.h2>
@@ -175,7 +175,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                 </motion.div>
 
                 <div className="mt-10 space-y-4 text-left">
-                  <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2 px-1">Unlocks</p>
+                  <p className="text-sm font-black text-text-secondary uppercase tracking-widest mb-2 px-1">Unlocks</p>
                   
                   {unlocks.map((unlock, idx) => (
                     <motion.div
@@ -183,14 +183,14 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.6 + (idx * 0.1) }}
-                      className="group flex items-center gap-4 p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-indigo-500/50 transition-colors"
+                      className="group flex items-center gap-4 p-4 bg-surface/50 rounded-2xl border border-border-default/50 hover:border-indigo-500/50 transition-colors"
                     >
-                      <div className="p-3 bg-slate-900 rounded-xl">
+                      <div className="p-3 bg-canvas rounded-xl">
                         {getIcon(unlock.type)}
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-bold text-white text-base leading-tight">{unlock.name}</h4>
-                        <p className="text-xs text-slate-400 font-medium">{unlock.description}</p>
+                        <h4 className="font-bold text-text-primary text-base leading-tight">{unlock.name}</h4>
+                        <p className="text-xs text-text-secondary font-medium">{unlock.description}</p>
                       </div>
                       <div className="p-1 bg-indigo-500/10 rounded-full">
                         <Check size={14} className="text-indigo-400 stroke-[3px]" />
@@ -204,7 +204,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 1 }}
                   onClick={onClose}
-                  className="w-full mt-10 px-8 py-5 bg-white text-slate-950 font-black rounded-3xl shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] transform transition-all active:scale-95 text-lg flex items-center justify-center gap-2"
+                  className="w-full mt-10 px-8 py-5 bg-surface text-slate-950 font-black rounded-3xl shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] transform transition-all active:scale-95 text-lg flex items-center justify-center gap-2"
                 >
                   Keep Nurturing
                   <Zap size={20} className="fill-slate-950" />

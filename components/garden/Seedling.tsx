@@ -49,10 +49,10 @@ export const Seedling = ({
       {/* The Contact Avatar */}
       <div className={`
         relative h-12 w-12 rounded-full border-2 flex items-center justify-center font-bold text-xs
-        ${status === 'Nurtured' ? 'border-emerald-400 bg-slate-900 text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.3)]' : 
-          status === 'Drifting' ? 'border-orange-400 bg-slate-900 text-orange-400' : 
-          'border-red-500/50 bg-slate-950 text-slate-500'}
-        ${isActive ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-950' : ''}
+        ${status === 'Nurtured' ? 'border-emerald-400 bg-canvas text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.3)]' : 
+          status === 'Drifting' ? 'border-orange-400 bg-canvas text-orange-400' : 
+          'border-red-500/50 bg-canvas text-text-secondary'}
+        ${isActive ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-canvas' : ''}
       `}>
         {name.split(' ').map(n => n[0]).join('')}
         

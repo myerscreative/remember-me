@@ -230,8 +230,8 @@ export function QuickAddNoteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-slate-950">
-        <DialogHeader className="p-6 bg-slate-900 border-b border-slate-800">
+      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden border-none bg-canvas">
+        <DialogHeader className="p-6 bg-canvas border-b border-border-default">
           <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
             <BookOpen className="h-5 w-5 text-indigo-500" />
             Quick Story Note
@@ -242,26 +242,26 @@ export function QuickAddNoteModal({
           {!selectedContact ? (
             <div className="space-y-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
                 <Input
                   placeholder="Search contact..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-12 bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl"
+                  className="pl-10 h-12 bg-canvas border-border-default focus:ring-indigo-500 rounded-xl"
                 />
               </div>
 
               <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
                 {isSearching ? (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+                    <Loader2 className="h-5 w-5 animate-spin text-text-secondary" />
                   </div>
                 ) : contacts.length > 0 ? (
                   contacts.map((contact) => (
                     <button
                       key={contact.id}
                       onClick={() => setSelectedContact({ id: contact.id!, name: contact.name! })}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-800 transition-all text-left"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-canvas hover:shadow-sm border border-transparent hover:border-border-default transition-all text-left"
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={contact.photo_url || undefined} />
@@ -269,29 +269,29 @@ export function QuickAddNoteModal({
                           {getInitials(contact.first_name || "", contact.last_name || "")}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-semibold text-slate-700 dark:text-slate-200">{contact.name}</span>
+                      <span className="font-semibold text-text-primary">{contact.name}</span>
                     </button>
                   ))
                 ) : search.length > 2 ? (
-                  <div className="text-center py-4 text-sm text-slate-500">No contacts found</div>
+                  <div className="text-center py-4 text-sm text-text-secondary">No contacts found</div>
                 ) : (
-                   <div className="text-center py-4 text-sm text-slate-400">Search for a contact to start</div>
+                   <div className="text-center py-4 text-sm text-text-secondary">Search for a contact to start</div>
                 )}
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800 shadow-sm transition-all duration-300">
+              <div className="flex items-center justify-between p-3 bg-canvas rounded-xl border border-border-default shadow-sm transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10 border-2 border-slate-100 dark:border-slate-700">
+                  <Avatar className="h-10 w-10 border-2 border-border-default">
                     <AvatarFallback className={cn("bg-linear-to-br text-white font-semibold", getGradient(selectedContact.name || ""))}>
                       {getInitials(selectedContact.name, "")}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-bold text-slate-700 dark:text-slate-200">{selectedContact.name}</span>
+                  <span className="font-bold text-text-primary">{selectedContact.name}</span>
                 </div>
                 {!initialContactId && (
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedContact(null)} className="text-xs text-slate-500 hover:text-red-500 font-medium">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedContact(null)} className="text-xs text-text-secondary hover:text-red-500 font-medium">
                     Change
                   </Button>
                 )}
@@ -303,14 +303,14 @@ export function QuickAddNoteModal({
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   className={cn(
-                    "min-h-[180px] bg-slate-900 border-slate-800 focus:ring-indigo-500 rounded-xl resize-none p-4 pb-16 transition-all duration-300 text-slate-200",
+                    "min-h-[180px] bg-canvas border-border-default focus:ring-indigo-500 rounded-xl resize-none p-4 pb-16 transition-all duration-300 text-text-primary",
                     isRecording && "border-indigo-500 ring-2 ring-indigo-500/20"
                   )}
                   autoFocus
                 />
                 
-                <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-950/70 px-2 py-1.5">
-                  <p className="min-h-[20px] text-[11px] text-slate-400">
+                <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-lg border border-border-default bg-canvas/70 px-2 py-1.5">
+                  <p className="min-h-[20px] text-[11px] text-text-secondary">
                     {isTranscribing
                       ? "Transcribing audio..."
                       : isRecording
@@ -326,7 +326,7 @@ export function QuickAddNoteModal({
                       "h-9 w-9 shrink-0 rounded-full transition-all duration-300",
                       isRecording
                         ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/30"
-                        : "bg-white dark:bg-slate-800 text-slate-500 hover:text-indigo-500 border-slate-200 dark:border-slate-700"
+                        : "bg-surface text-text-secondary hover:text-indigo-500 border-border-default"
                     )}
                     title={isRecording ? "Stop recording" : "Record voice note"}
                   >
@@ -342,7 +342,7 @@ export function QuickAddNoteModal({
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold border-border-default hover:bg-subtle transition-colors">
                   Cancel
                 </Button>
                 <Button 

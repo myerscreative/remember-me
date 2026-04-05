@@ -30,9 +30,9 @@ const WEATHER_CONFIG = {
   },
   overcast: {
     icon: Cloud,
-    color: "text-slate-400",
+    color: "text-text-secondary",
     bg: "bg-linear-to-br from-slate-400/10 via-gray-300/5 to-transparent",
-    border: "border-slate-200 dark:border-slate-800",
+    border: "border-border-default",
     text: "You are in maintenance mode.",
     advice: "You are replacing decay with new seeds. Stay consistent.",
   },
@@ -53,9 +53,9 @@ export function SocialForecast() {
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 animate-pulse">
+      <Card className="w-full bg-canvas/50 border-border-default animate-pulse">
         <CardContent className="p-6 h-24 flex items-center justify-center">
-            <RefreshCw className="h-5 w-5 text-slate-400 animate-spin" />
+            <RefreshCw className="h-5 w-5 text-text-secondary animate-spin" />
         </CardContent>
       </Card>
     );
@@ -87,21 +87,21 @@ export function SocialForecast() {
                  <Icon className="h-8 w-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <h3 className="text-sm font-black uppercase tracking-widest text-text-secondary flex items-center gap-2">
                   Social Forecast
                   {weatherState === 'stormy' && <AlertTriangle className="h-3 w-3 text-red-500" />}
                 </h3>
-                <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
-                  In 30 days, your Nurtured core will be <span className={cn("inline-flex items-center px-2 py-0.5 rounded-md bg-white/80 dark:bg-slate-800/80 shadow-xs mx-1", delta >= 0 ? "text-emerald-600" : "text-red-600")}>{forecastedHealth}</span> contacts.
+                <p className="text-lg font-bold text-text-primary leading-tight">
+                  In 30 days, your Nurtured core will be <span className={cn("inline-flex items-center px-2 py-0.5 rounded-md bg-elevated shadow-xs mx-1", delta >= 0 ? "text-emerald-600" : "text-red-600")}>{forecastedHealth}</span> contacts.
                 </p>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <p className="text-xs font-semibold text-text-secondary">
                     Net Trajectory: <span className={cn(delta >= 0 ? "text-emerald-500" : "text-red-500")}>{delta > 0 ? "+" : ""}{delta} contacts</span>
                 </p>
               </div>
             </div>
             
             <div className="flex flex-col items-end gap-2">
-                <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
+                <div className="p-1.5 rounded-full bg-subtle text-text-secondary">
                     {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </div>
             </div>
@@ -115,14 +115,14 @@ export function SocialForecast() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="px-5 pb-6 pt-0 border-t border-slate-100 dark:border-slate-800"
+              className="px-5 pb-6 pt-0 border-t border-border-default"
             >
               <div className="mt-4 space-y-6">
                 {/* Math Breakdown */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="p-3 rounded-xl bg-white/30 dark:bg-slate-800/30 border border-white/20">
-                        <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Current</div>
-                        <div className="text-xl font-black text-slate-700 dark:text-slate-200">{currentHealth}</div>
+                    <div className="p-3 rounded-xl bg-surface/30 border border-white/20">
+                        <div className="text-[10px] uppercase font-bold text-text-secondary mb-1">Current</div>
+                        <div className="text-xl font-black text-text-tertiary">{currentHealth}</div>
                     </div>
                     <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                         <div className="text-[10px] uppercase font-bold text-emerald-600/70 mb-1">New Gen</div>
@@ -141,15 +141,15 @@ export function SocialForecast() {
                 {/* At Risk List */}
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">At-Risk Core Contacts (30d)</h4>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-sm">{atRiskContacts.length} at risk</span>
+                        <h4 className="text-xs font-black text-text-secondary uppercase tracking-widest">At-Risk Core Contacts (30d)</h4>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 bg-subtle text-text-secondary rounded-sm">{atRiskContacts.length} at risk</span>
                     </div>
                     <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
                         {atRiskContacts.map(contact => (
                             <div 
                                 key={contact.id}
                                 onClick={() => router.push(`/contacts/${contact.id}`)}
-                                className="flex items-center justify-between p-2.5 rounded-lg bg-white/40 dark:bg-slate-900/40 border border-white/20 hover:border-indigo-400 group transition-all cursor-pointer"
+                                className="flex items-center justify-between p-2.5 rounded-lg bg-surface/40 border border-white/20 hover:border-indigo-400 group transition-all cursor-pointer"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={cn(
@@ -158,18 +158,18 @@ export function SocialForecast() {
                                         contact.daysUntilDecay < 14 ? "bg-orange-500" : "bg-amber-400"
                                     )} />
                                     <div>
-                                        <div className="text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">{contact.name}</div>
-                                        <div className="text-[10px] font-medium text-slate-400 italic">Expected decay in {contact.daysUntilDecay} days</div>
+                                        <div className="text-sm font-bold text-text-tertiary group-hover:text-indigo-600 transition-colors">{contact.name}</div>
+                                        <div className="text-[10px] font-medium text-text-secondary italic">Expected decay in {contact.daysUntilDecay} days</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                      <span className={cn(
                                          "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-xs",
-                                         contact.importance === 'high' ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-500"
+                                         contact.importance === 'high' ? "bg-indigo-100 text-indigo-600" : "bg-subtle text-text-secondary"
                                      )}>
                                          {contact.importance}
                                      </span>
-                                     <ArrowRight className="h-3 w-3 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                                     <ArrowRight className="h-3 w-3 text-text-tertiary group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
                                 </div>
                             </div>
                         ))}

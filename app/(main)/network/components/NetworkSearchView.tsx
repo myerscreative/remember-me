@@ -129,11 +129,11 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-subtle transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-xl font-bold text-white">Search & Filter</h2>
+        <h2 className="text-xl font-bold text-text-primary">Search & Filter</h2>
       </div>
 
       {/* Search Input */}
@@ -142,15 +142,15 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
           ref={inputRef}
           type="text"
           placeholder="Search by name, interest, tag, location..."
-          className="w-full pl-11 pr-10 py-3 rounded-xl border border-slate-700 bg-slate-900 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+          className="w-full pl-11 pr-10 py-3 rounded-xl border border-border-default bg-canvas text-text-primary placeholder-text-secondary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
-        <Search className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-3.5 top-3.5 w-5 h-5 text-text-secondary" />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute right-3 top-3 p-0.5 text-slate-400 hover:text-white transition-colors"
+            className="absolute right-3 top-3 p-0.5 text-text-secondary hover:text-text-primary transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -166,7 +166,7 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                 activeChip === 'recent'
                   ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300'
-                  : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                  : 'bg-subtle/50 border-border-default text-text-secondary hover:text-text-primary hover:border-border-strong'
               }`}
             >
               <Clock className="w-4 h-4" />
@@ -177,7 +177,7 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                 activeChip === 'frequent'
                   ? 'bg-amber-600/20 border-amber-500/40 text-amber-300'
-                  : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                  : 'bg-subtle/50 border-border-default text-text-secondary hover:text-text-primary hover:border-border-strong'
               }`}
             >
               <Star className="w-4 h-4" />
@@ -193,7 +193,7 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
               className="space-y-2"
             >
               {(activeChip === 'recent' ? recentContacts : frequentContacts).length === 0 ? (
-                <p className="text-sm text-slate-500 py-4 text-center">
+                <p className="text-sm text-text-secondary py-4 text-center">
                   {activeChip === 'recent'
                     ? 'No recently viewed contacts yet.'
                     : 'No frequent contacts found.'}
@@ -203,20 +203,20 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
                   <Link
                     key={contact.id}
                     href={`/contacts/${contact.id}`}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-slate-600 transition-all group"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-subtle/50 border border-border-default/50 hover:bg-subtle hover:border-border-strong transition-all group"
                   >
-                    <Avatar className="h-9 w-9 border border-slate-600">
+                    <Avatar className="h-9 w-9 border border-border-strong">
                       <AvatarImage src={contact.photo_url || undefined} alt={contact.name} />
                       <AvatarFallback className="bg-indigo-900 text-indigo-300 text-xs font-bold">
                         {(contact.first_name?.[0] || '') + (contact.last_name?.[0] || '')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate group-hover:text-indigo-300 transition-colors">
+                      <p className="text-sm font-semibold text-text-primary truncate group-hover:text-indigo-300 transition-colors">
                         {contact.name}
                       </p>
                       {contact.where_met && (
-                        <p className="text-xs text-slate-500 truncate">{contact.where_met}</p>
+                        <p className="text-xs text-text-secondary truncate">{contact.where_met}</p>
                       )}
                     </div>
                   </Link>
@@ -234,9 +234,9 @@ export function NetworkSearchView({ data, onBack, onNurtureTribe, onContactAdded
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
+              className="flex flex-col gap-4 p-4 rounded-xl border border-border-default bg-surface/50"
             >
-              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+              <p className="text-sm text-text-secondary text-center">
                 No one named &quot;{debouncedTerm}&quot; in your garden yet.
               </p>
               <Button

@@ -65,13 +65,13 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-subtle transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-xl font-bold text-white">Inspect the Roots</h2>
-          <p className="text-sm text-slate-400">Explore your network by domain and tag</p>
+          <h2 className="text-xl font-bold text-text-primary">Inspect the Roots</h2>
+          <p className="text-sm text-text-secondary">Explore your network by domain and tag</p>
         </div>
       </div>
 
@@ -79,8 +79,8 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
       <div className="space-y-3 max-w-2xl mx-auto">
         {activeDomains.length === 0 && (
           <div className="text-center py-16">
-            <Tag className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500">No domains found. Add tags and interests to your contacts to see them here.</p>
+            <Tag className="w-10 h-10 text-text-tertiary mx-auto mb-3" />
+            <p className="text-text-secondary">No domains found. Add tags and interests to your contacts to see them here.</p>
           </div>
         )}
 
@@ -96,8 +96,8 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
                 className={cn(
                   "w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left",
                   isExpanded
-                    ? "bg-slate-800/80 border-slate-600 shadow-lg"
-                    : "bg-slate-800/30 border-slate-700/50 hover:bg-slate-800/60 hover:border-slate-600"
+                    ? "bg-surface/80 border-border-strong shadow-lg"
+                    : "bg-surface/30 border-border-default/50 hover:bg-surface/60 hover:border-border-strong"
                 )}
               >
                 <div
@@ -107,12 +107,12 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
                   {emoji}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-white text-base">{group.domain.name}</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="font-bold text-text-primary text-base">{group.domain.name}</h3>
+                  <p className="text-xs text-text-secondary">
                     {group.totalMembers} {group.totalMembers === 1 ? 'person' : 'people'} · {group.subTribes.length} {group.subTribes.length === 1 ? 'tag' : 'tags'}
                   </p>
                 </div>
-                <div className="shrink-0 text-slate-400">
+                <div className="shrink-0 text-text-secondary">
                   {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                 </div>
               </button>
@@ -138,14 +138,14 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
                               "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg border transition-all text-left text-sm",
                               isSelected
                                 ? "bg-indigo-600/15 border-indigo-500/30 text-indigo-300"
-                                : "bg-slate-800/20 border-transparent text-slate-300 hover:bg-slate-800/50 hover:border-slate-700"
+                                : "bg-surface/20 border-transparent text-text-tertiary hover:bg-surface/50 hover:border-border-default"
                             )}
                           >
                             <Tag className="w-3.5 h-3.5 shrink-0 opacity-60" />
                             <span className="flex-1 truncate font-medium">{subTribe.name}</span>
                             <span className={cn(
                               "shrink-0 text-xs font-bold px-2 py-0.5 rounded-full",
-                              isSelected ? "bg-indigo-500/20 text-indigo-300" : "bg-slate-700/50 text-slate-400"
+                              isSelected ? "bg-indigo-500/20 text-indigo-300" : "bg-subtle/50 text-text-secondary"
                             )}>
                               {subTribe.memberCount}
                             </span>
@@ -180,7 +180,7 @@ export function NetworkInspectView({ data, onBack, onNurtureTribe }: NetworkInsp
       {/* Empty state when domain expanded but no subtribe selected */}
       {expandedDomainId && !selectedSubTribeId && (
         <div className="text-center py-12 animate-in fade-in duration-500">
-          <p className="text-slate-500 text-sm">Select a tag above to see the people in that group.</p>
+          <p className="text-text-secondary text-sm">Select a tag above to see the people in that group.</p>
         </div>
       )}
     </motion.div>

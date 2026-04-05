@@ -242,12 +242,12 @@ export function VoiceEntryModalEnhanced({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-surface rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-border-default">
           <div className="flex items-center gap-2">
             <Mic className="h-5 w-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">AI Voice Entry</h2>
+            <h2 className="text-xl font-bold text-text-primary">AI Voice Entry</h2>
           </div>
           <Button
             variant="ghost"
@@ -273,30 +273,30 @@ export function VoiceEntryModalEnhanced({
           {currentStep === "record" && (
             <div className="space-y-6">
               <div className="text-center">
-                <p className="text-gray-700 font-medium mb-2">
+                <p className="text-text-tertiary font-medium mb-2">
                   Speak naturally about the contact
                 </p>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-text-secondary mb-4">
                   You can say things like:
                 </p>
 
                 <div className="bg-linear-to-r from-blue-50 to-purple-50 rounded-lg p-4 text-left space-y-2 mb-4">
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-text-tertiary">
                     📝 <span className="font-medium">"I just met Sarah Johnson at the AI Summit.
                     She's a product manager at Tesla working on autonomous driving.
                     Her email is sarah@tesla.com. We talked about user experience design
                     and she's really interested in sustainable tech. She has two kids,
                     Emma and Jake."</span>
                   </p>
-                  <div className="border-t border-gray-200 my-2"></div>
-                  <p className="text-sm text-gray-700">
+                  <div className="border-t border-border-default my-2"></div>
+                  <p className="text-sm text-text-tertiary">
                     🔄 <span className="font-medium">"Update John Smith - he just told me he's
                     moving to Google and starting a new role as engineering director.
                     His new email is john@google.com."</span>
                   </p>
                 </div>
 
-                <p className="text-xs text-gray-500 italic">
+                <p className="text-xs text-text-secondary italic">
                   The AI will automatically detect whether you're adding a new contact
                   or updating an existing one, and extract all the relevant information.
                 </p>
@@ -329,8 +329,8 @@ export function VoiceEntryModalEnhanced({
                   Re-record
                 </Button>
               </div>
-              <div className="p-4 bg-gray-50 rounded-lg max-h-64 overflow-y-auto">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{transcript}</p>
+              <div className="p-4 bg-canvas rounded-lg max-h-64 overflow-y-auto">
+                <p className="text-sm text-text-tertiary whitespace-pre-wrap">{transcript}</p>
               </div>
               {isProcessing && (
                 <div className="flex items-center justify-center gap-2 text-blue-600">
@@ -348,7 +348,7 @@ export function VoiceEntryModalEnhanced({
                 <Users className="h-5 w-5 text-blue-600" />
                 <h3 className="text-lg font-semibold">Similar Contacts Found</h3>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-tertiary">
                 We found {similarContacts.length} contact{similarContacts.length > 1 ? "s" : ""} with similar information.
                 Did you mean to update one of these instead?
               </p>
@@ -357,7 +357,7 @@ export function VoiceEntryModalEnhanced({
                 {similarContacts.map((contact) => (
                   <div
                     key={contact.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer"
+                    className="p-4 border border-border-default rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer"
                     onClick={() => handleSelectSimilar(contact.id)}
                   >
                     <div className="flex items-start gap-3">
@@ -371,14 +371,14 @@ export function VoiceEntryModalEnhanced({
                         )}
                       </Avatar>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900">{contact.name}</div>
+                        <div className="font-semibold text-text-primary">{contact.name}</div>
                         {contact.email && (
-                          <div className="text-sm text-gray-600">{contact.email}</div>
+                          <div className="text-sm text-text-tertiary">{contact.email}</div>
                         )}
                         {contact.phone && (
-                          <div className="text-sm text-gray-600">{formatPhoneNumberDisplay(contact.phone)}</div>
+                          <div className="text-sm text-text-tertiary">{formatPhoneNumberDisplay(contact.phone)}</div>
                         )}
-                        <div className="mt-2 text-sm text-gray-700">
+                        <div className="mt-2 text-sm text-text-tertiary">
                           {contact.summary || contact.similarity_reasons.join(" • ")}
                         </div>
                         <div className="mt-1">
@@ -407,14 +407,14 @@ export function VoiceEntryModalEnhanced({
                 <AlertCircle className="h-5 w-5 text-yellow-600" />
                 <h3 className="text-lg font-semibold">Missing Information</h3>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-tertiary">
                 The following fields are recommended for new contacts. You can fill them now or skip:
               </p>
 
               <div className="space-y-3">
                 {missingFields.map((field) => (
                   <div key={field}>
-                    <label className="text-sm font-medium text-gray-700 capitalize">
+                    <label className="text-sm font-medium text-text-tertiary capitalize">
                       {field === "email" ? "Email Address" : field === "phone" ? "Phone Number" : field}
                     </label>
                     <Input
@@ -463,18 +463,18 @@ export function VoiceEntryModalEnhanced({
                     {matchedContact.matches.map((match: any) => (
                       <button
                         key={match.id}
-                        className="w-full text-left p-2 bg-white border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50"
+                        className="w-full text-left p-2 bg-surface border border-border-default rounded hover:border-blue-300 hover:bg-blue-50"
                         onClick={() => handleSelectSimilar(match.id)}
                       >
                         <div className="font-medium">{match.name}</div>
-                        {match.email && <div className="text-sm text-gray-600">{match.email}</div>}
+                        {match.email && <div className="text-sm text-text-tertiary">{match.email}</div>}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-tertiary">
                 AI extracted the following information. Review before applying:
               </p>
 
@@ -492,12 +492,12 @@ export function VoiceEntryModalEnhanced({
                     if (key === "familyMembers") {
                       return (
                         <div key={key}>
-                          <label className="text-xs font-medium text-gray-500">{label}</label>
+                          <label className="text-xs font-medium text-text-secondary">{label}</label>
                           <div className="mt-1 space-y-1">
                             {value.map((member: any, index: number) => (
-                              <div key={index} className="p-2 bg-gray-50 rounded border border-gray-200">
+                              <div key={index} className="p-2 bg-canvas rounded border border-border-default">
                                 <span className="font-medium">{member.name}</span>
-                                <span className="text-gray-500 ml-2">({member.relationship})</span>
+                                <span className="text-text-secondary ml-2">({member.relationship})</span>
                               </div>
                             ))}
                           </div>
@@ -507,8 +507,8 @@ export function VoiceEntryModalEnhanced({
 
                     return (
                       <div key={key}>
-                        <label className="text-xs font-medium text-gray-500">{label}</label>
-                        <div className="mt-1 p-2 bg-gray-50 rounded border border-gray-200">
+                        <label className="text-xs font-medium text-text-secondary">{label}</label>
+                        <div className="mt-1 p-2 bg-canvas rounded border border-border-default">
                           {value.join(", ")}
                         </div>
                       </div>
@@ -517,8 +517,8 @@ export function VoiceEntryModalEnhanced({
 
                   return (
                     <div key={key}>
-                      <label className="text-xs font-medium text-gray-500">{label}</label>
-                      <div className="mt-1 p-2 bg-gray-50 rounded border border-gray-200">
+                      <label className="text-xs font-medium text-text-secondary">{label}</label>
+                      <div className="mt-1 p-2 bg-canvas rounded border border-border-default">
                         {key === "phone" ? formatPhoneNumberDisplay(value as string) : value as string}
                       </div>
                     </div>

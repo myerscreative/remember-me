@@ -35,7 +35,7 @@ export function MobileProfileHeader({
   };
 
   return (
-    <div className="md:hidden bg-[#6366f1] text-white shadow-xl relative overflow-hidden transition-all duration-300">
+    <div className="md:hidden bg-accent text-white shadow-xl relative overflow-hidden transition-all duration-300">
       {/* Background Decor */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
       
@@ -103,7 +103,7 @@ export function MobileProfileHeader({
                             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-8 text-sm" 
                             placeholder="Last" 
                         />
-                        <Button size="icon" onClick={handleSave} className="bg-white text-[#6366f1] h-8 w-8 shrink-0"><Check className="h-3 w-3" /></Button>
+                        <Button size="icon" onClick={handleSave} className="bg-surface text-[#6366f1] h-8 w-8 shrink-0"><Check className="h-3 w-3" /></Button>
                      </div>
                 ) : (
                     <div className="flex flex-col">

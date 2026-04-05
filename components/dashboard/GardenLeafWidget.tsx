@@ -144,13 +144,13 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-xl">🌱</span>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Relationship Garden</h3>
+            <h3 className="text-lg font-bold text-text-primary tracking-tight">Relationship Garden</h3>
           </div>
-          <ChevronRight className="w-5 h-5 text-gray-400" />
+          <ChevronRight className="w-5 h-5 text-text-secondary" />
         </div>
         
         {/* Info Banner - Full Width at Top */}
-        <div className="mb-3 px-3 py-2 bg-slate-800/60 backdrop-blur-sm rounded-lg border border-white/10">
+        <div className="mb-3 px-3 py-2 bg-surface/60 backdrop-blur-sm rounded-lg border border-white/10">
           <div className="flex items-center justify-between">
             <div className="text-xs font-semibold text-white/90">Network Graph</div>
             <div className="flex items-center gap-3 text-xs text-white/70">
@@ -162,7 +162,7 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
         </div>
         
         {/* Mini Garden Visualization - Seeds */}
-        <div className="relative h-48 mb-4 flex items-center justify-center bg-[#0B1120] rounded-xl overflow-hidden">
+        <div className="relative h-48 mb-4 flex items-center justify-center bg-surface rounded-xl overflow-hidden">
           <div className="absolute top-1/2 left-1/2 w-0 h-0">
             {seedPositions.map(({ contact, x, y, color, seedSize }) => (
               <motion.div
@@ -187,7 +187,7 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
           {/* Micro-tooltip */}
           {tooltip.visible && tooltip.contact && (
             <div 
-              className="fixed z-50 bg-slate-900/95 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none whitespace-nowrap"
+              className="fixed z-50 bg-canvas/95 text-text-primary text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none whitespace-nowrap"
               style={{ 
                 left: tooltip.x, 
                 top: tooltip.y,
@@ -203,10 +203,10 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
         {/* Health Score & Stats */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Garden Health</span>
+            <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Garden Health</span>
             <div className="flex items-center gap-2">
-              <span className="font-black text-2xl text-gray-900 dark:text-white">{stats.score}</span>
-              <span className="text-xs text-gray-400 font-bold">/100</span>
+              <span className="font-black text-2xl text-text-primary">{stats.score}</span>
+              <span className="text-xs text-text-secondary font-bold">/100</span>
             </div>
           </div>
           
@@ -232,12 +232,12 @@ export default function GardenLeafWidget({ contacts = [], className = '' }: Gard
 
 function StatBadge({ color, count }: { color: string; count: number }) {
   return (
-    <div className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-white/60 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/5">
+    <div className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-surface/60 rounded-lg border border-border-default">
       <div 
         className="w-2.5 h-2.5 rounded-full shadow-xs" 
         style={{ backgroundColor: color }}
       />
-      <span className="text-xs font-black text-gray-700 dark:text-gray-300">{count}</span>
+      <span className="text-xs font-black text-text-tertiary">{count}</span>
     </div>
   );
 }

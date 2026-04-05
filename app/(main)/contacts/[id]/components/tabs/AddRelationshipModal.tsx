@@ -95,10 +95,10 @@ export function AddRelationshipModal({
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-[#1a1d24] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="relative bg-surface rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2d333b]">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-5 border-b border-border-default">
+          <h2 className="text-lg font-semibold text-text-primary">
             Add Relationship
           </h2>
           <Button variant="ghost" size="icon" onClick={handleClose}>
@@ -110,7 +110,7 @@ export function AddRelationshipModal({
         <div className="p-5 space-y-5">
           {/* Search input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
             <Input
               placeholder="Search contacts to link..."
               value={searchQuery}
@@ -134,7 +134,7 @@ export function AddRelationshipModal({
                     setSearchQuery('');
                     setSearchResults([]);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-[#252931] transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-subtle transition-colors text-left"
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={contact.photo_url || undefined} />
@@ -142,7 +142,7 @@ export function AddRelationshipModal({
                       {contact.name[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="font-medium text-text-primary">
                     {contact.name}
                   </span>
                 </button>
@@ -152,7 +152,7 @@ export function AddRelationshipModal({
 
           {/* Selected contact */}
           {selectedContact && (
-            <div className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
+            <div className="flex items-center gap-3 p-3 bg-accent-muted rounded-xl">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={selectedContact.photo_url || undefined} />
                 <AvatarFallback className="bg-indigo-100 text-indigo-600">
@@ -160,10 +160,10 @@ export function AddRelationshipModal({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p className="font-medium text-text-primary">
                   {selectedContact.name}
                 </p>
-                <p className="text-sm text-gray-500">Selected</p>
+                <p className="text-sm text-text-secondary">Selected</p>
               </div>
               <Button 
                 variant="ghost" 
@@ -178,7 +178,7 @@ export function AddRelationshipModal({
           {/* Relationship type selector */}
           {selectedContact && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="text-sm font-medium text-text-tertiary">
                 Relationship to {contactName}
               </label>
               <div className="grid grid-cols-4 gap-2">
@@ -189,14 +189,14 @@ export function AddRelationshipModal({
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       relationshipType === type
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-gray-100 dark:bg-[#252931] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2d333b]'
+                        : 'bg-subtle text-text-tertiary hover:bg-subtle'
                     }`}
                   >
                     {RELATIONSHIP_LABELS[type]}
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs text-text-secondary mt-2">
                 {selectedContact.name} is {contactName}'s {RELATIONSHIP_LABELS[relationshipType].toLowerCase()}
               </p>
             </div>
@@ -204,7 +204,7 @@ export function AddRelationshipModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-5 border-t border-gray-100 dark:border-[#2d333b]">
+        <div className="flex justify-end gap-3 p-5 border-t border-border-default">
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>

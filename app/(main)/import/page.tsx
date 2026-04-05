@@ -296,9 +296,9 @@ export default function ImportContactsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20 md:pb-6">
+    <div className="min-h-screen bg-canvas pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-surface border-b border-border-default">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -307,10 +307,10 @@ export default function ImportContactsPage() {
               </Button>
             </Link>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-text-primary">
                 Import Contacts
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-text-secondary mt-1">
                 Import contacts from VCF or CSV files
               </p>
             </div>
@@ -323,35 +323,35 @@ export default function ImportContactsPage() {
         <div className="space-y-6">
           {/* Instructions (shown before file selection) */}
           {stage === 'idle' && !selectedFile && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
               <div className="text-center space-y-4">
                 <div className="mx-auto w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
                   <Upload className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="text-lg font-semibold text-text-primary">
                     Upload Your Contacts
                   </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-text-secondary mt-1">
                     Import contacts from your phone, email, or other sources
                   </p>
                 </div>
 
                 {/* Supported Formats */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <div className="p-4 bg-canvas rounded-lg border border-border-default">
                     <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                    <p className="font-medium text-gray-900 dark:text-white text-sm">VCF Files</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="font-medium text-text-primary text-sm">VCF Files</p>
+                    <p className="text-xs text-text-secondary mt-1">
                       Standard vCard format from iPhone, Android, Outlook
                     </p>
                   </div>
 
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <div className="p-4 bg-canvas rounded-lg border border-border-default">
                     <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                    <p className="font-medium text-gray-900 dark:text-white text-sm">CSV Files</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="font-medium text-text-primary text-sm">CSV Files</p>
+                    <p className="text-xs text-text-secondary mt-1">
                       From Google Contacts, Excel, or any spreadsheet
                     </p>
                   </div>
@@ -378,7 +378,7 @@ export default function ImportContactsPage() {
                       </span>
                     </Button>
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  <p className="text-xs text-text-secondary mt-2">
                     Maximum file size: 10MB
                   </p>
                 </div>
@@ -388,21 +388,21 @@ export default function ImportContactsPage() {
                   <summary className="cursor-pointer text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300">
                     How do I export my contacts?
                   </summary>
-                  <div className="mt-3 space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="mt-3 space-y-3 text-sm text-text-secondary">
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">iPhone:</p>
+                      <p className="font-medium text-text-primary">iPhone:</p>
                       <p className="text-xs mt-1">
                         Settings → [Your Name] → iCloud → Contacts → Turn on. Then use iCloud.com → Contacts → Select All → Export vCard
                       </p>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Android:</p>
+                      <p className="font-medium text-text-primary">Android:</p>
                       <p className="text-xs mt-1">
                         Contacts app → Menu → Settings → Export → Export to .vcf file
                       </p>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Google Contacts:</p>
+                      <p className="font-medium text-text-primary">Google Contacts:</p>
                       <p className="text-xs mt-1">
                         contacts.google.com → Export → Google CSV or vCard format
                       </p>
@@ -415,7 +415,7 @@ export default function ImportContactsPage() {
 
           {/* File Selected - Preview */}
           {stage === 'idle' && selectedFile && parsedContacts.length === 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -423,8 +423,8 @@ export default function ImportContactsPage() {
                       <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{selectedFile.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="font-medium text-text-primary">{selectedFile.name}</p>
+                      <p className="text-sm text-text-secondary">
                         {(selectedFile.size / 1024).toFixed(1)} KB
                       </p>
                     </div>
@@ -448,7 +448,7 @@ export default function ImportContactsPage() {
 
           {/* Parsed - Select Contacts to Import */}
           {stage === 'idle' && parsedContacts.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-center gap-3">
@@ -456,10 +456,10 @@ export default function ImportContactsPage() {
                     <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-text-primary">
                       Select contacts to import
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-text-secondary">
                       {selectedContactIds.size} of {parsedContacts.length} selected • From: {selectedFile?.name}
                     </p>
                   </div>
@@ -468,13 +468,13 @@ export default function ImportContactsPage() {
                 {/* Search and Controls */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
                     <input
                       type="text"
                       placeholder="Search contacts..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full pl-10 pr-4 py-2 text-sm border border-border-default rounded-lg bg-surface text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -500,10 +500,10 @@ export default function ImportContactsPage() {
                 </div>
 
                 {/* Contact List */}
-                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+                <div className="border border-border-default rounded-lg overflow-hidden">
                   <div className="max-h-80 overflow-y-auto">
                     {filteredContacts.length === 0 ? (
-                      <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                      <div className="p-4 text-center text-text-secondary text-sm">
                         No contacts match your search
                       </div>
                     ) : (
@@ -513,7 +513,7 @@ export default function ImportContactsPage() {
                         return (
                           <label
                             key={originalIndex}
-                            className={`flex items-center gap-3 p-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                            className={`flex items-center gap-3 p-3 border-b border-border-default last:border-b-0 cursor-pointer hover:bg-subtle transition-colors ${
                               isSelected ? 'bg-purple-50 dark:bg-purple-900/20' : ''
                             }`}
                           >
@@ -524,11 +524,11 @@ export default function ImportContactsPage() {
                               className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 dark:text-white truncate">
+                              <p className="font-medium text-text-primary truncate">
                                 {contact.name}
                               </p>
                               {(contact.email || contact.phone) && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                <p className="text-text-secondary text-xs truncate">
                                   {contact.email || contact.phone}
                                 </p>
                               )}
@@ -592,11 +592,11 @@ export default function ImportContactsPage() {
 
           {/* Dry Run Preview Panel */}
           {stage === 'preview' && dryRunPreview && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">
                 🔍 Dry Run Preview
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-text-secondary text-sm mb-4">
                 Found {dryRunPreview.totalWithPhotos} contacts with photos. Here&apos;s what will happen:
               </p>
 
@@ -631,11 +631,11 @@ export default function ImportContactsPage() {
 
                 {/* No Match */}
                 {dryRunPreview.noMatch.length > 0 && (
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <div className="bg-canvas rounded-lg p-4">
+                    <h4 className="font-medium text-text-tertiary mb-2">
                       ❓ No Match ({dryRunPreview.noMatch.length})
                     </h4>
-                    <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 max-h-32 overflow-y-auto">
+                    <ul className="text-sm text-text-secondary space-y-1 max-h-32 overflow-y-auto">
                       {dryRunPreview.noMatch.map((c, i) => (
                         <li key={i}>{c.name} {c.email && `(${c.email})`}</li>
                       ))}
@@ -645,7 +645,7 @@ export default function ImportContactsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-3 mt-6 pt-4 border-t border-border-default">
                 <Button variant="outline" onClick={handleReset} className="flex-1">
                   Cancel
                 </Button>
@@ -663,7 +663,7 @@ export default function ImportContactsPage() {
 
           {/* Progress */}
           {(stage === 'parsing' || stage === 'importing' || stage === 'complete' || stage === 'error') && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
               <ImportProgress
                 stage={stage}
                 total={totalContacts}
@@ -675,7 +675,7 @@ export default function ImportContactsPage() {
 
               {/* Actions after completion */}
               {stage === 'complete' && (
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                <div className="mt-6 pt-6 border-t border-border-default space-y-4">
                   {/* Avatar sync success message */}
                   {importMode === 'avatars' && (
                     <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
@@ -715,7 +715,7 @@ export default function ImportContactsPage() {
 
               {/* Actions after error */}
               {stage === 'error' && (
-                <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex gap-3 mt-6 pt-6 border-t border-border-default">
                   <Button onClick={handleReset} className="flex-1">
                     Try Again
                   </Button>
@@ -725,8 +725,8 @@ export default function ImportContactsPage() {
           )}
 
           {/* Dev Tools Section */}
-          <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          <div className="mt-12 pt-6 border-t border-border-default">
+            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4">
               Developer Tools
             </h3>
             <div className="flex gap-4">

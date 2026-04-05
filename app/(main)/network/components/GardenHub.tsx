@@ -102,7 +102,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight"
+          className="text-2xl md:text-3xl font-bold text-text-primary leading-tight tracking-tight"
         >
           Tools for a Flourishing Garden
         </motion.h1>
@@ -110,7 +110,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
-          className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-normal"
+          className="text-sm md:text-base text-text-secondary max-w-md mx-auto leading-normal"
         >
           Four ways to tend to your connections and help your relationships grow.
         </motion.p>
@@ -126,7 +126,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
           <Button 
             onClick={() => setIsImporterOpen(true)}
             variant="outline" 
-            className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800"
+            className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 bg-surface border-indigo-200 dark:border-indigo-500/30 text-text-accent hover:bg-indigo-50 dark:hover:bg-surface"
           >
               <Upload className="w-4 h-4" />
               Import iPhone Contacts
@@ -149,10 +149,10 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
               key={i}
               variants={cardVariants}
               onClick={() => onNavigate(tool.route)}
-              className={`relative flex w-full text-left gap-4 px-5 py-4 rounded-xl border transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 group ${
+              className={`relative flex w-full text-left gap-4 px-5 py-4 rounded-xl border transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-canvas group ${
                 isNurture
                   ? "border-red-500/30 bg-red-500/5 dark:bg-red-500/10 shadow-sm"
-                  : "border-gray-200 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800"
+                  : "border-border-default bg-surface/50 hover:bg-surface"
               }`}
             >
               <div className={`shrink-0 p-2.5 h-11 w-11 rounded-lg flex items-center justify-center ${tool.color} group-hover:scale-110 transition-transform`}>
@@ -160,7 +160,7 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
               </div>
               <div className="space-y-1 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                  <h3 className="font-bold text-text-primary text-base">
                     {tool.title}
                   </h3>
                   <button
@@ -169,13 +169,13 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
                       e.stopPropagation();
                       setExpandedInfo(i);
                     }}
-                    className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/20 transition-colors"
+                    className="p-1.5 text-text-secondary hover:text-text-accent rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-500/20 transition-colors"
                     title={`More info about ${tool.title}`}
                   >
                     <Info className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed pr-6">
+                <p className="text-sm text-text-secondary leading-relaxed pr-6">
                   {tool.description}
                 </p>
               </div>
@@ -187,10 +187,10 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
       {/* Info Overlay */}
       {expandedInfo !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-sm bg-surface rounded-2xl shadow-xl border border-border-default p-6 animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setExpandedInfo(null)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors bg-gray-50 dark:bg-gray-800/50 rounded-full"
+              className="absolute top-4 right-4 p-2 text-text-secondary hover:text-text-tertiary transition-colors bg-canvas rounded-full"
             >
               <X className="w-5 h-5" />
             </button>
@@ -202,12 +202,12 @@ export function GardenHub({ onNavigate }: GardenHubProps) {
                   return <Icon className="w-5 h-5" />;
                 })()}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h3 className="text-xl font-bold text-text-primary leading-tight">
                 {tools[expandedInfo].title}
               </h3>
             </div>
 
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
+            <p className="text-text-tertiary leading-relaxed text-[15px]">
               {tools[expandedInfo].detailedDescription}
             </p>
 

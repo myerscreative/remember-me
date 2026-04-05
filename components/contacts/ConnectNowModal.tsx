@@ -70,23 +70,23 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="sm:max-w-md p-0 gap-0 bg-[#1a1a24] border-gray-800 text-white overflow-hidden flex flex-col max-h-[85vh]"
+        className="sm:max-w-md p-0 gap-0 bg-surface border-border-default text-text-primary overflow-hidden flex flex-col max-h-[85vh]"
         showCloseButton={false} 
       >
         
         {/* Header */}
-        <div className="p-5 border-b border-gray-800 bg-[#1a1a24] sticky top-0 z-10">
-          <div className="w-10 h-1 bg-gray-700/30 rounded-full mx-auto mb-4" /> {/* Drag Handle visual */}
+        <div className="p-5 border-b border-border-default bg-surface sticky top-0 z-10">
+          <div className="w-10 h-1 bg-subtle/30 rounded-full mx-auto mb-4" /> {/* Drag Handle visual */}
           <div className="flex items-center gap-3">
-             <Avatar className="h-12 w-12 border border-gray-700">
+             <Avatar className="h-12 w-12 border border-border-strong">
                 <AvatarImage src={person.photo_url || undefined} />
-                <AvatarFallback className={cn("text-white font-medium", getGradient(person.name))}>
+                <AvatarFallback className={cn("text-text-primary font-medium", getGradient(person.name))}>
                    {getInitialsFromFullName(person.name)}
                 </AvatarFallback>
              </Avatar>
              <div>
-                <h3 className="font-semibold text-lg leading-tight text-white">{person.name}</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="font-semibold text-lg leading-tight text-text-primary">{person.name}</h3>
+                <p className="text-sm text-text-secondary">
                     Last contacted: {formatLastContacted(person.last_interaction_date)}
                 </p>
              </div>
@@ -98,23 +98,23 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
             
             {/* Contact Methods */}
             <section>
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Choose how to connect</h4>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">Choose how to connect</h4>
                 <div className="grid grid-cols-2 gap-3">
-                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
-                        <MessageSquare className="h-7 w-7 text-indigo-400 group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-medium text-gray-300 group-hover:text-white">Text</span>
+                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface/60 border border-border-strong/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+                        <MessageSquare className="h-7 w-7 text-text-accent group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium text-text-tertiary group-hover:text-text-primary">Text</span>
                     </button>
-                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface/60 border border-border-strong/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
                          <Mail className="h-7 w-7 text-purple-400 group-hover: scale-110 transition-transform" />
-                         <span className="text-sm font-medium text-gray-300 group-hover:text-white">Email</span>
+                         <span className="text-sm font-medium text-text-tertiary group-hover:text-text-primary">Email</span>
                     </button>
-                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface/60 border border-border-strong/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
                          <Phone className="h-7 w-7 text-green-400 group-hover:scale-110 transition-transform" />
-                         <span className="text-sm font-medium text-gray-300 group-hover:text-white">Call</span>
+                         <span className="text-sm font-medium text-text-tertiary group-hover:text-text-primary">Call</span>
                     </button>
-                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+                    <button className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface/60 border border-border-strong/30 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
                          <Heart className="h-7 w-7 text-rose-400 group-hover:scale-110 transition-transform" />
-                         <span className="text-sm font-medium text-gray-300 group-hover:text-white">WhatsApp</span>
+                         <span className="text-sm font-medium text-text-tertiary group-hover:text-text-primary">WhatsApp</span>
                     </button>
                 </div>
             </section>
@@ -122,7 +122,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
             {/* AI Starters */}
             <section>
                 <div className="flex items-center gap-2 mb-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Conversation Starters</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Conversation Starters</h4>
                     <span className="px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400 flex items-center gap-1">
                         <Sparkles className="w-3 h-3" /> AI
                     </span>
@@ -130,11 +130,11 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                 
                 <div className="space-y-3">
                     {starters.map((starter, i) => (
-                        <div key={i} className="group p-4 rounded-xl bg-[#1e1e2d]/60 border border-gray-700/30 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all">
-                             <p className="text-sm text-gray-200 leading-relaxed mb-2">
+                        <div key={i} className="group p-4 rounded-xl bg-surface/60 border border-border-strong/30 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all">
+                             <p className="text-sm text-text-tertiary leading-relaxed mb-2">
                                 "{starter.text}"
                              </p>
-                             <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+                             <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-3">
                                 <Sparkles className="w-3 h-3 opacity-50" />
                                 {starter.context}
                              </div>
@@ -162,14 +162,14 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
 
             {/* Connection Logging */}
             <section>
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Log Interaction</h4>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">Log Interaction</h4>
                 <div className="space-y-3">
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs text-gray-400 ml-1">Date</label>
+                        <label className="text-xs text-text-secondary ml-1">Date</label>
                         <DatePicker 
                             date={interactionDate} 
                             setDate={setInteractionDate} 
-                            className="w-full bg-[#1e1e2d]/60 border-gray-700/30 text-gray-200 hover:bg-[#1e1e2d]/80 hover:text-white"
+                            className="w-full bg-surface/60 border-border-strong/30 text-text-tertiary hover:bg-surface/80 hover:text-text-primary"
                         />
                     </div>
 
@@ -179,7 +179,7 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
                         placeholder="Add a quick note..."
                         value={quickNote}
                         onChange={(e) => setQuickNote(e.target.value)}
-                        className="w-full bg-[#1e1e2d]/60 border border-gray-700/30 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                        className="w-full bg-surface/60 border border-border-strong/30 rounded-xl px-4 py-3 text-sm text-text-tertiary placeholder:text-text-secondary focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
                     />
 
                     {/* Action Buttons */}
@@ -204,10 +204,10 @@ export function ConnectNowModal({ person, isOpen, onOpenChange }: ConnectNowModa
             </section>
         </div>
         
-        <div className="p-4 border-t border-gray-800 bg-[#1a1a24]">
+        <div className="p-4 border-t border-border-default bg-surface">
              <Button 
                 variant="ghost" 
-                className="w-full text-gray-400 hover:text-white hover:bg-gray-800"
+                className="w-full text-text-secondary hover:text-text-primary hover:bg-surface"
                 onClick={() => onOpenChange(false)}
              >
                 Close

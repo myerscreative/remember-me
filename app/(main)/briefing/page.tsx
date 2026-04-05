@@ -70,10 +70,10 @@ export default function BriefingPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-          <span className="text-gray-600 dark:text-gray-400">Loading your briefing...</span>
+          <span className="text-text-secondary">Loading your briefing...</span>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function BriefingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className="min-h-screen bg-canvas pb-16 md:pb-0">
       <div className="max-w-3xl mx-auto w-full px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
 
         {/* Header */}
@@ -117,11 +117,11 @@ export default function BriefingPage() {
                         <span className="text-sm">Synthesizing your personal briefing...</span>
                     </div>
                 ) : narrative ? (
-                    <div className="prose dark:prose-invert prose-purple max-w-none text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                    <div className="prose dark:prose-invert prose-purple max-w-none text-text-tertiary leading-relaxed whitespace-pre-line">
                         {narrative}
                     </div>
                 ) : (
-                    <p className="text-sm text-gray-500 italic">Narrative unavailable. Check your connection or API key.</p>
+                    <p className="text-sm text-text-secondary italic">Narrative unavailable. Check your connection or API key.</p>
                 )}
             </CardContent>
         </Card>
@@ -130,7 +130,7 @@ export default function BriefingPage() {
         {briefing ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <p className="text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wider font-bold">
+                <p className="text-text-secondary text-sm uppercase tracking-wider font-bold">
                     Action Items
                 </p>
                 <Badge variant="outline">{briefing.milestones.length + briefing.thirstyTribes.length + briefing.priorityNurtures.length} Total</Badge>
@@ -140,7 +140,7 @@ export default function BriefingPage() {
             
             {(briefing.milestones.length === 0 && briefing.thirstyTribes.length === 0 && briefing.priorityNurtures.length === 0) && (
                 <Card className="border-dashed">
-                    <CardContent className="pt-6 text-center text-gray-500">
+                    <CardContent className="pt-6 text-center text-text-secondary">
                         <p>All caught up! You are a relationship superhero. 🦸‍♂️</p>
                         <Button variant="link" onClick={() => router.push('/dashboard')}>Back to Dashboard</Button>
                     </CardContent>
@@ -148,7 +148,7 @@ export default function BriefingPage() {
             )}
           </div>
         ) : (
-            <div className="text-center text-gray-500">No briefing data available.</div>
+            <div className="text-center text-text-secondary">No briefing data available.</div>
         )}
       </div>
     </div>

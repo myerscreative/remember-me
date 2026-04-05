@@ -72,10 +72,10 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
   if (isLoading && meetings.length === 0) {
     return (
-      <section className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-gray-100 dark:border-gray-700">
+      <section className="bg-surface rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-border-default">
         <div className="flex justify-center items-center py-12">
           <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading meetings...</span>
+          <span className="ml-3 text-text-secondary">Loading meetings...</span>
         </div>
       </section>
     );
@@ -83,7 +83,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
   if (error) {
     return (
-      <section className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-gray-100 dark:border-gray-700">
+      <section className="bg-surface rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-border-default">
         <div className="text-center py-8">
           <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
           <button
@@ -99,13 +99,13 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
   if (meetings.length === 0) {
     return (
-      <section className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-gray-100 dark:border-gray-700">
+      <section className="bg-surface rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-border-default">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-text-primary flex items-center gap-2">
             <span>📅</span> Upcoming Meetings
           </h2>
         </div>
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-text-secondary">
           <p>No upcoming meetings with contacts found</p>
           <p className="text-sm mt-2">Meetings with attendees in your contacts will appear here</p>
         </div>
@@ -114,15 +114,15 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
   }
 
   return (
-    <section className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-gray-100 dark:border-gray-700">
+    <section className="bg-surface rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-border-default">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+        <h2 className="text-xl md:text-2xl font-bold text-text-primary flex items-center gap-2">
           <span>📅</span> Upcoming Meetings
         </h2>
         <button
           onClick={fetchMeetings}
           disabled={isLoading}
-          className="px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 font-medium text-sm hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 bg-canvas border border-border-strong rounded-lg text-text-tertiary font-medium text-sm hover:bg-subtle transition-colors disabled:opacity-50"
         >
           {isLoading ? 'Refreshing...' : 'Refresh'}
         </button>
@@ -131,7 +131,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
       <div className="flex flex-col gap-6">
         {groupedMeetings.Today.length > 0 && (
           <div className="space-y-3">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider pl-1">Today</div>
+            <div className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Today</div>
             {groupedMeetings.Today.map(meeting => (
               <MeetingCard
                 key={meeting.calendarEvent.id}
@@ -145,7 +145,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
         {groupedMeetings.Tomorrow.length > 0 && (
           <div className="space-y-3">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider pl-1">Tomorrow</div>
+            <div className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Tomorrow</div>
             {groupedMeetings.Tomorrow.map(meeting => (
               <MeetingCard
                 key={meeting.calendarEvent.id}
@@ -159,7 +159,7 @@ export function UpcomingMeetingsWidget({ onOpenPrep }: UpcomingMeetingsWidgetPro
 
         {groupedMeetings.ThisWeek.length > 0 && (
           <div className="space-y-3">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider pl-1">This Week</div>
+            <div className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">This Week</div>
             {groupedMeetings.ThisWeek.map(meeting => (
               <MeetingCard
                 key={meeting.calendarEvent.id}
@@ -198,8 +198,8 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
   };
 
   const containerClasses = cn(
-    "flex flex-col sm:flex-row gap-4 p-5 bg-gray-50 dark:bg-gray-800/50 border-2 rounded-2xl cursor-pointer transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5",
-    isHighConfidence ? "border-green-200 dark:border-green-800" : "border-gray-200 dark:border-gray-700"
+    "flex flex-col sm:flex-row gap-4 p-5 bg-canvas border-2 rounded-2xl cursor-pointer transition-all hover:bg-surface hover:shadow-lg hover:-translate-y-0.5",
+    isHighConfidence ? "border-green-200 dark:border-green-800" : "border-border-default"
   );
 
   return (
@@ -207,11 +207,11 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
       onClick={onClick}
       className={cn(containerClasses, "hover:border-indigo-500 dark:hover:border-indigo-400")}
     >
-      <div className="flex sm:flex-col items-start sm:items-center gap-2 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 pb-3 sm:pb-0 pr-0 sm:pr-4">
+      <div className="flex sm:flex-col items-start sm:items-center gap-2 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-border-default pb-3 sm:pb-0 pr-0 sm:pr-4">
         {isHighConfidence && (
           <span className="px-2.5 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 rounded-lg text-xs font-bold whitespace-nowrap">High Match</span>
         )}
-        <span className="text-lg font-bold text-gray-900 dark:text-white" suppressHydrationWarning>
+        <span className="text-lg font-bold text-text-primary" suppressHydrationWarning>
           {formatTime(event.start.dateTime)}
         </span>
       </div>
@@ -232,15 +232,15 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
                 </div>
               )}
               <div>
-                <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight">{primaryContact.name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{event.summary || 'Meeting'}</p>
+                <h3 className="text-base font-bold text-text-primary leading-tight">{primaryContact.name}</h3>
+                <p className="text-sm text-text-secondary">{event.summary || 'Meeting'}</p>
               </div>
             </>
           ) : (
             <div>
-              <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight">{event.summary || 'Meeting'}</h3>
+              <h3 className="text-base font-bold text-text-primary leading-tight">{event.summary || 'Meeting'}</h3>
               {event.attendees && event.attendees.length > 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <p className="text-sm text-text-secondary flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" />
                   {event.attendees.length} attendee{event.attendees.length !== 1 ? 's' : ''}
                 </p>
@@ -250,7 +250,7 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
         </div>
 
         {(event.location || event.hangoutLink) && (
-          <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 font-medium">
+          <div className="flex items-center gap-1.5 text-sm text-text-secondary font-medium">
             {getLocationIcon(event.location)}
             {event.location || 'Video Call'}
           </div>
@@ -262,7 +262,7 @@ function MeetingCard({ meeting, onClick, mounted }: { meeting: MatchedMeeting; o
               {meeting.matchedContacts.length} contact{meeting.matchedContacts.length !== 1 ? 's' : ''} matched
             </span>
             {primaryContact?.role && (
-              <span className="px-2 py-1 bg-white dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md text-xs text-gray-500 dark:text-gray-400">
+              <span className="px-2 py-1 bg-subtle border border-border-strong rounded-md text-xs text-text-secondary">
                 {primaryContact.role}
               </span>
             )}

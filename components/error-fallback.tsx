@@ -28,19 +28,19 @@ export function ErrorFallback({
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-2xl font-bold text-text-primary mb-2">
           {title}
         </h2>
 
         {/* Message */}
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
+        <p className="text-text-secondary mb-6">
           {message}
         </p>
 
         {/* Error details (development only) */}
         {error && process.env.NODE_ENV === "development" && (
-          <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-left">
-            <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">
+          <div className="mb-6 p-4 bg-subtle rounded-lg text-left">
+            <p className="text-xs font-mono text-text-secondary break-all">
               {error.message}
             </p>
           </div>

@@ -50,7 +50,7 @@ export function AISynopsisCard({
 
   if (!hasContent) {
     if (isInline) return (
-      <div className="bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-4 md:px-6 md:py-4">
+      <div className="bg-surface border border-border-default rounded-2xl p-4 md:px-6 md:py-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-linear-to-br from-[#7c3aed] to-[#5b21b6] flex items-center justify-center text-lg shrink-0">
             ✨
@@ -79,12 +79,12 @@ export function AISynopsisCard({
   };
 
   return (
-    <div className={cn("bg-[#1a1f2e] border border-[#2d3748] rounded-2xl p-5 md:p-6", !isInline && "shadow-sm")}>
+    <div className={cn("bg-surface border border-border-default rounded-2xl p-5 md:p-6", !isInline && "shadow-sm")}>
       <div className="flex items-center justify-between mb-3.5">
         <div className="flex items-center gap-2 text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
             <span>✨</span>
             <span>AI Summary</span>
-            <span className="px-1.5 py-0.5 bg-[#2d3748] rounded text-[#7c3aed] text-[10px] font-medium">
+            <span className="px-1.5 py-0.5 bg-elevated rounded text-[#7c3aed] text-[10px] font-medium">
               {levelLabels[summaryLevel]}
             </span>
         </div>
@@ -111,13 +111,13 @@ export function AISynopsisCard({
         {aiSummary || deepLore}
       </div>
 
-      <div className="pt-3 border-t border-[#2d3748] flex items-center justify-between flex-wrap gap-2">
+      <div className="pt-3 border-t border-border-default flex items-center justify-between flex-wrap gap-2">
          <span className="text-[11px] text-[#64748b]">
             {lastUpdated ? `Updated ${new Date(lastUpdated).toLocaleDateString()}` : 'Recently updated'}
          </span>
          <div className="flex gap-1.5 flex-wrap">
             {whereMet && (
-                <span className="bg-[#2d3748] px-2 py-1 rounded-md text-[10px] text-[#94a3b8] flex items-center gap-1.5 uppercase tracking-wider font-semibold">
+                <span className="bg-elevated px-2 py-1 rounded-md text-[10px] text-[#94a3b8] flex items-center gap-1.5 uppercase tracking-wider font-semibold">
                     📍 {whereMet}
                 </span>
             )}

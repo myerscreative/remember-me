@@ -152,15 +152,15 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
+      <div className="flex items-center justify-center h-screen bg-canvas">
+        <Loader2 className="h-8 w-8 animate-spin text-text-accent" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-canvas">
         <ErrorFallback
           error={error}
           reset={() => window.location.reload()}
@@ -172,15 +172,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-canvas">
       <Toaster position="top-center" />
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between px-6 py-4 bg-surface border-b border-border-default">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+          <Link href="/" className="text-text-secondary hover:text-text-primary">
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
         </div>
         
         <button
@@ -202,30 +202,30 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto p-6 space-y-6">
           
           {/* Profile Section */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
                 <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Profile</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-secondary"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-text-secondary mt-1">Email cannot be changed</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Display Name
                 </label>
                 <input
@@ -233,28 +233,28 @@ export default function SettingsPage() {
                   value={settings.display_name || ''}
                   onChange={(e) => setSettings({ ...settings, display_name: e.target.value })}
                   placeholder="Your name"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
           </section>
 
           {/* Network Preferences */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
                 <Network className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Network</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Network</h2>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Show Birthdays on Network
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Display birthday badges on contact nodes</p>
+                  <p className="text-xs text-text-secondary">Display birthday badges on contact nodes</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -263,16 +263,16 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, show_birthdays_on_network: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Auto-favorite New Contacts
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Automatically mark new contacts as favorites</p>
+                  <p className="text-xs text-text-secondary">Automatically mark new contacts as favorites</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -281,12 +281,12 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, auto_favorite_new_contacts: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Default Zoom Level
                 </label>
                 <div className="flex items-center gap-4">
@@ -296,9 +296,9 @@ export default function SettingsPage() {
                     max="150"
                     value={settings.network_zoom_level}
                     onChange={(e) => setSettings({ ...settings, network_zoom_level: parseInt(e.target.value) })}
-                    className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 h-2 bg-subtle rounded-lg appearance-none cursor-pointer"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[50px]">
+                  <span className="text-sm font-medium text-text-tertiary min-w-[50px]">
                     {settings.network_zoom_level}%
                   </span>
                 </div>
@@ -307,21 +307,21 @@ export default function SettingsPage() {
           </section>
 
           {/* Notifications */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
                 <Bell className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Notifications</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Notifications</h2>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Email Notifications
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Receive notifications via email</p>
+                  <p className="text-xs text-text-secondary">Receive notifications via email</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -330,16 +330,16 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, email_notifications: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Birthday Reminders
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Get notified of upcoming birthdays</p>
+                  <p className="text-xs text-text-secondary">Get notified of upcoming birthdays</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -348,19 +348,19 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, birthday_reminders: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
               {settings.birthday_reminders && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-tertiary mb-2">
                     Notify me this many days before
                   </label>
                   <select
                     value={settings.birthday_reminder_days}
                     onChange={(e) => setSettings({ ...settings, birthday_reminder_days: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value={1}>1 day</option>
                     <option value={3}>3 days</option>
@@ -372,10 +372,10 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Contact Reminders
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Remind me to reach out to contacts</p>
+                  <p className="text-xs text-text-secondary">Remind me to reach out to contacts</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -384,71 +384,71 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, contact_reminders: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
             </div>
           </section>
 
           {/* Reminders */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
                 <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Reminders</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Reminders</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Default Reminder Time
                 </label>
                 <input
                   type="time"
                   value={settings.default_reminder_time}
                   onChange={(e) => setSettings({ ...settings, default_reminder_time: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Check-in Frequency
                 </label>
                 <select
                   value={settings.reminder_frequency}
                   onChange={(e) => setSettings({ ...settings, reminder_frequency: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">How often to suggest reaching out to contacts</p>
+                <p className="text-xs text-text-secondary mt-1">How often to suggest reaching out to contacts</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-tertiary mb-2">
                     Quiet Hours Start
                   </label>
                   <input
                     type="time"
                     value={settings.quiet_hours_start || '22:00'}
                     onChange={(e) => setSettings({ ...settings, quiet_hours_start: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-tertiary mb-2">
                     Quiet Hours End
                   </label>
                   <input
                     type="time"
                     value={settings.quiet_hours_end || '08:00'}
                     onChange={(e) => setSettings({ ...settings, quiet_hours_end: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border-strong rounded-lg bg-subtle text-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -456,17 +456,17 @@ export default function SettingsPage() {
           </section>
 
           {/* Display Options */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
                 <Palette className="h-5 w-5 text-pink-600 dark:text-pink-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Display</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Display</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-sm font-medium text-text-tertiary mb-3">
                   Theme
                 </label>
                 <div className="flex gap-2">
@@ -476,10 +476,10 @@ export default function SettingsPage() {
                     className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'light'
                         ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'light' ? "bg-purple-100 text-purple-600" : "bg-gray-100 dark:bg-gray-800")}>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'light' ? "bg-purple-100 text-purple-600" : "bg-subtle")}>
                       <Sun className="h-5 w-5" />
                     </div>
                     <span className="font-semibold text-xs uppercase tracking-wider">Light</span>
@@ -490,11 +490,11 @@ export default function SettingsPage() {
                     onClick={() => setTheme('dark')}
                     className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'border-purple-500 bg-[#1E293B] text-purple-400 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        ? 'border-purple-500 bg-surface text-purple-400 shadow-sm ring-1 ring-purple-500/20'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'dark' ? "bg-purple-900/40 text-purple-400" : "bg-gray-100 dark:bg-gray-800")}>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'dark' ? "bg-purple-900/40 text-purple-400" : "bg-subtle")}>
                       <Moon className="h-5 w-5" />
                     </div>
                     <span className="font-semibold text-xs uppercase tracking-wider">Dark</span>
@@ -506,10 +506,10 @@ export default function SettingsPage() {
                     className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
                       theme === 'auto'
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
-                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'auto' ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300" : "bg-gray-100 dark:bg-gray-800")}>
+                    <div className={cn("p-2 rounded-lg transition-colors", theme === 'auto' ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300" : "bg-subtle")}>
                       <Monitor className="h-5 w-5" />
                     </div>
                     <span className="font-semibold text-xs uppercase tracking-wider">Auto</span>
@@ -519,10 +519,10 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Compact Mode
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Use denser spacing in lists</p>
+                  <p className="text-xs text-text-secondary">Use denser spacing in lists</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -531,16 +531,16 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, compact_mode: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="text-sm font-medium text-text-primary">
                     Show Last Contact Date
                   </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Display when you last contacted someone</p>
+                  <p className="text-xs text-text-secondary">Display when you last contacted someone</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -549,30 +549,30 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings({ ...settings, show_last_contact: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-subtle peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
             </div>
           </section>
 
           {/* AI Summary Preferences */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
                 <span className="text-xl">✨</span>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">AI Summary Detail</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Choose how much detail you want to see</p>
+                <h2 className="text-xl font-semibold text-text-primary">AI Summary Detail</h2>
+                <p className="text-xs text-text-secondary mt-0.5">Choose how much detail you want to see</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-sm font-medium text-text-tertiary mb-3">
                   Default Summary Level
                 </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                <p className="text-xs text-text-secondary mb-4">
                   Changes take effect immediately. No new AI generation needed - all summaries are pre-cached.
                 </p>
                 <div className="flex gap-3">
@@ -582,7 +582,7 @@ export default function SettingsPage() {
                     className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
                       settings.summary_level_default === 'micro'
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
                     <div className={cn("text-2xl")}>⚡</div>
@@ -598,7 +598,7 @@ export default function SettingsPage() {
                     className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
                       settings.summary_level_default === 'default'
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
                     <div className={cn("text-2xl")}>📝</div>
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                     className={`flex-1 flex flex-col items-center justify-center gap-3 px-4 py-5 rounded-xl border-2 transition-all duration-200 ${
                       settings.summary_level_default === 'full'
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm ring-1 ring-purple-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400'
+                        : 'border-border-default hover:border-purple-300 dark:hover:border-purple-700 text-text-secondary hover:text-purple-500 dark:hover:text-purple-400'
                     }`}
                   >
                     <div className={cn("text-2xl")}>📖</div>
@@ -635,72 +635,72 @@ export default function SettingsPage() {
           </section>
 
           {/* Setup & Imports */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
                 <Database className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Setup & Imports</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Setup & Imports</h2>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-4 bg-subtle/50 rounded-lg border border-border-default">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
-                    <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="p-2 bg-surface rounded-lg border border-border-default shadow-sm">
+                    <Calendar className="h-5 w-5 text-text-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">Calendar Sync</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Connect Google Calendar to track interactions</p>
+                    <h3 className="font-medium text-text-primary">Calendar Sync</h3>
+                    <p className="text-sm text-text-secondary">Connect Google Calendar to track interactions</p>
                   </div>
                 </div>
                 <GoogleSignInButton />
               </div>
 
-              <Link href="/import" className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+              <Link href="/import" className="flex items-center justify-between p-4 bg-subtle/50 rounded-lg border border-border-default hover:bg-subtle transition-colors group">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
-                    <Database className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="p-2 bg-surface rounded-lg border border-border-default shadow-sm">
+                    <Database className="h-5 w-5 text-text-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">Import Data</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Import contacts from CSV or vCard</p>
+                    <h3 className="font-medium text-text-primary">Import Data</h3>
+                    <p className="text-sm text-text-secondary">Import contacts from CSV or vCard</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                <ChevronRight className="h-5 w-5 text-text-secondary group-hover:text-text-tertiary transition-colors" />
               </Link>
 
-              <Link href="/network/deduplicate" className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+              <Link href="/network/deduplicate" className="flex items-center justify-between p-4 bg-subtle/50 rounded-lg border border-border-default hover:bg-subtle transition-colors group">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
-                    <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="p-2 bg-surface rounded-lg border border-border-default shadow-sm">
+                    <Users className="h-5 w-5 text-text-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">Merge Duplicates</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Find and merge duplicate contacts</p>
+                    <h3 className="font-medium text-text-primary">Merge Duplicates</h3>
+                    <p className="text-sm text-text-secondary">Find and merge duplicate contacts</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                <ChevronRight className="h-5 w-5 text-text-secondary group-hover:text-text-tertiary transition-colors" />
               </Link>
             </div>
           </section>
 
           {/* Account Management */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <section className="bg-surface rounded-lg shadow-sm border border-border-default p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
                 <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Account</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Account</h2>
             </div>
 
             <div className="space-y-4">
               <button
                 onClick={() => router.push('/change-password')}
-                className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 border border-border-strong rounded-lg bg-subtle hover:bg-subtle transition-colors"
               >
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Change Password</span>
-                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <span className="text-sm font-medium text-text-primary">Change Password</span>
+                <ChevronRight className="h-5 w-5 text-text-secondary" />
               </button>
 
               <button
@@ -711,10 +711,10 @@ export default function SettingsPage() {
                     router.push('/login');
                   }
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 border border-border-strong rounded-lg bg-subtle hover:bg-subtle transition-colors"
               >
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Sign Out</span>
-                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <span className="text-sm font-medium text-text-primary">Sign Out</span>
+                <ChevronRight className="h-5 w-5 text-text-secondary" />
               </button>
 
               <button
@@ -723,7 +723,7 @@ export default function SettingsPage() {
                     toast('Account deletion feature coming soon', { icon: 'ℹ️' });
                   }
                 }}
-                className="w-full px-4 py-3 border border-red-300 dark:border-red-700 rounded-lg bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 font-medium"
+                className="w-full px-4 py-3 border border-red-300 dark:border-red-700 rounded-lg bg-subtle hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 font-medium"
               >
                 Delete Account
               </button>

@@ -87,9 +87,9 @@ export function OverviewPanel({
   };
 
   return (
-    <div className="flex-1 bg-[#0a0e1a] flex flex-col md:overflow-y-auto h-auto md:h-full min-w-0">
+    <div className="flex-1 bg-canvas flex flex-col md:overflow-y-auto h-auto md:h-full min-w-0">
         {/* TABS - STICKY */}
-        <div className="flex px-5 md:px-8 pt-5 md:pt-6 gap-6 md:gap-8 border-b border-[#2d3748] bg-[#0a0e1a] sticky top-0 z-10 shrink-0">
+        <div className="flex px-5 md:px-8 pt-5 md:pt-6 gap-6 md:gap-8 border-b border-border-default bg-canvas sticky top-0 z-10 shrink-0">
             {['Overview', 'Story', 'Family'].map((tab) => (
                 <button
                     key={tab}
@@ -98,7 +98,7 @@ export function OverviewPanel({
                         "pb-3 text-[15px] font-medium border-b-2 transition-all",
                         activeTab === tab 
                             ? "text-[#60a5fa] border-[#60a5fa]" 
-                            : "text-[#94a3b8] border-transparent hover:text-gray-300"
+                            : "text-[#94a3b8] border-transparent hover:text-text-tertiary"
                     )}
                 >
                     {tab}
@@ -114,7 +114,7 @@ export function OverviewPanel({
                 <>
                     {/* AI Synopsis */}
                     <div className={cn(
-                        "bg-[#1a1f2e] border border-[#2d3748] rounded-2xl",
+                        "bg-surface border border-border-default rounded-2xl",
                         contact.ai_summary ? "p-5 md:p-6" : "p-4 md:px-6 md:py-4"
                     )}>
                          {contact.ai_summary ? (
@@ -158,7 +158,7 @@ export function OverviewPanel({
                         </p>
                         <button 
                             onClick={handleDraftReconnection}
-                            className="w-full bg-white text-[#7c3aed] border-none py-3.5 px-5 rounded-xl font-semibold text-sm cursor-pointer flex items-center justify-center gap-2 hover:-translate-y-px transition-transform shadow-sm"
+                            className="w-full bg-surface text-[#7c3aed] border-none py-3.5 px-5 rounded-xl font-semibold text-sm cursor-pointer flex items-center justify-center gap-2 hover:-translate-y-px transition-transform shadow-sm"
                         >
                             <MessageSquare className="w-4 h-4" />
                             Draft Reconnection
@@ -168,7 +168,7 @@ export function OverviewPanel({
                     {/* Grid: Info & Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {/* Contact Info */}
-                        <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5">
+                        <div className="bg-surface rounded-2xl p-5 md:px-6 md:py-5">
                             <div className="flex items-center justify-between mb-3.5">
                                 <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8]">
                                     Contact Information
@@ -182,13 +182,13 @@ export function OverviewPanel({
                             </div>
                             
                             <div className="flex flex-col">
-                                <div className="flex items-center gap-3 py-2.5 border-b border-[#2d3748]">
-                                     <div className="w-9 h-9 bg-[#2d3748] rounded-lg flex items-center justify-center text-base shrink-0">
+                                <div className="flex items-center gap-3 py-2.5 border-b border-border-default">
+                                     <div className="w-9 h-9 bg-elevated rounded-lg flex items-center justify-center text-base shrink-0">
                                         ✉️
                                      </div>
                                      <div className="flex-1 min-w-0">
                                         <div className="text-[10px] text-[#64748b] uppercase tracking-wide mb-0.5">Email</div>
-                                        <div className={cn("text-[13px] truncate cursor-pointer hover:text-white transition-colors", !contact.email && "text-[#64748b] italic")}>
+                                        <div className={cn("text-[13px] truncate cursor-pointer hover:text-text-primary transition-colors", !contact.email && "text-[#64748b] italic")}>
                                             {contact.email ? (
                                                 <a href={`mailto:${contact.email}`} className="block w-full h-full text-inherit no-underline">
                                                     {contact.email}
@@ -198,12 +198,12 @@ export function OverviewPanel({
                                      </div>
                                 </div>
                                 <div className="flex items-center gap-3 pt-2.5">
-                                     <div className="w-9 h-9 bg-[#2d3748] rounded-lg flex items-center justify-center text-base shrink-0">
+                                     <div className="w-9 h-9 bg-elevated rounded-lg flex items-center justify-center text-base shrink-0">
                                         📞
                                      </div>
                                      <div className="flex-1 min-w-0">
                                         <div className="text-[10px] text-[#64748b] uppercase tracking-wide mb-0.5">Phone</div>
-                                        <div className={cn("text-[13px] truncate cursor-pointer hover:text-white transition-colors", !contact.phone && "text-[#64748b] italic")}>
+                                        <div className={cn("text-[13px] truncate cursor-pointer hover:text-text-primary transition-colors", !contact.phone && "text-[#64748b] italic")}>
                                             {contact.phone ? (
                                                 <a href={`tel:${contact.phone}`} className="block w-full h-full text-inherit no-underline">
                                                     {contact.phone}
@@ -216,34 +216,34 @@ export function OverviewPanel({
                         </div>
 
                         {/* Stats */}
-                        <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5">
+                        <div className="bg-surface rounded-2xl p-5 md:px-6 md:py-5">
                             <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3.5">
                                 Quick Stats
                             </div>
                             <div className="grid grid-cols-3 gap-2.5">
-                                <div className="bg-[#0f1419] rounded-lg p-3 text-center">
-                                     <div className="text-lg font-bold text-gray-200 mb-1">—</div>
+                                <div className="bg-canvas rounded-lg p-3 text-center">
+                                     <div className="text-lg font-bold text-text-primary mb-1">—</div>
                                      <div className="text-[9px] text-[#64748b] uppercase tracking-wide">Last</div>
                                 </div>
-                                <div className="bg-[#0f1419] rounded-lg p-3 text-center">
-                                     <div className="text-lg font-bold text-gray-200 mb-1">0</div>
+                                <div className="bg-canvas rounded-lg p-3 text-center">
+                                     <div className="text-lg font-bold text-text-primary mb-1">0</div>
                                      <div className="text-[9px] text-[#64748b] uppercase tracking-wide">Total</div>
                                 </div>
-                                <div className="bg-[#0f1419] rounded-lg p-3 text-center">
-                                     <div className="text-lg font-bold text-gray-200 mb-1">—</div>
+                                <div className="bg-canvas rounded-lg p-3 text-center">
+                                     <div className="text-lg font-bold text-text-primary mb-1">—</div>
                                      <div className="text-[9px] text-[#64748b] uppercase tracking-wide">Next</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Details Card: Relationship & Cadence */}
-                        <div className="bg-[#1a1f2e] rounded-xl p-4 md:p-[18px]">
+                        <div className="bg-surface rounded-xl p-4 md:p-[18px]">
                           <h3 className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
                             Details
                           </h3>
                           
                           <div className="mb-4">
-                            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Relationship Level</span>
+                            <span className="block text-[13px] font-medium text-text-tertiary mb-2.5">Relationship Level</span>
                             <div className="grid grid-cols-3 gap-2">
                                 <button 
                                   onClick={() => handleImportanceUpdate('high')}
@@ -251,7 +251,7 @@ export function OverviewPanel({
                                     "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
                                     importance === 'high' 
                                       ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                      : "bg-canvas border-border-default text-[#94a3b8] hover:border-[#7c3aed]"
                                   )}
                                 >
                                   <Star className={cn("w-5 h-5 mb-1", importance === 'high' ? "fill-current" : "")} />
@@ -264,7 +264,7 @@ export function OverviewPanel({
                                     "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
                                     importance === 'medium' 
                                       ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                      : "bg-canvas border-border-default text-[#94a3b8] hover:border-[#7c3aed]"
                                   )}
                                 >
                                   <User className="w-5 h-5 mb-1" />
@@ -277,7 +277,7 @@ export function OverviewPanel({
                                     "flex flex-col items-center justify-center p-3 rounded-[10px] border-2 transition-all",
                                     importance === 'low' 
                                       ? "bg-[#3b4a6b] border-[#93c5fd] text-[#93c5fd]" 
-                                      : "bg-[#0f1419] border-[#2d3748] text-[#94a3b8] hover:border-[#7c3aed]"
+                                      : "bg-canvas border-border-default text-[#94a3b8] hover:border-[#7c3aed]"
                                   )}
                                 >
                                   <IdCard className="w-5 h-5 mb-1" />
@@ -287,11 +287,11 @@ export function OverviewPanel({
                           </div>
 
                           <div>
-                            <span className="block text-[13px] font-medium text-gray-300 mb-2.5">Contact Cadence</span>
+                            <span className="block text-[13px] font-medium text-text-tertiary mb-2.5">Contact Cadence</span>
                             <select 
                               value={frequency}
                               onChange={(e) => handleFrequencyUpdate(Number(e.target.value))}
-                              className="w-full bg-[#0f1419] border-2 border-[#2d3748] rounded-[10px] p-3 text-sm text-gray-200 focus:outline-none focus:border-[#7c3aed] cursor-pointer appearance-none"
+                              className="w-full bg-canvas border-2 border-border-default rounded-[10px] p-3 text-sm text-text-primary focus:outline-none focus:border-[#7c3aed] cursor-pointer appearance-none"
                             >
                               <option value="7">Weekly (7 days)</option>
                               <option value="14">Bi-Weekly (14 days)</option>
@@ -307,14 +307,14 @@ export function OverviewPanel({
 
 
                     {/* Tags & Interests */}
-                     <div className="bg-[#1a1f2e] rounded-2xl p-5 md:p-6">
+                     <div className="bg-surface rounded-2xl p-5 md:p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                  <span className="block text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-2.5">🏷️ Tags</span>
                                  <div className="flex flex-wrap gap-1.5">
                                     {(contact.tags || []).map((tag: string) => (
                                         <Link key={tag} href={`/network?search=${encodeURIComponent(tag)}`}>
-                                            <Badge className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
+                                            <Badge className="bg-elevated hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
                                                 {tag}
                                             </Badge>
                                         </Link>
@@ -332,7 +332,7 @@ export function OverviewPanel({
                                  <div className="flex flex-wrap gap-1.5">
                                     {(contact.interests || []).map((interest: string) => (
                                         <Link key={interest} href={`/network?search=${encodeURIComponent(interest)}`}>
-                                            <Badge className="bg-[#2d3748] hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
+                                            <Badge className="bg-elevated hover:bg-[#3d4758] text-[#cbd5e1] border-none px-2.5 py-1.5 rounded-md text-[11px] font-normal cursor-pointer transition-colors">
                                                 {interest}
                                             </Badge>
                                         </Link>
@@ -349,7 +349,7 @@ export function OverviewPanel({
                      </div>
 
                      {/* Connections */}
-                     <div className="bg-[#1a1f2e] rounded-2xl p-5">
+                     <div className="bg-surface rounded-2xl p-5">
                         {(!contact.connections || contact.connections.length === 0) ? (
                             <div className="text-center">
                                 <p className="text-[13px] text-[#64748b] mb-3">No connections yet</p>
@@ -365,7 +365,7 @@ export function OverviewPanel({
                             <div className="flex flex-col gap-3">
                                 <div className="flex items-center justify-between mb-2">
                                      <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8]">🔗 Connections</span>
-                                     <button onClick={onLinkConnection} className="text-[#a78bfa] hover:text-white transition-colors">
+                                     <button onClick={onLinkConnection} className="text-[#a78bfa] hover:text-text-primary transition-colors">
                                         <Plus className="h-4 w-4" />
                                      </button>
                                 </div>
@@ -374,9 +374,9 @@ export function OverviewPanel({
                                         <div 
                                             key={conn.id} 
                                             onClick={() => router.push(`/contacts/${conn.person.id}`)}
-                                            className="flex items-center gap-3 bg-[#0f1419] p-3 rounded-xl border border-[#2d3748]/50 group cursor-pointer hover:bg-[#1e293b] transition-colors"
+                                            className="flex items-center gap-3 bg-canvas p-3 rounded-xl border border-border-default group cursor-pointer hover:bg-surface transition-colors"
                                         >
-                                            <div className="h-10 w-10 rounded-full bg-[#2d3748] flex items-center justify-center overflow-hidden border border-[#3d4758]">
+                                            <div className="h-10 w-10 rounded-full bg-elevated flex items-center justify-center overflow-hidden border border-[#3d4758]">
                                                 {conn.person.photo_url ? (
                                                     <img src={conn.person.photo_url} alt={conn.person.name} className="h-full w-full object-cover" />
                                                 ) : (
@@ -386,7 +386,7 @@ export function OverviewPanel({
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="text-[13px] font-medium text-slate-200 truncate group-hover:text-white transition-colors">{conn.person.name}</div>
+                                                <div className="text-[13px] font-medium text-slate-200 truncate group-hover:text-text-primary transition-colors">{conn.person.name}</div>
                                                 <div className="text-[11px] text-[#94a3b8]">{conn.relationship_type}</div>
                                             </div>
                                             <button 
@@ -412,12 +412,12 @@ export function OverviewPanel({
             {activeTab === 'Story' && (
                 <div className="text-center py-12 text-[#94a3b8]">
                     <div className="text-4xl mb-4">📖</div>
-                    <h3 className="text-lg font-medium text-white mb-2">Story Timeline</h3>
+                    <h3 className="text-lg font-medium text-text-primary mb-2">Story Timeline</h3>
                      <p className="max-w-md mx-auto mb-6">Capture the journey of your relationship here.</p>
                      
                     {/* Notes / Voice Entry */}
                     {(contact.notes || contact.deep_lore) && (
-                      <div className="bg-[#1a1f2e] rounded-2xl p-5 md:px-6 md:py-5 text-left mb-6">
+                      <div className="bg-surface rounded-2xl p-5 md:px-6 md:py-5 text-left mb-6">
                           <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-[#94a3b8] mb-3">
                               Voice Input & Notes
                           </div>
@@ -434,7 +434,7 @@ export function OverviewPanel({
                           {contact.deep_lore && (
                             <div className="last:mb-0">
                                 <div className="text-[10px] uppercase text-[#64748b] mb-1">Original Voice Context</div>
-                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-[#2d3748] pl-3 italic">
+                                <p className="text-[13px] md:text-sm text-slate-300 whitespace-pre-wrap leading-relaxed opacity-90 border-l-2 border-border-default pl-3 italic">
                                     &quot;{contact.deep_lore}&quot;
                                 </p>
                             </div>
@@ -453,7 +453,7 @@ export function OverviewPanel({
             {activeTab === 'Family' && (
                 <div className="py-2">
                     <div className="flex items-center justify-between mb-4 px-1">
-                        <h3 className="text-[15px] font-bold text-gray-200">Family Members</h3>
+                        <h3 className="text-[15px] font-bold text-text-primary">Family Members</h3>
                         <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => toast.success("Add family member coming soon!")}>
                             <Plus className="w-3.5 h-3.5" />
                             Add Member
@@ -461,10 +461,10 @@ export function OverviewPanel({
                     </div>
 
                     {!contact.familyMembers || contact.familyMembers.length === 0 ? (
-                        <div className="text-center py-12 bg-[#1a1f2e] rounded-xl border border-[#2d3748] border-dashed">
+                        <div className="text-center py-12 bg-surface rounded-xl border border-border-default border-dashed">
                             <div className="text-4xl mb-3 opacity-50">👨‍👩‍👧‍👦</div>
-                            <h3 className="text-sm font-medium text-gray-300 mb-1">No family members yet</h3>
-                            <p className="text-xs text-gray-500 mb-4 px-8">Add family members to keep track of their important relationships.</p>
+                            <h3 className="text-sm font-medium text-text-tertiary mb-1">No family members yet</h3>
+                            <p className="text-xs text-text-secondary mb-4 px-8">Add family members to keep track of their important relationships.</p>
                             <Button size="sm" variant="secondary" onClick={() => toast.success("Add family member coming soon!")}>
                                 Add First Member
                             </Button>
@@ -472,8 +472,8 @@ export function OverviewPanel({
                     ) : (
                         <div className="grid grid-cols-1 gap-3">
                             {contact.familyMembers.map((member: any, idx: number) => (
-                                <div key={idx} className="bg-[#1a1f2e] p-4 rounded-xl border border-[#2d3748] flex items-center gap-4">
-                                     <div className="w-10 h-10 rounded-full bg-[#2d3748] flex items-center justify-center text-lg shrink-0 border border-[#3d4758]">
+                                <div key={idx} className="bg-surface p-4 rounded-xl border border-border-default flex items-center gap-4">
+                                     <div className="w-10 h-10 rounded-full bg-elevated flex items-center justify-center text-lg shrink-0 border border-[#3d4758]">
                                         {member.photo_url ? (
                                             <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover rounded-full" />
                                         ) : (
@@ -481,7 +481,7 @@ export function OverviewPanel({
                                         )}
                                      </div>
                                      <div className="flex-1 min-w-0">
-                                        <div className="text-[13px] font-medium text-gray-200 truncate">{member.name}</div>
+                                        <div className="text-[13px] font-medium text-text-primary truncate">{member.name}</div>
                                         <div className="text-[11px] text-[#94a3b8] flex items-center gap-2">
                                             <span className="capitalize">{member.relationship || 'Relative'}</span>
                                             {member.birthday && (

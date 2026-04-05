@@ -199,7 +199,7 @@ const InteractionSuite = ({ contactId, onLog, isLogging }: InteractionSuiteProps
               </DialogTrigger>
               <DialogContent className="bg-slate-950 border-slate-800 text-slate-200 sm:max-w-[425px] p-0 overflow-hidden shadow-2xl">
                 <DialogHeader className="p-6 pb-0">
-                  <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+                  <DialogTitle className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <Brain className="size-5 text-purple-400" />
                     The Brain Dump
                   </DialogTitle>
@@ -694,7 +694,7 @@ export function OverviewTab({
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                     placeholder="Identify with tag..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddTag} disabled={submittingTag} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -739,7 +739,7 @@ export function OverviewTab({
                     onChange={(e) => setInterestInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddInterest()}
                     placeholder="Favorite interest..."
-                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-bold"
+                    className="flex-1 bg-slate-900 border border-slate-200/10 rounded-xl px-5 py-3 text-sm text-text-primary focus:outline-none focus:border-indigo-500 transition-all font-bold"
                     autoFocus
                   />
                   <Button onClick={handleAddInterest} disabled={submittingInterest} className="bg-indigo-600 hover:bg-indigo-500 h-[48px] px-6 rounded-xl shadow-lg shadow-indigo-900/30">
@@ -796,7 +796,7 @@ export function OverviewTab({
 const QuickActionButton = ({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) => {
   const content = (
     <div className="flex flex-col items-center justify-center p-3 py-4 bg-slate-900 border border-slate-200/10 rounded-xl hover:bg-slate-800/50 transition-all active:scale-[0.98] group shadow-sm">
-      <div className="text-indigo-400 group-hover:text-white mb-1 transition-all">{icon}</div>
+      <div className="text-indigo-400 group-hover:text-text-primary mb-1 transition-all">{icon}</div>
       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-300">{label}</span>
     </div>
   );

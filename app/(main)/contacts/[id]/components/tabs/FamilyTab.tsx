@@ -156,15 +156,15 @@ export function FamilyTab({ contact }: FamilyTabProps) {
   // Could handle Parents/Siblings too if needed, but per prompt focus on Inner Circle (Partner/Child)
 
   return (
-    <div className="flex flex-col gap-8 pb-20 text-slate-200">
+    <div className="flex flex-col gap-8 pb-20 text-text-primary">
 
       {/* HOUSEHOLD CONTEXT */}
-       <div className="group bg-slate-900 border border-slate-800 rounded-2xl p-4 relative">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center justify-between">
+       <div className="group bg-canvas border border-border-default rounded-2xl p-4 relative">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center justify-between">
            <span className="flex items-center gap-2"><Home size={14} /> Household Context</span>
-           <button 
+           <button
              onClick={() => setIsEditingHousehold(!isEditingHousehold)}
-             className="p-3 -mr-3 -mt-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+             className="p-3 -mr-3 -mt-3 text-text-secondary hover:text-text-accent transition-all active:scale-95"
            >
              {isEditingHousehold ? <Check size={16} className="text-emerald-400" /> : <Edit2 size={16} />}
            </button>
@@ -173,7 +173,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
           {isEditingHousehold ? (
             <textarea 
               placeholder="Lives in the suburbs? Likes hosting BBQs? Any pets?"
-              className="w-full bg-slate-950 border border-indigo-500/50 rounded-xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm resize-none"
+              className="w-full bg-canvas border border-indigo-500/50 rounded-xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm resize-none"
               value={householdNotes}
               onChange={(e) => setHouseholdNotes(e.target.value)}
               onBlur={() => {
@@ -183,8 +183,8 @@ export function FamilyTab({ contact }: FamilyTabProps) {
               autoFocus
             />
           ) : (
-            <p className="text-sm text-slate-300 leading-relaxed pr-8">
-              {householdNotes || <span className="text-slate-600 italic">No notes set</span>}
+            <p className="text-sm text-text-tertiary leading-relaxed pr-8">
+              {householdNotes || <span className="text-text-tertiary italic">No notes set</span>}
             </p>
           )}
           {isEditingHousehold && (
@@ -204,22 +204,22 @@ export function FamilyTab({ contact }: FamilyTabProps) {
 
       
       {/* PARTNER SECTION */}
-      <section className="bg-slate-900/30 border border-slate-800 rounded-3xl p-5 relative overflow-hidden">
+      <section className="bg-canvas/30 border border-border-default rounded-3xl p-5 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-pink-500 to-indigo-500 opacity-20" />
         
         <div className="flex justify-between items-center mb-4">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+          <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
             <Heart size={14} className="text-pink-500"/> Partner
           </label>
           <div className="flex items-center gap-1">
             {partners.length === 0 && !isEditingCircle && (
-              <button onClick={() => { handleAddMember('Partner'); setIsEditingCircle(true); }} className="text-[10px] font-black uppercase tracking-widest bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg transition-colors border border-slate-700">
+              <button onClick={() => { handleAddMember('Partner'); setIsEditingCircle(true); }} className="text-[10px] font-black uppercase tracking-widest bg-surface hover:bg-subtle text-text-primary px-3 py-1.5 rounded-lg transition-colors border border-border-default">
                   + Add
               </button>
             )}
             <button 
               onClick={() => setIsEditingCircle(!isEditingCircle)}
-              className="p-3 -mr-3 text-slate-500 hover:text-indigo-400 transition-all active:scale-95"
+              className="p-3 -mr-3 text-text-secondary hover:text-text-accent transition-all active:scale-95"
             >
               {isEditingCircle ? <Check size={16} className="text-emerald-400" /> : <Edit2 size={16} />}
             </button>
@@ -234,20 +234,20 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                  <div key={idx} className="space-y-4">
                     <div className="flex gap-4">
                          <div className="flex-1">
-                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Name</label>
+                            <label className="text-[10px] text-text-secondary uppercase font-bold mb-1 block">Name</label>
                             {linkedContact ? (
-                              <Link href={`/contacts/${linkedContact.person.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
+                              <Link href={`/contacts/${linkedContact.person.id}`} className="flex w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-accent font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
                                  {partner.name}
-                                 <span className="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
+                                 <span className="text-[10px] uppercase tracking-wider text-text-secondary flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
                               </Link>
                             ) : partner.id ? (
-                              <Link href={`/contacts/${partner.id}`} className="flex w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-indigo-400 font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
+                              <Link href={`/contacts/${partner.id}`} className="flex w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-accent font-bold hover:text-indigo-300 hover:border-indigo-500 transition-colors items-center justify-between group-hover:border-indigo-500/50">
                                  {partner.name}
-                                 <span className="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
+                                 <span className="text-[10px] uppercase tracking-wider text-text-secondary flex items-center gap-1">View Profile <ChevronRight size={12} /></span>
                               </Link>
                             ) : (
                               <input 
-                                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-primary font-bold focus:outline-none focus:border-indigo-500 transition-colors"
                                   placeholder="Name"
                                   value={partner.name}
                                   onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
@@ -256,9 +256,9 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                             )}
                          </div>
                          <div className="w-1/3">
-                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Relationship</label>
+                            <label className="text-[10px] text-text-secondary uppercase font-bold mb-1 block">Relationship</label>
                             <select
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-tertiary text-sm focus:outline-none focus:border-indigo-500"
                                 value={partner.relationship || 'Partner'}
                                 onChange={(e) => handleUpdateMember(realIdx, 'relationship', e.target.value)}
                                 onBlur={() => handleSaveMember(realIdx)}
@@ -274,10 +274,10 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                             </select>
                          </div>
                          <div className="w-1/3">
-                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Birthday</label>
+                            <label className="text-[10px] text-text-secondary uppercase font-bold mb-1 block">Birthday</label>
                             <input 
                                 type="date"
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-tertiary text-sm focus:outline-none focus:border-indigo-500"
                                 value={partner.birthday || ''}
                                 onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
                                 onBlur={() => handleSaveMember(realIdx)}
@@ -286,19 +286,19 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                     </div>
                     {/* Anniversary Field */}
                     <div className="mb-2">
-                         <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Anniversary (Yearly Reminder)</label>
+                         <label className="text-[10px] text-text-secondary uppercase font-bold mb-1 block">Anniversary (Yearly Reminder)</label>
                          <input 
                              type="date"
-                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-indigo-500"
+                             className="w-full bg-canvas border border-border-default rounded-xl px-3 py-2 text-text-tertiary text-sm focus:outline-none focus:border-indigo-500"
                              value={partner.anniversary || ''}
                              onChange={(e) => handleUpdateMember(realIdx, 'anniversary', e.target.value)}
                          />
                     </div>
                     {/* Partner Notes */}
                     <div className="relative">
-                         <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Notes & Brain Dump</label>
+                         <label className="text-[10px] text-text-secondary uppercase font-bold mb-1 block">Notes & Brain Dump</label>
                          <textarea 
-                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 pr-10 text-slate-300 text-sm focus:outline-none focus:border-indigo-500 min-h-[60px] resize-none"
+                             className="w-full bg-canvas border border-border-default rounded-xl px-3 py-2 pr-10 text-text-tertiary text-sm focus:outline-none focus:border-indigo-500 min-h-[60px] resize-none"
                              placeholder="Anniversary ideas, food allergies, work info..."
                              value={partner.notes || ''}
                              onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
@@ -319,19 +319,19 @@ export function FamilyTab({ contact }: FamilyTabProps) {
              );
            })
         ) : (
-             <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl">
-                 <p className="text-xs text-slate-600">No partner listed</p>
+             <div className="text-center py-4 border border-dashed border-border-default rounded-xl">
+                 <p className="text-xs text-text-tertiary">No partner listed</p>
              </div>
         )}
       </section>
 
       {/* CHILDREN SECTION */}
-      <section className="bg-slate-900/30 border border-slate-800 rounded-3xl p-5 relative">
+      <section className="bg-canvas/30 border border-border-default rounded-3xl p-5 relative">
          <div className="flex justify-between items-center mb-4">
-          <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+          <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
             <User size={14} className="text-blue-400"/> Children
           </label>
-          <button onClick={() => handleAddMember('Child')} className="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg transition-colors border border-slate-700">
+          <button onClick={() => handleAddMember('Child')} className="text-xs bg-surface hover:bg-subtle text-text-primary px-2 py-1 rounded-lg transition-colors border border-border-default">
              + Add Child
           </button>
         </div>
@@ -342,26 +342,26 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                      const realIdx = members.indexOf(child);
                      const linkedContact = contact.connections?.find(c => c.person.name.toLowerCase() === child.name.toLowerCase());
                      return (
-                        <div key={idx} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl relative group">
+                        <div key={idx} className="bg-canvas border border-border-default p-4 rounded-2xl relative group">
                              <button 
                                 onClick={() => handleRemoveMember(realIdx)}
-                                className="absolute top-2 right-2 text-slate-700 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute top-2 right-2 text-text-tertiary hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                              >
                                 <X size={14} />
                              </button>
 
                              <div className="flex gap-3 mb-3">
                                  {linkedContact ? (
-                                    <Link href={`/contacts/${linkedContact.person.id}`} className="flex-1 bg-transparent text-indigo-400 font-bold hover:text-indigo-300 transition-colors flex items-center gap-1 border-b border-transparent">
+                                    <Link href={`/contacts/${linkedContact.person.id}`} className="flex-1 bg-transparent text-text-accent font-bold hover:text-text-accent transition-colors flex items-center gap-1 border-b border-transparent">
                                        {child.name} <ChevronRight size={14} className="opacity-70" />
                                     </Link>
                                  ) : child.id ? (
-                                    <Link href={`/contacts/${child.id}`} className="flex-1 bg-transparent text-indigo-400 font-bold hover:text-indigo-300 transition-colors flex items-center gap-1 border-b border-transparent">
+                                    <Link href={`/contacts/${child.id}`} className="flex-1 bg-transparent text-text-accent font-bold hover:text-text-accent transition-colors flex items-center gap-1 border-b border-transparent">
                                        {child.name} <ChevronRight size={14} className="opacity-70" />
                                     </Link>
                                  ) : (
                                     <input 
-                                       className="flex-1 bg-transparent text-white font-bold placeholder:text-slate-600 focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors" 
+                                       className="flex-1 bg-transparent text-text-primary font-bold placeholder:text-text-tertiary focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors" 
                                        placeholder="Child Name"
                                        value={child.name}
                                        onChange={(e) => handleUpdateMember(realIdx, 'name', e.target.value)}
@@ -369,7 +369,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                                  )}
                                   <input 
                                     type="date"
-                                    className="bg-transparent text-xs text-slate-500 focus:outline-none w-24"
+                                    className="bg-transparent text-xs text-text-secondary focus:outline-none w-24"
                                     value={child.birthday || ''}
                                     onChange={(e) => handleUpdateMember(realIdx, 'birthday', e.target.value)}
                                   />
@@ -377,7 +377,7 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                              
                              <div className="relative">
                                <textarea 
-                                  className="w-full bg-slate-900 rounded-xl px-3 py-2 pr-10 text-xs text-slate-300 focus:outline-none border border-slate-800 focus:border-indigo-500/30 resize-none" 
+                                  className="w-full bg-canvas rounded-xl px-3 py-2 pr-10 text-xs text-text-tertiary focus:outline-none border border-border-default focus:border-indigo-500/30 resize-none" 
                                   placeholder="Age, Grade, Interests (e.g. Soccer, Minecraft)..."
                                   value={child.notes || ''}
                                   onChange={(e) => handleUpdateMember(realIdx, 'notes', e.target.value)}
@@ -398,22 +398,22 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                      );
                 })
             ) : (
-                <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl">
-                    <p className="text-xs text-slate-600">No children listed</p>
+                <div className="text-center py-4 border border-dashed border-border-default rounded-xl">
+                    <p className="text-xs text-text-tertiary">No children listed</p>
                 </div>
             )}
         </div>
       </section>
 
       {/* CONNECTIONS WEB */}
-      <section className="bg-slate-900 border border-slate-800 rounded-3xl p-5">
-         <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 block">The Web (Connections)</label>
+      <section className="bg-canvas border border-border-default rounded-3xl p-5">
+         <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-4 block">The Web (Connections)</label>
          
          <div className="space-y-2">
             {(contact.connections || []).length > 0 ? (
                 (contact.connections || []).map((conn) => (
-                    <Link href={`/contacts/${conn.person.id}`} key={conn.id} className="flex items-center gap-3 p-3 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 transition-colors group">
-                        <div className="relative w-8 h-8 rounded-full bg-slate-900 border border-slate-700 overflow-hidden flex items-center justify-center text-xs font-bold text-slate-500">
+                    <Link href={`/contacts/${conn.person.id}`} key={conn.id} className="flex items-center gap-3 p-3 bg-canvas hover:bg-subtle rounded-2xl border border-border-default transition-colors group">
+                        <div className="relative w-8 h-8 rounded-full bg-canvas border border-border-default overflow-hidden flex items-center justify-center text-xs font-bold text-text-secondary">
                             {conn.person.photo_url ? (
                                 <Image 
                                   src={conn.person.photo_url} 
@@ -426,16 +426,16 @@ export function FamilyTab({ contact }: FamilyTabProps) {
                             )}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-bold text-slate-300 truncate group-hover:text-indigo-400 transition-colors">{conn.person.name}</h4>
-                            <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider">
+                            <h4 className="text-sm font-bold text-text-tertiary truncate group-hover:text-text-accent transition-colors">{conn.person.name}</h4>
+                            <p className="text-[10px] text-text-secondary truncate uppercase tracking-wider">
                                 {conn.relationship_type} 
-                                {conn.context && <span className="text-slate-600 normal-case ml-1">• {conn.context}</span>}
+                                {conn.context && <span className="text-text-tertiary normal-case ml-1">• {conn.context}</span>}
                             </p>
                         </div>
                     </Link>
                 ))
             ) : (
-                <p className="text-xs text-slate-500 italic p-2">No network connections.</p>
+                <p className="text-xs text-text-secondary italic p-2">No network connections.</p>
             )}
          </div>
       </section>

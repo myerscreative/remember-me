@@ -91,7 +91,7 @@ export function ExploreFilter({
             "gap-2 font-medium transition-colors",
             activeCount > 0
               ? "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              : "text-text-secondary hover:text-text-primary"
           )}
         >
           <Compass className="h-4 w-4 text-indigo-500" />
@@ -104,19 +104,19 @@ export function ExploreFilter({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[850px] p-0" align="start">
-        <div className="p-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="p-4 border-b border-border-default">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
             <Input
               placeholder="Search tribes & interests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white dark:focus:bg-black transition-all"
+              className="pl-9 bg-canvas border-transparent focus:bg-white dark:focus:bg-black transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-tertiary"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -124,7 +124,7 @@ export function ExploreFilter({
           </div>
 
           <div className="flex items-center gap-4 mt-4">
-             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+             <label className="flex items-center gap-2 text-sm text-text-tertiary cursor-pointer select-none">
                 <input 
                   type="checkbox" 
                   checked={showMutuals} 
@@ -136,8 +136,8 @@ export function ExploreFilter({
           </div>
 
           {activeCount > 0 && (
-            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-dashed border-gray-200 dark:border-gray-800 flex-wrap">
-               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active:</span>
+            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-dashed border-border-default flex-wrap">
+               <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Active:</span>
                
                {showMutuals && (
                  <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
@@ -165,7 +165,7 @@ export function ExploreFilter({
                      <X className="h-3 w-3 cursor-pointer" onClick={() => onSelectConnectedPerson(null)} />
                   </Badge>
                 )}
-               <Button variant="ghost" size="sm" className="h-6 text-xs ml-auto text-gray-500" onClick={clearFilters}>
+               <Button variant="ghost" size="sm" className="h-6 text-xs ml-auto text-text-secondary" onClick={clearFilters}>
                  Clear All
                </Button>
             </div>
@@ -174,8 +174,8 @@ export function ExploreFilter({
         
         <div className="grid grid-cols-3 h-[400px]">
           {/* Left Column: Tribes (Tags) */}
-          <div className="border-r border-gray-100 dark:border-gray-800 overflow-y-auto p-2">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-white dark:bg-gray-950 z-10">Tribes</h4>
+          <div className="border-r border-border-default overflow-y-auto p-2">
+            <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-surface z-10">Tribes</h4>
             <div className="space-y-1">
               {filteredTags.map(tag => (
                 <button
@@ -185,7 +185,7 @@ export function ExploreFilter({
                     "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between group",
                     selectedTag === tag
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      : "text-text-tertiary hover:bg-subtle"
                   )}
                 >
                   {tag}
@@ -193,7 +193,7 @@ export function ExploreFilter({
                 </button>
               ))}
               {filteredTags.length === 0 && (
-                <div className="px-3 py-4 text-center text-sm text-gray-500">
+                <div className="px-3 py-4 text-center text-sm text-text-secondary">
                    No tribes found
                 </div>
               )}
@@ -201,8 +201,8 @@ export function ExploreFilter({
           </div>
 
           {/* Right Column: Interests */}
-          <div className="overflow-y-auto p-2 bg-gray-50/50 dark:bg-gray-900/50">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm z-10">Interests</h4>
+          <div className="overflow-y-auto p-2 bg-canvas/50">
+            <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-canvas/95 backdrop-blur-sm z-10">Interests</h4>
             <div className="space-y-1">
               {filteredInterests.map(interest => (
                 <button
@@ -212,7 +212,7 @@ export function ExploreFilter({
                     "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between group",
                     selectedInterest === interest
                       ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 font-medium shadow-sm ring-1 ring-indigo-200 dark:ring-indigo-800"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm"
+                      : "text-text-secondary hover:bg-surface hover:shadow-sm"
                   )}
                 >
                   {interest}
@@ -220,7 +220,7 @@ export function ExploreFilter({
                 </button>
               ))}
                {filteredInterests.length === 0 && (
-                <div className="px-3 py-4 text-center text-sm text-gray-500">
+                <div className="px-3 py-4 text-center text-sm text-text-secondary">
                    No interests found
                 </div>
               )}
@@ -228,8 +228,8 @@ export function ExploreFilter({
           </div>
 
           {/* Right Column: Connections */}
-          <div className="overflow-y-auto p-2 bg-gray-50/80 dark:bg-gray-900/80 border-l border-gray-100 dark:border-gray-800">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-gray-50 dark:bg-gray-900 z-10 backdrop-blur-sm">Connected To...</h4>
+          <div className="overflow-y-auto p-2 bg-canvas/80 border-l border-border-default">
+            <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider px-2 py-2 mb-1 sticky top-0 bg-canvas z-10 backdrop-blur-sm">Connected To...</h4>
             <div className="space-y-1">
               {filteredPeople.map(person => (
                 <button
@@ -239,10 +239,10 @@ export function ExploreFilter({
                     "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-3 group",
                     selectedConnectedPerson === person.id
                       ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 font-medium shadow-sm ring-1 ring-purple-200 dark:ring-purple-800"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm"
+                      : "text-text-secondary hover:bg-surface hover:shadow-sm"
                   )}
                 >
-                  <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden shrink-0">
+                  <div className="h-6 w-6 rounded-full bg-border-default overflow-hidden shrink-0">
                     {person.photo_url ? (
                         <Avatar className="h-full w-full">
                             <AvatarImage src={person.photo_url} alt={person.name} />
@@ -250,7 +250,7 @@ export function ExploreFilter({
                         </Avatar>
                     ) : (
                         <Avatar className="h-full w-full">
-                            <AvatarFallback className="text-[10px] font-bold text-gray-500">
+                            <AvatarFallback className="text-[10px] font-bold text-text-secondary">
                                 {getInitials(person.name)}
                             </AvatarFallback>
                         </Avatar>
@@ -261,7 +261,7 @@ export function ExploreFilter({
                 </button>
               ))}
                {filteredPeople.length === 0 && (
-                <div className="px-3 py-4 text-center text-sm text-gray-500">
+                <div className="px-3 py-4 text-center text-sm text-text-secondary">
                    No people found
                 </div>
               )}

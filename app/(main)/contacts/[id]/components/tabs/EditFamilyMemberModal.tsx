@@ -104,10 +104,10 @@ export function EditFamilyMemberModal({
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-[#1a1d24] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="relative bg-surface rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2d333b]">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+        <div className="flex items-center justify-between p-5 border-b border-border-default">
+          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
             {memberIndex !== null ? 'Edit' : 'Add'} Family Member
           </h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -118,7 +118,7 @@ export function EditFamilyMemberModal({
         {/* Content */}
         <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+            <label className="text-sm font-medium text-text-tertiary">Name</label>
             <Input
               placeholder="Full name"
               value={formData.name}
@@ -127,7 +127,7 @@ export function EditFamilyMemberModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Relationship</label>
+            <label className="text-sm font-medium text-text-tertiary">Relationship</label>
             <Input
               placeholder="e.g. Son, Spouse, Partner"
               value={formData.relationship}
@@ -136,7 +136,7 @@ export function EditFamilyMemberModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <label className="text-sm font-medium text-text-tertiary flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-500" />
               Birthday
             </label>
@@ -149,7 +149,7 @@ export function EditFamilyMemberModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <label className="text-sm font-medium text-text-tertiary flex items-center gap-2">
               <Heart className="w-4 h-4 text-red-500" />
               Hobbies
             </label>
@@ -162,7 +162,7 @@ export function EditFamilyMemberModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <label className="text-sm font-medium text-text-tertiary flex items-center gap-2">
               <Star className="w-4 h-4 text-amber-500" />
               Interests
             </label>
@@ -176,7 +176,7 @@ export function EditFamilyMemberModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-5 border-t border-gray-100 dark:border-[#2d333b]">
+        <div className="flex justify-end gap-3 p-5 border-t border-border-default">
           <Button variant="outline" onClick={onClose} disabled={isSaving}>
             Cancel
           </Button>

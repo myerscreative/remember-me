@@ -140,29 +140,29 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
 
   if (error) {
       return (
-          <div className="fixed inset-0 bg-[#0f111a] z-100 flex items-center justify-center p-6">
-              <div className="bg-slate-900 border border-red-500 rounded-xl p-6 text-center">
+          <div className="fixed inset-0 bg-canvas z-100 flex items-center justify-center p-6">
+              <div className="bg-canvas border border-red-500 rounded-xl p-6 text-center">
                   <h3 className="text-red-400 font-bold mb-2">Error in Pulse</h3>
-                  <p className="text-slate-300 mb-4">{error}</p>
-                  <button onClick={() => setError(null)} className="px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 text-white">Dismiss</button>
+                  <p className="text-text-tertiary mb-4">{error}</p>
+                  <button onClick={() => setError(null)} className="px-4 py-2 bg-surface rounded-lg hover:bg-subtle text-text-primary">Dismiss</button>
               </div>
           </div>
       )
   }
 
   return (
-    <div className="fixed inset-0 bg-[#0f111a] z-100 p-6 flex flex-col animate-in slide-in-from-bottom duration-300">
+    <div className="fixed inset-0 bg-canvas z-100 p-6 flex flex-col animate-in slide-in-from-bottom duration-300">
       
       {/* HEADER / NAV */}
       <div className="flex justify-between items-start mb-6">
-          <button onClick={onClose} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
+          <button onClick={onClose} className="p-2 bg-surface rounded-full text-text-secondary hover:text-text-primary">
               <X size={20} />
           </button>
       </div>
 
       <header className="mb-8">
-        <h2 className="text-2xl font-bold text-white">How was the catch-up with {name}?</h2>
-        <p className="text-slate-400 text-sm mt-1">Capture the lore while it&apos;s fresh.</p>
+        <h2 className="text-2xl font-bold text-text-primary">How was the catch-up with {name}?</h2>
+        <p className="text-text-secondary text-sm mt-1">Capture the lore while it&apos;s fresh.</p>
         
         {/* Mode Switcher */}
         <div className="flex gap-2 mt-4">
@@ -171,7 +171,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
             className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
               mode === 'voice' 
                 ? 'bg-indigo-600 text-white' 
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                : 'bg-surface text-text-secondary hover:text-text-primary'
             }`}
           >
             <Mic size={16} />
@@ -182,7 +182,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
             className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
               mode === 'text' 
                 ? 'bg-indigo-600 text-white' 
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                : 'bg-surface text-text-secondary hover:text-text-primary'
             }`}
           >
             <Keyboard size={16} />
@@ -195,16 +195,16 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
       <div className="flex-1 flex flex-col space-y-6 animate-in fade-in slide-in-from-right-4">
             
             {mode === 'voice' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+              <div className="bg-canvas border border-border-default rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
                 {isTranscribing ? (
                    <div className="flex flex-col items-center gap-4">
                      <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
-                     <p className="text-white font-medium">Transcribing your thoughts...</p>
-                     <p className="text-slate-400 text-sm">This may take a few seconds.</p>
+                     <p className="text-text-primary font-medium">Transcribing your thoughts...</p>
+                     <p className="text-text-secondary text-sm">This may take a few seconds.</p>
                    </div>
                 ) : (
                   <div className="w-full max-w-md">
-                    <p className="text-center text-slate-400 mb-8">
+                    <p className="text-center text-text-secondary mb-8">
                       Speak naturally. We&apos;ll transcribe and extract the details.
                     </p>
                     <VoiceRecorder 
@@ -220,8 +220,8 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
             )}
 
             {mode === 'text' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col min-h-[300px]">
-                <label className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-2 block">
+              <div className="bg-canvas border border-border-default rounded-2xl p-4 flex-1 flex flex-col min-h-[300px]">
+                <label className="text-text-accent text-[10px] font-black uppercase tracking-widest mb-2 block">
                     The Interaction Dump
                 </label>
                 <div className="relative flex-1 flex flex-col min-h-[300px]">
@@ -230,7 +230,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                       value={dumpText}
                       onChange={(e) => setDumpText(e.target.value)}
                       placeholder={`Ex: ${name} is moving to Austin in July. His daughter Chloe started violin. We joked about...`}
-                      className="w-full flex-1 bg-transparent text-slate-200 focus:outline-none leading-relaxed resize-none placeholder:text-slate-600 pr-12"
+                      className="w-full flex-1 bg-transparent text-text-primary focus:outline-none leading-relaxed resize-none placeholder:text-text-tertiary pr-12"
                   />
                   <div className="absolute right-0 bottom-2">
                     <AudioInputButton 
@@ -244,9 +244,9 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
 
             {/* SUGGESTION RAIL (Only show in Text mode or when text is present) */}
             {suggestions.length > 0 && mode === 'text' && (
-                <div className="bg-slate-900/50 border border-dashed border-slate-700/50 rounded-2xl p-4 animate-in slide-in-from-bottom-2">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
-                         <Sparkles size={12} className="text-indigo-400"/> Identifying entities...
+                <div className="bg-canvas/50 border border-dashed border-border-default/50 rounded-2xl p-4 animate-in slide-in-from-bottom-2">
+                    <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
+                         <Sparkles size={12} className="text-text-accent"/> Identifying entities...
                     </p>
                     <div className="flex flex-wrap gap-2">
                         {suggestions.map((entity, i) => (
@@ -257,8 +257,8 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                         >
                             <div className="w-2 h-2 rounded-full bg-indigo-500" />
                             <div className="flex flex-col items-start">
-                                <span className="text-indigo-300 text-xs font-bold">+ Add &apos;{entity.value}&apos;</span>
-                                <span className="text-[10px] text-slate-500 uppercase">{entity.type}</span>
+                                <span className="text-text-accent text-xs font-bold">+ Add &apos;{entity.value}&apos;</span>
+                                <span className="text-[10px] text-text-secondary uppercase">{entity.type}</span>
                             </div>
                         </button>
                         ))}
@@ -272,11 +272,11 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-indigo-500/20 rounded-full">
-                                <Calendar size={16} className="text-indigo-400" />
+                                <Calendar size={16} className="text-text-accent" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-indigo-300 uppercase tracking-wide">Milestone Detected</p>
-                                <p className="text-sm text-white font-medium">&quot;{milestoneSuggestion.detectedDate}&quot;</p>
+                                <p className="text-xs font-bold text-text-accent uppercase tracking-wide">Milestone Detected</p>
+                                <p className="text-sm text-text-primary font-medium">&quot;{milestoneSuggestion.detectedDate}&quot;</p>
                             </div>
                         </div>
                         <button 
@@ -291,7 +291,7 @@ export function PostCallPulse({ contactId, name, onClose, onComplete, initialMod
 
              {/* FOOTER ACTIONS */}
             <footer className="pt-2 flex gap-3">
-                <button onClick={onClose} className="flex-1 py-4 bg-slate-800 text-slate-400 hover:text-white rounded-2xl font-bold transition-colors">
+                <button onClick={onClose} className="flex-1 py-4 bg-surface text-text-secondary hover:text-text-primary rounded-2xl font-bold transition-colors">
                     Discard
                 </button>
                 <button 

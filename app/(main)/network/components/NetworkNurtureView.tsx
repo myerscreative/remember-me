@@ -92,13 +92,13 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-subtle transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-xl font-bold text-white">Nurture Connections</h2>
-          <p className="text-sm text-slate-400">Relationships that need your attention</p>
+          <h2 className="text-xl font-bold text-text-primary">Nurture Connections</h2>
+          <p className="text-sm text-text-secondary">Relationships that need your attention</p>
         </div>
       </div>
 
@@ -125,8 +125,8 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
         {categorized.length === 0 ? (
           <div className="text-center py-16">
             <Heart className="w-10 h-10 text-emerald-500/50 mx-auto mb-3" />
-            <p className="text-slate-400 font-medium">Your garden is flourishing!</p>
-            <p className="text-sm text-slate-500 mt-1">No drifting or neglected connections right now.</p>
+            <p className="text-text-secondary font-medium">Your garden is flourishing!</p>
+            <p className="text-sm text-text-secondary mt-1">No drifting or neglected connections right now.</p>
           </div>
         ) : (
           categorized.map(({ contact, category, daysAgo }, i) => {
@@ -155,17 +155,17 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
               >
                 {/* Avatar with health dot */}
                 <Link href={`/contacts/${contact.id}`} className="shrink-0 relative">
-                  <Avatar className="h-10 w-10 border-2 border-slate-700">
+                  <Avatar className="h-10 w-10 border-2 border-border-default">
                     <AvatarImage src={contact.photo_url || undefined} />
                     <AvatarFallback className={cn(
                         "text-xs font-bold",
-                        isNurtured ? "bg-emerald-800 text-emerald-100" : "bg-slate-800 text-slate-300"
+                        isNurtured ? "bg-emerald-800 text-emerald-100" : "bg-surface text-text-tertiary"
                     )}>
                       {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className={cn(
-                    "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-slate-950",
+                    "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-canvas",
                     isNurtured ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]' 
                     : category === 'neglected' ? 'bg-red-500' 
                     : 'bg-amber-500'
@@ -174,11 +174,11 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
 
                 {/* Info */}
                 <Link href={`/contacts/${contact.id}`} className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{contact.name}</p>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <p className="text-sm font-semibold text-text-primary truncate">{contact.name}</p>
+                  <div className="flex items-center gap-2 text-xs text-text-secondary">
                     <CalendarDays className="w-3 h-3" />
                     <span>{lastDate}</span>
-                    <span className="text-slate-600">·</span>
+                    <span className="text-text-tertiary">·</span>
                     {isNurtured ? (
                         <span className="font-medium text-emerald-400">Nurtured!</span>
                     ) : (
@@ -203,7 +203,7 @@ export function NetworkNurtureView({ data, onBack }: NetworkNurtureViewProps) {
                   className={cn(
                     "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all",
                     isNurtured 
-                      ? "bg-slate-800 text-emerald-400 opacity-80 cursor-default"
+                      ? "bg-surface text-emerald-400 opacity-80 cursor-default"
                       : category === 'neglected'
                       ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"
                       : "bg-emerald-600/80 hover:bg-emerald-500 text-white shadow-md shadow-emerald-900/20"

@@ -17,13 +17,13 @@ function ProgressBarComponent({
 
   return (
         <div className="max-w-2xl mx-auto mb-2">
-            <div className="bg-white rounded-full h-3 overflow-hidden shadow-inner w-full">
+            <div className="bg-surface rounded-full h-3 overflow-hidden shadow-inner w-full">
                 <div
                     className={`h-full bg-linear-to-r ${colorFrom} ${colorTo} transition-all duration-300 ease-out`}
                     style={{ width: `${progress}%` }}
                 />
             </div>
-             <div className="flex items-center justify-between mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wide px-1">
+             <div className="flex items-center justify-between mt-2 text-xs font-semibold text-text-secondary uppercase tracking-wide px-1">
                 <span>Question {current} of {total}</span>
                 <span>{Math.round(progress)}% Complete</span>
             </div>

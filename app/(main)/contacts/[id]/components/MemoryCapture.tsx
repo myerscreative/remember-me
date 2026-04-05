@@ -134,7 +134,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
         </Button>
 
         {/* Label */}
-        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+        <p className="text-sm text-text-secondary font-medium">
           {isListening ? "Click again to stop" : isProcessing ? "Processing..." : "Add important info"}
         </p>
 
@@ -148,7 +148,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
               onKeyDown={handleKeyDown}
               placeholder={isListening ? "Listening..." : "Type or edit..."}
               rows={3}
-              className="min-h-[80px] w-full resize-none rounded-xl border-2 border-indigo-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-700 placeholder:text-slate-400 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50 dark:border-indigo-900/50 dark:bg-slate-900/50 dark:text-slate-300 dark:placeholder:text-slate-500"
+              className="min-h-[80px] w-full resize-none rounded-xl border-2 border-indigo-200 bg-surface px-4 py-3 text-sm leading-relaxed text-text-tertiary placeholder:text-text-secondary transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50"
               disabled={isProcessing || isListening}
             />
             
@@ -159,7 +159,7 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => setInput('')}
-                  className="text-slate-600 dark:text-slate-400"
+                  className="text-text-secondary"
                 >
                   Clear
                 </Button>
@@ -181,19 +181,19 @@ export function MemoryCapture({ contactId, onSuccess }: MemoryCaptureProps) {
           <div className="absolute top-0 right-0">
             <Popover>
               <PopoverTrigger asChild>
-                <button className="p-2 text-slate-400 hover:text-indigo-500 transition-colors">
+                <button className="p-2 text-text-secondary hover:text-indigo-500 transition-colors">
                   <Info className="w-4 h-4" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-72 p-4 bg-[#1E293B] border-[#334155] shadow-xl rounded-xl z-[9999]" align="end">
-                <h3 className="text-slate-200 font-bold text-xs uppercase tracking-wider border-b border-slate-700/50 pb-2 mb-2">
+              <PopoverContent className="w-72 p-4 bg-surface border-border-default shadow-xl rounded-xl z-[9999]" align="end">
+                <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider border-b border-border-default/50 pb-2 mb-2">
                   AI Memory Capture
                 </h3>
-                <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
-                  <span className="text-white font-bold">Click the AI button</span> to speak or type anything you want to remember.
+                <p className="text-text-secondary text-[11px] leading-relaxed mb-3">
+                  <span className="text-text-primary font-bold">Click the AI button</span> to speak or type anything you want to remember.
                 </p>
-                <p className="text-slate-400 text-[11px] leading-relaxed">
-                  Our AI will automatically organize details into <span className="text-white font-bold">Story</span>, <span className="text-white font-bold">Family</span>, <span className="text-white font-bold">Interests</span>, and more.
+                <p className="text-text-secondary text-[11px] leading-relaxed">
+                  Our AI will automatically organize details into <span className="text-text-primary font-bold">Story</span>, <span className="text-text-primary font-bold">Family</span>, <span className="text-text-primary font-bold">Interests</span>, and more.
                 </p>
               </PopoverContent>
             </Popover>

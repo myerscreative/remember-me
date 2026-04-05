@@ -71,12 +71,12 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
   const handleMouseUp = () => setIsDragging(false);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-linear-to-br from-[#f8fafc] to-[#f1f5f9] dark:from-slate-900 dark:to-[#0f172a] select-none rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner">
+    <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-canvas select-none rounded-3xl border border-border-default shadow-inner">
         {/* Header Controls */}
         <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
             <button
               onClick={() => setShowGuide(true)}
-              className="p-2.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all hover:scale-105 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              className="p-2.5 rounded-full bg-elevated backdrop-blur-md border border-border-default shadow-sm hover:shadow-md transition-all hover:scale-105 text-text-tertiary hover:text-text-primary"
               title="Garden Guide"
             >
               <Info className="w-5 h-5" />
@@ -112,7 +112,7 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
                     {[1, 2, 3, 4, 5, 6].map(i => (
                         <div 
                            key={i} 
-                           className="absolute rounded-full border border-slate-300/30 dark:border-slate-700/30 -translate-x-1/2 -translate-y-1/2"
+                           className="absolute rounded-full border border-border-default/30 -translate-x-1/2 -translate-y-1/2"
                            style={{ 
                                width: (80 + (i-1)*60) * 2, 
                                height: (80 + (i-1)*60) * 2 
@@ -139,7 +139,7 @@ export default function GardenView({ contacts, onLeafClick }: GardenViewProps) {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center opacity-50">
                     <p className="text-2xl mb-2">🌱</p>
-                    <p className="text-sm font-medium text-slate-500">Plant your first seed</p>
+                    <p className="text-sm font-medium text-text-secondary">Plant your first seed</p>
                 </div>
             </div>
         )}

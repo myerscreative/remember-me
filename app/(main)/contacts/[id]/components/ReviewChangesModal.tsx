@@ -57,29 +57,29 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1f2e] rounded-2xl border border-slate-700 max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-2xl border border-border-default max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+        <div className="p-6 border-b border-border-default flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-text-primary flex items-center gap-2">
               🤖 Review AI Extracted Changes
             </h2>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-text-secondary text-sm mt-1">
               Review and edit the information before saving
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-slate-400" />
+            <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {!hasChanges && (
-            <div className="text-center py-12 text-slate-400">
+            <div className="text-center py-12 text-text-secondary">
               No changes detected from the brain dumps.
             </div>
           )}
@@ -87,29 +87,29 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Career & Business */}
           {(changes.company || changes.job_title) && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 💼 Career & Business
               </h3>
               <div className="space-y-3">
                 {changes.company && (
-                  <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
-                    <label className="text-xs text-slate-400 mb-1.5 block">Company</label>
+                  <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
+                    <label className="text-xs text-text-secondary mb-1.5 block">Company</label>
                     <input
                       type="text"
                       value={editedChanges.company || ''}
                       onChange={(e) => updateField('company', e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 )}
                 {changes.job_title && (
-                  <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
-                    <label className="text-xs text-slate-400 mb-1.5 block">Job Title</label>
+                  <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
+                    <label className="text-xs text-text-secondary mb-1.5 block">Job Title</label>
                     <input
                       type="text"
                       value={editedChanges.job_title || ''}
                       onChange={(e) => updateField('job_title', e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 )}
@@ -120,29 +120,29 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Family Members */}
           {changes.family_members && changes.family_members.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 👥 Family
               </h3>
               <div className="space-y-3">
                 {editedChanges.family_members?.map((member, idx) => (
-                  <div key={idx} className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30 space-y-2">
+                  <div key={idx} className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-xs text-slate-400 mb-1 block">Name</label>
+                        <label className="text-xs text-text-secondary mb-1 block">Name</label>
                         <input
                           type="text"
                           value={member.name}
                           onChange={(e) => updateFamilyMember(idx, 'name', e.target.value)}
-                          className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-surface border border-border-strong rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-indigo-500"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-slate-400 mb-1 block">Relationship</label>
+                        <label className="text-xs text-text-secondary mb-1 block">Relationship</label>
                         <input
                           type="text"
                           value={member.relationship}
                           onChange={(e) => updateFamilyMember(idx, 'relationship', e.target.value)}
-                          className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-surface border border-border-strong rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-indigo-500"
                         />
                       </div>
                     </div>
@@ -155,14 +155,14 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Priorities */}
           {changes.most_important_to_them && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 ⭐ Current Priorities & Hobbies
               </h3>
-              <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
+              <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
                 <textarea
                   value={editedChanges.most_important_to_them || ''}
                   onChange={(e) => updateField('most_important_to_them', e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
+                  className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
                 />
               </div>
             </div>
@@ -171,14 +171,14 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Challenges */}
           {changes.current_challenges && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 💪 What They're Working Through
               </h3>
-              <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
+              <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
                 <textarea
                   value={editedChanges.current_challenges || ''}
                   onChange={(e) => updateField('current_challenges', e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
+                  className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
                 />
               </div>
             </div>
@@ -187,14 +187,14 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Goals */}
           {changes.goals_aspirations && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 ✨ What They're Working Toward
               </h3>
-              <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
+              <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
                 <textarea
                   value={editedChanges.goals_aspirations || ''}
                   onChange={(e) => updateField('goals_aspirations', e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
+                  className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500 min-h-[80px] resize-none"
                 />
               </div>
             </div>
@@ -203,10 +203,10 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Interests */}
           {changes.interests && changes.interests.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 🎯 Interests
               </h3>
-              <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
+              <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
                 <div className="flex flex-wrap gap-2">
                   {editedChanges.interests?.map((interest, idx) => (
                     <span key={idx} className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm">
@@ -221,15 +221,15 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
           {/* Where Met */}
           {changes.where_met && (
             <div className="space-y-3">
-              <h3 className="text-indigo-400 text-xs font-black uppercase tracking-wider">
+              <h3 className="text-text-accent text-xs font-black uppercase tracking-wider">
                 📍 Where We Met
               </h3>
-              <div className="bg-slate-900/50 rounded-lg p-3 border-2 border-green-500/30">
+              <div className="bg-canvas/50 rounded-lg p-3 border-2 border-green-500/30">
                 <input
                   type="text"
                   value={editedChanges.where_met || ''}
                   onChange={(e) => updateField('where_met', e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-surface border border-border-strong rounded px-3 py-2 text-text-primary focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -237,10 +237,10 @@ export function ReviewChangesModal({ isOpen, onClose, changes, onAccept }: Revie
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-700 flex gap-3">
+        <div className="p-6 border-t border-border-default flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors"
+            className="flex-1 py-3 px-4 bg-surface hover:bg-subtle text-text-primary rounded-xl font-bold transition-colors"
           >
             Cancel
           </button>

@@ -102,7 +102,7 @@ export function SearchResultCard({
     <Link href={`/contacts/${contact.id}`}>
       <div 
         className={cn(
-          "group relative bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-700/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 w-full p-5 backdrop-blur-sm",
+          "group relative bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 w-full p-5 backdrop-blur-sm",
           isCompactView && "flex items-center p-3 gap-3"
         )}
       >
@@ -112,7 +112,7 @@ export function SearchResultCard({
         <div className="flex gap-4 items-start relative z-10">
             {/* Avatar Column */}
             <div className={cn("relative shrink-0", isCompactView ? "h-10 w-10" : "h-[56px] w-[56px]")}>
-              <Avatar className="h-full w-full ring-2 ring-white dark:ring-gray-800 shadow-sm transition-transform group-hover:scale-105 duration-300">
+              <Avatar className="h-full w-full ring-2 ring-surface shadow-sm transition-transform group-hover:scale-105 duration-300">
                 <AvatarImage src={contact.photo_url || undefined} alt={contact.name} className="object-cover" />
                 <AvatarFallback className={cn("text-white font-semibold text-lg", getGradient(contact.name))}>
                   {getInitialsFromFullName(contact.name)}
@@ -120,14 +120,14 @@ export function SearchResultCard({
               </Avatar>
               <button
                 onClick={(e) => onToggleFavorite(contact.id, e)}
-                className="absolute -bottom-1 -right-1 p-1 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:scale-110 transition-transform z-20 border border-gray-100 dark:border-gray-700"
+                className="absolute -bottom-1 -right-1 p-1 bg-surface rounded-full shadow-sm hover:scale-110 transition-transform z-20 border border-border-default"
                 title={contact.is_favorite ? "Remove from favorites" : "Add to favorites"}
               >
                 <Star 
                   size={14} 
                   className={cn(
                     "transition-colors", 
-                    contact.is_favorite ? "fill-amber-400 text-amber-400" : "text-gray-300 dark:text-gray-600 hover:text-amber-400"
+                    contact.is_favorite ? "fill-amber-400 text-amber-400" : "text-text-tertiary hover:text-amber-400"
                   )} 
                 />
               </button>
@@ -136,7 +136,7 @@ export function SearchResultCard({
             {/* Info Column */}
             <div className="flex-1 min-w-0 flex flex-col">
                  <div className="flex justify-between items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-[18px] text-gray-900 dark:text-white truncate group-hover:text-indigo-400 transition-colors flex-1 min-w-0">
+                    <h3 className="font-semibold text-[18px] text-text-primary truncate group-hover:text-indigo-400 transition-colors flex-1 min-w-0">
                       {contact.name}
                     </h3>
 
@@ -157,7 +157,7 @@ export function SearchResultCard({
                         <div className={cn(
                             "flex items-center gap-2 text-sm font-medium",
                             health === 'overdue' ? "text-amber-600 dark:text-amber-500" : 
-                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-gray-500 dark:text-gray-400"
+                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-text-secondary"
                         )}>
                              <CalendarDays size={14} className={cn("shrink-0", !lastContact && "opacity-70")} />
                              <span>{lastContact ? `Last contacted: ${lastContact}` : "No contact yet"}</span>
@@ -207,7 +207,7 @@ export function SearchResultCard({
                                 </Badge>
                                 ))}
                                 {tags.length > 3 && (
-                                <Badge variant="secondary" className="bg-gray-500/10 text-gray-600 dark:text-gray-400 border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
+                                <Badge variant="secondary" className="bg-gray-500/10 text-text-secondary border border-gray-500/20 text-[11px] h-6 px-2 rounded-md font-medium">
                                     +{tags.length - 3}
                                 </Badge>
                                 )}
@@ -223,7 +223,7 @@ export function SearchResultCard({
                      <span className={cn(
                             "text-xs font-medium",
                             health === 'overdue' ? "text-amber-600 dark:text-amber-500" : 
-                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-gray-500 dark:text-gray-400"
+                            health === 'healthy' ? "text-emerald-600 dark:text-emerald-500" : "text-text-secondary"
                         )}>
                         {lastContact || "No contact"}
                      </span>
@@ -231,7 +231,7 @@ export function SearchResultCard({
                      <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <span 
-                            className="text-[10px] text-gray-400 hover:text-indigo-400 cursor-pointer transition-colors z-20"
+                            className="text-[10px] text-text-secondary hover:text-indigo-400 cursor-pointer transition-colors z-20"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {isUpdatingFrequency ? (

@@ -108,17 +108,17 @@ export function DecayAlertBanner() {
     <>
       {/* Collapsed View */}
       <Card 
-        className="border border-indigo-500/30 bg-slate-900/40 backdrop-blur-sm shadow-xl mb-4 overflow-hidden transition-all hover:bg-slate-900/60 hover:scale-[1.01] hover:shadow-indigo-500/10 group cursor-pointer"
+        className="border border-indigo-500/30 bg-surface/40 backdrop-blur-sm shadow-xl mb-4 overflow-hidden transition-all hover:bg-surface/60 hover:scale-[1.01] hover:shadow-indigo-500/10 group cursor-pointer"
         onClick={() => setIsExpanded(true)}
       >
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <Leaf className="h-5 w-5 text-indigo-400" />
+                <Leaf className="h-5 w-5 text-text-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg md:text-xl font-black text-white tracking-tight group-hover:text-indigo-300 transition-colors leading-tight">
+                <h3 className="text-lg md:text-xl font-black text-text-primary tracking-tight group-hover:text-indigo-300 transition-colors leading-tight">
                   Reconnect with{" "}
                   {firstNames.length > 0 ? (
                     firstNames.map((name, i) => (
@@ -128,7 +128,7 @@ export function DecayAlertBanner() {
                     ))
                   ) : "your network"}
                 </h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1 opacity-70">
+                <p className="text-xs text-text-secondary font-bold uppercase tracking-wider mt-1 opacity-70">
                   Nurture your network today
                 </p>
               </div>
@@ -151,17 +151,17 @@ export function DecayAlertBanner() {
 
       {/* Expanded View (Sheet) */}
       <Sheet open={isExpanded} onOpenChange={setIsExpanded}>
-        <SheetContent side="bottom" className="sm:max-w-none h-[85vh] bg-slate-950 border-0 p-0 rounded-t-[32px] overflow-hidden flex flex-col">
-          <div className="w-12 h-1 bg-slate-800 rounded-full mx-auto mt-3 mb-6 shrink-0" />
+        <SheetContent side="bottom" className="sm:max-w-none h-[85vh] bg-canvas border-0 p-0 rounded-t-[32px] overflow-hidden flex flex-col">
+          <div className="w-12 h-1 bg-surface rounded-full mx-auto mt-3 mb-6 shrink-0" />
           
           <div className="px-6 flex-1 overflow-y-auto">
             <SheetHeader className="text-left space-y-1 mb-8">
-              <SheetTitle className="text-2xl font-bold text-white">
+              <SheetTitle className="text-2xl font-bold text-text-primary">
                 Time to Reconnect
               </SheetTitle>
-              <SheetDescription className="text-slate-400 text-base leading-relaxed">
+              <SheetDescription className="text-text-secondary text-base leading-relaxed">
                 Nurture your network to keep it healthy. <br />
-                <Leaf className="h-4 w-4 text-indigo-400 inline mt-1" />
+                <Leaf className="h-4 w-4 text-text-accent inline mt-1" />
               </SheetDescription>
             </SheetHeader>
 
@@ -173,37 +173,37 @@ export function DecayAlertBanner() {
                   onClick={() => setIsExpanded(false)}
                   className="block"
                 >
-                  <div className="flex flex-col gap-3 p-5 bg-slate-900 border border-slate-800 rounded-2xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all group shadow-sm">
+                  <div className="flex flex-col gap-3 p-5 bg-surface border border-border-default rounded-2xl hover:border-indigo-500/50 hover:bg-surface/80 transition-all group shadow-sm">
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-14 w-14 border-2 border-slate-800 group-hover:border-indigo-500/30 shadow-inner">
-                        <AvatarFallback className="bg-slate-800 text-slate-400 font-bold text-lg">
+                      <Avatar className="h-14 w-14 border-2 border-border-default group-hover:border-indigo-500/30 shadow-inner">
+                        <AvatarFallback className="bg-surface text-text-secondary font-bold text-lg">
                           {getInitials(relationship.name)}
                         </AvatarFallback>
                       </Avatar>
                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                        <h4 className="text-lg font-bold text-text-primary truncate group-hover:text-indigo-300 transition-colors">
                           {relationship.name}
                         </h4>
-                        <p className="text-sm text-slate-400 font-medium mt-0.5">
-                          Last contact: <span className="text-slate-300">{formatDate(relationship.last_interaction_date)}</span>
+                        <p className="text-sm text-text-secondary font-medium mt-0.5">
+                          Last contact: <span className="text-text-tertiary">{formatDate(relationship.last_interaction_date)}</span>
                         </p>
                       </div>
 
-                      <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-1 h-fit shrink-0">
+                      <Badge className="bg-indigo-500/10 text-text-accent border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-1 h-fit shrink-0">
                         {getSeverityText(relationship.last_contact_days)} AGO
                       </Badge>
                     </div>
 
                     {relationship.relationship_summary ? (
-                      <div className="mt-2 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50 italic">
-                        <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
+                      <div className="mt-2 p-3 bg-canvas/50 rounded-xl border border-border-default/50 italic">
+                        <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
                           &quot;{relationship.relationship_summary}&quot;
                         </p>
                       </div>
                     ) : (
-                      <div className="mt-2 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50">
-                        <p className="text-sm text-slate-500 italic">
+                      <div className="mt-2 p-3 bg-canvas/50 rounded-xl border border-border-default/50">
+                        <p className="text-sm text-text-secondary italic">
                           No reach-out suggestion available yet. Start a memory dump to get AI insights.
                         </p>
                       </div>
@@ -214,11 +214,11 @@ export function DecayAlertBanner() {
             </div>
           </div>
 
-          <div className="p-6 bg-slate-950/80 backdrop-blur-md border-t border-slate-900">
+          <div className="p-6 bg-canvas/80 backdrop-blur-md border-t border-surface">
             <div className="flex gap-3">
               <Link href="/insights" className="flex-1">
                 <Button 
-                  className="w-full bg-[#1a1c24] hover:bg-[#252835] text-white border border-slate-800 h-14 rounded-2xl font-bold text-base shadow-xl"
+                  className="w-full bg-surface hover:bg-elevated text-text-primary border border-border-default h-14 rounded-2xl font-bold text-base shadow-xl"
                   onClick={() => setIsExpanded(false)}
                 >
                   View All Suggestions
@@ -226,7 +226,7 @@ export function DecayAlertBanner() {
               </Link>
               <Button 
                 variant="ghost" 
-                className="bg-[#1a1c24]/50 hover:bg-[#252835] text-slate-400 h-14 rounded-2xl px-6 font-bold text-base"
+                className="bg-surface/50 hover:bg-elevated text-text-secondary h-14 rounded-2xl px-6 font-bold text-base"
                 onClick={() => {
                   setDismissed(true);
                   setIsExpanded(false);

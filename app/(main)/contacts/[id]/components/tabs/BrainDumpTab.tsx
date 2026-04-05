@@ -178,7 +178,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
             setShowInitialMode('voice');
             setShowPostCallPulse(true);
           }}
-          className="w-full bg-white text-indigo-600 font-bold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 animate-pulse"
+          className="w-full bg-surface text-indigo-600 font-bold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 animate-pulse"
         >
           <Mic className="w-5 h-5" />
           Start Brain Dump
@@ -186,7 +186,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       </div>
 
       {/* Text Input for Quick Memory */}
-      <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
+      <div className="bg-surface rounded-2xl p-5 border border-slate-800/50">
         <label className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider mb-3 block">
           ✏️ Quick Text Memory
         </label>
@@ -195,7 +195,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
             value={newMemory}
             onChange={(e) => setNewMemory(e.target.value)}
             placeholder={`Add a quick note about ${contactName}...`}
-            className="w-full bg-[#0f1419] border border-[#2d3748] focus:border-[#7c3aed] rounded-xl p-3.5 pr-12 text-white text-[15px] outline-none resize-none min-h-[100px] placeholder:text-[#64748b] transition-colors"
+            className="w-full bg-canvas border border-border-default focus:border-[#7c3aed] rounded-xl p-3.5 pr-12 text-text-primary text-[15px] outline-none resize-none min-h-[100px] placeholder:text-[#64748b] transition-colors"
           />
           <div className="absolute right-2 bottom-4">
             <AudioInputButton 
@@ -224,7 +224,7 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
       </div>
 
       {/* Recent Memories */}
-      <div className="bg-[#1a1f2e] rounded-2xl p-5 border border-slate-800/50">
+      <div className="bg-surface rounded-2xl p-5 border border-slate-800/50">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-[#94a3b8] text-[11px] font-semibold uppercase tracking-wider">
             💭 Memory Vault ({allMemories.length})
@@ -260,8 +260,8 @@ export function BrainDumpTab({ contact }: BrainDumpTabProps) {
             {allMemories.map((memory, index) => {
               const isOptimistic = optimisticMemories.includes(memory);
               return (
-                <div key={index} className={`bg-[#0f1419] p-4 rounded-lg border transition-all ${
-                  isOptimistic ? 'border-[#fbbf24] animate-pulse' : 'border-[#2d3748]'
+                <div key={index} className={`bg-canvas p-4 rounded-lg border transition-all ${
+                  isOptimistic ? 'border-[#fbbf24] animate-pulse' : 'border-border-default'
                 }`}>
                   <div className="text-[#64748b] text-[11px] mb-2 flex items-center justify-between">
                     <span>

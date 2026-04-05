@@ -89,16 +89,16 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
     };
 
     const cardStyles = {
-      whereWeMet: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/40',
-      whyStayInContact: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-500/40',
-      whatsImportant: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-amber-200 dark:hover:border-amber-500/40',
-      whatFoundInteresting: 'bg-white dark:bg-[#1f2937]/60 border-slate-200 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-500/40'
+      whereWeMet: 'bg-surface border-border-default hover:border-indigo-200 dark:hover:border-indigo-500/40',
+      whyStayInContact: 'bg-surface border-border-default hover:border-rose-200 dark:hover:border-rose-500/40',
+      whatsImportant: 'bg-surface border-border-default hover:border-amber-200 dark:hover:border-amber-500/40',
+      whatFoundInteresting: 'bg-surface border-border-default hover:border-emerald-200 dark:hover:border-emerald-500/40'
     };
 
     const activeStyle = cardStyles[field as keyof typeof cardStyles];
 
     return (
-      <div className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
+      <div className={`group relative flex flex-col h-full bg-surface border border-border-default rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
@@ -109,13 +109,13 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
           }`}>
               {icon}
             </div>
-            <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{title}</span>
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-text-secondary">{title}</span>
           </div>
           {!isEditing && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-indigo-600"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-text-secondary hover:text-indigo-600"
               onClick={() => handleEdit(field, value)}
             >
               <Edit2 className="h-3.5 w-3.5" />
@@ -129,7 +129,7 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
                 value={editValue}
                 onChange={e => setEditValue(e.target.value)}
                 placeholder={placeholder}
-                className="min-h-[120px] text-sm resize-none bg-gray-50 dark:bg-[#1a1d24] border-gray-200 dark:border-gray-700 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+                className="min-h-[120px] text-sm resize-none bg-canvas border-border-default focus:border-indigo-500/50 focus:ring-indigo-500/20"
                 autoFocus
               />
               <div className="flex justify-end gap-2">
@@ -138,7 +138,7 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
                   size="sm"
                   onClick={handleCancel}
                   disabled={isSaving}
-                  className="h-8 text-xs text-gray-500 hover:text-gray-700"
+                  className="h-8 text-xs text-text-secondary hover:text-text-tertiary"
                 >
                   Cancel
                 </Button>
@@ -158,14 +158,14 @@ export function StoryGrid({ contactId, story }: StoryGridProps) {
               className={cn(
               "cursor-pointer pb-1 text-[15px] leading-relaxed",
               isEmpty
-                ? "flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-4 italic text-gray-400 hover:border-indigo-300 dark:border-gray-700/50 dark:text-gray-500 dark:hover:border-indigo-400/50"
-                : "text-gray-900 dark:text-gray-100"
+                ? "flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-default py-4 italic text-text-secondary hover:border-indigo-300"
+                : "text-text-primary"
             )}
               onClick={() => handleEdit(field, value)}
             >
               {isEmpty ? (
                 <>
-                  <Plus className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <Plus className="h-4 w-4 text-text-secondary" />
                   <span className="text-sm not-italic">{placeholder}</span>
                 </>
               ) : (

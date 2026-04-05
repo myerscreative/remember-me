@@ -74,21 +74,21 @@ export default function GardenSetupPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B1120] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-text-accent" />
       </div>
     );
   }
 
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0B1120] flex flex-col items-center justify-center p-4">
-        <Sparkles className="w-16 h-16 text-indigo-400 mb-6" />
-        <h2 className="text-2xl font-bold text-white mb-2">Your Garden is Fully Categorized!</h2>
-        <p className="text-slate-400 mb-8 max-w-md text-center">
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-4">
+        <Sparkles className="w-16 h-16 text-text-accent mb-6" />
+        <h2 className="text-2xl font-bold text-text-primary mb-2">Your Garden is Fully Categorized!</h2>
+        <p className="text-text-secondary mb-8 max-w-md text-center">
           All your contacts have frequency targets set. Your relationship health is being tracked.
         </p>
-        <Link href="/garden" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all">
+        <Link href="/garden" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-text-primary rounded-xl font-semibold transition-all">
           Go to Garden Map
         </Link>
       </div>
@@ -99,9 +99,9 @@ export default function GardenSetupPage() {
   const progress = ((currentIndex) / contacts.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#0B1120] text-white font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-canvas text-text-primary font-sans selection:bg-indigo-500/30">
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <Link href="/garden" className="inline-flex items-center text-slate-400 hover:text-white mb-8 transition-colors">
+        <Link href="/garden" className="inline-flex items-center text-text-secondary hover:text-text-primary mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Garden
         </Link>
@@ -110,7 +110,7 @@ export default function GardenSetupPage() {
           <h1 className="text-4xl font-extrabold mb-2 bg-linear-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
             Nurturing your Garden...
           </h1>
-          <p className="text-slate-400">
+          <p className="text-text-secondary">
             Set a connection rhythm for each person to activate health tracking.
           </p>
         </div>
@@ -118,10 +118,10 @@ export default function GardenSetupPage() {
         {/* Progress Bar */}
         <div className="mb-12">
           <div className="flex justify-between items-end mb-2">
-            <span className="text-sm font-medium text-slate-400">Progress</span>
-            <span className="text-sm font-bold text-indigo-400">{currentIndex} / {contacts.length}</span>
+            <span className="text-sm font-medium text-text-secondary">Progress</span>
+            <span className="text-sm font-bold text-text-accent">{currentIndex} / {contacts.length}</span>
           </div>
-          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-subtle rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-linear-to-r from-indigo-500 to-emerald-500"
               initial={{ width: 0 }}
@@ -140,43 +140,43 @@ export default function GardenSetupPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: -100, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="absolute inset-0 bg-[#1E293B]/50 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-2xl"
+              className="absolute inset-0 bg-surface/50 backdrop-blur-xl border border-border-default/50 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-2xl"
             >
               <div className="w-24 h-24 bg-linear-to-br from-indigo-500 to-indigo-700 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg shadow-indigo-500/20">
                 {currentContact.initials}
               </div>
               <h2 className="text-3xl font-bold mb-2">{currentContact.name}</h2>
-              <p className="text-slate-400 mb-10">How often would you like to stay in touch?</p>
+              <p className="text-text-secondary mb-10">How often would you like to stay in touch?</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                 <button
                   disabled={updating}
                   onClick={() => handleSelection(14)}
-                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-800/50 hover:bg-emerald-500/10 border border-slate-700 hover:border-emerald-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-subtle/50 hover:bg-emerald-500/10 border border-border-default hover:border-emerald-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Wind className="w-6 h-6 text-emerald-400 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-bold">Bi-Weekly</span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">Every 14 days</span>
+                  <span className="text-[10px] text-text-secondary uppercase tracking-wider">Every 14 days</span>
                 </button>
 
                 <button
                   disabled={updating}
                   onClick={() => handleSelection(30)}
-                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-800/50 hover:bg-indigo-500/10 border border-slate-700 hover:border-indigo-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-subtle/50 hover:bg-indigo-500/10 border border-border-default hover:border-indigo-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <Calendar className="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform" />
+                  <Calendar className="w-6 h-6 text-text-accent group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-bold">Monthly</span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">Every 30 days</span>
+                  <span className="text-[10px] text-text-secondary uppercase tracking-wider">Every 30 days</span>
                 </button>
 
                 <button
                   disabled={updating}
                   onClick={() => handleSelection(90)}
-                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-800/50 hover:bg-amber-500/10 border border-slate-700 hover:border-amber-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-subtle/50 hover:bg-amber-500/10 border border-border-default hover:border-amber-500/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Sun className="w-6 h-6 text-amber-400 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-bold">Quarterly</span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">Every 90 days</span>
+                  <span className="text-[10px] text-text-secondary uppercase tracking-wider">Every 90 days</span>
                 </button>
               </div>
             </motion.div>
@@ -184,7 +184,7 @@ export default function GardenSetupPage() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-slate-500 text-sm">
+          <p className="text-text-secondary text-sm">
             Setting these targets allows the Garden to calculate "Health Status"<br/>
             based on your actual interactions.
           </p>

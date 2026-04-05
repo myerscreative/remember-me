@@ -27,7 +27,7 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-20 text-slate-200">
+    <div className="flex flex-col gap-8 pb-20 text-text-primary">
       
       {/* AI-Generated Mutual Value Summary */}
       {mutualValueIntroductions && (
@@ -38,21 +38,21 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
               AI Insights
             </label>
           </div>
-          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{mutualValueIntroductions}</p>
+          <p className="text-text-tertiary leading-relaxed whitespace-pre-wrap">{mutualValueIntroductions}</p>
         </div>
       )}
 
       {/* How I Can Help Them */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Handshake size={14} className="text-blue-500" /> How I Can Help Them
         </label>
-        <p className="text-slate-400 text-sm mb-4">Ways you can provide value or assistance</p>
+        <p className="text-text-secondary text-sm mb-4">Ways you can provide value or assistance</p>
         
         <div className="relative">
           <textarea
             placeholder="What can you offer? Introductions, expertise, resources, connections..."
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            className="w-full bg-canvas/50 border border-border-default rounded-2xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
             value={mutualValueIntroductions.split('\n\n')[0] || ''}
             onChange={(e) => {
               const parts = mutualValueIntroductions.split('\n\n');
@@ -78,15 +78,15 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* How They Can Help Me */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <ArrowLeftRight size={14} className="text-purple-500" /> How They Can Help Me
         </label>
-        <p className="text-slate-400 text-sm mb-4">Ways they can provide value or assistance</p>
+        <p className="text-text-secondary text-sm mb-4">Ways they can provide value or assistance</p>
         
         <div className="relative">
           <textarea
             placeholder="What can they offer? Their expertise, network, resources, insights..."
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            className="w-full bg-canvas/50 border border-border-default rounded-2xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
             value={mutualValueIntroductions.split('\n\n')[1] || ''}
             onChange={(e) => {
               const parts = mutualValueIntroductions.split('\n\n');
@@ -112,15 +112,15 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* Introductions & Connections */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Users size={14} className="text-cyan-500" /> Introductions & Connections
         </label>
-        <p className="text-slate-400 text-sm mb-4">People to introduce, connections to make</p>
+        <p className="text-text-secondary text-sm mb-4">People to introduce, connections to make</p>
         
         <div className="relative">
           <textarea
             placeholder="Who should you introduce them to? Who did you promise to connect them with?"
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            className="w-full bg-canvas/50 border border-border-default rounded-2xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
             value={mutualValueIntroductions.split('\n\n')[2] || ''}
             onChange={(e) => {
               const parts = mutualValueIntroductions.split('\n\n');
@@ -146,15 +146,15 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
 
       {/* Collaboration Opportunities */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
           <Lightbulb size={14} className="text-yellow-500" /> Collaboration Opportunities
         </label>
-        <p className="text-slate-400 text-sm mb-4">Projects, partnerships, or ways to work together</p>
+        <p className="text-text-secondary text-sm mb-4">Projects, partnerships, or ways to work together</p>
         
         <div className="relative">
           <textarea
             placeholder="What could you build together? Business opportunities, creative projects, shared goals..."
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
+            className="w-full bg-canvas/50 border border-border-default rounded-2xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[120px] resize-none leading-relaxed"
             value={mutualValueIntroductions.split('\n\n')[3] || ''}
             onChange={(e) => {
               const parts = mutualValueIntroductions.split('\n\n');
@@ -179,8 +179,8 @@ export default function MutualValueTab({ contact }: MutualValueTabProps) {
       </div>
 
       {/* Helper Text */}
-      <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-4 text-sm text-slate-400">
-        <p className="font-semibold text-slate-300 mb-2">💡 Why this matters</p>
+      <div className="bg-canvas/30 border border-border-default rounded-xl p-4 text-sm text-text-secondary">
+        <p className="font-semibold text-text-tertiary mb-2">💡 Why this matters</p>
         <p>Tracking mutual value helps you:</p>
         <ul className="list-disc list-inside mt-2 space-y-1 ml-2">
           <li>Remember promises and commitments</li>

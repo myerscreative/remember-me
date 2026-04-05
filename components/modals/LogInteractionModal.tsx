@@ -87,11 +87,11 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1a1d24] rounded-xl w-full max-w-md shadow-lg border border-gray-200 dark:border-gray-800 animate-in zoom-in-95 duration-200">
+      <div className="bg-surface rounded-xl w-full max-w-md shadow-lg border border-border-default animate-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+        <div className="flex items-center justify-between p-4 border-b border-border-default">
+          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
             <span className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                {type === 'call' && <Phone className="w-4 h-4" />}
                {type === 'email' && <Mail className="w-4 h-4" />}
@@ -100,8 +100,8 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
             </span>
             Log Interaction
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-1 hover:bg-subtle rounded-lg transition-colors">
+            <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
 
@@ -111,11 +111,11 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
           {/* Type & Date Row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-500">Type</label>
+              <label className="text-xs font-medium text-text-secondary">Type</label>
               <select 
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
-                className="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252931] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full h-9 rounded-md border border-border-default bg-elevated px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="call">Call</option>
                 <option value="email">Email</option>
@@ -125,30 +125,30 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
             </div>
             
             <div className="space-y-1.5">
-               <label className="text-xs font-medium text-gray-500">Date</label>
+               <label className="text-xs font-medium text-text-secondary">Date</label>
                <input 
                  type="date"
                  value={date}
                  onChange={(e) => setDate(e.target.value)}
-                 className="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252931] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                 className="w-full h-9 rounded-md border border-border-default bg-elevated px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                />
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-1.5">
-             <label className="text-xs font-medium text-gray-500">Notes (Optional)</label>
+             <label className="text-xs font-medium text-text-secondary">Notes (Optional)</label>
              <textarea 
                value={notes}
                onChange={(e) => setNotes(e.target.value)}
                placeholder="What did you talk about?"
-               className="w-full min-h-[100px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#252931] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+               className="w-full min-h-[100px] rounded-md border border-border-default bg-elevated p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
              />
           </div>
 
           {/* Next Goal */}
           <div className="space-y-1.5">
-             <label className="text-xs font-medium text-gray-500">Next Goal (Strategy)</label>
+             <label className="text-xs font-medium text-text-secondary">Next Goal (Strategy)</label>
              <textarea 
                value={nextGoal}
                onChange={(e) => setNextGoal(e.target.value)}
@@ -159,7 +159,7 @@ export function LogInteractionModal({ isOpen, onClose, contactId, initialType }:
         </div>
 
         {/* Footer */}
-        <div className="p-4 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="p-4 flex justify-end gap-3 border-t border-border-default">
            <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
            <div className="relative">
              <Button onClick={handleSubmit} disabled={isSubmitting} className="relative z-10">

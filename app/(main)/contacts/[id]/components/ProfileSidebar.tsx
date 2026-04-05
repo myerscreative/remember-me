@@ -114,7 +114,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
   };
 
   return (
-    <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-[#0f111a] border-r border-white/10 overflow-y-auto">
+    <aside className="w-[350px] shrink-0 flex flex-col h-screen sticky top-0 bg-canvas border-r border-white/10 overflow-y-auto">
       <div className="p-8 space-y-8">
         
         {/* 1. Profile Photo with Health Ring */}
@@ -133,25 +133,25 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
             
                 {/* Ring Container */}
                 <div 
-                        className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
+                        className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-surface"
                         style={{ border: `4px solid ${health.color}40` }}
                 >
                     {/* Active Ring Segment */}
                     <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
                     <Avatar className={cn(
-                        "w-[124px] h-[124px] border-4 border-[#1a1b2e]",
+                        "w-[124px] h-[124px] border-4 border-surface",
                         isUploading && "opacity-50"
                     )}>
                         <AvatarImage src={contact.photo_url || ""} alt={contact.firstName && contact.lastName ? `${contact.firstName} ${contact.lastName}` : "Contact photo"} className="object-cover" />
-                        <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
+                        <AvatarFallback className="text-4xl font-bold bg-elevated text-text-primary">
                         {initials}
                         </AvatarFallback>
                     </Avatar>
 
                     {/* Status Dot */}
                     <div 
-                            className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e]" 
+                            className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-surface" 
                             style={{ backgroundColor: health.color }} 
                     />
                     
@@ -170,9 +170,9 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
             </div>
 
             {/* Name & Identity */}
-            <h1 className="text-2xl font-bold text-white text-center mb-1">{fullName}</h1>
+            <h1 className="text-2xl font-bold text-text-primary text-center mb-1">{fullName}</h1>
             {(contact.job_title || contact.company) && (
-                <p className="text-sm font-medium text-gray-400 text-center mb-2">
+                <p className="text-sm font-medium text-text-secondary text-center mb-2">
                     {contact.job_title || contact.jobTitle}
                     {contact.job_title && contact.company && " at "}
                     {contact.company}
@@ -180,8 +180,8 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
             )}
              {/* Birthday Badge - Restored */}
              <div className="flex items-center justify-center gap-2 mb-4">
-                <Badge variant="outline" className="px-3 py-1.5 bg-[#242642] border-white/10 text-gray-300 rounded-full font-medium">
-                    <Cake className="w-3.5 h-3.5 mr-1.5 inline-block -mt-0.5 text-indigo-400" />
+                <Badge variant="outline" className="px-3 py-1.5 bg-elevated border-white/10 text-text-tertiary rounded-full font-medium">
+                    <Cake className="w-3.5 h-3.5 mr-1.5 inline-block -mt-0.5 text-text-accent" />
                     {contact.birthday
                     ? new Date(contact.birthday).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
                     : "Birthday: Not set"}
@@ -193,49 +193,49 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
         <div className="grid grid-cols-3 gap-2">
             {contact.phone ? (
               <a href={`tel:${contact.phone}`}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
                   <Phone size={20} />
-                  <span className="text-xs font-medium text-gray-300">Call</span>
+                  <span className="text-xs font-medium text-text-tertiary">Call</span>
               </a>
             ) : (
               <button onClick={() => toast('No phone number saved')}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated/30 opacity-50 text-text-secondary"
               >
                   <Phone size={20} />
-                  <span className="text-xs font-medium text-gray-300">Call</span>
+                  <span className="text-xs font-medium text-text-tertiary">Call</span>
               </button>
             )}
 
             {contact.email ? (
               <a href={`mailto:${contact.email}`}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
                   <Mail size={20} />
-                  <span className="text-xs font-medium text-gray-300">Email</span>
+                  <span className="text-xs font-medium text-text-tertiary">Email</span>
               </a>
             ) : (
               <button onClick={() => toast('No email saved')}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated/30 opacity-50 text-text-secondary"
               >
                   <Mail size={20} />
-                  <span className="text-xs font-medium text-gray-300">Email</span>
+                  <span className="text-xs font-medium text-text-tertiary">Email</span>
               </button>
             )}
 
             {contact.phone ? (
               <a href={`sms:${contact.phone}`}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
                   <MessageSquare size={20} />
-                  <span className="text-xs font-medium text-gray-300">Text</span>
+                  <span className="text-xs font-medium text-text-tertiary">Text</span>
               </a>
             ) : (
               <button onClick={() => toast('No phone number saved')}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-[#242642]/30 opacity-50 text-gray-500"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 border border-white/5 bg-elevated/30 opacity-50 text-text-secondary"
               >
                   <MessageSquare size={20} />
-                  <span className="text-xs font-medium text-gray-300">Text</span>
+                  <span className="text-xs font-medium text-text-tertiary">Text</span>
               </button>
             )}
         </div>
@@ -244,7 +244,7 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
         {/* 3. Interaction Logger */}
         <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Log Interaction</h3>
+            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-3">Log Interaction</h3>
             <InteractionLogger 
                 contactId={contact.id} 
                 contactName={contact.firstName} 
@@ -255,13 +255,13 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
         {/* 4. Contact Details (Secondary) */}
         <div className="space-y-3">
-             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Details</h3>
+             <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Details</h3>
              
              {/* Importance & Frequency */}
              <div className="space-y-4">
                  {/* Importance Selector */}
                 <div>
-                   <div className="flex items-center gap-2 text-sm text-gray-400 mb-1.5">
+                   <div className="flex items-center gap-2 text-sm text-text-secondary mb-1.5">
                       <span className="font-medium">Relationship Level</span>
                    </div>
                    <ImportanceSelector 
@@ -272,16 +272,16 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
 
                  {/* Frequency Selector */}
                  <div>
-                     <div className="flex items-center gap-2 text-sm text-gray-400 mb-1.5">
+                     <div className="flex items-center gap-2 text-sm text-text-secondary mb-1.5">
                       <div className="flex items-center gap-2">
-                        <Repeat className="w-3.5 h-3.5 text-gray-500" />
+                        <Repeat className="w-3.5 h-3.5 text-text-secondary" />
                         <span className="font-medium">Cadence</span>
                       </div>
                     </div>
                     <select
                       value={contact.target_frequency_days || 30}
                       onChange={(e) => onFrequencyChange?.(parseInt(e.target.value))}
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-[#242642] text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer"
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-elevated text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer"
                       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
                     >
                       {FREQUENCY_PRESETS.map(preset => (
@@ -296,19 +296,19 @@ export function ProfileSidebar({ contact, onFrequencyChange, onImportanceChange,
              {/* Existing Contact Info Links */}
              <div className="space-y-1 pt-2">
                 {contact.email && (
-                    <a href={`mailto:${contact.email}`} className="flex items-center gap-3 text-sm text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
+                    <a href={`mailto:${contact.email}`} className="flex items-center gap-3 text-sm text-text-secondary hover:text-text-primary transition-colors p-2 rounded-lg hover:bg-white/5">
                         <Mail className="w-4 h-4 shrink-0" />
                         <span className="truncate">{contact.email}</span>
                     </a>
                 )}
                 {contact.phone && (
-                    <a href={`tel:${contact.phone}`} className="flex items-center gap-3 text-sm text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
+                    <a href={`tel:${contact.phone}`} className="flex items-center gap-3 text-sm text-text-secondary hover:text-text-primary transition-colors p-2 rounded-lg hover:bg-white/5">
                         <Phone className="w-4 h-4 shrink-0" />
                         <span>{contact.phone}</span>
                     </a>
                 )}
                 {contact.linkedin && (
-                    <a href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
+                    <a href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-text-secondary hover:text-text-primary transition-colors p-2 rounded-lg hover:bg-white/5">
                         <Briefcase className="w-4 h-4 shrink-0" />
                         <span>LinkedIn</span>
                     </a>

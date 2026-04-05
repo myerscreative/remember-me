@@ -333,15 +333,15 @@ export default function InsightsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <p className="text-gray-500 dark:text-gray-400">Loading insights...</p>
+      <div className="flex items-center justify-center h-screen bg-canvas">
+        <p className="text-text-secondary">Loading insights...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex h-screen items-center justify-center bg-canvas">
         <ErrorFallback
           error={error}
           reset={() => {
@@ -359,13 +359,13 @@ export default function InsightsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-canvas">
       <div className="max-w-7xl mx-auto px-8 py-8">
         {/* Page Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-[32px] font-semibold text-gray-900 dark:text-white">Insights</h1>
-            <p className="text-base text-gray-600 dark:text-gray-400 mt-1">Your relationship analytics</p>
+            <h1 className="text-[32px] font-semibold text-text-primary">Insights</h1>
+            <p className="text-base text-text-secondary mt-1">Your relationship analytics</p>
           </div>
           <Select
             value={timeRange}
@@ -380,21 +380,21 @@ export default function InsightsPage() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex gap-4 mb-8 border-b border-border-default">
           <button
             onClick={() => setActiveTab("overview")}
             className={cn(
               "pb-4 text-sm font-bold uppercase tracking-widest transition-all relative",
-              activeTab === "overview" 
-                ? "text-indigo-600 dark:text-indigo-400" 
-                : "text-gray-400 hover:text-gray-600"
+              activeTab === "overview"
+                ? "text-text-accent"
+                : "text-text-secondary hover:text-text-tertiary"
             )}
           >
             Overview
             {activeTab === "overview" && (
-              <motion.div 
+              <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" 
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400"
               />
             )}
           </button>
@@ -402,9 +402,9 @@ export default function InsightsPage() {
             onClick={() => setActiveTab("ledger")}
             className={cn(
               "pb-4 text-sm font-bold uppercase tracking-widest transition-all relative",
-              activeTab === "ledger" 
-                ? "text-indigo-600 dark:text-indigo-400" 
-                : "text-gray-400 hover:text-gray-600"
+              activeTab === "ledger"
+                ? "text-text-accent"
+                : "text-text-secondary hover:text-text-tertiary"
             )}
           >
             Learning Ledger
@@ -422,12 +422,12 @@ export default function InsightsPage() {
             {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Total Contacts */}
-          <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+          <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
             <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
               <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white mb-1">{summary.totalContacts}</p>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Total Contacts</p>
+            <p className="text-4xl font-bold text-text-primary mb-1">{summary.totalContacts}</p>
+            <p className="text-sm font-medium text-text-secondary mb-2">Total Contacts</p>
             <p className={cn(
               "text-xs font-medium",
               summary.totalContactsChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
@@ -437,12 +437,12 @@ export default function InsightsPage() {
           </Card>
 
           {/* Active This Week */}
-          <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+          <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
             <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
               <MessageCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white mb-1">{summary.activeThisWeek}</p>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Active This Week</p>
+            <p className="text-4xl font-bold text-text-primary mb-1">{summary.activeThisWeek}</p>
+            <p className="text-sm font-medium text-text-secondary mb-2">Active This Week</p>
             <p className={cn(
               "text-xs font-medium",
               summary.activeThisWeekChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
@@ -452,12 +452,12 @@ export default function InsightsPage() {
           </Card>
 
           {/* Reminders Completed */}
-          <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+          <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
             <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
               <CheckCircle2 className="h-5 w-5 text-pink-600 dark:text-pink-400" />
             </div>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white mb-1">{summary.remindersCompleted}</p>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Reminders Completed</p>
+            <p className="text-4xl font-bold text-text-primary mb-1">{summary.remindersCompleted}</p>
+            <p className="text-sm font-medium text-text-secondary mb-2">Reminders Completed</p>
             <p className={cn(
               "text-xs font-medium",
               summary.remindersCompletedChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
@@ -467,12 +467,12 @@ export default function InsightsPage() {
           </Card>
 
           {/* Network Growth */}
-          <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+          <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
             <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
               <TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white mb-1">{summary.networkGrowth}</p>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Network Growth</p>
+            <p className="text-4xl font-bold text-text-primary mb-1">{summary.networkGrowth}</p>
+            <p className="text-sm font-medium text-text-secondary mb-2">Network Growth</p>
             <p className={cn(
               "text-xs font-medium",
               summary.networkGrowthChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
@@ -487,19 +487,19 @@ export default function InsightsPage() {
           {/* Left Column */}
           <div className="space-y-6">
             {/* Communication Activity Chart */}
-            <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+            <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Communication Activity</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Interactions over time</p>
+                <h2 className="text-xl font-semibold text-text-primary">Communication Activity</h2>
+                <p className="text-sm text-text-secondary mt-1">Interactions over time</p>
               </div>
               <CommunicationActivityChart data={activity} />
             </Card>
 
             {/* Relationship Health */}
-            <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+            <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Relationship Health</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Contacts needing attention</p>
+                <h2 className="text-xl font-semibold text-text-primary">Relationship Health</h2>
+                <p className="text-sm text-text-secondary mt-1">Contacts needing attention</p>
               </div>
               <div className="space-y-0">
                 {healthList.length > 0 ? (
@@ -507,8 +507,8 @@ export default function InsightsPage() {
                     <div
                       key={contact.id}
                       className={cn(
-                        "flex items-center gap-4 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer",
-                        index !== healthList.length - 1 && "border-b border-gray-200 dark:border-gray-700"
+                        "flex items-center gap-4 py-4 hover:bg-subtle transition-colors cursor-pointer",
+                        index !== healthList.length - 1 && "border-b border-border-default"
                       )}
                     >
                       <Avatar className="h-12 w-12">
@@ -518,12 +518,12 @@ export default function InsightsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-base font-semibold text-gray-900 dark:text-white">{contact.name}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-base font-semibold text-text-primary">{contact.name}</p>
+                        <p className="text-sm text-text-secondary">
                           Last contact: {contact.lastContact} {contact.lastContact === 1 ? 'day' : 'days'} ago
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="w-[100px] h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="w-[100px] h-1.5 bg-border-default rounded-full overflow-hidden">
                             <div
                               className={cn(
                                 "h-full rounded-full",
@@ -534,14 +534,14 @@ export default function InsightsPage() {
                               style={{ width: `${contact.healthScore}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{contact.healthScore}%</span>
+                          <span className="text-sm font-medium text-text-primary">{contact.healthScore}%</span>
                         </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      <ChevronRight className="h-5 w-5 text-text-secondary" />
                     </div>
                   ))
                 ) : (
-                  <p className="text-center py-8 text-gray-500 dark:text-gray-400">No data available</p>
+                  <p className="text-center py-8 text-text-secondary">No data available</p>
                 )}
               </div>
             </Card>
@@ -583,14 +583,14 @@ export default function InsightsPage() {
                         href={`/contacts/${relationship.person_id}`}
                         className="block"
                       >
-                        <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all border-2 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md cursor-pointer">
+                        <div className="flex items-center justify-between p-4 bg-surface rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all border-2 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md cursor-pointer">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                              <p className="text-base font-semibold text-text-primary truncate">
                                 {relationship.name}
                               </p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <p className="text-sm text-text-secondary">
                                 {relationship.interaction_count} interaction{relationship.interaction_count !== 1 ? 's' : ''}
                               </p>
                             </div>
@@ -615,10 +615,10 @@ export default function InsightsPage() {
             )}
 
             {/* Top Connections */}
-            <Card className="bg-white dark:bg-gray-800 p-6 rounded-xl border-none shadow-sm">
+            <Card className="bg-surface p-6 rounded-xl border-none shadow-sm">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Top Connections</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Your most frequent contacts</p>
+                <h2 className="text-xl font-semibold text-text-primary">Top Connections</h2>
+                <p className="text-sm text-text-secondary mt-1">Your most frequent contacts</p>
               </div>
               <div className="space-y-0">
                 {topConnections.length > 0 ? (
@@ -631,25 +631,25 @@ export default function InsightsPage() {
                         key={connection.id}
                         className={cn(
                           "flex items-center gap-3 py-3",
-                          index !== topConnections.length - 1 && "border-b border-gray-200 dark:border-gray-700"
+                          index !== topConnections.length - 1 && "border-b border-border-default"
                         )}
                       >
-                        <span className="text-base font-semibold text-gray-400 dark:text-gray-500 w-[30px]">{index + 1}.</span>
+                        <span className="text-base font-semibold text-text-secondary w-[30px]">{index + 1}.</span>
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={connection.avatar || ""} />
                           <AvatarFallback className="bg-linear-to-br text-white font-semibold from-green-500 to-blue-500">
                             {connection.name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-[15px] font-medium text-gray-900 dark:text-white flex-1">{connection.name}</span>
+                        <span className="text-[15px] font-medium text-text-primary flex-1">{connection.name}</span>
                         <div className="flex items-center gap-2 shrink-0">
-                          <div className="w-[120px] h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="w-[120px] h-2 bg-border-default rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white w-[60px] text-right">
+                          <span className="text-sm font-semibold text-text-primary w-[60px] text-right">
                             {connection.interactionCount} {connection.interactionCount === 1 ? 'interaction' : 'interactions'}
                           </span>
                         </div>
@@ -657,7 +657,7 @@ export default function InsightsPage() {
                     );
                   })
                 ) : (
-                  <p className="text-center py-8 text-gray-500 dark:text-gray-400">No interaction data available</p>
+                  <p className="text-center py-8 text-text-secondary">No interaction data available</p>
                 )}
               </div>
             </Card>
@@ -669,37 +669,37 @@ export default function InsightsPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <Card className="bg-white dark:bg-gray-800 p-5 rounded-xl border-none shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+            <Card className="bg-surface p-5 rounded-xl border-none shadow-sm">
+              <h2 className="text-lg font-semibold text-text-primary mb-4">Quick Actions</h2>
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-full h-12 justify-start gap-3 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full h-12 justify-start gap-3 border border-border-default hover:bg-subtle"
                 >
-                  <Phone className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reach out today</span>
+                  <Phone className="h-5 w-5 text-text-secondary" />
+                  <span className="text-sm font-medium text-text-tertiary">Reach out today</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full h-12 justify-start gap-3 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full h-12 justify-start gap-3 border border-border-default hover:bg-subtle"
                 >
-                  <Calendar className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Add reminder</span>
+                  <Calendar className="h-5 w-5 text-text-secondary" />
+                  <span className="text-sm font-medium text-text-tertiary">Add reminder</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full h-12 justify-start gap-3 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full h-12 justify-start gap-3 border border-border-default hover:bg-subtle"
                 >
-                  <UserPlus className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Update contacts</span>
+                  <UserPlus className="h-5 w-5 text-text-secondary" />
+                  <span className="text-sm font-medium text-text-tertiary">Update contacts</span>
                 </Button>
               </div>
             </Card>
 
             {/* Upcoming Reminders */}
-            <Card className="bg-white dark:bg-gray-800 p-5 rounded-xl border-none shadow-sm">
+            <Card className="bg-surface p-5 rounded-xl border-none shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Upcoming</h2>
+                <h2 className="text-lg font-semibold text-text-primary">Upcoming</h2>
                 {upcomingReminders.length > 0 && (
                   <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 px-2 py-0.5 text-xs">
                     {upcomingReminders.length}
@@ -736,21 +736,21 @@ export default function InsightsPage() {
                         key={reminder.id}
                         className={cn(
                           "py-3",
-                          index !== upcomingReminders.length - 1 && "border-b border-gray-200 dark:border-gray-700"
+                          index !== upcomingReminders.length - 1 && "border-b border-border-default"
                         )}
                       >
                         <div className="flex items-start gap-2">
                           <div className={cn("w-2 h-2 rounded-full mt-1.5", dotColor)} />
                           <div>
-                            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">{dateLabel}</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-0.5">{reminder.description}</p>
+                            <p className="text-xs font-semibold text-text-secondary uppercase">{dateLabel}</p>
+                            <p className="text-sm font-medium text-text-primary mt-0.5">{reminder.description}</p>
                           </div>
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">No upcoming reminders</p>
+                  <p className="text-center py-6 text-sm text-text-secondary">No upcoming reminders</p>
                 )}
               </div>
             </Card>

@@ -334,19 +334,19 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                  {photoUrl ? (
                      <img src={photoUrl} alt={contactName} className="rounded-full w-full h-full object-cover" />
                  ) : (
-                     <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-lg font-bold text-white">
+                     <div className="w-full h-full rounded-full bg-surface flex items-center justify-center text-lg font-bold text-text-primary">
                          {getInitials(contactName)}
                      </div>
                  )}
              </div>
-             <h3 className="text-lg font-bold text-white leading-none">{contactName}</h3>
-             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1 opacity-70">Log Connection</p>
+             <h3 className="text-lg font-bold text-text-primary leading-none">{contactName}</h3>
+             <p className="text-[10px] text-text-secondary uppercase font-bold tracking-widest mt-1 opacity-70">Log Connection</p>
         </div>
 
         {/* TOP: BRAIN DUMP AREA */}
-        <div className="flex-1 min-h-[160px] bg-slate-900/50 border border-slate-700/50 rounded-2xl p-4 flex flex-col relative focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all shadow-inner">
+        <div className="flex-1 min-h-[160px] bg-canvas/50 border border-border-default/50 rounded-2xl p-4 flex flex-col relative focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all shadow-inner">
             <div className="flex items-center justify-between mb-2">
-                <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-[10px] font-bold text-text-accent uppercase tracking-widest flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"/> What did you talk about?
                 </label>
                 {/* Audio Recording Button */}
@@ -358,8 +358,8 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                         isRecording
                             ? "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
                             : isTranscribing
-                            ? "bg-slate-700/50 text-slate-500 cursor-wait"
-                            : "bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30"
+                            ? "bg-subtle/50 text-text-secondary cursor-wait"
+                            : "bg-surface/50 text-text-secondary border border-border-default/50 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30"
                     )}
                 >
                     {isTranscribing ? (
@@ -381,7 +381,7 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                 </button>
             </div>
             <textarea
-                className="flex-1 bg-transparent border-none focus:ring-0 text-slate-200 text-sm placeholder:text-slate-600 resize-none leading-relaxed selection:bg-indigo-500/30"
+                className="flex-1 bg-transparent border-none focus:ring-0 text-text-primary text-sm placeholder:text-text-tertiary resize-none leading-relaxed selection:bg-indigo-500/30"
                 placeholder="Caught up about his move to Austin. He's worried about the schools but excited for the BBQ..."
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -393,7 +393,7 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                 <div className="absolute inset-0 rounded-2xl border-2 border-red-500/50 pointer-events-none animate-pulse" />
             )}
             {/* Character Count */}
-            <div className="absolute bottom-3 right-3 text-[10px] text-slate-600 font-medium font-mono">
+            <div className="absolute bottom-3 right-3 text-[10px] text-text-tertiary font-medium font-mono">
                 {note.length}
             </div>
         </div>
@@ -406,7 +406,7 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
                 {['Call', 'Text', 'Email', 'Review'].map((type) => (
                     <button 
                         key={type}
-                        className="px-3 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-[10px] text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30 transition-all uppercase tracking-wider font-medium"
+                        className="px-3 py-1.5 bg-surface/50 border border-border-default/50 rounded-lg text-[10px] text-text-secondary hover:bg-indigo-500/20 hover:text-indigo-300 hover:border-indigo-500/30 transition-all uppercase tracking-wider font-medium"
                     >
                         {type}
                     </button>
@@ -417,10 +417,10 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
         </div>
 
         {/* SCHEDULE NEXT CONTACT SECTION */}
-        <div className="border-t border-slate-800 pt-3">
+        <div className="border-t border-border-default pt-3">
             <button 
                 onClick={() => setShowNextContact(!showNextContact)}
-                className="flex items-center gap-2 text-slate-400 hover:text-indigo-300 text-sm transition-colors w-full justify-between"
+                className="flex items-center gap-2 text-text-secondary hover:text-indigo-300 text-sm transition-colors w-full justify-between"
             >
                 <div className="flex items-center gap-2">
                     <Calendar size={14} />
@@ -430,25 +430,25 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
             </button>
             
             {showNextContact && (
-                <div className="mt-3 space-y-3 bg-slate-900/30 rounded-xl p-3 border border-white/5 animate-in fade-in slide-in-from-bottom-2">
+                <div className="mt-3 space-y-3 bg-canvas/30 rounded-xl p-3 border border-white/5 animate-in fade-in slide-in-from-bottom-2">
                     <div>
-                        <label className="text-xs text-slate-400 mb-1 block">When?</label>
+                        <label className="text-xs text-text-secondary mb-1 block">When?</label>
                         <input 
                             type="date"
                             value={nextContactDate}
                             onChange={(e) => setNextContactDate(e.target.value)}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                            className="w-full bg-surface border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                             min={new Date().toISOString().split('T')[0]}
                         />
                     </div>
                     <div>
-                        <label className="text-xs text-slate-400 mb-1 block">What for? (optional)</label>
+                        <label className="text-xs text-text-secondary mb-1 block">What for? (optional)</label>
                         <input 
                             type="text"
                             value={nextContactReason}
                             onChange={(e) => setNextContactReason(e.target.value)}
                             placeholder="e.g., Follow up on job search, Check in about project"
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                            className="w-full bg-surface border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                         />
                     </div>
                 </div>
@@ -474,10 +474,10 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
             </button>
 
             {/* SETTINGS TOGGLE (HIDDEN AREA) */}
-            <div className="border-t border-slate-800 pt-2 flex justify-center">
+            <div className="border-t border-border-default pt-2 flex justify-center">
                 <button 
                     onClick={() => setShowSettings(!showSettings)}
-                    className="flex items-center gap-1 text-slate-600 hover:text-slate-400 px-2 py-2 text-[10px] uppercase font-bold tracking-widest transition-colors"
+                    className="flex items-center gap-1 text-text-tertiary hover:text-text-secondary px-2 py-2 text-[10px] uppercase font-bold tracking-widest transition-colors"
                 >
                     <Settings size={10} /> Settings
                     {showSettings ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
@@ -485,13 +485,13 @@ export function InteractionLogger({ contactId, contactName, photoUrl, healthStat
             </div>
                 
             {showSettings && (
-                <div className="bg-slate-900/30 rounded-xl p-3 animate-in fade-in slide-in-from-bottom-2 border border-white/5">
+                <div className="bg-canvas/30 rounded-xl p-3 animate-in fade-in slide-in-from-bottom-2 border border-white/5">
                         <div className="flex justify-between items-center">
-                            <label className="text-xs text-slate-400">Target Frequency</label>
-                            <div className="flex items-center gap-2 bg-slate-900 rounded-lg p-1 border border-slate-700">
-                                <Clock size={12} className="text-slate-500 ml-1"/>
+                            <label className="text-xs text-text-secondary">Target Frequency</label>
+                            <div className="flex items-center gap-2 bg-canvas rounded-lg p-1 border border-border-default">
+                                <Clock size={12} className="text-text-secondary ml-1"/>
                                 <select 
-                                className="bg-transparent text-xs text-slate-300 focus:outline-none py-1 pr-2"
+                                className="bg-transparent text-xs text-text-tertiary focus:outline-none py-1 pr-2"
                                 value={frequency}
                                 onChange={(e) => setFrequency(Number(e.target.value))}
                                 >

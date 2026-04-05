@@ -70,7 +70,7 @@ function NetworkContent() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-text-accent" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ function NetworkContent() {
   // Sub-view active: render the appropriate tool view
   if (activeView && data) {
     return (
-      <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8 flex flex-col">
+      <div className="min-h-screen bg-canvas p-3 md:p-8 flex flex-col">
         <div className="max-w-7xl mx-auto flex-1 w-full">
           <AnimatePresence mode="wait">
             {activeView === 'search' && (
@@ -120,7 +120,7 @@ function NetworkContent() {
 
   // Default: Garden Hub landing page
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black/20 p-3 md:p-8 flex flex-col">
+    <div className="min-h-screen bg-canvas p-3 md:p-8 flex flex-col">
       <div className="flex-1 w-full">
         <GardenHub onNavigate={handleNavigateToView} />
       </div>
@@ -131,8 +131,8 @@ function NetworkContent() {
 export default function NetworkPage() {
   return (
     <Suspense fallback={
-       <div className="flex items-center justify-center min-h-screen bg-[#0a0e1a]">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+       <div className="flex items-center justify-center min-h-screen bg-canvas">
+          <Loader2 className="w-8 h-8 animate-spin text-text-accent" />
        </div>
     }>
        <NetworkContent />

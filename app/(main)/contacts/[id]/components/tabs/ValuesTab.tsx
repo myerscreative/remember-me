@@ -40,7 +40,7 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-20 text-slate-200">
+    <div className="flex flex-col gap-8 pb-20 text-text-primary">
       
       {/* AI-Generated Values & Personality Summary */}
       {valuesPersonality && (
@@ -51,16 +51,16 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
               AI Insights
             </label>
           </div>
-          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{valuesPersonality}</p>
+          <p className="text-text-tertiary leading-relaxed whitespace-pre-wrap">{valuesPersonality}</p>
         </div>
       )}
 
       {/* Core Values */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
           <Heart size={14} className="text-pink-500" /> Core Values
         </label>
-        <p className="text-slate-400 text-sm mb-4">What seems most important to them</p>
+        <p className="text-text-secondary text-sm mb-4">What seems most important to them</p>
         
         <div className="flex flex-wrap gap-2">
           {commonValues.map(value => (
@@ -70,7 +70,7 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 coreValues.includes(value)
                   ? 'bg-indigo-600 text-white border-2 border-indigo-400'
-                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-indigo-500/50'
+                  : 'bg-canvas text-text-secondary border-2 border-border-default hover:border-indigo-500/50'
               }`}
             >
               {value}
@@ -81,10 +81,10 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
 
       {/* Communication Style */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
           <MessageCircle size={14} className="text-blue-500" /> Communication Style
         </label>
-        <p className="text-slate-400 text-sm mb-4">How they prefer to communicate and make decisions</p>
+        <p className="text-text-secondary text-sm mb-4">How they prefer to communicate and make decisions</p>
         
         <div className="flex gap-3">
           {['Direct', 'Cautious', 'Relational', 'Analytical'].map(style => (
@@ -97,7 +97,7 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
               className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                 communicationStyle === style
                   ? 'bg-blue-600 text-white border-2 border-blue-400'
-                  : 'bg-slate-900 text-slate-400 border-2 border-slate-800 hover:border-blue-500/50'
+                  : 'bg-canvas text-text-secondary border-2 border-border-default hover:border-blue-500/50'
               }`}
             >
               {style}
@@ -108,15 +108,15 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
 
       {/* Personality & Motivations */}
       <div className="group">
-        <label className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <label className="text-text-accent text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
           <Target size={14} className="text-green-500" /> Personality & Motivations
         </label>
-        <p className="text-slate-400 text-sm mb-4">Decision-making style, motivations, sensitivities</p>
+        <p className="text-text-secondary text-sm mb-4">Decision-making style, motivations, sensitivities</p>
         
         <div className="relative">
           <textarea
             placeholder="What drives them? How do they make decisions? Any sensitivities to be aware of?"
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pr-12 text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[150px] resize-none leading-relaxed"
+            className="w-full bg-canvas/50 border border-border-default rounded-2xl p-4 pr-12 text-text-primary focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-h-[150px] resize-none leading-relaxed"
             value={personalityNotes}
             onChange={(e) => setPersonalityNotes(e.target.value)}
             onBlur={() => handleBlur('personality_notes', personalityNotes)}
@@ -135,8 +135,8 @@ export default function ValuesTab({ contact }: ValuesTabProps) {
       </div>
 
       {/* Helper Text */}
-      <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-4 text-sm text-slate-400">
-        <p className="font-semibold text-slate-300 mb-2">💡 Why this matters</p>
+      <div className="bg-canvas/30 border border-border-default rounded-xl p-4 text-sm text-text-secondary">
+        <p className="font-semibold text-text-tertiary mb-2">💡 Why this matters</p>
         <p>Understanding someone's values and communication style helps you:</p>
         <ul className="list-disc list-inside mt-2 space-y-1 ml-2">
           <li>Communicate more effectively</li>

@@ -91,14 +91,14 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: 
                 className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
                   selectedKeeperId === contact.id 
                     ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30' 
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    : 'border-border-default hover:border-border-strong'
                 }`}
               >
                 <div className="flex justify-between items-start mb-3">
                    <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
                      selectedKeeperId === contact.id 
                        ? 'bg-indigo-600 text-white' 
-                       : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                       : 'bg-subtle text-text-secondary'
                    }`}>
                       {selectedKeeperId === contact.id ? 'PRIMARY (Keep)' : 'Will Merge'}
                    </span>
@@ -110,9 +110,9 @@ export function MergeWizard({ isOpen, onClose, keeper, duplicates, onSuccess }: 
           </div>
 
           {/* Summary */}
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Merging <strong className="text-gray-900 dark:text-white">{finalVictims.length}</strong> contact(s) into
+          <div className="mt-6 p-4 bg-canvas rounded-lg text-center">
+            <div className="text-sm text-text-secondary">
+              Merging <strong className="text-text-primary">{finalVictims.length}</strong> contact(s) into
             </div>
             <div className="text-lg font-bold text-indigo-600 mt-1">
               {finalMaster.name}
@@ -145,15 +145,15 @@ function ContactCard({ contact }: { contact: Person }) {
     <div className="space-y-3">
        <div className="flex items-center gap-3">
           {contact.photo_url ? (
-            <img src={contact.photo_url} alt={contact.name} className="w-10 h-10 rounded-full object-cover bg-gray-200" />
+            <img src={contact.photo_url} alt={contact.name} className="w-10 h-10 rounded-full object-cover bg-border-default" />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-sm">
+            <div className="w-10 h-10 rounded-full bg-border-default flex items-center justify-center text-text-secondary font-bold text-sm">
                {contact.name.slice(0, 2).toUpperCase()}
             </div>
           )}
           <div className="min-w-0">
-            <div className="font-bold text-gray-900 dark:text-white truncate">{contact.name}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{contact.job_title || 'No Job Title'}</div>
+            <div className="font-bold text-text-primary truncate">{contact.name}</div>
+            <div className="text-xs text-text-secondary truncate">{contact.job_title || 'No Job Title'}</div>
           </div>
        </div>
        
@@ -166,9 +166,9 @@ function ContactCard({ contact }: { contact: Person }) {
        </div>
        
        {contact.notes && (
-         <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="text-[10px] text-gray-400 mb-1">Notes Preview:</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+         <div className="pt-2 border-t border-border-default">
+            <div className="text-[10px] text-text-secondary mb-1">Notes Preview:</div>
+            <div className="text-xs text-text-secondary line-clamp-2">
               {contact.notes}
             </div>
          </div>
@@ -181,8 +181,8 @@ function InfoRow({ label, value }: { label: string, value?: string | null }) {
   if (!value) return null; // Don't show empty rows - cleaner UI
   return (
      <div className="flex justify-between py-0.5">
-        <span className="text-gray-500 dark:text-gray-400">{label}</span>
-        <span className="font-medium text-gray-900 dark:text-white text-right truncate max-w-[120px]" title={value}>
+        <span className="text-text-secondary">{label}</span>
+        <span className="font-medium text-text-primary text-right truncate max-w-[120px]" title={value}>
           {value}
         </span>
      </div>

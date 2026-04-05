@@ -46,6 +46,28 @@
 }
 
 @theme inline {
+  --color-canvas:         var(--rm-bg-canvas);
+  --color-surface:        var(--rm-bg-surface);
+  --color-elevated:       var(--rm-bg-elevated);
+  --color-subtle:         var(--rm-bg-subtle);
+  --color-border-faint:   var(--rm-border-faint);
+  --color-border-default: var(--rm-border-default);
+  --color-border-strong:  var(--rm-border-strong);
+  --color-border-accent:  var(--rm-border-accent);
+  --color-text-primary:   var(--rm-text-primary);
+  --color-text-secondary: var(--rm-text-secondary);
+  --color-text-tertiary:  var(--rm-text-tertiary);
+  --color-text-accent:    var(--rm-text-accent);
+  --color-accent:         var(--rm-accent-primary);
+  --color-accent-hover:   var(--rm-accent-hover);
+  --color-accent-muted:   var(--rm-accent-muted);
+  --color-accent-avatar:  var(--rm-accent-avatar);
+  --color-health-vibrant: var(--rm-health-vibrant);
+  --color-health-fading:  var(--rm-health-fading);
+  --color-health-amber:   var(--rm-health-amber);
+  --color-health-dried:   var(--rm-health-dried);
+  --color-health-new:     var(--rm-health-new);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans:
@@ -363,4 +385,63 @@
 
 .animate-reminder-circle-pop {
   animation: reminder-circle-pop 0.3s ease-out forwards;
+}
+
+/* ========================================
+   UNIFIED DARK / LIGHT TOKEN SYSTEM
+   ======================================== */
+[data-theme="dark"], .dark {
+  --rm-bg-canvas:    #0c1421;
+  --rm-bg-surface:   #121e30;
+  --rm-bg-elevated:  #1a2840;
+  --rm-bg-subtle:    #1e2f4a;
+
+  --rm-border-faint:   rgba(255,255,255,0.05);
+  --rm-border-default: rgba(255,255,255,0.10);
+  --rm-border-strong:  rgba(255,255,255,0.20);
+  --rm-border-accent:  #5b6fd9;
+
+  --rm-text-primary:   #e8eef8;
+  --rm-text-secondary: #8fa3bf;
+  --rm-text-tertiary:  #556880;
+  --rm-text-accent:    #8b9ff0;
+
+  --rm-accent-primary: #4a5fc7;
+  --rm-accent-hover:   #5b6fd9;
+  --rm-accent-muted:   #1e2a4a;
+  --rm-accent-avatar:  #2a3560;
+
+  --rm-health-vibrant: #4ade80;
+  --rm-health-fading:  #a3e635;
+  --rm-health-amber:   #fb923c;
+  --rm-health-dried:   #a3693c;
+  --rm-health-new:     #8b9ff0;
+}
+
+[data-theme="light"], .light {
+  --rm-bg-canvas:    #f5f6fa;
+  --rm-bg-surface:   #ffffff;
+  --rm-bg-elevated:  #ffffff;
+  --rm-bg-subtle:    #eef0f8;
+
+  --rm-border-faint:   rgba(0,0,0,0.04);
+  --rm-border-default: rgba(0,0,0,0.10);
+  --rm-border-strong:  rgba(0,0,0,0.19);
+  --rm-border-accent:  #4a5fc7;
+
+  --rm-text-primary:   #111827;
+  --rm-text-secondary: #4b5d72;
+  --rm-text-tertiary:  #8494a8;
+  --rm-text-accent:    #4a5fc7;
+
+  --rm-accent-primary: #4a5fc7;
+  --rm-accent-hover:   #3a4fb5;
+  --rm-accent-muted:   #eef0fb;
+  --rm-accent-avatar:  #dde0f8;
+
+  --rm-health-vibrant: #16a34a;
+  --rm-health-fading:  #65a30d;
+  --rm-health-amber:   #ea580c;
+  --rm-health-dried:   #854d0e;
+  --rm-health-new:     #4a5fc7;
 }

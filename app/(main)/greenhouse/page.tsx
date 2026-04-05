@@ -9,16 +9,16 @@ export default function GreenhousePage() {
           <Sprout size={32} />
         </div>
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary tracking-tight">
             The Greenhouse: <span className="text-emerald-400">Help Us Grow</span>
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-text-secondary text-lg">
             Found a bug? Have an idea for a new feature? Plant your thoughts here.
           </p>
         </div>
       </div>
 
-      <div className="bg-[#161926]/50 backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div className="bg-surface/50 backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute -top-24 -right-24 size-48 bg-indigo-500/10 blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 size-48 bg-emerald-500/10 blur-[100px] pointer-events-none" />
@@ -27,7 +27,7 @@ export default function GreenhousePage() {
       </div>
       
       <div className="mt-12 text-center">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-text-secondary">
           ReMember Me Beta &bull; Greenhouse V1.0
         </p>
       </div>

@@ -184,9 +184,9 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         className="fixed inset-0 z-[2000] bg-black/50 overflow-y-auto backdrop-blur-sm flex items-center justify-center"
         onClick={onClose}
       >
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 flex flex-col items-center">
+        <div className="bg-canvas rounded-2xl p-8 flex flex-col items-center">
           <RefreshCw className="w-8 h-8 animate-spin text-indigo-500 mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading meeting details...</p>
+          <p className="text-text-secondary">Loading meeting details...</p>
         </div>
       </div>
     );
@@ -199,7 +199,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         className="fixed inset-0 z-[2000] bg-black/50 overflow-y-auto backdrop-blur-sm flex items-center justify-center"
         onClick={onClose}
       >
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 text-center max-w-md mx-4">
+        <div className="bg-canvas rounded-2xl p-8 text-center max-w-md mx-4">
           <p className="text-red-500 mb-4">{error || 'Meeting not found'}</p>
           <Button onClick={onClose}>Close</Button>
         </div>
@@ -222,32 +222,32 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-[800px] mx-auto min-h-screen md:min-h-0 md:my-8 bg-white dark:bg-gray-900 md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-[800px] mx-auto min-h-screen md:min-h-0 md:my-8 bg-canvas md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
 
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-4 md:px-8 md:py-6 flex justify-between items-center shadow-sm">
+        <div className="sticky top-0 z-10 bg-canvas border-b border-border-default px-4 py-4 md:px-8 md:py-6 flex justify-between items-center shadow-sm">
           <button
             onClick={onClose}
-            className="flex items-center gap-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-medium transition-colors"
+            className="flex items-center gap-1 px-3 py-2 bg-subtle hover:bg-subtle rounded-lg text-text-tertiary font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back</span>
           </button>
 
-          <h1 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-lg md:text-2xl font-bold text-text-primary flex items-center gap-2">
             Meeting Prep
           </h1>
 
           <button
             onClick={onClose}
-            className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-colors"
+            className="p-2 bg-subtle hover:bg-subtle rounded-lg text-text-tertiary transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Meeting Info Banner */}
-        <div className="px-8 py-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-800 border-b-2 border-indigo-500 flex gap-6 items-center">
+        <div className="px-8 py-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-surface dark:to-surface border-b-2 border-indigo-500 flex gap-6 items-center">
           {contact?.photo_url || primaryContact?.photo ? (
             <img
               src={contact?.photo_url || primaryContact?.photo || ''}
@@ -260,10 +260,10 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
             </div>
           )}
           <div className="flex-1">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-3xl font-bold text-text-primary mb-3">
               Meeting with {displayName}
             </h2>
-            <div className="flex flex-wrap gap-4 text-gray-600 dark:text-gray-300 font-medium text-sm md:text-base mb-3">
+            <div className="flex flex-wrap gap-4 text-text-tertiary font-medium text-sm md:text-base mb-3">
               <span className="flex items-center gap-1.5" suppressHydrationWarning>
                 {mounted ? formatCalendarTime(event.start.dateTime) : '--:--'}
               </span>
@@ -289,21 +289,21 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         </div>
 
         {/* Quick Context Bar */}
-        <div className="flex flex-wrap gap-4 px-8 py-6 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex flex-wrap gap-4 px-8 py-6 bg-canvas border-b border-border-default">
           {contact?.last_interaction_date && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 font-medium shadow-sm">
-              <MessageSquare className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-surface border border-border-strong rounded-xl text-text-tertiary font-medium shadow-sm">
+              <MessageSquare className="w-4 h-4 text-text-secondary" />
               <span>Last spoke: {getDaysAgo(contact.last_interaction_date)} days ago</span>
             </div>
           )}
           {meeting.matchedContacts.length > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 font-medium shadow-sm">
-              <Users className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-surface border border-border-strong rounded-xl text-text-tertiary font-medium shadow-sm">
+              <Users className="w-4 h-4 text-text-secondary" />
               <span>{meeting.matchedContacts.length} contact{meeting.matchedContacts.length !== 1 ? 's' : ''} matched</span>
             </div>
           )}
           {contact?.importance && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 font-medium shadow-sm capitalize">
+            <div className="flex items-center gap-2 px-4 py-2 bg-surface border border-border-strong rounded-xl text-text-tertiary font-medium shadow-sm capitalize">
               {contact.importance} priority
             </div>
           )}
@@ -311,24 +311,24 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
 
         {/* The Story - only show if we have contact details */}
         {contact && (contact.where_met || contact.why_stay_in_contact || contact.most_important_to_them) && (
-          <div className="px-8 py-8 border-b border-gray-100 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <div className="px-8 py-8 border-b border-border-default">
+            <h3 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
               The Story
             </h3>
 
             <div className="grid gap-6">
               {/* Where We Met */}
               {contact.where_met && (
-                <div className="flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 p-5 bg-canvas rounded-2xl border border-border-default">
                   <div className="text-2xl mt-1">📍</div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Where We Met</h4>
-                    <p className="text-base text-gray-900 dark:text-white mb-1 font-medium">
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">Where We Met</h4>
+                    <p className="text-base text-text-primary mb-1 font-medium">
                       {contact.where_met}
                       {contact.when_met && ` - ${contact.when_met}`}
                     </p>
                     {contact.who_introduced && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 italic">Introduced by {contact.who_introduced}</p>
+                      <p className="text-sm text-text-secondary italic">Introduced by {contact.who_introduced}</p>
                     )}
                   </div>
                 </div>
@@ -336,43 +336,43 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
 
               {/* What Found Interesting */}
               {contact.what_found_interesting && (
-                <div className="flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 p-5 bg-canvas rounded-2xl border border-border-default">
                   <div className="text-2xl mt-1">💭</div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">What I Found Interesting</h4>
-                    <p className="text-gray-700 dark:text-gray-300">{contact.what_found_interesting}</p>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">What I Found Interesting</h4>
+                    <p className="text-text-tertiary">{contact.what_found_interesting}</p>
                   </div>
                 </div>
               )}
 
               {/* Why Stay in Contact */}
               {contact.why_stay_in_contact && (
-                <div className="flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 p-5 bg-canvas rounded-2xl border border-border-default">
                   <div className="text-2xl mt-1">❤️</div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Why Stay in Contact</h4>
-                    <p className="text-gray-900 dark:text-gray-200">{contact.why_stay_in_contact}</p>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">Why Stay in Contact</h4>
+                    <p className="text-text-primary">{contact.why_stay_in_contact}</p>
                   </div>
                 </div>
               )}
 
               {/* What Matters to Them */}
               {contact.most_important_to_them && (
-                <div className="flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 p-5 bg-canvas rounded-2xl border border-border-default">
                   <div className="text-2xl mt-1">⭐</div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">What Matters to Them</h4>
-                    <p className="text-gray-700 dark:text-gray-300">{contact.most_important_to_them}</p>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">What Matters to Them</h4>
+                    <p className="text-text-tertiary">{contact.most_important_to_them}</p>
                   </div>
                 </div>
               )}
 
               {/* Interests */}
               {contact.interests && contact.interests.length > 0 && (
-                <div className="flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 p-5 bg-canvas rounded-2xl border border-border-default">
                   <div className="text-2xl mt-1">🎯</div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Interests</h4>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">Interests</h4>
                     <div className="flex flex-wrap gap-2">
                       {contact.interests.map((interest, i) => (
                         <span key={i} className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">
@@ -389,13 +389,13 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
 
         {/* Last Contact */}
         {contact?.last_interaction_date && (
-          <div className="px-8 py-8 border-b border-gray-100 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <div className="px-8 py-8 border-b border-border-default">
+            <h3 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
               Last Contact
             </h3>
             <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl">
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-600 rounded-lg text-emerald-800 dark:text-emerald-400 text-sm font-bold">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface border border-emerald-200 dark:border-emerald-600 rounded-lg text-emerald-800 dark:text-emerald-400 text-sm font-bold">
                   {contact.last_contact_method === 'phone' ? <Phone className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
                   <span className="capitalize">{contact.last_contact_method || 'Contact'}</span>
                 </span>
@@ -404,7 +404,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
                 </span>
               </div>
               {contact.notes && (
-                <div className="p-4 bg-white dark:bg-gray-800 rounded-xl text-emerald-900 dark:text-emerald-300 italic border border-emerald-100 dark:border-emerald-700">
+                <div className="p-4 bg-surface rounded-xl text-emerald-900 dark:text-emerald-300 italic border border-emerald-100 dark:border-emerald-700">
                   &quot;{contact.notes}&quot;
                 </div>
               )}
@@ -415,13 +415,13 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         {/* Conversation Starters */}
         <div className="px-8 py-8 mx-8 my-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-2 border-amber-300 dark:border-amber-600 rounded-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-xl font-bold text-text-primary flex items-center gap-2">
               Conversation Starters
             </h3>
             <button
               onClick={generateStarters}
               disabled={isGeneratingStarters}
-              className="px-3 py-1 text-sm bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              className="px-3 py-1 text-sm bg-surface text-text-accent border border-indigo-300 dark:border-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-subtle disabled:opacity-50 transition-colors"
             >
               {isGeneratingStarters ? 'Generating...' : 'Regenerate'}
             </button>
@@ -430,18 +430,18 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
           {isGeneratingStarters ? (
             <div className="py-8 text-center flex flex-col items-center justify-center">
               <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+              <p className="text-sm text-text-secondary font-medium">
                 Generating personalized questions...
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               {conversationStarters.map((starter, i) => (
-                <div key={i} className="flex gap-4 items-start p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-amber-100 dark:border-amber-700">
+                <div key={i} className="flex gap-4 items-start p-4 bg-surface rounded-xl shadow-sm border border-amber-100 dark:border-amber-700">
                   <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-amber-400 text-white font-bold rounded-full">
                     {i + 1}
                   </span>
-                  <p className="text-gray-900 dark:text-gray-100 pt-1 text-lg">{starter}</p>
+                  <p className="text-text-primary pt-1 text-lg">{starter}</p>
                 </div>
               ))}
             </div>
@@ -449,7 +449,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
         </div>
 
         {/* Footer Actions */}
-        <div className="px-8 py-8 flex gap-4 flex-wrap bg-gray-50 dark:bg-gray-800">
+        <div className="px-8 py-8 flex gap-4 flex-wrap bg-canvas">
           {contact?.id && (
             <Button
               onClick={() => {
@@ -464,7 +464,7 @@ export function MeetingPrepOverlayReal({ meetingId, isOpen, onClose }: MeetingPr
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+            className="flex-1 min-w-[200px] h-12 text-base font-semibold bg-surface dark:text-text-primary dark:border-border-strong dark:hover:bg-subtle"
           >
             Close
           </Button>

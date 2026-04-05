@@ -20,7 +20,7 @@ export function ContactRow({ contact }: ContactRowProps) {
   return (
     <Link 
       href={`/people/${contact.id}`}
-      className="group grid grid-cols-[auto_1fr_200px_180px_160px] gap-6 items-center px-6 py-[18px] border-b border-[#1a1f2e] hover:bg-[#1a1f2e] transition-all duration-200 cursor-pointer"
+      className="group grid grid-cols-[auto_1fr_200px_180px_160px] gap-6 items-center px-6 py-[18px] border-b border-surface hover:bg-surface transition-all duration-200 cursor-pointer"
     >
       {/* Column 1: Avatar */}
       <div className="relative">
@@ -28,11 +28,11 @@ export function ContactRow({ contact }: ContactRowProps) {
           {!isAvatarEmoji && contact.avatar_url && (
             <AvatarImage src={contact.avatar_url} alt={contact.name} />
           )}
-          <AvatarFallback className="bg-[#2d3748] text-white text-[17px] font-semibold">
+          <AvatarFallback className="bg-elevated text-text-primary text-[17px] font-semibold">
             {isAvatarEmoji ? <span className="text-[22px]">{contact.avatar_url}</span> : initials}
           </AvatarFallback>
         </Avatar>
-        <div className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] bg-[#0a0e1a] rounded-full flex items-center justify-center text-[11px] border-2 border-[#0a0e1a]">
+        <div className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] bg-canvas rounded-full flex items-center justify-center text-[11px] border-2 border-canvas">
           {relationshipEmoji}
         </div>
       </div>

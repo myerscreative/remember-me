@@ -17,21 +17,21 @@ function GameHeaderComponent({ score, streak, timeLeft, onBack, title, icon }: G
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={onBack}
-          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition"
+          className="p-2 text-text-tertiary hover:text-text-primary hover:bg-surface rounded-lg transition"
         >
            <ArrowLeft className="w-6 h-6" />
         </button>
 
         <div className="flex items-center gap-4">
            {title && (
-               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-slate-700 font-bold">
+               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-surface rounded-xl shadow-sm text-text-tertiary font-bold">
                    {icon && <span>{icon}</span>}
                    {title}
                </div>
            )}
 
-          <div className="px-4 py-2 bg-white rounded-xl shadow-sm min-w-[100px] text-center">
-            <span className="text-xs text-slate-500 uppercase font-bold block">Score</span>
+          <div className="px-4 py-2 bg-surface rounded-xl shadow-sm min-w-[100px] text-center">
+            <span className="text-xs text-text-secondary uppercase font-bold block">Score</span>
             <div className="text-xl font-bold text-indigo-600">{score}</div>
           </div>
           
@@ -44,8 +44,8 @@ function GameHeaderComponent({ score, streak, timeLeft, onBack, title, icon }: G
           )}
 
            {timeLeft !== undefined && (
-            <div className={cn("min-w-[80px] rounded-xl px-4 py-2 text-center shadow-sm", timeLeft <= 10 ? "animate-pulse border border-red-200 bg-red-50 text-red-600" : "bg-white text-slate-700")}>
-              <span className="text-xs text-slate-500 uppercase font-bold block">Time</span>
+            <div className={cn("min-w-[80px] rounded-xl px-4 py-2 text-center shadow-sm", timeLeft <= 10 ? "animate-pulse border border-red-200 bg-red-50 text-red-600" : "bg-surface text-text-tertiary")}>
+              <span className="text-xs text-text-secondary uppercase font-bold block">Time</span>
               <div className="text-xl font-bold">{timeLeft}s</div>
             </div>
           )}

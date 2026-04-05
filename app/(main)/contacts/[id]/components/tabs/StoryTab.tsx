@@ -103,7 +103,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
       icon: <Map className="w-5 h-5" />,
       content: localContent.where_met,
       placeholder: "College? A mutual friend's wedding? The office?",
-      cardColor: 'bg-purple-950/40 text-purple-100 border-slate-200 dark:border-slate-600',
+      cardColor: 'bg-purple-950/40 text-purple-100 border-border-default',
       fieldKey: 'where_met',
     },
     {
@@ -111,7 +111,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
       icon: <HeartHandshake className="w-5 h-5 text-indigo-300" />,
       content: localContent.why_stay_in_contact,
       placeholder: 'Shared values? They always make me laugh?',
-      cardColor: 'bg-indigo-950/40 text-indigo-100 border-slate-200 dark:border-slate-600',
+      cardColor: 'bg-indigo-950/40 text-indigo-100 border-border-default',
       fieldKey: 'why_stay_in_contact',
     },
     {
@@ -119,7 +119,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
       icon: <BookOpen className="w-5 h-5 text-teal-300" />,
       content: localContent.most_important_to_them,
       placeholder: 'Their kids? Career growth? Sustainability?',
-      cardColor: 'bg-teal-950/40 text-teal-100 border-slate-200 dark:border-slate-600',
+      cardColor: 'bg-teal-950/40 text-teal-100 border-border-default',
       fieldKey: 'most_important_to_them',
     },
   ];
@@ -196,8 +196,8 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
       {/* AI Synopsis Hero Section */}
       <div
         className={cn(
-          'rounded-xl p-5 mb-6 border border-slate-200 dark:border-slate-700',
-          'bg-indigo-50 dark:bg-slate-800',
+          'rounded-xl p-5 mb-6 border border-border-default',
+          'bg-accent-muted',
           heroBorderGlow
         )}
       >
@@ -234,9 +234,9 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
                 }
               }}
               className={cn(
-                'group rounded-xl p-4 border border-slate-200 dark:border-slate-600 shadow-sm transition-colors cursor-pointer min-w-0',
+                'group rounded-xl p-4 border border-border-default shadow-sm transition-colors cursor-pointer min-w-0',
                 card.cardColor,
-                !isEditing && 'hover:bg-slate-800/50 hover:border-indigo-500/50'
+                !isEditing && 'hover:bg-subtle/50 hover:border-indigo-500/50'
               )}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
@@ -262,7 +262,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
                     'w-full min-w-0 max-w-full p-0 text-base leading-relaxed resize-none',
                     'bg-transparent border-0 rounded-none shadow-none',
                     'focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none',
-                    'placeholder:text-slate-500/80',
+                    'placeholder:text-text-secondary/80',
                     'min-h-[80px] overflow-y-auto overflow-x-hidden'
                   )}
                   autoFocus
@@ -270,7 +270,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
                   rows={4}
                 />
               ) : isEmpty ? (
-                <p className="text-slate-500 italic text-sm leading-relaxed flex items-center gap-2">
+                <p className="text-text-secondary italic text-sm leading-relaxed flex items-center gap-2">
                   <Plus className="h-4 w-4 shrink-0" />
                   <span>{card.placeholder}</span>
                 </p>
@@ -286,28 +286,28 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
 
       {/* Shared Memories Feed */}
       <div className="flex flex-col">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 ml-2">
+        <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-6 ml-2">
           Shared Memories
         </h3>
 
         {memories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-dashed border-slate-700 rounded-xl bg-slate-900/50">
-            <p className="text-slate-400 text-sm leading-relaxed">
+          <div className="flex flex-col items-center justify-center py-12 px-6 text-center border border-dashed border-border-default rounded-xl bg-canvas/50">
+            <p className="text-text-secondary text-sm leading-relaxed">
               The Story begins here.
               <br />
               Add a shared memory to deepen the connection.
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6 border-l-2 border-slate-800 ml-4 pl-4 relative">
+          <div className="flex flex-col gap-6 border-l-2 border-border-default ml-4 pl-4 relative">
             {memories
               .sort((a, b) => b.date.getTime() - a.date.getTime())
               .map((memory) => (
                 <div key={memory.id} className="relative">
                   <div
                     className={cn(
-                      'absolute -left-[23px] top-4 w-3 h-3 rounded-full border-2 border-slate-950 z-10',
-                      memory.isMilestone ? 'bg-indigo-500 scale-125' : 'bg-slate-600'
+                      'absolute -left-[23px] top-4 w-3 h-3 rounded-full border-2 border-canvas z-10',
+                      memory.isMilestone ? 'bg-indigo-500 scale-125' : 'bg-subtle'
                     )}
                   />
 
@@ -319,12 +319,12 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
 
                   <div
                     className={cn(
-                      'rounded-xl p-4 border border-slate-200 dark:border-slate-600 bg-slate-900',
-                      memory.isMilestone && 'shadow-[0_0_20px_rgba(99,102,241,0.15)] bg-slate-900/90'
+                      'rounded-xl p-4 border border-border-default bg-canvas',
+                      memory.isMilestone && 'shadow-[0_0_20px_rgba(99,102,241,0.15)] bg-canvas/90'
                     )}
                   >
                     <div className="flex items-center justify-between mb-3 gap-2">
-                      <span className="text-xs font-medium text-slate-400">
+                      <span className="text-xs font-medium text-text-secondary">
                         {memory.date.toLocaleDateString(undefined, {
                           year: 'numeric',
                           month: 'short',
@@ -349,7 +349,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
                     </div>
 
                     {memory.imageUrl && (
-                      <div className="mb-4 rounded-lg overflow-hidden border border-slate-800">
+                      <div className="mb-4 rounded-lg overflow-hidden border border-border-default">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={memory.imageUrl}
@@ -363,7 +363,7 @@ export function StoryTab({ contact, synopsis }: StoryTabProps) {
                       </div>
                     )}
 
-                    <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                    <p className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
                       {memory.text}
                     </p>
                   </div>

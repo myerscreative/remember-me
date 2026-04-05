@@ -24,7 +24,7 @@ const INTERACTION_ICONS: Record<InteractionType, React.ElementType> = {
 export function HistoryTimeline({ history, onCopy, isLoading }: HistoryTimelineProps) {
   if (isLoading) {
     return (
-        <div className="flex flex-col items-center justify-center h-48 space-y-3 text-slate-500">
+        <div className="flex flex-col items-center justify-center h-48 space-y-3 text-text-secondary">
             <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
             <span className="text-xs font-medium tracking-wide">Retrieving memory...</span>
         </div>
@@ -33,7 +33,7 @@ export function HistoryTimeline({ history, onCopy, isLoading }: HistoryTimelineP
 
   if (history.length === 0) {
     return (
-        <div className="flex flex-col items-center justify-center h-48 text-slate-500 text-sm italic opacity-60">
+        <div className="flex flex-col items-center justify-center h-48 text-text-secondary text-sm italic opacity-60">
             <Sparkles className="h-8 w-8 mb-2 opacity-20" />
             <p>No history found yet.</p>
             <p className="text-xs">Start your gardening! 🌱</p>

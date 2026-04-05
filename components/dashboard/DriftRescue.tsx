@@ -107,16 +107,16 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
           )}
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-xl bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto p-0">
+      <SheetContent side="right" className="w-full sm:max-w-xl bg-canvas border-l border-border-default overflow-y-auto p-0">
         <div className="flex flex-col h-full">
-            <SheetHeader className="p-6 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-md sticky top-0 z-10">
+            <SheetHeader className="p-6 border-b border-border-default bg-surface/50 backdrop-blur-md sticky top-0 z-10">
                 <div className="flex items-center gap-3 mb-1">
                     <div className="p-2 bg-rose-500/10 rounded-lg">
                         <Heart className="h-5 w-5 text-rose-500" />
                     </div>
-                    <SheetTitle className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Connection Revival</SheetTitle>
+                    <SheetTitle className="text-2xl font-black text-text-primary uppercase tracking-tighter">Connection Revival</SheetTitle>
                 </div>
-                <SheetDescription className="text-slate-500 font-medium">
+                <SheetDescription className="text-text-secondary font-medium">
                     {activeContacts.length} connections currently drifting. Send a &quot;Low-Stakes Ping&quot; to reset the decay timer.
                 </SheetDescription>
             </SheetHeader>
@@ -125,15 +125,15 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <RefreshCw className="h-8 w-8 text-indigo-500 animate-spin" />
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Scanning Shared Lore...</p>
+                        <p className="text-xs font-black text-text-secondary uppercase tracking-widest">Scanning Shared Lore...</p>
                     </div>
                 ) : activeContacts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
                         <div className="p-6 bg-emerald-500/10 rounded-full mb-4">
                             <CheckCircle2 className="h-12 w-12 text-emerald-500" />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Garden is Nurtured</h3>
-                        <p className="text-sm text-slate-500 max-w-xs mt-1">
+                        <h3 className="text-xl font-black text-text-primary uppercase tracking-tight">Garden is Nurtured</h3>
+                        <p className="text-sm text-text-secondary max-w-xs mt-1">
                             No drifting contacts found. Your core relationships are currently stable.
                         </p>
                     </div>
@@ -148,7 +148,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                 exit={{ opacity: 0, x: 20, scale: 0.95 }}
                                 transition={{ duration: 0.3, delay: index * 0.05 }}
                             >
-                                <Card className="p-5 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative">
+                                <Card className="p-5 bg-surface border-border-default shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative">
                                     <div className="absolute inset-x-0 bottom-4 flex justify-center pointer-events-none z-50">
                                       <BloomEffect 
                                         isActive={rescuedId === contact.id} 
@@ -157,20 +157,20 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                     </div>
                                     <div className="flex justify-between items-start mb-4 relative z-10">
                                         <div>
-                                            <h4 className="text-lg font-black text-slate-900 dark:text-white leading-none mb-1">{contact.name}</h4>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                            <h4 className="text-lg font-black text-text-primary leading-none mb-1">{contact.name}</h4>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary uppercase tracking-widest">
                                                 <Clock className="h-3 w-3" />
                                                 Last interacted: {contact.lastInteractionDate ? new Date(contact.lastInteractionDate).toLocaleDateString() : 'Unknown'}
                                             </div>
                                         </div>
-                                        <div className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 rounded text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-tighter border border-indigo-100 dark:border-indigo-800">
+                                        <div className="px-2 py-0.5 bg-accent-muted rounded text-text-accent text-[10px] font-black uppercase tracking-tighter border border-indigo-100 dark:border-indigo-800">
                                             {contact.memoryDensity} Shared Memories
                                         </div>
                                     </div>
 
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 mb-6 relative group">
+                                    <div className="p-4 bg-canvas rounded-xl border border-border-default mb-6 relative group">
                                         <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <p className="text-sm text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed">
+                                        <p className="text-sm text-text-tertiary italic font-medium leading-relaxed">
                                             &quot;{contact.suggestedHook}&quot;
                                         </p>
                                     </div>
@@ -187,7 +187,7 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                                         <Button 
                                             variant="outline"
                                             onClick={() => handleSkip(contact.id)}
-                                            className="border-slate-200 dark:border-slate-700 text-slate-500 font-black uppercase tracking-widest"
+                                            className="border-border-default text-text-secondary font-black uppercase tracking-widest"
                                         >
                                             Skip
                                         </Button>
@@ -201,8 +201,8 @@ export function DriftRescue({ initialContacts, defaultOpen = false }: DriftRescu
                 )}
             </div>
 
-            <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm">
-                <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest">
+            <div className="p-6 border-t border-border-default bg-surface/50 backdrop-blur-sm">
+                <p className="text-[10px] text-center text-text-secondary font-bold uppercase tracking-widest">
                     AI generated hooks are optimized for resonance and zero-burden response.
                 </p>
             </div>

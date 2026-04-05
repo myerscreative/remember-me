@@ -67,22 +67,22 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
 
   return (
-    <div className="relative w-full bg-linear-to-b from-[#111322] to-[#1a1b2e] pb-8 pt-4 rounded-b-[32px] shadow-2xl">
+    <div className="relative w-full bg-linear-to-b from-canvas to-surface pb-8 pt-4 rounded-b-[32px] shadow-2xl">
       
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center px-6 mb-6">
          <BackButton
             fallbackHref="/"
-            className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors"
+            className="p-2 -ml-2 text-text-secondary hover:text-text-primary transition-colors"
             size="icon"
          >
             <ChevronLeft size={28} />
          </BackButton>
          <div className="flex gap-4">
-            <button onClick={onToggleFavorite} className="text-gray-400 hover:text-yellow-400 transition-colors">
+            <button onClick={onToggleFavorite} className="text-text-secondary hover:text-yellow-400 transition-colors">
                 <Star size={24} className={cn(contact.is_favorite && "fill-yellow-400 text-yellow-400")} />
             </button>
-            <button onClick={onEdit} className="text-gray-400 hover:text-white transition-colors">
+            <button onClick={onEdit} className="text-text-secondary hover:text-text-primary transition-colors">
                 <Edit2 size={24} />
             </button>
          </div>
@@ -97,15 +97,15 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
            
            {/* Ring Container */}
            <div 
-                className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-[#1a1b2e]"
+                className="relative w-[140px] h-[140px] rounded-full flex items-center justify-center bg-surface"
                 style={{ border: `4px solid ${health.color}40` }}
            >
                {/* Active Ring Segment */}
                <div className="absolute inset-0 rounded-full" style={{ border: `4px solid ${health.color}` }} />
 
-               <Avatar className="w-[124px] h-[124px] border-4 border-[#1a1b2e]">
+               <Avatar className="w-[124px] h-[124px] border-4 border-surface">
                  <AvatarImage src={optimisticPhotoUrl || contact.photo_url || ''} className="object-cover" />
-                 <AvatarFallback className="text-4xl font-bold bg-[#242642] text-white">
+                 <AvatarFallback className="text-4xl font-bold bg-elevated text-text-primary">
                    {getInitials(contact.first_name, contact.last_name)}
                  </AvatarFallback>
                </Avatar>
@@ -114,11 +114,11 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
                <Popover>
                  <PopoverTrigger asChild>
                    <div 
-                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-[#1a1b2e] cursor-pointer" 
+                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-surface cursor-pointer" 
                         style={{ backgroundColor: health.color }} 
                    />
                  </PopoverTrigger>
-                 <PopoverContent side="bottom" sideOffset={8} className="w-64 text-sm bg-slate-900 border-slate-800 text-slate-300">
+                 <PopoverContent side="bottom" sideOffset={8} className="w-64 text-sm bg-canvas border-border-default text-text-tertiary">
                    Relationship Health: {health.label}. This is based on the frequency and quality of your recent interactions.
                  </PopoverContent>
                </Popover>
@@ -132,10 +132,10 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
 
         {/* Identity Section */}
         <div className="text-center space-y-1 mb-8">
-           <h1 className="text-3xl font-bold text-white tracking-tight">
+           <h1 className="text-3xl font-bold text-text-primary tracking-tight">
              {contact.first_name} {contact.last_name}
            </h1>
-           <div className="text-[10px] text-slate-400 font-medium">Score: 0</div>
+           <div className="text-[10px] text-text-secondary font-medium">Score: 0</div>
            
            {contact.birthday && (
              <div className="flex items-center justify-center gap-2 text-[#818cf8] font-medium">
@@ -145,8 +145,8 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
            )}
 
            <div className="pt-2">
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#242642] border border-white/5 text-gray-300 text-sm font-medium">
-                <Calendar size={14} className="text-gray-400" />
+             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-elevated border border-white/5 text-text-tertiary text-sm font-medium">
+                <Calendar size={14} className="text-text-secondary" />
                 <span>{frequencyLabel} Cadence</span>
              </div>
            </div>
@@ -157,51 +157,51 @@ export function PersonHeader({ contact, onEdit, onToggleFavorite, onAvatarClick 
             {/* Call */}
             {contact.phone ? (
               <a href={`tel:${contact.phone.replace(/\D/g, '')}`}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
                   <Phone size={24} />
-                  <span className="text-sm font-medium text-gray-300">Call</span>
+                  <span className="text-sm font-medium text-text-tertiary">Call</span>
               </a>
             ) : (
               <button onClick={() => toast.error('No phone number saved')}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated/50 opacity-50 text-text-secondary"
               >
                   <Phone size={24} />
-                  <span className="text-sm font-medium text-gray-300">Call</span>
+                  <span className="text-sm font-medium text-text-tertiary">Call</span>
               </button>
             )}
 
             {/* Email */}
             {contact.email ? (
               <a href={`mailto:${contact.email}`}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
-                  <Mail size={24} className="text-indigo-300" />
-                  <span className="text-sm font-medium text-gray-300">Email</span>
+                  <Mail size={24} className="text-text-accent" />
+                  <span className="text-sm font-medium text-text-tertiary">Email</span>
               </a>
             ) : (
               <button onClick={() => toast.error('No email saved')}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated/50 opacity-50 text-text-secondary"
               >
                   <Mail size={24} />
-                  <span className="text-sm font-medium text-gray-300">Email</span>
+                  <span className="text-sm font-medium text-text-tertiary">Email</span>
               </button>
             )}
 
             {/* Text */}
             {contact.phone ? (
               <a href={`sms:${contact.phone.replace(/\D/g, '')}`}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642] hover:bg-[#2e3152] active:scale-95 text-indigo-300"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated hover:bg-subtle active:scale-95 text-text-accent"
               >
                   <MessageSquare size={24} />
-                  <span className="text-sm font-medium text-gray-300">Text</span>
+                  <span className="text-sm font-medium text-text-tertiary">Text</span>
               </a>
             ) : (
               <button onClick={() => toast.error('No phone number saved')}
-                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-[#242642]/50 opacity-50 text-gray-500"
+                 className="flex flex-col items-center justify-center gap-2 py-5 rounded-2xl transition-all duration-200 bg-elevated/50 opacity-50 text-text-secondary"
               >
                   <MessageSquare size={24} />
-                  <span className="text-sm font-medium text-gray-300">Text</span>
+                  <span className="text-sm font-medium text-text-tertiary">Text</span>
               </button>
             )}
         </div>

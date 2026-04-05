@@ -120,7 +120,7 @@ export function LinkConnectionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-[#0f1419] border-slate-800 text-slate-100">
+      <DialogContent className="sm:max-w-md bg-canvas border-border-default text-text-primary">
         <DialogHeader>
           <DialogTitle>Link a Connection</DialogTitle>
         </DialogHeader>
@@ -130,19 +130,19 @@ export function LinkConnectionModal({
             /* SEARCH STATE */
             <div className="flex flex-col gap-4">
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-text-secondary" />
                 <Input
                   placeholder="Search for a person..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 bg-[#1a1f2e] border-slate-700 text-slate-100 focus:ring-violet-500"
+                  className="pl-9 bg-surface border-border-default text-text-primary focus:ring-violet-500"
                   autoFocus
                 />
               </div>
 
               <div className="flex flex-col gap-2 min-h-[200px]">
                 {isSearching ? (
-                  <div className="flex items-center justify-center h-20 text-slate-500">
+                  <div className="flex items-center justify-center h-20 text-text-secondary">
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
                     Searching...
                   </div>
@@ -151,29 +151,29 @@ export function LinkConnectionModal({
                     <button
                       key={person.id}
                       onClick={() => setSelectedPerson(person)}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#1a1f2e] transition-colors text-left group"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface transition-colors text-left group"
                     >
-                      <Avatar className="h-10 w-10 border border-slate-700">
+                      <Avatar className="h-10 w-10 border border-border-default">
                         <AvatarImage src={person.photo_url || undefined} alt={person.name} />
-                        <AvatarFallback className="bg-slate-800 text-slate-300">
+                        <AvatarFallback className="bg-surface text-text-tertiary">
                           {getInitials(person.first_name, person.last_name)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <div className="font-medium text-slate-200 group-hover:text-white">{person.name}</div>
+                        <div className="font-medium text-text-primary group-hover:text-text-primary">{person.name}</div>
                         {person.company && (
-                          <div className="text-xs text-slate-500">{person.company}</div>
+                          <div className="text-xs text-text-secondary">{person.company}</div>
                         )}
                       </div>
-                      <UserPlus className="h-4 w-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <UserPlus className="h-4 w-4 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   ))
                 ) : searchTerm ? (
-                  <div className="text-center py-8 text-slate-500 text-sm">
+                  <div className="text-center py-8 text-text-secondary text-sm">
                     No people found matching &quot;{searchTerm}&quot;
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-slate-600 text-sm">
+                  <div className="text-center py-8 text-text-tertiary text-sm">
                     Type to search your contacts
                   </div>
                 )}
@@ -182,29 +182,29 @@ export function LinkConnectionModal({
           ) : (
             /* SELECTION STATE */
             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="flex items-center gap-4 bg-[#1a1f2e] p-4 rounded-xl border border-slate-700">
-                <Avatar className="h-12 w-12 border-2 border-slate-600">
+              <div className="flex items-center gap-4 bg-surface p-4 rounded-xl border border-border-default">
+                <Avatar className="h-12 w-12 border-2 border-border-strong">
                   <AvatarImage src={selectedPerson.photo_url || undefined} alt={selectedPerson.name} />
-                  <AvatarFallback className="bg-slate-800 text-slate-300">
+                  <AvatarFallback className="bg-surface text-text-tertiary">
                     {getInitials(selectedPerson.first_name, selectedPerson.last_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <div className="font-medium text-lg text-white">{selectedPerson.name}</div>
-                  <div className="text-sm text-slate-400">Selected Contact</div>
+                  <div className="font-medium text-lg text-text-primary">{selectedPerson.name}</div>
+                  <div className="text-sm text-text-secondary">Selected Contact</div>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setSelectedPerson(null)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700"
+                  className="text-text-secondary hover:text-text-primary hover:bg-subtle"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               <div className="space-y-3">
-                <label className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+                <label className="text-sm font-medium text-text-secondary uppercase tracking-wider">
                   Relationship to {currentContactName}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -216,7 +216,7 @@ export function LinkConnectionModal({
                         p-3 rounded-lg text-sm font-medium transition-all border
                         ${relationshipType === type 
                           ? "bg-violet-600/20 border-violet-500 text-violet-200 shadow-[0_0_15px_rgba(124,58,237,0.3)]" 
-                          : "bg-[#1a1f2e] border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+                          : "bg-surface border-border-default text-text-secondary hover:border-border-strong hover:text-text-primary"
                         }
                       `}
                     >
@@ -226,8 +226,8 @@ export function LinkConnectionModal({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
-                <Button variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-slate-400 hover:text-white">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border-default">
+                <Button variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-text-secondary hover:text-text-primary">
                   Cancel
                 </Button>
                 <Button 

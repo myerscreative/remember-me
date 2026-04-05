@@ -84,7 +84,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
 
   if (gameStatus === 'complete') {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
         <ResultsScreen
           score={score}
           correctAnswers={correctAnswers}
@@ -99,13 +99,13 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
   }
 
   if (!currentQuestion) return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <p className="text-white">Loading...</p>
+    <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <p className="text-text-primary">Loading...</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4">
+    <div className="min-h-screen bg-canvas text-text-primary p-4">
       <GameHeader
         score={score}
         streak={streak}
@@ -150,14 +150,14 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
               scale: { duration: 0.5 }
             }}
           >
-            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-slate-800 transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-slate-700")}>
+            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-surface transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-border-default")}>
               {currentQuestion.contactA.photoUrl ? (
                 <img src={currentQuestion.contactA.photoUrl} alt={currentQuestion.contactA.name} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-2xl font-bold">{currentQuestion.contactA.firstName[0]}</span>
               )}
             </div>
-            <p className="text-center mt-2 font-bold text-sm bg-slate-800/80 px-2 py-1 rounded-lg backdrop-blur-sm">
+            <p className="text-center mt-2 font-bold text-sm bg-surface/80 px-2 py-1 rounded-lg backdrop-blur-sm">
               {currentQuestion.contactA.name}
             </p>
           </motion.div>
@@ -174,14 +174,14 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
               scale: { duration: 0.5 }
             }}
           >
-            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-slate-800 transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-slate-700")}>
+            <div className={cn("flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 bg-surface transition-colors duration-300", showFeedback && currentQuestion.options[selectedAnswer!] === currentQuestion.correctAnswer ? "border-green-500 shadow-[0_0_20px_#22c55e]" : "border-border-default")}>
               {currentQuestion.contactB.photoUrl ? (
                 <img src={currentQuestion.contactB.photoUrl} alt={currentQuestion.contactB.name} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-2xl font-bold">{currentQuestion.contactB.firstName[0]}</span>
               )}
             </div>
-             <p className="text-center mt-2 font-bold text-sm bg-slate-800/80 px-2 py-1 rounded-lg backdrop-blur-sm">
+             <p className="text-center mt-2 font-bold text-sm bg-surface/80 px-2 py-1 rounded-lg backdrop-blur-sm">
               {currentQuestion.contactB.name}
             </p>
           </motion.div>
@@ -222,10 +222,10 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
 
         {/* Question Prompt */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black text-white mb-2 tracking-tight">
+          <h2 className="text-3xl font-black text-text-primary mb-2 tracking-tight">
             How are {currentQuestion.contactA.firstName} and {currentQuestion.contactB.firstName} connected?
           </h2>
-          <p className="text-slate-400 font-medium italic">Identify the link to nurture their connection.</p>
+          <p className="text-text-secondary font-medium italic">Identify the link to nurture their connection.</p>
         </div>
 
         {/* Choice Buttons */}
@@ -234,7 +234,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
             const isCorrect = option === currentQuestion.correctAnswer;
             const isSelected = selectedAnswer === index;
             
-            let buttonStyles = "bg-slate-800 border-slate-700 text-slate-200 hover:border-indigo-500 hover:bg-slate-700";
+            let buttonStyles = "bg-surface border-border-default text-text-primary hover:border-indigo-500 hover:bg-subtle";
             
             if (showFeedback) {
               if (isCorrect) {
@@ -242,7 +242,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
               } else if (isSelected) {
                 buttonStyles = "bg-red-900/30 border-red-500 text-red-100";
               } else {
-                buttonStyles = "bg-slate-800/50 border-slate-800 text-slate-500 opacity-50";
+                buttonStyles = "bg-surface/50 border-border-default text-text-secondary opacity-50";
               }
             }
 
@@ -258,7 +258,7 @@ export function WebRecallGame({ questions, onComplete }: WebRecallGameProps) {
                 <div className="flex items-center justify-between">
                   <span>{option}</span>
                   {!showFeedback && (
-                    <div className="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-xs text-slate-500 group-hover:border-indigo-500 group-hover:text-indigo-400">
+                    <div className="w-6 h-6 rounded-full border border-border-strong flex items-center justify-center text-xs text-text-secondary group-hover:border-indigo-500 group-hover:text-indigo-400">
                       {index + 1}
                     </div>
                   )}

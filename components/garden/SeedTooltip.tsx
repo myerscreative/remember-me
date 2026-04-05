@@ -20,17 +20,17 @@ export function SeedTooltip({ data, onOpenProfile }: { data: SeedPreview, onOpen
 
   return (
     <div 
-      className={`absolute -top-24 left-1/2 -translate-x-1/2 w-48 bg-slate-900 border-2 ${statusColors[data.status]} p-3 rounded-xl shadow-2xl z-50 ${isNeglected ? 'animate-pulse' : ''}`}
+      className={`absolute -top-24 left-1/2 -translate-x-1/2 w-48 bg-canvas border-2 ${statusColors[data.status]} p-3 rounded-xl shadow-2xl z-50 ${isNeglected ? 'animate-pulse' : ''}`}
       onClick={(e) => e.stopPropagation()} // Prevent closing when interacting with tooltip
     >
       <div className="flex justify-between items-start mb-1">
-        <h4 className="font-bold text-white text-sm truncate pr-2">{data.name}</h4>
-        <span className="text-[10px] font-mono opacity-60 text-white shrink-0">
+        <h4 className="font-bold text-text-primary text-sm truncate pr-2">{data.name}</h4>
+        <span className="text-[10px] font-mono opacity-60 text-text-primary shrink-0">
           {data.daysSinceLastContact}d ago
         </span>
       </div>
       
-      <p className="text-[11px] text-slate-400 mb-3 capitalize">
+      <p className="text-[11px] text-text-secondary mb-3 capitalize">
         Last: {data.lastInteractionType || 'unknown'}
       </p>
 
@@ -42,7 +42,7 @@ export function SeedTooltip({ data, onOpenProfile }: { data: SeedPreview, onOpen
       </button>
       
       {/* Tooltip Tail */}
-      <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-900 border-r-2 border-b-2 ${statusColors[data.status]} rotate-45`} />
+      <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-canvas border-r-2 border-b-2 ${statusColors[data.status]} rotate-45`} />
     </div>
   );
 }

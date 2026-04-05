@@ -249,7 +249,7 @@ export default function HomePage() {
   if (error) {
      // ... (Error UI)
       return (
-      <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden items-center justify-center">
+      <div className="flex flex-col h-screen bg-canvas overflow-hidden items-center justify-center">
         <ErrorFallback
           error={error}
           reset={() => window.location.reload()}
@@ -263,29 +263,29 @@ export default function HomePage() {
 
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-screen bg-canvas overflow-hidden">
       {/* Main Container */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[950px] mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Header & Banner */}
           <div className="pt-6 pb-2 md:pt-8 md:pb-4 space-y-4">
-             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+             <h1 className="text-3xl md:text-4xl font-bold text-text-primary">
                {showArchived ? "Archived Contacts" : "Contacts"}
              </h1>
              {!showArchived && <div className="-mt-1"><DecayAlertBanner /></div>}
              <div className="relative w-full max-w-2xl">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-500" />
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
                <Input
                  placeholder="Search your network..."
                  value={searchQuery}
                  onChange={(e) => setSearchQuery(e.target.value)}
-                 className="w-full pl-9 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:border-blue-500 transition-all font-medium"
+                 className="w-full pl-9 h-10 rounded-lg bg-subtle border-transparent focus:bg-surface focus:border-border-accent transition-all font-medium"
                />
              </div>
           </div>
 
           {/* Sticky Toolbar */}
-          <div className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 border-b border-gray-100 dark:border-gray-800 mb-6 transition-all hover:bg-white/95 dark:hover:bg-gray-900/95">
+          <div className="sticky top-0 z-30 bg-canvas/80 backdrop-blur-md -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 border-b border-border-default mb-6 transition-all hover:bg-canvas/95">
              <div className="max-w-[950px] mx-auto flex items-center justify-between gap-3">
                {/* LEFT: Filters */}
                <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mask-fade-right flex-1 min-w-0 max-w-[600px]">
@@ -303,7 +303,7 @@ export default function HomePage() {
                    onToggleMutuals={setShowMutuals}
                  />
                  
-                 <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+                 <div className="w-px h-6 bg-border-default mx-1" />
 
                  <button
                    onClick={() => { setSelectedFilter("All"); setSelectedInterest(null); setShowMutuals(false); setSelectedConnectedPerson(null); }}
@@ -311,7 +311,7 @@ export default function HomePage() {
                      "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 border border-transparent",
                      selectedFilter === "All" && !selectedInterest && !showMutuals && !selectedConnectedPerson
                        ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
-                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                       : "text-text-secondary hover:text-text-primary hover:bg-subtle"
                    )}
                  >
                    All
@@ -322,7 +322,7 @@ export default function HomePage() {
                      "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 border border-transparent",
                      selectedFilter === "Favorites"
                        ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shadow-sm"
-                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                       : "text-text-secondary hover:text-text-primary hover:bg-subtle"
                    )}
                  >
                    Favorites
@@ -394,7 +394,7 @@ export default function HomePage() {
                        Add Contact
                      </Link>
                   </Button>
-                  <Button variant="ghost" size="icon" className="hidden lg:flex text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" title="Quick Capture" asChild>
+                  <Button variant="ghost" size="icon" className="hidden lg:flex text-text-secondary hover:text-text-accent" title="Quick Capture" asChild>
                      <Link href="/quick-capture">
                        <Zap className="h-4 w-4" />
                      </Link>
@@ -404,18 +404,18 @@ export default function HomePage() {
                      variant="ghost" 
                      size="icon" 
                      onClick={() => router.push('/practice')}
-                     className="h-9 w-9 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                     className="h-9 w-9 text-text-accent hover:bg-accent-muted"
                      title="Daily Practice"
                   >
                      <Brain size={18} />
                   </Button>
 
-                   <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+                   <div className="w-px h-6 bg-border-default mx-1" />
 
                    {/* Sort Menu */}
                    <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-9 gap-2 px-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                      <Button variant="ghost" size="sm" className="h-9 gap-2 px-2 text-text-secondary hover:text-text-primary">
                         <ArrowUpDown className="h-4 w-4" />
                         <span className="text-xs font-medium hidden sm:inline-block">
                           {sortOption === "first_name" ? "First Name" : 
@@ -424,7 +424,7 @@ export default function HomePage() {
                         </span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    <DropdownMenuContent align="end" className="w-48 bg-surface border-border-default">
                       <DropdownMenuLabel>Sort By</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => { setSortOption("first_name"); setSortDirection("asc"); }}>
@@ -442,17 +442,17 @@ export default function HomePage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                   <div className="hidden sm:flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 gap-1"> 
+                   <div className="hidden sm:flex bg-subtle rounded-lg p-1 gap-1"> 
                     <Button
                     variant="ghost" 
                     size="icon" 
                     onClick={toggleViewMode}
-                    className={cn("h-9 w-9 transition-colors", isCompactView ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20" : "text-gray-500 hover:text-gray-700 dark:text-gray-400")}
+                    className={cn("h-9 w-9 transition-colors", isCompactView ? "text-text-accent bg-accent-muted" : "text-text-secondary hover:text-text-primary")}
                     title="Toggle View"
                   >
                     {isCompactView ? <List size={18} /> : <Rows size={18} />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-500 hover:text-gray-700 dark:text-gray-400" asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-text-secondary hover:text-text-primary" asChild>
                     <Link href="/settings">
                       <Settings size={18} />
                     </Link>
@@ -466,16 +466,16 @@ export default function HomePage() {
           <div className="pb-6 md:pb-8 lg:pb-12">
              {loading ? (
                <div className="flex flex-col items-center justify-center py-20">
-                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                 <p className="mt-4 text-slate-500 text-sm">Loading your network...</p>
+                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-border-accent"></div>
+                 <p className="mt-4 text-text-secondary text-sm">Loading your network...</p>
                </div>
             ) : sortedContacts.length === 0 ? (
               <div className="text-center py-16 px-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-slate-400" />
+                <div className="bg-subtle w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-text-tertiary" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">No contacts found</h3>
-                <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                <h3 className="text-lg font-medium text-text-primary mb-1">No contacts found</h3>
+                <p className="text-text-secondary max-w-sm mx-auto mb-6">
                   Try adjusting your filters or search query, or add a new person to your network.
                 </p>
                 {sortedContacts.length === 0 && contacts.length > 0 && searchQuery && (
@@ -512,7 +512,7 @@ export default function HomePage() {
         
       {/* Action Bar - Mobile & Tablet Only */}
       <div className="lg:hidden fixed bottom-20 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-auto z-40">
-        <div className="flex gap-2 bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl p-2 shadow-[0_8px_32px_rgba(0,0,0,0.25)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        <div className="flex gap-2 bg-elevated backdrop-blur-md rounded-2xl p-2 shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
           {/* Add Contact Button */}
           <Link
             href="/contacts/new"

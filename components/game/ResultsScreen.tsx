@@ -40,39 +40,39 @@ export function ResultsScreen({
   const btnBgClass = colorMap[primaryColor]?.split(' ').slice(1).join(' ') || 'bg-indigo-600 hover:bg-indigo-700';
 
   return (
-    <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 mx-auto mt-10 animate-in fade-in zoom-in duration-300">
+    <div className="max-w-md w-full bg-surface rounded-3xl shadow-2xl p-8 mx-auto mt-10 animate-in fade-in zoom-in duration-300">
       <div className="text-center">
         <div className="text-8xl mb-6">
           {accuracy >= 80 ? '🏆' : accuracy >= 60 ? '⭐' : '💪'}
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-2">
+        <h2 className="text-3xl font-bold text-text-primary mb-2">
           {accuracy >= 80 ? 'Excellent!' : accuracy >= 60 ? 'Good Job!' : 'Keep Practicing!'}
         </h2>
         <div className={`text-6xl font-bold mb-8 ${textColorClass}`}>
           {score} pts
         </div>
 
-        <div className="bg-slate-50 rounded-2xl p-6 mb-8 space-y-4">
+        <div className="bg-canvas rounded-2xl p-6 mb-8 space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-slate-600">Correct Answers</span>
-            <span className="font-semibold text-slate-900">
+            <span className="text-text-tertiary">Correct Answers</span>
+            <span className="font-semibold text-text-primary">
               {correctAnswers}/{totalQuestions}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-600">Accuracy</span>
-            <span className="font-semibold text-slate-900">{accuracy}%</span>
+            <span className="text-text-tertiary">Accuracy</span>
+            <span className="font-semibold text-text-primary">{accuracy}%</span>
           </div>
           {streak !== undefined && (
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">Best Streak</span>
-              <span className="font-semibold text-slate-900">🔥 {streak}</span>
+              <span className="text-text-tertiary">Best Streak</span>
+              <span className="font-semibold text-text-primary">🔥 {streak}</span>
             </div>
           )}
            {timeSpent !== undefined && (
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">Time Spent</span>
-              <span className="font-semibold text-slate-900">{timeSpent}s</span>
+              <span className="text-text-tertiary">Time Spent</span>
+              <span className="font-semibold text-text-primary">{timeSpent}s</span>
             </div>
           )}
         </div>
@@ -86,7 +86,7 @@ export function ResultsScreen({
           </button>
           <button
             onClick={onBackToMenu}
-            className="w-full py-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
+            className="w-full py-4 bg-subtle text-text-tertiary font-semibold rounded-xl hover:bg-border-default transition-colors"
           >
             Back to Game Center
           </button>

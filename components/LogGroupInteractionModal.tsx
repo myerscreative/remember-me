@@ -75,22 +75,22 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-[#0F172A] border border-[#1E293B] flex flex-col overflow-hidden rounded-none shadow-none">
+      <div className="w-full max-w-lg bg-canvas border border-border-default flex flex-col overflow-hidden rounded-none shadow-none">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#1E293B]">
+        <div className="flex items-center justify-between p-4 border-b border-border-default">
           <div className="flex items-center gap-2">
             <Droplets className="w-5 h-5 text-[#38BDF8]" />
-            <h3 className="text-lg font-bold text-white uppercase tracking-tight">Watering {contacts.length} Contacts</h3>
+            <h3 className="text-lg font-bold text-text-primary uppercase tracking-tight">Watering {contacts.length} Contacts</h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-text-secondary hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <p className="text-slate-400 text-sm">
-            You are logging an interaction for <span className="text-white font-medium">{contacts.length} people</span> in the <span className="text-white font-medium">{tribeName}</span> tribe.
+          <p className="text-text-secondary text-sm">
+            You are logging an interaction for <span className="text-text-primary font-medium">{contacts.length} people</span> in the <span className="text-text-primary font-medium">{tribeName}</span> tribe.
           </p>
           
           <div className="space-y-2">
@@ -98,19 +98,19 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full h-32 bg-[#1E293B] border border-[#334155] text-white p-3 focus:outline-none focus:border-[#38BDF8] resize-none rounded-none shadow-none"
+              className="w-full h-32 bg-surface border border-border-strong text-text-primary p-3 focus:outline-none focus:border-[#38BDF8] resize-none rounded-none shadow-none"
               placeholder="What did you say?"
             />
           </div>
 
           <div className="flex flex-wrap gap-2 pt-2">
             {contacts.slice(0, 5).map(c => (
-              <span key={c.id} className="text-[10px] bg-[#334155] text-slate-300 px-2 py-1 uppercase font-bold tracking-tighter">
+              <span key={c.id} className="text-[10px] bg-elevated text-text-tertiary px-2 py-1 uppercase font-bold tracking-tighter">
                 {c.name}
               </span>
             ))}
             {contacts.length > 5 && (
-              <span className="text-[10px] bg-[#334155] text-slate-300 px-2 py-1 uppercase font-bold tracking-tighter">
+              <span className="text-[10px] bg-elevated text-text-tertiary px-2 py-1 uppercase font-bold tracking-tighter">
                 + {contacts.length - 5} More
               </span>
             )}
@@ -118,7 +118,7 @@ export default function LogGroupInteractionModal({ isOpen, onClose, onSuccess, t
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#1E293B] flex justify-end">
+        <div className="p-4 border-t border-border-default flex justify-end">
           <div className="relative">
             <button
               onClick={handleWaterTribe}

@@ -60,7 +60,7 @@ export function WeeklyDigestCard() {
                     variant="outline" 
                     size="sm" 
                     onClick={generateRecap}
-                    className="bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 border-0 text-xs font-bold uppercase tracking-wider"
+                    className="bg-subtle text-text-primary hover:bg-border-default border-0 text-xs font-bold uppercase tracking-wider"
                 >
                     <RefreshCw className="h-3 w-3 mr-2" /> Try Again
                 </Button>

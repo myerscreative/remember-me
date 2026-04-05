@@ -93,12 +93,12 @@ export function GroupInteractionModal({
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-[#1a1d24] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="relative bg-surface rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2d333b] shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-border-default shrink-0">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-text-primary">
               Log Group Interaction
             </h2>
           </div>
@@ -110,13 +110,13 @@ export function GroupInteractionModal({
         {/* Content - scrollable */}
         <div className="p-5 space-y-5 overflow-y-auto flex-1">
           {/* Instructions */}
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-text-secondary">
             Log an interaction that updates all selected contacts at once (e.g., family dinner, group call).
           </p>
 
           {/* Contact selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium text-text-tertiary">
               Select People ({selectedIds.size} selected)
             </label>
             <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
@@ -128,8 +128,8 @@ export function GroupInteractionModal({
                     onClick={() => toggleContact(contact.id)}
                     className={`flex items-center gap-2 p-2 rounded-lg text-left transition-colors ${
                       isSelected
-                        ? 'bg-indigo-50 dark:bg-indigo-900/20 border-2 border-indigo-400'
-                        : 'bg-gray-50 dark:bg-[#252931] border-2 border-transparent hover:bg-gray-100 dark:hover:bg-[#2d333b]'
+                        ? 'bg-accent-muted border-2 border-indigo-400'
+                        : 'bg-canvas border-2 border-transparent hover:bg-subtle'
                     }`}
                   >
                     <Avatar className="h-7 w-7 shrink-0">
@@ -138,7 +138,7 @@ export function GroupInteractionModal({
                         {contact.first_name?.[0] || contact.name[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                    <span className="text-sm font-medium text-text-tertiary truncate">
                       {contact.first_name || contact.name.split(' ')[0]}
                     </span>
                     {isSelected && (
@@ -152,7 +152,7 @@ export function GroupInteractionModal({
 
           {/* Interaction type */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium text-text-tertiary">
               Interaction Type
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -163,7 +163,7 @@ export function GroupInteractionModal({
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     interactionType === value
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-100 dark:bg-[#252931] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2d333b]'
+                      : 'bg-subtle text-text-tertiary hover:bg-subtle'
                   }`}
                 >
                   {emoji} {label.split(' ')[0]}
@@ -174,7 +174,7 @@ export function GroupInteractionModal({
 
           {/* Note */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium text-text-tertiary">
               Note (optional)
             </label>
             <Textarea
@@ -187,7 +187,7 @@ export function GroupInteractionModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-5 border-t border-gray-100 dark:border-[#2d333b] shrink-0">
+        <div className="flex justify-end gap-3 p-5 border-t border-border-default shrink-0">
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>

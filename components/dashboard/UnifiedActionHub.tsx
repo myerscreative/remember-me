@@ -238,9 +238,9 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
   const lastContactDate = optimisticLastContact ? new Date(optimisticLastContact) : null;
   const isFading = lastContactDate && lastContactDate < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   
-  const statusColor = !lastContactDate ? "text-slate-400" : (isFading ? "text-orange-400" : "text-emerald-400");
-  const statusBorder = !lastContactDate ? "border-slate-500/30" : (isFading ? "border-orange-500/30" : "border-emerald-500/30");
-  const statusBg = !lastContactDate ? "bg-slate-500/10" : (isFading ? "bg-orange-500/10" : "bg-emerald-500/10");
+  const statusColor = !lastContactDate ? "text-text-secondary" : (isFading ? "text-orange-400" : "text-emerald-400");
+  const statusBorder = !lastContactDate ? "border-border-default/30" : (isFading ? "border-orange-500/30" : "border-emerald-500/30");
+  const statusBg = !lastContactDate ? "bg-subtle/10" : (isFading ? "bg-orange-500/10" : "bg-emerald-500/10");
 
   // Reordered for UI: Call, Email, Text (Row 1) - In Person, Social, Other (Row 2)
   const ORDERED_TYPES: InteractionType[] = ['call', 'email', 'text', 'in-person', 'social', 'other'];
@@ -255,7 +255,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-slate-950/40 backdrop-blur-2xl border-white/10 text-foreground shadow-2xl overflow-hidden p-0 gap-0 rounded-3xl">
+      <DialogContent className="sm:max-w-md bg-canvas/40 backdrop-blur-2xl border-white/10 text-foreground shadow-2xl overflow-hidden p-0 gap-0 rounded-3xl">
         <DialogTitle className="sr-only">Log Interaction with {person.name}</DialogTitle>
         
         {/* Header Section */}
@@ -281,19 +281,19 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
              </div>
           </div>
           
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-subtle transition-colors">
             <X className="h-4 w-4 text-muted-foreground" />
           </Button>
         </div>
 
-        <div className="flex mx-6 mt-4 mb-2 bg-slate-900/50 rounded-lg p-1 border border-border/40">
+        <div className="flex mx-6 mt-4 mb-2 bg-canvas/50 rounded-lg p-1 border border-border/40">
            <button
              onClick={() => setActiveTab('log')}
              className={cn(
                "flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-200",
                activeTab === 'log' 
-                 ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                 : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                 ? "bg-surface text-text-accent shadow-sm" 
+                 : "text-text-secondary hover:text-text-primary"
              )}
            >
              <span className="text-base">✨</span> Log Action
@@ -303,8 +303,8 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
              className={cn(
                "flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-200",
                activeTab === 'history' 
-                 ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                 : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                 ? "bg-surface text-text-accent shadow-sm" 
+                 : "text-text-secondary hover:text-text-primary"
              )}
            >
              <span className="text-base">📜</span> History
@@ -317,7 +317,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                <>
                  {/* 6-Tile Grid */}
                 <div className="animate-in fade-in slide-in-from-left-4 duration-300">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
+                  <label className="block text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2 px-1">
                     How did you connect?
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -334,13 +334,13 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             "p-2 rounded-xl border transition-all duration-200 text-center flex flex-col items-center justify-center gap-1 h-16 relative group",
                             isActive 
                               ? "border-[#8B5CF6] bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.3)]" 
-                              : "border-border bg-slate-950/40 backdrop-blur-xl hover:bg-slate-900/50 hover:border-slate-400 dark:hover:border-slate-700"
+                              : "border-border bg-canvas/40 backdrop-blur-xl hover:bg-canvas/50 hover:border-border-strong"
                           )}
                         >
                           <span className="text-xl drop-shadow-sm transition-transform group-hover:scale-110 duration-200">{typeInfo.emoji}</span>
                           <span className={cn(
                             "text-[9px] font-bold uppercase tracking-tight",
-                            isActive ? "text-[#8B5CF6]" : "text-slate-500 group-hover:text-slate-300"
+                            isActive ? "text-[#8B5CF6]" : "text-text-secondary group-hover:text-text-tertiary"
                           )}>
                             {typeInfo.label}
                           </span>
@@ -352,21 +352,21 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
 
                  {/* Date Picker */}
                  <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-50 mt-4">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
+                    <label className="block text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2 px-1">
                        When?
                     </label>
                     <input 
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-slate-900/50 text-slate-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] transition-all text-sm scheme-dark"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-canvas/50 text-text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] transition-all text-sm scheme-dark"
                     />
                  </div>
 
                  {/* Unified Story Input */}
                  <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-75">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
-                       Story / Notes <span className="text-slate-600 font-normal normal-case italic ml-1">(Optional)</span>
+                    <label className="block text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2 px-1">
+                       Story / Notes <span className="text-text-tertiary font-normal normal-case italic ml-1">(Optional)</span>
                     </label>
                     <div className="relative">
                         <textarea
@@ -375,15 +375,15 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="What did you talk about? Add a specific detail..."
                             rows={2}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-slate-900/50 text-slate-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
+                            className="w-full px-4 py-3 rounded-xl border border-border bg-canvas/50 text-text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:border-[#8B5CF6] resize-none transition-all text-sm"
                         />
                     </div>
                  </div>
 
                  {/* Next Goal Input (New) */}
                  <div className="animate-in fade-in slide-in-from-left-4 duration-300 delay-100 mb-4">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
-                       Goal for Next Contact <span className="text-indigo-400 font-normal normal-case italic ml-1">(Column 3 Strategy)</span>
+                    <label className="block text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2 px-1">
+                       Goal for Next Contact <span className="text-text-accent font-normal normal-case italic ml-1">(Column 3 Strategy)</span>
                     </label>
                     <div className="relative">
                         <textarea
@@ -471,7 +471,7 @@ export function UnifiedActionHub({ person, isOpen, onClose, onAction, initialMet
                     </div>
 
                     <div className="flex items-center justify-between px-1 shrink-0">
-                         <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Interaction Timeline</h4>
+                         <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Interaction Timeline</h4>
                     </div>
                     
                     <HistoryTimeline 

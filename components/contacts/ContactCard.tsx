@@ -20,7 +20,7 @@ export function ContactCard({ contact }: ContactCardProps) {
   return (
     <Link 
       href={`/people/${contact.id}`}
-      className="flex flex-col gap-3 p-4 bg-[#1a1f2e] rounded-2xl cursor-pointer active:bg-[#242938] transition-all duration-200 active:scale-[0.98] border border-transparent"
+      className="flex flex-col gap-3 p-4 bg-surface rounded-2xl cursor-pointer active:bg-elevated transition-all duration-200 active:scale-[0.98] border border-transparent"
     >
       {/* Row 1: Avatar + Name + Status */}
       <div className="flex items-center gap-3">
@@ -29,11 +29,11 @@ export function ContactCard({ contact }: ContactCardProps) {
             {!isAvatarEmoji && contact.avatar_url && (
               <AvatarImage src={contact.avatar_url} alt={contact.name} />
             )}
-            <AvatarFallback className="bg-[#2d3748] text-white text-[17px] font-semibold">
+            <AvatarFallback className="bg-elevated text-text-primary text-[17px] font-semibold">
               {isAvatarEmoji ? <span className="text-[22px]">{contact.avatar_url}</span> : initials}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#1a1f2e] rounded-full flex items-center justify-center text-[10px] border-2 border-[#1a1f2e]">
+          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-surface rounded-full flex items-center justify-center text-[10px] border-2 border-surface">
             {relationshipEmoji}
           </div>
         </div>

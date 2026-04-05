@@ -34,7 +34,7 @@ export default function MainLayout({
               </div>
             </div>
             <Toaster position="bottom-center" toastOptions={{
-              className: 'bg-[#161926] border-emerald-500/30 text-white',
+              className: 'bg-elevated border-border-default text-text-primary',
             }} />
           </ThemeProvider>
         </SessionProvider>

@@ -285,7 +285,7 @@ export default function NewContactPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-screen bg-canvas overflow-hidden">
       <Toaster position="top-center" />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -295,12 +295,12 @@ export default function NewContactPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="h-10 w-10 rounded-full bg-subtle hover:bg-subtle"
               >
-                <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <X className="h-5 w-5 text-text-tertiary" />
               </Button>
             </Link>
-            <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">New Contact</h1>
+            <h1 className="text-lg md:text-xl font-bold text-text-primary">New Contact</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
 
@@ -326,7 +326,7 @@ export default function NewContactPage() {
             <div className="space-y-6">
               {/* First Name */}
               <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="firstName" className="text-sm md:text-base text-text-tertiary font-medium">
                   First Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -337,14 +337,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, firstName: e.target.value })
                   }
                   placeholder="First name"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Last Name */}
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="lastName" className="text-sm md:text-base text-text-tertiary font-medium">
                   Last Name
                 </Label>
                 <Input
@@ -354,14 +354,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, lastName: e.target.value })
                   }
                   placeholder="Last name (optional)"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="email" className="text-sm md:text-base text-text-tertiary font-medium">
                   Email
                 </Label>
                 <Input
@@ -372,14 +372,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   placeholder="email@example.com"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Phone */}
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="phone" className="text-sm md:text-base text-text-tertiary font-medium">
                   Phone
                 </Label>
                 <Input
@@ -391,14 +391,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, phone: formatted });
                   }}
                   placeholder="+1 (555) 123-4567"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* LinkedIn */}
               <div className="space-y-2">
-                <Label htmlFor="linkedin" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="linkedin" className="text-sm md:text-base text-text-tertiary font-medium">
                   LinkedIn
                 </Label>
                 <Input
@@ -408,14 +408,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, linkedin: e.target.value })
                   }
                   placeholder="linkedin.com/in/username"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Birthday */}
               <div className="space-y-2">
-                <Label className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label className="text-sm md:text-base text-text-tertiary font-medium">
                   Birthday
                 </Label>
                 <BirthdayPicker
@@ -429,7 +429,7 @@ export default function NewContactPage() {
               {/* Company & Job Title */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="company" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  <Label htmlFor="company" className="text-sm md:text-base text-text-tertiary font-medium">
                     Company
                   </Label>
                   <Input
@@ -439,12 +439,12 @@ export default function NewContactPage() {
                       setFormData({ ...formData, company: e.target.value })
                     }
                     placeholder="Company Name"
-                    className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                    className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                     disabled={isSaving}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="jobTitle" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                  <Label htmlFor="jobTitle" className="text-sm md:text-base text-text-tertiary font-medium">
                     Job Title
                   </Label>
                   <Input
@@ -454,7 +454,7 @@ export default function NewContactPage() {
                       setFormData({ ...formData, jobTitle: e.target.value })
                     }
                     placeholder="Job Title"
-                    className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                    className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                     disabled={isSaving}
                   />
                 </div>
@@ -462,7 +462,7 @@ export default function NewContactPage() {
 
               {/* Where did we meet? */}
               <div className="space-y-2">
-                <Label htmlFor="whereMet" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="whereMet" className="text-sm md:text-base text-text-tertiary font-medium">
                   Where did we meet?
                 </Label>
                 <Input
@@ -472,14 +472,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whereMet: e.target.value })
                   }
                   placeholder="e.g., AI Summit, coffee shop, Zoom call"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Who introduced us? */}
               <div className="space-y-2">
-                <Label htmlFor="introducedBy" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="introducedBy" className="text-sm md:text-base text-text-tertiary font-medium">
                   Who introduced us?
                 </Label>
                 <Input
@@ -489,14 +489,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, introducedBy: e.target.value })
                   }
                   placeholder="Leave blank if met directly"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* First Impression */}
               <div className="space-y-2">
-                <Label htmlFor="firstImpression" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="firstImpression" className="text-sm md:text-base text-text-tertiary font-medium">
                   First impression
                 </Label>
                 <Textarea
@@ -506,14 +506,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, firstImpression: e.target.value })
                   }
                   placeholder="What was your immediate impression when you first met?"
-                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[80px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Memorable Moment */}
               <div className="space-y-2">
-                <Label htmlFor="memorableMoment" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="memorableMoment" className="text-sm md:text-base text-text-tertiary font-medium">
                   What made it memorable?
                 </Label>
                 <Textarea
@@ -523,14 +523,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, memorableMoment: e.target.value })
                   }
                   placeholder="What made this first conversation or meeting memorable?"
-                  className="min-h-[80px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[80px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Why stay in contact? */}
               <div className="space-y-2">
-                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="whyStayInContact" className="text-sm md:text-base text-text-tertiary font-medium">
                   Why stay in contact?
                 </Label>
                 <Textarea
@@ -540,14 +540,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whyStayInContact: e.target.value })
                   }
                   placeholder="What's the value of this relationship?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[100px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
 
               {/* What did I find interesting? */}
               <div className="space-y-2">
-                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="whatInteresting" className="text-sm md:text-base text-text-tertiary font-medium">
                   What did I find interesting?
                 </Label>
                 <Textarea
@@ -557,14 +557,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whatInteresting: e.target.value })
                   }
                   placeholder="What stood out about them?"
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[100px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
 
               {/* What's important to them? */}
               <div className="space-y-2">
-                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="whatsImportant" className="text-sm md:text-base text-text-tertiary font-medium">
                   What's important to them?
                 </Label>
                 <Textarea
@@ -574,14 +574,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, whatsImportant: e.target.value })
                   }
                   placeholder="Their priorities, values, goals..."
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[100px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Tags */}
               <div className="space-y-2">
-                <Label htmlFor="tags" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="tags" className="text-sm md:text-base text-text-tertiary font-medium">
                   Tags
                 </Label>
                 <Input
@@ -591,14 +591,14 @@ export default function NewContactPage() {
                     setFormData({ ...formData, tags: e.target.value })
                   }
                   placeholder="e.g., Investor, Friend, AI Summit (comma-separated)"
-                  className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white"
+                  className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary"
                   disabled={isSaving}
                 />
               </div>
 
               {/* Family Members */}
               <div className="space-y-2">
-                <Label className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label className="text-sm md:text-base text-text-tertiary font-medium">
                   Family Members
                 </Label>
                 <div className="space-y-3">
@@ -612,7 +612,7 @@ export default function NewContactPage() {
                           setFormData({ ...formData, familyMembers: updated });
                         }}
                         placeholder="Name"
-                        className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white flex-1"
+                        className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary flex-1"
                         disabled={isSaving}
                       />
                       <Input
@@ -623,7 +623,7 @@ export default function NewContactPage() {
                           setFormData({ ...formData, familyMembers: updated });
                         }}
                         placeholder="Relationship"
-                        className="h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white flex-1"
+                        className="h-11 md:h-12 rounded-lg border-border-default bg-surface text-text-primary flex-1"
                         disabled={isSaving}
                       />
                       <Button
@@ -650,7 +650,7 @@ export default function NewContactPage() {
                         familyMembers: [...formData.familyMembers, { name: "", relationship: "" }]
                       });
                     }}
-                    className="w-full h-11 md:h-12 rounded-lg border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="w-full h-11 md:h-12 rounded-lg border-border-default hover:bg-subtle"
                     disabled={isSaving}
                   >
                     + Add Family Member
@@ -660,7 +660,7 @@ export default function NewContactPage() {
 
               {/* Misc Notes */}
               <div className="space-y-2">
-                <Label htmlFor="misc" className="text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                <Label htmlFor="misc" className="text-sm md:text-base text-text-tertiary font-medium">
                   Additional Notes
                 </Label>
                 <Textarea
@@ -670,7 +670,7 @@ export default function NewContactPage() {
                     setFormData({ ...formData, misc: e.target.value })
                   }
                   placeholder="Any other details or notes you want to remember..."
-                  className="min-h-[100px] rounded-lg border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white resize-none"
+                  className="min-h-[100px] rounded-lg border-border-default bg-surface text-text-primary resize-none"
                   disabled={isSaving}
                 />
               </div>
@@ -689,7 +689,7 @@ export default function NewContactPage() {
       />
 
       {/* Save Contact Button - Mobile */}
-      <div className="fixed bottom-16 left-0 right-0 z-[60] bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 md:hidden shadow-lg">
+      <div className="fixed bottom-16 left-0 right-0 z-[60] bg-surface border-t border-border-default p-4 md:hidden shadow-lg">
         <Button
           type="submit"
           form="contact-form"
@@ -708,7 +708,7 @@ export default function NewContactPage() {
       </div>
 
       {/* Save Contact Button - Desktop */}
-      <div className="fixed bottom-0 left-0 right-0 z-[60] hidden border-t border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800 md:ml-64 md:block">
+      <div className="fixed bottom-0 left-0 right-0 z-[60] hidden border-t border-border-default bg-surface p-6 shadow-lg md:ml-64 md:block">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button
             type="submit"

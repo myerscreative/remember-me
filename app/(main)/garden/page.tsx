@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 
 const NetworkGraphView = dynamic(() => import('@/components/relationship-garden/NetworkGraphView'), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="animate-spin h-8 w-8 text-slate-400" /></div>
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="animate-spin h-8 w-8 text-text-secondary" /></div>
 });
 
 // Health status types
@@ -379,10 +379,10 @@ export default function GardenPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-green-600 mb-2" />
-          <p className="text-slate-600">Loading your garden...</p>
+          <p className="text-text-tertiary">Loading your garden...</p>
         </div>
       </div>
     );
@@ -391,7 +391,7 @@ export default function GardenPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <Link href="/login" className="text-blue-600 hover:underline">
@@ -405,20 +405,20 @@ export default function GardenPage() {
   // Empty state
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors">
+      <div className="min-h-screen bg-canvas font-sans transition-colors">
         <div className="max-w-[1400px] mx-auto px-4 py-8">
           <div className="mb-8">
-            <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-4 transition-colors">
+            <Link href="/" className="inline-flex items-center text-text-secondary hover:text-text-primary mb-4 transition-colors">
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">🍃 Relationship Garden</h1>
+            <h1 className="text-3xl font-bold text-text-primary mb-2">🍃 Relationship Garden</h1>
           </div>
-          
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-12 text-center transition-colors">
+
+          <div className="bg-surface rounded-2xl shadow-sm border border-border-default p-12 text-center transition-colors">
             <p className="text-6xl mb-4">🌱</p>
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Your garden is empty</h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-6">Add some contacts to see them bloom in your garden!</p>
+            <h2 className="text-xl font-semibold text-text-primary mb-2">Your garden is empty</h2>
+            <p className="text-text-secondary mb-6">Add some contacts to see them bloom in your garden!</p>
             <Link 
               href="/contacts/new" 
               className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -463,19 +463,19 @@ export default function GardenPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors overflow-x-hidden pb-24">
+    <div className="min-h-screen bg-canvas font-sans transition-colors overflow-x-hidden pb-24">
       <div className="max-w-[1400px] mx-auto px-4 py-4 md:py-6">
         
         {/* Header - Compact on mobile */}
         <div className="mb-2 md:mb-4">
-          <Link href="/" className="inline-flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-3 transition-colors">
+          <Link href="/" className="inline-flex items-center text-text-secondary hover:text-text-primary mb-3 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
           </Link>
           <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">🍃 Relationship Garden</h1>
-              <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 hidden md:block">Click a health status to see contacts in that group</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">🍃 Relationship Garden</h1>
+              <p className="text-sm md:text-base text-text-secondary hidden md:block">Click a health status to see contacts in that group</p>
             </div>
           </div>
         </div>
@@ -483,13 +483,13 @@ export default function GardenPage() {
         {/* MOBILE: Garden First, Filters Below */}
         <div className="md:hidden">
           {/* View Mode Toggle - ALWAYS AT TOP */}
-          <div className="flex items-center gap-2 justify-center bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-2 mb-2">
+          <div className="flex items-center gap-2 justify-center bg-surface rounded-xl border border-border-default p-2 mb-2">
             <button
               onClick={() => setViewMode('garden')}
               className={`flex-1 py-2 rounded-lg border transition-colors ${
                 viewMode === 'garden'
-                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  ? 'bg-subtle text-text-primary border-border-strong'
+                  : 'bg-surface text-text-tertiary border-border-default'
               }`}
             >
               <LayoutGrid className="w-5 h-5 mx-auto" />
@@ -498,8 +498,8 @@ export default function GardenPage() {
               onClick={() => setViewMode('list')}
               className={`flex-1 py-2 rounded-lg border transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  ? 'bg-subtle text-text-primary border-border-strong'
+                  : 'bg-surface text-text-tertiary border-border-default'
               }`}
             >
               <List className="w-5 h-5 mx-auto" />
@@ -508,8 +508,8 @@ export default function GardenPage() {
               onClick={() => setViewMode('graph')}
               className={`flex-1 py-2 rounded-lg border transition-colors ${
                 viewMode === 'graph'
-                  ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                  : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  ? 'bg-subtle text-text-primary border-border-strong'
+                  : 'bg-surface text-text-tertiary border-border-default'
               }`}
             >
               <Share2 className="w-5 h-5 mx-auto" />
@@ -518,7 +518,7 @@ export default function GardenPage() {
 
           {/* Garden View */}
           {viewMode === 'garden' && healthFilter === 'all' && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-2 mb-2 transition-colors">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border-default p-2 mb-2 transition-colors">
               <RelationshipGarden
                 contacts={filteredContacts}
                 filter={categoryFilter}
@@ -536,16 +536,16 @@ export default function GardenPage() {
 
           {/* List View on Mobile */}
           {(viewMode === 'list' || healthFilter !== 'all') && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border-default p-4 mb-4">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                <h3 className="text-lg font-semibold text-text-primary">
                   {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
-                  <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
+                  <span className="ml-2 text-text-secondary font-normal">({filteredContacts.length})</span>
                 </h3>
               </div>
 
               {filteredContacts.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                <div className="text-center py-12 text-text-secondary">
                   No contacts in this category
                 </div>
               ) : (
@@ -557,20 +557,20 @@ export default function GardenPage() {
                       <div
                         key={contact.dbId}
                         onClick={() => window.location.href = `/contacts/${contact.dbId}`}
-                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                        className="p-3 rounded-xl bg-canvas hover:bg-subtle transition-colors cursor-pointer"
                       >
                         <div className="flex items-start gap-3 mb-2">
                           <div
-                            className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                            className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-text-primary font-semibold text-sm"
                             style={{ backgroundColor: config.color }}
                           >
                             {contact.initials}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-slate-800 dark:text-slate-200 truncate">
+                            <div className="font-medium text-text-primary truncate">
                               {contact.name}
                             </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                            <div className="text-xs text-text-secondary">
                               {contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`} • {contact.category}
                             </div>
                           </div>
@@ -580,7 +580,7 @@ export default function GardenPage() {
                             value={contact.importance || 'medium'}
                             onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
                             disabled={updatingId === contact.dbId}
-                            className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800"
+                            className="flex-1 px-2 py-1.5 rounded-lg border border-border-default text-xs font-medium bg-surface"
                           >
                             <option value="high">⭐ Favorite</option>
                             <option value="medium">🔹 Friend</option>
@@ -607,7 +607,7 @@ export default function GardenPage() {
 
           {/* Graph View on Mobile */}
           {viewMode === 'graph' && (
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mb-4">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border-default p-4 mb-4">
               <NetworkGraphView
                 contacts={filteredContacts}
                 relationships={relationships}
@@ -639,16 +639,16 @@ export default function GardenPage() {
           <div className="space-y-3 mb-4">
             
             {/* Health Status Filters - Compact & Scrollable */}
-            <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-2">
-              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider px-1">Health Status</div>
+            <div className="bg-surface rounded-xl border border-border-default p-2">
+              <div className="text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider px-1">Health Status</div>
               <div className="flex overflow-x-auto pb-1 gap-2 no-scrollbar">
                 <div className="flex flex-nowrap gap-2 min-w-max">
                   <button
                     onClick={() => setHealthFilter('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       healthFilter === 'all'
-                        ? 'bg-slate-900 dark:bg-slate-700 text-white'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                        ? 'bg-subtle text-text-primary'
+                        : 'bg-canvas text-text-tertiary'
                     }`}
                   >
                     All ({contacts.length})
@@ -694,14 +694,14 @@ export default function GardenPage() {
                 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button 
+                    <button
                       onClick={(e) => e.preventDefault()}
                       className="p-1 hover:bg-orange-200 dark:hover:bg-orange-800/40 rounded-full transition-colors"
                     >
-                      <Info className="w-4 h-4 text-slate-400" />
+                      <Info className="w-4 h-4 text-text-secondary" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-3 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
+                  <PopoverContent className="w-64 p-3 text-xs bg-surface border-border-default shadow-xl rounded-xl">
                     <p className="text-sm font-medium text-orange-800/80 dark:text-orange-200/70 mt-3 pr-8">
                       Needs Nurture surfaces the seeds that are thirstiest, so you can quickly water them back to health.
                     </p>
@@ -719,14 +719,14 @@ export default function GardenPage() {
         {/* DESKTOP: Original Layout */}
         <div className="hidden md:block">
           {/* Health Status Bar (clickable filters) */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-3 transition-colors">
+          <div className="bg-surface rounded-xl border border-border-default p-3 mb-3 transition-colors">
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setHealthFilter('all')}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   healthFilter === 'all'
-                    ? 'bg-slate-900 dark:bg-slate-700 text-white'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'bg-subtle text-text-primary'
+                    : 'bg-canvas text-text-tertiary hover:bg-subtle'
                 }`}
               >
                 All ({contacts.length})
@@ -741,7 +741,7 @@ export default function GardenPage() {
                     onClick={() => setHealthFilter(status)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                       healthFilter === status
-                        ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-500 dark:ring-offset-[#1e293b]'
+                        ? 'ring-2 ring-offset-2 ring-border-strong ring-offset-surface'
                         : 'hover:opacity-80'
                     }`}
                     style={{
@@ -768,7 +768,7 @@ export default function GardenPage() {
           />
  
           {/* Main Content */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 md:p-6 transition-colors">
+          <div className="bg-surface rounded-2xl shadow-sm border border-border-default p-4 md:p-6 transition-colors">
             
             {/* Desktop-only view controls - Now inside the content area */}
             <div className="hidden md:block mb-6">
@@ -786,7 +786,7 @@ export default function GardenPage() {
                   </Link>
                   <button
                     onClick={() => setViewMode('garden')}
-                    className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                    className="p-2 rounded-lg border transition-colors bg-surface text-text-tertiary border-border-default hover:border-border-strong"
                     title="Garden View"
                   >
                     <LayoutGrid className="w-5 h-5" />
@@ -795,8 +795,8 @@ export default function GardenPage() {
                     onClick={() => setViewMode('list')}
                     className={`p-2 rounded-lg border transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                        : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        ? 'bg-subtle text-text-primary border-border-strong'
+                        : 'bg-surface text-text-tertiary border-border-default hover:border-border-strong'
                     }`}
                     title="List View"
                   >
@@ -806,8 +806,8 @@ export default function GardenPage() {
                     onClick={() => setViewMode('graph')}
                     className={`p-2 rounded-lg border transition-colors ${
                       viewMode === 'graph'
-                        ? 'bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700'
-                        : 'bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        ? 'bg-subtle text-text-primary border-border-strong'
+                        : 'bg-surface text-text-tertiary border-border-default hover:border-border-strong'
                     }`}
                     title="Network Graph"
                   >
@@ -842,21 +842,21 @@ export default function GardenPage() {
                         </Link>
                         <button
                           onClick={() => setViewMode('garden')}
-                          className="p-2 rounded-lg border transition-colors bg-slate-900 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-700"
+                          className="p-2 rounded-lg border transition-colors bg-subtle text-text-primary border-border-strong"
                           title="Garden View"
                         >
                           <LayoutGrid className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => setViewMode('list')}
-                          className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                          className="p-2 rounded-lg border transition-colors bg-surface text-text-tertiary border-border-default hover:border-border-strong"
                           title="List View"
                         >
                           <List className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => setViewMode('graph')}
-                          className="p-2 rounded-lg border transition-colors bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                          className="p-2 rounded-lg border transition-colors bg-surface text-text-tertiary border-border-default hover:border-border-strong"
                           title="Network Graph"
                         >
                           <Share2 className="w-5 h-5" />
@@ -880,18 +880,18 @@ export default function GardenPage() {
             {(viewMode === 'list' || healthFilter !== 'all') && (
               <div className="space-y-3">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                  <h3 className="text-lg font-semibold text-text-primary">
                     {healthFilter !== 'all' ? `${healthConfig[healthFilter].label} Contacts` : 'All Contacts'}
-                    <span className="ml-2 text-slate-400 font-normal">({filteredContacts.length})</span>
+                    <span className="ml-2 text-text-secondary font-normal">({filteredContacts.length})</span>
                   </h3>
                 </div>
 
                 {filteredContacts.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                  <div className="text-center py-12 text-text-secondary">
                     No contacts in this category
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <div className="divide-y divide-border-default">
                     {filteredContacts.map(contact => {
                       const status = getHealthStatus(contact.days);
                       const config = healthConfig[status];
@@ -899,12 +899,12 @@ export default function GardenPage() {
                         <div
                           key={contact.dbId}
                           onClick={() => window.location.href = `/contacts/${contact.dbId}`}
-                          className="group py-4 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/40 transition-colors flex items-center justify-between cursor-pointer"
+                          className="group py-4 px-4 -mx-4 rounded-xl hover:bg-subtle transition-colors flex items-center justify-between cursor-pointer"
                         >
                           <div className="flex items-center gap-4">
                             {/* Status indicator */}
                             <div
-                              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-text-primary font-semibold text-sm"
                               style={{ backgroundColor: config.color }}
                             >
                               {contact.initials}
@@ -912,7 +912,7 @@ export default function GardenPage() {
 
                             <div>
                               <div className="flex items-center gap-3">
-                                <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                <span className="font-medium text-text-primary group-hover:text-text-accent transition-colors">
                                   {contact.name}
                                 </span>
 
@@ -929,7 +929,7 @@ export default function GardenPage() {
                                 </button>
                               </div>
 
-                              <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                              <div className="text-sm text-text-secondary flex items-center gap-2">
                                 <span>{contact.days === 999 ? 'Never contacted' : `${contact.days} days ago`}</span>
                                 <span>•</span>
                                 <span className="capitalize">{contact.category}</span>
@@ -944,7 +944,7 @@ export default function GardenPage() {
                               value={contact.importance || 'medium'}
                               onChange={(e) => setImportance(contact, e.target.value as 'high' | 'medium' | 'low')}
                               disabled={updatingId === contact.dbId}
-                              className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-600 dark:text-slate-300"
+                              className="px-2 py-1.5 rounded-lg border border-border-default text-xs font-medium bg-surface cursor-pointer hover:border-border-strong focus:outline-none focus:ring-2 focus:ring-purple-500 text-text-tertiary"
                             >
                               <option value="high">⭐ Favorite</option>
                               <option value="medium">🔹 Friend</option>
@@ -954,12 +954,12 @@ export default function GardenPage() {
                             {/* Health Status Selector */}
                             <div className="flex items-center gap-2">
                               {updatingId === contact.dbId ? (
-                                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                                <Loader2 className="w-5 h-5 animate-spin text-text-secondary" />
                               ) : (
                                 <select
                                   value={status}
                                   onChange={(e) => setHealthStatus(contact, e.target.value as 'blooming' | 'nourished' | 'thirsty' | 'fading')}
-                                  className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-800 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="px-3 py-2 rounded-lg border border-border-default text-sm font-medium bg-surface cursor-pointer hover:border-border-strong focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   style={{
                                     color: config.color,
                                     borderColor: config.color + '40'
