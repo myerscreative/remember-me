@@ -91,5 +91,10 @@
     "@tailwindcss/oxide-linux-x64-gnu": "^4.2.1",
     "lightningcss-linux-arm64-gnu": "1.30.2",
     "lightningcss-linux-x64-gnu": "1.30.2"
-  }
+  },
+  "browserslist": [
+    "last 2 versions",
+    "not dead",
+    "> 0.5%"
+  ]
 }
