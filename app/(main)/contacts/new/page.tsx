@@ -17,6 +17,8 @@ import { BirthdayPicker } from "@/components/ui/birthday-picker";
 
 interface ParsedContactData {
   name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   email?: string | null;
   phone?: string | null;
   linkedin?: string | null;
@@ -28,8 +30,9 @@ interface ParsedContactData {
   whyStayInContact?: string | null;
   whatInteresting?: string | null;
   whatsImportant?: string | null;
+  firstImpression?: string | null;
+  memorableMoment?: string | null;
   interests?: string[] | null;
-  skills?: string[] | null;
   familyMembers?: Array<{ name: string; relationship: string }> | null;
   birthday?: string | null;
   notes?: string | null;
@@ -56,11 +59,9 @@ export default function NewContactPage() {
     phone: "",
     linkedin: "",
     interests: "",
-    skills: "",
     company: "",
     jobTitle: "",
     birthday: "",
-    notes: "",
     familyMembers: [] as Array<{ name: string; relationship: string }>,
     misc: "",
   });
@@ -124,6 +125,8 @@ export default function NewContactPage() {
         why_stay_in_contact: formData.whyStayInContact.trim() || null,
         what_found_interesting: formData.whatInteresting.trim() || null,
         most_important_to_them: formData.whatsImportant.trim() || null,
+        first_impression: formData.firstImpression.trim() || null,
+        memorable_moment: formData.memorableMoment.trim() || null,
         notes: formData.misc.trim() || null,
         birthday: formData.birthday || null,
         family_members: formData.familyMembers.length > 0 ? formData.familyMembers : null,
@@ -241,42 +244,37 @@ export default function NewContactPage() {
   };
 
   const handleVoiceDataApply = (data: ParsedContactData) => {
-    // Parse name into first and last name
-    let parsedFirstName = "";
-    let parsedLastName = "";
-    if (data.name) {
+    // Prefer parser-supplied firstName/lastName; fall back to splitting `name` only when needed.
+    let parsedFirstName = data.firstName?.trim() || "";
+    let parsedLastName = data.lastName?.trim() || "";
+    if (!parsedFirstName && !parsedLastName && data.name) {
       const nameParts = data.name.trim().split(/\s+/);
       parsedFirstName = nameParts[0] || "";
       parsedLastName = nameParts.slice(1).join(" ") || "";
     }
 
     // Merge voice data into form, preserving existing data where fields are already filled
-    setFormData((prev) => {
-      const newFormData = {
-        firstName: prev.firstName || parsedFirstName || "",
-        lastName: prev.lastName || parsedLastName || "",
-        email: prev.email || data.email || "",
-        phone: prev.phone || (data.phone ? formatPhoneNumber(data.phone) : ""),
-        linkedin: prev.linkedin || data.linkedin || "",
-        company: prev.company || data.company || "",
-        jobTitle: prev.jobTitle || data.jobTitle || "",
-        whereMet: prev.whereMet || data.whereMet || "",
-        introducedBy: prev.introducedBy || data.introducedBy || "",
-        whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
-        whatInteresting: prev.whatInteresting || data.whatInteresting || "",
-        whatsImportant: prev.whatsImportant || data.whatsImportant || "",
-        firstImpression: prev.firstImpression || "",
-        memorableMoment: prev.memorableMoment || "",
-        interests: prev.interests || (data.interests ? data.interests.join(", ") : ""),
-        skills: prev.skills || (data.skills ? data.skills.join(", ") : ""),
-        birthday: prev.birthday || data.birthday || "",
-        tags: prev.tags || (data.tags ? (Array.isArray(data.tags) ? data.tags.join(", ") : data.tags) : ""),
-        familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
-        notes: prev.notes || data.notes || "",
-        misc: prev.misc || data.notes || "", // Keep misc for backward compat
-      };
-      return newFormData;
-    });
+    setFormData((prev) => ({
+      firstName: prev.firstName || parsedFirstName,
+      lastName: prev.lastName || parsedLastName,
+      email: prev.email || data.email || "",
+      phone: prev.phone || (data.phone ? formatPhoneNumber(data.phone) : ""),
+      linkedin: prev.linkedin || data.linkedin || "",
+      company: prev.company || data.company || "",
+      jobTitle: prev.jobTitle || data.jobTitle || "",
+      whereMet: prev.whereMet || data.whereMet || "",
+      introducedBy: prev.introducedBy || data.introducedBy || "",
+      whyStayInContact: prev.whyStayInContact || data.whyStayInContact || "",
+      whatInteresting: prev.whatInteresting || data.whatInteresting || "",
+      whatsImportant: prev.whatsImportant || data.whatsImportant || "",
+      firstImpression: prev.firstImpression || data.firstImpression || "",
+      memorableMoment: prev.memorableMoment || data.memorableMoment || "",
+      interests: prev.interests || (data.interests ? data.interests.join(", ") : ""),
+      birthday: prev.birthday || data.birthday || "",
+      tags: prev.tags || (data.tags ? (Array.isArray(data.tags) ? data.tags.join(", ") : data.tags) : ""),
+      familyMembers: prev.familyMembers.length > 0 ? prev.familyMembers : (data.familyMembers || []),
+      misc: prev.misc || data.notes || "",
+    }));
   };
 
   const handleSelectExistingContact = (contactId: string) => {

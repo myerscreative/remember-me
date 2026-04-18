@@ -23,6 +23,8 @@ export type CreateContactInput = {
   why_stay_in_contact?: string | null;
   what_found_interesting?: string | null;
   most_important_to_them?: string | null;
+  first_impression?: string | null;
+  memorable_moment?: string | null;
   imported?: boolean;
   has_context?: boolean;
 };
@@ -54,6 +56,8 @@ export async function createContact(
       importance: input.importance ?? null,
       target_frequency_days: input.target_frequency_days ?? null,
       birthday: input.birthday ?? null,
+      first_impression: input.first_impression ?? null,
+      memorable_moment: input.memorable_moment ?? null,
     });
 
     if (!validation.success) {
@@ -91,6 +95,8 @@ export async function createContact(
       why_stay_in_contact: input.why_stay_in_contact?.trim() || null,
       what_found_interesting: input.what_found_interesting?.trim() || null,
       most_important_to_them: input.most_important_to_them?.trim() || null,
+      first_impression: input.first_impression?.trim() || null,
+      memorable_moment: input.memorable_moment?.trim() || null,
       notes: input.notes?.trim() || null,
       family_members: input.family_members ?? null,
       interests: input.interests ?? null,

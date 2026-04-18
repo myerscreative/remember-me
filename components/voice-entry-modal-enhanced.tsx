@@ -10,6 +10,8 @@ import { Avatar } from "@/components/ui/avatar";
 
 interface ParsedContactData {
   name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   email?: string | null;
   phone?: string | null;
   linkedin?: string | null;
@@ -21,8 +23,9 @@ interface ParsedContactData {
   whyStayInContact?: string | null;
   whatInteresting?: string | null;
   whatsImportant?: string | null;
+  firstImpression?: string | null;
+  memorableMoment?: string | null;
   interests?: string[] | null;
-  skills?: string[] | null;
   familyMembers?: Array<{ name: string; relationship: string }> | null;
   birthday?: string | null;
   notes?: string | null;

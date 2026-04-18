@@ -133,7 +133,7 @@ confidence is 0-1 representing how certain you are.`,
 ${intent.intent === "update" ? "The user is UPDATING an existing contact. Extract only the NEW information being added." : "The user is adding a NEW contact. Extract all mentioned information."}
 
 Extract the following information if mentioned:
-- Name (full name) - only if mentioned
+- Name: split into firstName and lastName (use lastName=null when only one name is given). Also include the full name in "name".
 - Email address
 - Phone number
 - LinkedIn profile URL or username
@@ -145,16 +145,19 @@ Extract the following information if mentioned:
 - Why stay in contact (reason/value)
 - What's interesting about them (profession, background, achievements)
 - What's important to them (their priorities/values/goals)
+- First impression (how they came across, vibe, initial read on them)
+- Memorable moment (a specific anecdote, story, or moment that stood out)
 - Interests (hobbies, passions, topics they care about)
-- Skills (professional skills, expertise)
 - Family members: Extract names and relationships
-- Birthday/Age
-- Notes: Any additional context, anecdotes, or details
+- Birthday (in YYYY-MM-DD when possible, otherwise raw text)
+- Notes: Any additional context, anecdotes, or details that don't belong above
 - Tags (based on context like "Friend", "Work", "Investor", "Startup", etc.)
 
 Return ONLY valid JSON in this exact format:
 {
   "name": string | null,
+  "firstName": string | null,
+  "lastName": string | null,
   "email": string | null,
   "phone": string | null,
   "linkedin": string | null,
@@ -166,15 +169,16 @@ Return ONLY valid JSON in this exact format:
   "whyStayInContact": string | null,
   "whatInteresting": string | null,
   "whatsImportant": string | null,
+  "firstImpression": string | null,
+  "memorableMoment": string | null,
   "interests": string[] | null,
-  "skills": string[] | null,
   "familyMembers": [{"name": string, "relationship": string}] | null,
   "birthday": string | null,
   "notes": string | null,
   "tags": string[] | null
 }
 
-Extract interests and skills as arrays. For tags, infer from context (e.g., mentions work → "Work", mentions investing → "Investor").`,
+Extract interests as an array. For tags, infer from context (e.g., mentions work → "Work", mentions investing → "Investor").`,
         },
         {
           role: "user",
@@ -205,6 +209,8 @@ Extract interests and skills as arrays. For tags, infer from context (e.g., ment
     // Clean and format the data
     const cleanedData = {
       name: parsedData.name?.trim() || null,
+      firstName: parsedData.firstName?.trim() || null,
+      lastName: parsedData.lastName?.trim() || null,
       email: parsedData.email?.trim() || null,
       phone: parsedData.phone?.trim() || null,
       linkedin: parsedData.linkedin?.trim() || null,
@@ -216,8 +222,9 @@ Extract interests and skills as arrays. For tags, infer from context (e.g., ment
       whyStayInContact: parsedData.whyStayInContact?.trim() || null,
       whatInteresting: parsedData.whatInteresting?.trim() || null,
       whatsImportant: parsedData.whatsImportant?.trim() || null,
+      firstImpression: parsedData.firstImpression?.trim() || null,
+      memorableMoment: parsedData.memorableMoment?.trim() || null,
       interests: Array.isArray(parsedData.interests) ? parsedData.interests.filter((i: any) => i?.trim()) : null,
-      skills: Array.isArray(parsedData.skills) ? parsedData.skills.filter((s: any) => s?.trim()) : null,
       familyMembers: Array.isArray(parsedData.familyMembers)
         ? parsedData.familyMembers.filter((fm: any) => fm?.name && fm?.relationship)
         : null,

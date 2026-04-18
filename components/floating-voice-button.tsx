@@ -91,6 +91,8 @@ export function FloatingVoiceButton({ className }: FloatingVoiceButtonProps) {
         why_stay_in_contact: data.whyStayInContact || null,
         what_found_interesting: data.whatInteresting || null,
         most_important_to_them: data.whatsImportant || null,
+        first_impression: data.firstImpression || null,
+        memorable_moment: data.memorableMoment || null,
         family_members: data.familyMembers || null,
         interests: (data.interests || data.tags) ? (data.interests || data.tags).split(',').map((t: string) => t.trim()).filter(Boolean) : null,
         notes: data.misc || null,

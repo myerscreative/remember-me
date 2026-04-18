@@ -202,6 +202,8 @@ export const createContactSchema = z.object({
   importance: importanceSchema,
   target_frequency_days: targetFrequencySchema,
   birthday: dateOnlySchema,
+  first_impression: longTextSchema,
+  memorable_moment: longTextSchema,
 });
 
 /**
